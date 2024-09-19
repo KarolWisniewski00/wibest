@@ -33,8 +33,9 @@ class SettingController extends Controller
             'bank' => $request->bank,
             'vat_number' => $request->vat_number,
         ]);
-
-        $user->company_id = $res->id;
+        $user->update([
+            'company_id'=>$res->id
+        ]);
         $user->save();
 
         // Przekierowanie z komunikatem
