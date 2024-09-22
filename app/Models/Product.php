@@ -18,6 +18,7 @@ class Product extends Model
         'vat_amount', // Kwota VAT obliczona na podstawie wartości netto
         'total', // Wartość brutto produktu (netto + VAT)
         'description', // Dodatkowy opis produktu
+        'company_id', // Id firmy powiązanej z klientem
     ];
 
     /**
@@ -27,5 +28,13 @@ class Product extends Model
     public function invoiceItems()
     {
         return $this->hasMany(InvoiceItem::class); // Produkt może być użyty w wielu pozycjach faktur
+    }
+    /**
+     * Definiuje relację odwrotną jeden-do-wielu (firma -> produkt).
+     * Każdy produkt należy do jednej firmy.
+     */
+    public function company()
+    {
+        return $this->belongsTo(Company::class); // Produkt należy do jednej firmy
     }
 }

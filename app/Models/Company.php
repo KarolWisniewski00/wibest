@@ -34,4 +34,28 @@ class Company extends Model
     {
         return $this->hasMany(Invoice::class); // Firma może mieć wiele faktur
     }
+    /**
+     * Definiuje relację jeden-do-wielu (firma -> klienci).
+     * Firma może mieć wielu klientów.
+     */
+    public function clients()
+    {
+        return $this->hasMany(Client::class); // Firma może mieć wielu klientów
+    }
+    /**
+     * Definiuje relację jeden-do-wielu (firma -> produkty).
+     * Firma może mieć wiele produktów.
+     */
+    public function products()
+    {
+        return $this->hasMany(Client::class); // Firma może mieć wiele produktów
+    }
+    /**
+     * Definiuje relację jeden-do-wielu (firma -> usługa).
+     * Firma może mieć wiele usług.
+     */
+    public function servises()
+    {
+        return $this->hasMany(Client::class); // Firma może mieć wiele usług
+    }
 }

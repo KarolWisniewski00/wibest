@@ -64,4 +64,12 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Company::class);
     }
+    /**
+     * Definiuje relację jeden-do-wielu (użytkownik -> klienci).
+     * Użytkownik może mieć wielu klientów.
+     */
+    public function clients()
+    {
+        return $this->hasMany(Client::class); // Użytkownik może mieć wielu klientów
+    }
 }

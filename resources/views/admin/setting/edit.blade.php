@@ -32,7 +32,7 @@
                         <!-- Adres -->
                         <div class="mb-6">
                             <label for="adress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres</label>
-                            <input type="text" id="adress" name="address" value="{{ old('adress', $company->adress) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            <input type="text" id="adress" name="adress" value="{{ old('adress', $company->adress) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                             @error('adress')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror

@@ -30,10 +30,10 @@
                                         Numer faktury
                                     </th>
                                     <th scope="col" class="px-6 py-3">
-                                        Data wystawienia
+                                        Klient
                                     </th>
                                     <th scope="col" class="px-6 py-3">
-                                        Klient
+                                        Kwota netto
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         Kwota brutto
@@ -66,10 +66,14 @@
                                         {{ $invoice->number }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ $invoice->issue_date }}
+                                        @if($invoice->client)
+                                        <a href="{{ route('client.show', $invoice->client->id) }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$invoice->client->name}}</a>
+                                        @else
+                                        {{$invoice->buyer_name}}
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4">
-                                        {{ $invoice->client ? $invoice->client->name : 'Brak klienta' }}
+                                        {{ $invoice->subtotal }} zł
                                     </td>
                                     <td class="px-6 py-4">
                                         {{ $invoice->total }} zł

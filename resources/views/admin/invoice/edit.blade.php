@@ -32,7 +32,7 @@
                                 <ul class="grid w-full gap-6 md:grid-cols-3">
                                     <li>
                                         <input name="invoice_type" type="radio" id="invoice" value="faktura" class="hidden peer" checked>
-                                        <label for="invoice" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="invoice" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Faktura</div>
                                             </div>
@@ -41,7 +41,7 @@
                                     <!--
                                     <li>
                                         <input disabled name="invoice_type" type="radio" id="invoice_proform" value="faktura proforma" class="hidden peer">
-                                         <label for="invoice_proform" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                         <label for="invoice_proform" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Faktura proforma</div>
                                             </div>
@@ -184,7 +184,7 @@
                                     </button>
 
                                     <!-- Niebieski przycisk: Dodaj produkt
-                                    <button type="button" id="add-item" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 dark:hover:bg-blue-400 focus:bg-blue-700 dark:focus:bg-blue-400 active:bg-blue-800 dark:active:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                    <button type="button" id="add-item" class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:bg-indigo-700 dark:focus:bg-indigo-400 active:bg-indigo-800 dark:active:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                         <i class="fa-solid fa-plus mr-2"></i>Dodaj produkt
                                     </button>
 
@@ -218,7 +218,7 @@
                                 <ul class="grid w-full gap-6 md:grid-cols-3">
                                     <li>
                                         <input name="payment_method" checked type="radio" id="payment_transfer" value="przelew" class="hidden peer">
-                                        <label for="payment_transfer" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_transfer" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Przelew</div>
                                             </div>
@@ -226,7 +226,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_method" type="radio" id="payment_cash" value="gotowka" class="hidden peer">
-                                        <label for="payment_cash" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_cash" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Gotówka</div>
                                             </div>
@@ -234,7 +234,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_method" type="radio" id="payment_card" value="karta" class="hidden peer">
-                                        <label for="payment_card" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_card" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Karta płatnicza</div>
                                             </div>
@@ -242,7 +242,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_method" type="radio" id="payment_cod" value="pobranie" class="hidden peer">
-                                        <label for="payment_cod" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_cod" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Opłata za pobraniem</div>
                                             </div>
@@ -250,7 +250,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_method" type="radio" id="payment_online" value="online" class="hidden peer">
-                                        <label for="payment_online" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_online" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Płatność On-Line</div>
                                             </div>
@@ -268,7 +268,7 @@
                                 <ul class="grid w-full gap-6 md:grid-cols-3">
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_now" value="natychmiast" class="hidden peer">
-                                        <label for="payment_now" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_now" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Natychmiast</div>
                                             </div>
@@ -276,7 +276,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_1day" value="1_dzien" class="hidden peer">
-                                        <label for="payment_1day" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_1day" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">1 dzień</div>
                                             </div>
@@ -284,7 +284,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_3days" value="3_dni" class="hidden peer">
-                                        <label for="payment_3days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_3days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">3 dni</div>
                                             </div>
@@ -292,7 +292,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_7days" value="7_dni" class="hidden peer">
-                                        <label for="payment_7days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_7days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">7 dni</div>
                                             </div>
@@ -300,7 +300,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_term" checked type="radio" id="payment_14days" value="14_dni" class="hidden peer">
-                                        <label for="payment_14days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_14days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">14 dni</div>
                                             </div>
@@ -308,7 +308,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_30days" value="30_dni" class="hidden peer">
-                                        <label for="payment_30days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_30days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">30 dni</div>
                                             </div>
@@ -316,7 +316,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_60days" value="60_dni" class="hidden peer">
-                                        <label for="payment_60days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_60days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">60 dni</div>
                                             </div>
@@ -324,7 +324,7 @@
                                     </li>
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_90days" value="90_dni" class="hidden peer">
-                                        <label for="payment_90days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-blue-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-blue-600">
+                                        <label for="payment_90days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">90 dni</div>
                                             </div>

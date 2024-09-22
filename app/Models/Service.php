@@ -18,6 +18,7 @@ class Service extends Model
         'vat_amount', // Kwota VAT obliczona na podstawie wartości netto
         'total', // Wartość brutto usługi (netto + VAT)
         'description', // Dodatkowy opis usługi
+        'company_id', // Id firmy powiązanej z klientem
     ];
 
     /**
@@ -27,5 +28,13 @@ class Service extends Model
     public function invoiceItems()
     {
         return $this->hasMany(InvoiceItem::class); // Usługa może być częścią wielu pozycji na fakturach
+    }
+    /**
+     * Definiuje relację odwrotną jeden-do-wielu (firma -> usługa).
+     * Każda usługa należy do jednej firmy.
+     */
+    public function company()
+    {
+        return $this->belongsTo(Company::class); // Usługa należy do jednej firmy
     }
 }

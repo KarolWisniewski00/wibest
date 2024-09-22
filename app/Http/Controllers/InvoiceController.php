@@ -7,6 +7,8 @@ use App\Models\Client;
 use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Models\Product;
+use App\Models\Service;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
@@ -20,8 +22,13 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        // Pobierz klientów z paginacją, np. 10 klientów na stronę
-        $invoices = Invoice::paginate(10);
+        // Pobranie identyfikatora zalogowanego użytkownika
+        $userId = auth()->id();
+
+        // Pobranie informacji o firmie zalogowanego użytkownika
+        $userCompany = User::find($userId)->company_id;
+
+        $invoices = Invoice::where('company_id', $userCompany)->paginate(10);
 
         return view('admin.invoice.index', compact('invoices'));
     }
@@ -30,7 +37,14 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        $clients = Client::all();
+        // Pobranie identyfikatora zalogowanego użytkownika
+        $userId = auth()->id();
+
+        // Pobranie informacji o firmie zalogowanego użytkownika
+        $userCompany = User::find($userId)->company_id;
+        $clients = Client::where('company_id', $userCompany)->get();
+        $services = Service::all();
+        $products = Product::all();
         // Pobierz aktualny miesiąc i rok
         $month = Carbon::now()->format('m');
         $year = Carbon::now()->format('Y');
@@ -54,7 +68,7 @@ class InvoiceController extends Controller
         $id = auth()->id();
         $user = User::where('id', $id)->first();
         $company = Company::where('id', $user->company_id)->first();
-        return view('admin.invoice.create', compact('clients', 'invoiceNumber', 'company'));
+        return view('admin.invoice.create', compact('clients', 'invoiceNumber', 'company','services','products'));
     }
     public function store(Request $request)
     {
@@ -187,7 +201,7 @@ class InvoiceController extends Controller
             'notes' => $invoice_obj->notes,
             'payment_method' => $invoice_obj->payment_method
         ];
-        return view('admin.invoice.invoice', compact('invoice'));
+        return view('admin.template.invoice', compact('invoice'));
     }
     public function edit(Invoice $invoice)
     {
@@ -312,7 +326,7 @@ class InvoiceController extends Controller
         ];
 
         // Generowanie PDF
-        $pdf = PDF::loadView('admin.invoice.invoice', compact('invoice'));
+        $pdf = PDF::loadView('admin.template.invoice', compact('invoice'));
 
         // Pobranie pliku PDF
         return $pdf->download('faktura' . $invoice_obj->id . '.pdf');

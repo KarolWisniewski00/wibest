@@ -29,24 +29,10 @@
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-200 font-semibold">
-                                Email
+                                NIP
                             </p>
                             <p class="text-gray-900 dark:text-gray-200">
-                                <a href="maito:{{ $client->email }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->email }}</a>
-                                @if($client->email2)
-                                <a href="maito:{{ $client->email2 }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->email2 }}</a>
-                                @endif
-                            </p>
-                        </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
-                                Telefon
-                            </p>
-                            <p class="text-gray-900 dark:text-gray-200">
-                                <a href="tel:{{ $client->phone }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->phone }}</a>
-                                @if($client->phone2)
-                                <a href="tel:{{ $client->phone2 }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->phone2 }}</a>
-                                @endif
+                                {{ $client->vat_number }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
@@ -59,10 +45,50 @@
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                                Email
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-200">
+                                <a href="maito:{{ $client->email }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->email }}</a>
+                                @if($client->email2)
+                                <br>
+                                <a href="maito:{{ $client->email2 }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->email2 }}</a>
+                                @endif
+                            </p>
+                        </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                                Telefon
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-200">
+                                <a href="tel:{{ $client->phone }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->phone }}</a>
+                                @if($client->phone2)
+                                <br>
+                                <a href="tel:{{ $client->phone2 }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->phone2 }}</a>
+                                @endif
+                            </p>
+                        </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
                                 Uwagi
                             </p>
                             <p class="text-gray-900 dark:text-gray-200">
                                 {{ $client->notes ?? '' }}
+                            </p>
+                        </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400 font-semibold">
+                                Utworzone przez
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-400">
+                                {{ $client->user->name ?? '' }}
+                            </p>
+                        </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400 font-semibold">
+                                Dane należące do
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-400">
+                                {{ $client->company->name ?? '' }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">

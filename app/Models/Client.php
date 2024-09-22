@@ -17,8 +17,10 @@ class Client extends Model
         'phone', // Główny numer telefonu klienta
         'phone2', // Dodatkowy numer telefonu klienta
         'vat_number', // Numer VAT klienta (unikalny)
-        'adress',
+        'adress', // Adres klienta
         'notes', // Dodatkowe uwagi dotyczące klienta
+        'user_id', // Id użytkownika powiązanego z klientem
+        'company_id', // Id firmy powiązanej z klientem
     ];
 
     /**
@@ -28,5 +30,22 @@ class Client extends Model
     public function invoices()
     {
         return $this->hasMany(Invoice::class); // Klient może mieć wiele faktur
+    }
+
+    /**
+     * Definiuje relację odwrotną jeden-do-wielu (użytkownik -> klient).
+     * Każdy klient należy do jednego użytkownika.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class); // Klient należy do jednego użytkownika
+    }
+        /**
+     * Definiuje relację odwrotną jeden-do-wielu (firma -> klient).
+     * Każdy klient należy do jednego firmy.
+     */
+    public function company()
+    {
+        return $this->belongsTo(Company::class); // Klient należy do jednego firmy
     }
 }

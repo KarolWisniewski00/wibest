@@ -84,34 +84,41 @@
                             <p class="text-gray-900 dark:text-gray-200">{{ $invoice_obj->due_date }}</p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">Kwota netto</p>
-                            <p class="text-gray-900 dark:text-gray-200">{{ $invoice_obj->subtotal }}</p>
-                        </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">Vat</p>
-                            <p class="text-gray-900 dark:text-gray-200">{{ $invoice_obj->vat }}</p>
-                        </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">Kwota brutto</p>
-                            <p class="text-gray-900 dark:text-gray-200">{{ $invoice_obj->total }}</p>
-                        </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-200 font-semibold">Nazwa kupującego</p>
+                            @if($invoice->client)
                             <p class="text-gray-900 dark:text-gray-200">
                                 <a href="{{route('client.show', $invoice->client_id)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $invoice_obj->buyer_name }}</a>
                             </p>
+                            @else
+                            <p class="text-gray-900 dark:text-gray-200">
+                                {{ $invoice_obj->buyer_name }}
+                            </p>
+                            @endif
+
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-200 font-semibold">Adres kupującego</p>
                             <p class="text-gray-900 dark:text-gray-200">
-                                <a href="{{route('client.show', $invoice->client_id)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $invoice_obj->buyer_adress }}</a>
+                                {{ $invoice_obj->buyer_adress }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-200 font-semibold">NIP kupującego</p>
                             <p class="text-gray-900 dark:text-gray-200">
-                                <a href="{{route('client.show', $invoice->client_id)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $invoice_obj->buyer_tax_id }}</a>
+                                {{ $invoice_obj->buyer_tax_id }}
                             </p>
+                        </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-200 font-semibold">Kwota netto</p>
+                            <p class="text-gray-900 dark:text-gray-200">{{ $invoice_obj->subtotal }} PLN</p>
+                        </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-200 font-semibold">Kwota VAT</p>
+                            <p class="text-gray-900 dark:text-gray-200">{{ $invoice_obj->vat }} PLN</p>
+                        </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-200 font-semibold">Kwota brutto</p>
+                            <p class="text-gray-900 dark:text-gray-200">{{ $invoice_obj->total }} PLN</p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-200 font-semibold">Uwagi</p>

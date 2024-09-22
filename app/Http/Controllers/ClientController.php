@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,9 +16,15 @@ class ClientController extends Controller
      */
     public function index()
     {
-        // Pobierz klientów z paginacją, np. 10 klientów na stronę
-        $clients = Client::paginate(10);
-
+        // Pobranie identyfikatora zalogowanego użytkownika
+        $userId = auth()->id();
+    
+        // Pobranie informacji o firmie zalogowanego użytkownika
+        $userCompany = User::find($userId)->company_id;
+    
+        // Pobranie klientów należących do tej samej firmy, z paginacją
+        $clients = Client::where('company_id', $userCompany)->paginate(10);
+    
         return view('admin.client.index', compact('clients'));
     }
     /**
@@ -34,7 +41,7 @@ class ClientController extends Controller
     {
         // Walidacja danych
         $validatedData = $request->validated();
-
+        $user = User::where('id',auth()->id())->first();
         // Tworzenie nowego obiektu klienta
         $client = new Client();
         $client->name = $validatedData['name'];
@@ -42,9 +49,11 @@ class ClientController extends Controller
         $client->email2 = $validatedData['email2'];
         $client->phone = $validatedData['phone'];
         $client->phone2 = $validatedData['phone2'];
-        $client->vat_number = $validatedData['vat_number'];
+        $client->vat_number = $validatedData['tax_id'];
         $client->adress = $validatedData['adress'];
         $client->notes = $validatedData['notes'];
+        $client->user_id = $user->id;
+        $client->company_id = $user->company_id;
 
         // Przechowywanie danych w bazie
         $res = $client->save();
@@ -80,7 +89,7 @@ class ClientController extends Controller
             'email2' => $validatedData['email2'],
             'phone' => $validatedData['phone'],
             'phone2' => $validatedData['phone2'],
-            'vat_number' => $validatedData['vat_number'],
+            'vat_number' => $validatedData['tax_id'],
             'adress' => $validatedData['adress'],
             'notes' => $validatedData['notes'],
         ]);

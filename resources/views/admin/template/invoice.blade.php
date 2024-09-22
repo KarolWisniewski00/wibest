@@ -146,7 +146,7 @@
         <thead>
             <tr>
                 <th>Lp.</th>
-                <th>Nazwa usługi</th>
+                <th>Nazwa usługi lub towaru</th>
                 <th>Ilość</th>
                 <th>Cena netto</th>
                 <th>Wartość netto</th>
@@ -156,9 +156,9 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($invoice['items'] as $item)
+            @foreach ($invoice['items'] as $key => $item)
             <tr>
-                <td>1.</td>
+                <td>{{$key + 1}}.</td>
                 <td>{{ $item['name'] }}</td>
                 <td>{{ $item['quantity'] }}</td>
                 <td>{{ number_format($item['unit_price'], 2) }} PLN</td>

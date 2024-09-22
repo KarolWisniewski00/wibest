@@ -17,7 +17,7 @@ class StoreClientRequest extends FormRequest
             'email2' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'phone2' => 'nullable|string|max:20',
-            'vat_number' => 'required|string|max:20',
+            'tax_id' => 'required|string|max:20',
             'adress' => 'required|string|max:255',
             'notes' => 'nullable|string|max:255',
         ];
@@ -33,7 +33,7 @@ class StoreClientRequest extends FormRequest
             'email.required' => 'Pole email jest wymagane.',
             'email.email' => 'Wprowadź poprawny adres email.',
             'phone.required' => 'Pole telefon jest wymagane.',
-            'vat_number.required' => 'Pole NIP jest wymagane.',
+            'tax_id.required' => 'Pole NIP jest wymagane.',
             'adress.required' => 'Pole adres jest wymagane.',
             'city.required' => 'Pole miasto jest wymagane.',
             'postal_code.required' => 'Pole kod pocztowy jest wymagane.',
