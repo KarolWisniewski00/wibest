@@ -16,17 +16,18 @@ class ClientController extends Controller
      */
     public function index()
     {
-        // Pobranie identyfikatora zalogowanego użytkownika
-        $userId = auth()->id();
-    
-        // Pobranie informacji o firmie zalogowanego użytkownika
-        $userCompany = User::find($userId)->company_id;
-    
-        // Pobranie klientów należących do tej samej firmy, z paginacją
-        $clients = Client::where('company_id', $userCompany)->paginate(10);
-    
+        $clients = Client::where('company_id', $this->get_company_id())->paginate(10);
         return view('admin.client.index', compact('clients'));
     }
+
+    /**
+     * Pokazuje klienta.
+     */
+    public function show(Client $client)
+    {
+        return view('admin.client.show', compact('client'));
+    }
+
     /**
      * Pokazuje formularz tworzenia nowego klienta.
      */
@@ -34,6 +35,7 @@ class ClientController extends Controller
     {
         return view('admin.client.create');
     }
+
     /**
      * Zapisuje nowego klienta w bazie danych.
      */
@@ -41,7 +43,8 @@ class ClientController extends Controller
     {
         // Walidacja danych
         $validatedData = $request->validated();
-        $user = User::where('id',auth()->id())->first();
+
+        $user = User::where('id', auth()->id())->first();
         // Tworzenie nowego obiektu klienta
         $client = new Client();
         $client->name = $validatedData['name'];
@@ -60,21 +63,20 @@ class ClientController extends Controller
 
         // Sprawdzanie, czy klient został zapisany pomyślnie
         if ($res) {
-            // Przekierowanie do listy klientów z komunikatem o sukcesie
             return redirect()->route('client')->with('success', 'Klient został pomyślnie dodany.');
         } else {
-            // Przekierowanie z powrotem do formularza z komunikatem o błędzie
             return redirect()->route('client.create')->with('fail', 'Wystąpił błąd podczas dodawania klienta. Proszę spróbować ponownie.');
         }
     }
-    public function show(Client $client)
-    {
-        return view('admin.client.show', compact('client'));
-    }
+
+    /**
+     * Pokazuje formularz edycji klienta.
+     */
     public function edit(Client $client)
     {
         return view('admin.client.edit', compact('client'));
     }
+
     /**
      * Zaktualizuj dane klienta.
      */
@@ -96,13 +98,15 @@ class ClientController extends Controller
 
         // Sprawdzanie, czy klient został zaktualizowany pomyślnie
         if ($res) {
-            // Przekierowanie do listy klientów z komunikatem o sukcesie
             return redirect()->route('client')->with('success', 'Klient został pomyślnie zaktualizowany.');
         } else {
-            // Przekierowanie z powrotem do formularza z komunikatem o błędzie
             return redirect()->route('client.edit')->with('fail', 'Wystąpił błąd podczas aktualizacji klienta. Proszę spróbować ponownie.');
         }
     }
+
+    /**
+     * Usuwa klienta.
+     */
     public function delete(Client $client)
     {
         $res = $client->delete();

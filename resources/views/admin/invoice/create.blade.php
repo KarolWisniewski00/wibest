@@ -5,24 +5,31 @@
         </h2>
     </x-slot>
 
+    @include('admin.elements.alerts')
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- WIDGET TASK -->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+
+                    <!--POWRÓT-->
                     <a href="{{ route('invoice') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                         <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do listy Faktur
                     </a>
 
+                    <!--FORMULARZ-->
                     <div class="mt-8">
                         <h1 class="text-2xl font-medium text-gray-900 dark:text-gray-100">Nowa Faktura</h1>
-
                         <form method="POST" action="{{ route('invoice.store') }}" class="mt-6">
                             @csrf
+
                             <!-- Numer faktury -->
                             <div class="mb-6">
                                 <label for="number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer faktury</label>
-                                <input type="text" id="number" name="number" value="{{ $invoiceNumber }}" readonly required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="text" id="number" name="number" value="{{ $invoiceNumber }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                @error('number')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
 
                             <!-- Typ Faktury -->
@@ -37,16 +44,6 @@
                                             </div>
                                         </label>
                                     </li>
-                                    <!--
-                                    <li>
-                                        <input disabled name="invoice_type" type="radio" id="invoice_proform" value="faktura proforma" class="hidden peer">
-                                        <label for="invoice_proform" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Faktura proforma</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                    -->
                                 </ul>
                                 @error('invoice_type')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -57,7 +54,11 @@
                             <div class="mb-6">
                                 <label for="issue_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data wystawienia</label>
                                 <input type="date" id="issue_date" name="issue_date" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                @error('issue_date')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
+
                             <!-- Termin płatności -->
                             <div class="mb-6">
                                 <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Termin płatności</h3>
@@ -132,9 +133,12 @@
                                 @enderror
                             </div>
 
+                            <!-- DIVIDER -->
                             <hr class="border-t border-gray-300 dark:border-gray-700 my-6">
+
                             <!-- Dane sprzedawcy i nabywcy -->
                             <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+
                                 <!-- Dane sprzedawcy -->
                                 <div>
                                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane sprzedawcy</h3>
@@ -147,6 +151,12 @@
                                             <input type="hidden" value="{{$company->id}}" name="company_id">
                                             <input type="hidden" value="{{$company->name}}" name="seller_name">
                                         </p>
+                                        @error('company_id')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                        @error('seller_name')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-200 font-semibold">
@@ -156,6 +166,9 @@
                                             {{$company->adress}}
                                             <input type="hidden" value="{{$company->adress}}" name="seller_adress">
                                         </p>
+                                        @error('seller_adress')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-200 font-semibold">
@@ -165,6 +178,9 @@
                                             {{$company->vat_number}}
                                             <input type="hidden" value="{{$company->vat_number}}" name="seller_vat_number">
                                         </p>
+                                        @error('seller_vat_number')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                     <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-200 font-semibold">
@@ -174,12 +190,16 @@
                                             {{$company->bank}}
                                             <input type="hidden" value="{{$company->bank}}" name="bank">
                                         </p>
+                                        @error('bank')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
 
                                 <!-- Dane nabywcy -->
                                 <div>
                                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane nabywcy</h3>
+
                                     <!-- Klient -->
                                     <div class="mb-6">
                                         <label for="buyer_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa nabywcy</label>
@@ -192,11 +212,21 @@
                                             @endforeach
                                         </datalist>
                                         <input type="hidden" id="client_id" name="client_id" value="">
+                                        @error('client_id')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                        @error('buyer_name')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
+                                    <!-- Adres -->
                                     <div class="mb-6">
                                         <label for="buyer_adress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres nabywcy</label>
                                         <input type="text" id="buyer_address" name="buyer_adress" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        @error('buyer_adress')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
 
                                     <!-- NIP -->
@@ -207,62 +237,34 @@
                                                 Pobierz dane podatnika VAT
                                             </button>
                                             <input type="text" id="buyer_vat_number" name="buyer_vat_number" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                            @error('buyer_vat_number')
+                                            <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                            @enderror
                                         </div>
                                         <a href="https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat" class="text-blue-600 dark:text-blue-400 hover:underline text-xs mt-1">Źródło: https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat</a>
                                     </div>
                                 </div>
                             </div>
+
+                            <!-- DIVIDER -->
                             <hr class="border-t border-gray-300 dark:border-gray-700 my-6">
+
                             <!-- Pozycje faktury -->
                             <div class="mb-6">
                                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Pozycje na fakturze</h3>
                                 <div id="invoice-items" class="mt-6">
-                                    <!-- Template dla pozycji -->
+
+                                    <!-- KONTERNER DLA POZYCJI -->
                                     <div class="invoice-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
-                                        <!--
-                                        <input type="hidden" name="items[0][service_id]">
-                                        <input type="hidden" name="items[0][product_id]">
-                                        <div>
-                                            <label for="item_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa produktu/usługi</label>
-                                            <input type="text" name="items[0][name]" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
-                                        </div>
-                                        <div>
-                                            <label for="item_quantity" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ilość</label>
-                                            <input type="number" value="1" name="items[0][quantity]" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
-                                        </div>
-                                        <div>
-                                            <label for="item_price" class=" block text-sm font-medium text-gray-700 dark:text-gray-300">Cena jednostkowa netto</label>
-                                            <input type="number" name="items[0][price]" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
-                                        </div>
-                                        <div>
-                                            <label for="item_vat" class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Stawka VAT (%)</label>
-                                            <span class="text-gray-900 dark:text-gray-200">0</span>
-                                            <input type="hidden" name="items[0][vat]" value="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
-                                        </div>
-                                        <div>
-                                            <label for="item_netto" class="mb-3 block text-sm font-medium text-gray-700 dark:text-gray-300">Kwota netto</label>
-                                            <span class="text-gray-900 dark:text-gray-200">0</span>
-                                            <input type="hidden" name="items[0][netto]" value="0" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                                        </div>
-                                        <div>
-                                            <label for="item_brutto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kwota brutto</label>
-                                            <input type="number" name="items[0][brutto]" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                                        </div>
-                                        <button type="button" onclick="removeItem(this)" class="w-fit inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                        -->
+
                                     </div>
                                 </div>
 
-                                <!-- Główna struktura faktury -->
+                                <!-- PODSUMOWANIE -->
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
                                     <!-- Lewa kolumna (3/4 szerokości) -->
                                     <div class="md:col-span-3">
-                                        <div id="invoice-items">
-                                            <!-- Pozycje faktury będą tutaj dodawane dynamicznie -->
-                                        </div>
-                                        <!-- Przycisk dodania pozycji -->
                                         <div class="mt-8">
                                             <button type="button" id="add-item" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-400 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 <i class="fa-solid fa-plus mr-2"></i>Dodaj pozycję
@@ -288,24 +290,10 @@
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
+
+                            <!-- DIVIDER -->
                             <hr class="border-t border-gray-300 dark:border-gray-700 my-6">
-                            <!-- Wpłacona kwota
-                            <div class="mb-6">
-                                <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Wpłacona kwota</h3>
-                                <ul class="grid w-full gap-6 md:grid-cols-1">
-                                    <li>
-                                        <label for="paid_amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kwota</label>
-                                        <input type="number" id="paid_amount" value="0" name="paid_amount" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
-                                        @error('paid_amount')
-                                        <p class="text-red-500 text-sm mt-1 dark:text-red-400">{{ $message }}</p>
-                                        @enderror
-                                    </li>
-                                </ul>
-                            </div>
-                            -->
 
                             <!-- Metoda płatności -->
                             <div class="mb-6">
@@ -361,18 +349,19 @@
                             <div class="mb-6">
                                 <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
                                 <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
+                                @error('notes')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                @enderror
                             </div>
-                            <!-- Przycisk dodawania faktury -->
+
+                            <!-- Przyciski kończońce -->
                             <div class="mt-8 flex justify-end space-x-4">
-                                <!-- Green button for marking as completed -->
                                 <button type="summit" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-400 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     <i class="fa-solid fa-check mr-2"></i>Zapisz
                                 </button>
-
-                                <button type="button" class="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <a href="{{ route('invoice') }}" class="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     <i class="fa-solid fa-trash mr-2"></i>Anuluj
-                                </button>
-
+                                </a>
                             </div>
                         </form>
                     </div>
@@ -380,7 +369,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         class Item {
@@ -420,7 +408,7 @@
 
             getItem() {
                 const itemElement = $(`
-        <div class="invoice-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 relative" data-index="${this.length}">
+        <div id="item_id_${this.length}" class="invoice-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 relative" data-index="${this.length}">
             <div>
             <label for="item_name_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa produktu/usługi</label>
             <input list="name_item_suggestions_${this.length}" type="text" name="items[${this.length}][name]" id="item_name_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
@@ -460,8 +448,8 @@
                 <p class="text-indigo-500 text-xs mt-1">Wartość automatycznie obliczana</p>
             </div>
         </div>
-        <div class="flex gap-4 mb-4 relative justify-end">
-            <button type="button" class="remove-item w-fit inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+        <div id="item2_id_${this.length}" class="flex gap-4 mb-4 relative justify-end">
+            <button type="button" id="remove_item_${this.length}" class=" w-fit inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                 <i class="fa-solid fa-trash"></i>
             </button>
         </div>
@@ -498,7 +486,11 @@
                         }
                     });
                 });
-
+                $('#remove_item_' + len).on('click', function() {
+                    $('#item_id_' + len).remove();
+                    $('#item2_id_' + len).remove();
+                    toastr.success('Operacja zakończona powodzeniem!');
+                });
                 this.updateSummary(); // Aktualizacja po dodaniu pozycji
             }
 
@@ -521,31 +513,26 @@
                 $('#total_vat').text(totalVat.toFixed(2));
                 $('#total_brutto').text(totalBrutto.toFixed(2));
             }
-
-            removeItem(button) {
-                $(button).closest('.invoice-item').remove();
-                this.updateSummary(); // Aktualizacja po usunięciu pozycji
-            }
         }
-        $(document).ready(function() {
+
+        function invoiceItems() {
             const $item = new Item($('#invoice-items'));
             $item.print();
 
             // Funkcja do dodawania nowych pozycji na fakturze
             $('#add-item').on('click', function() {
                 $item.print();
+                toastr.success('Operacja zakończona powodzeniem!');
             });
+        }
 
-            // Usuwanie pozycji
-            $(document).on('click', '.remove-item', function() {
-                $item.removeItem(this);
-            });
-
-            //AUTOMATYCZNA DATA
+        function autoDate() {
             // Funkcja ustawia dzisiejszą datę jako wartość domyślną dla pola daty
             const today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
             $('#issue_date').val(today);
+        }
 
+        function addClient() {
             //PODSTAWIANIE KLIENTA
             $('#buyer_name').on('input', function() {
                 var input = $(this).val();
@@ -563,10 +550,13 @@
 
                         var vatNumber = $(this).data('id');
                         $('#client_id').val(vatNumber);
+                        toastr.success('Operacja zakończona powodzeniem!');
                     }
                 });
             });
+        }
 
+        function addClientByTaxId() {
             //POBIERANIE PŁATNIKA VAT
             $('#fetch_vat_data').click(function() {
                 var taxId = $('#buyer_vat_number').val();
@@ -588,17 +578,31 @@
                             if (subject.workingAddress) {
                                 $('#buyer_adress').val(subject.workingAddress || '');
                             }
-
+                            toastr.success('Operacja zakończona powodzeniem!');
                         },
                         error: function(xhr, status, error) {
                             console.error('Błąd:', error);
                             // Możesz tutaj dodać kod do obsługi błędów
+                            toastr.error('Operacja zakończona niepowodzeniem!');
                         }
                     });
                 } else {
                     alert('Proszę wprowadzić numer NIP.');
                 }
             });
+        }
+        //START
+        $(document).ready(function() {
+            toastr.options = {
+                "positionClass": "toast-top-center", // Wyświetl na środku u góry
+                "timeOut": "5000", // Czas trwania (5 sekund)
+                "closeButton": true, // Dodanie przycisku zamknięcia
+                "progressBar": true // Pokaż pasek postępu
+            };
+            invoiceItems();
+            autoDate();
+            addClient();
+            addClientByTaxId();
         });
     </script>
 

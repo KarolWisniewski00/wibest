@@ -6,7 +6,7 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <span class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-indigo-600" style='font-family: "Raleway", sans-serif;'>SDF</span>
+                        <span class="sm:order-1 text-indigo-600 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-indigo-400" style='font-family: "Raleway", sans-serif;'>SDF</span>
                     </a>
                 </div>
 
@@ -29,6 +29,9 @@
                     </x-nav-link>
                     <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                         {{ __('Ustawienia') }}
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('version') }}" :active="Str::startsWith(request()->path(), 'dashboard/version')">
+                        {{ __('Wersje') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -171,6 +174,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                 {{ __('Ustawienia') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('version') }}" :active="Str::startsWith(request()->path(), 'dashboard/version')">
+                {{ __('Wersje') }}
             </x-responsive-nav-link>
         </div>
 

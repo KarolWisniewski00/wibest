@@ -86,5 +86,8 @@ Route::middleware([
             Route::get('edit/{company}', [SettingController::class, 'edit'])->name('setting.edit');
             Route::put('update/{company}', [SettingController::class, 'update'])->name('setting.update');
         });
+        Route::prefix('version')->group(function () {
+            Route::get('/', [DashboardController::class, 'version'])->name('version');
+        });
     });
 });

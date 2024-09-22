@@ -9,26 +9,33 @@ use Illuminate\Http\Request;
 class ServiceController extends Controller
 {
     /**
-     * Pokazuje usług.
+     * Pokazuje usługi.
      */
     public function index()
     {
-        // Paginate the services, e.g., 10 services per page
-        $services = Service::paginate(10);
-
-        // Pass paginated services to the view
+        $services = Service::where('company_id', $this->get_company_id())->paginate(10);
         return view('admin.service.index', compact('services'));
     }
+
+    /**
+     * Pokazuje usługę.
+     */
     public function show(Service $service)
     {
-        // Pass the service object to the view
         return view('admin.service.show', compact('service'));
     }
+
+    /**
+     * Pokazuje formularz tworzenia nowej usługi.
+     */
     public function create()
     {
-        return view('admin.service.create'); // Widok formularza tworzenia
+        return view('admin.service.create');
     }
 
+    /**
+     * Zapisuje formularz tworzenia nowej usługi.
+     */
     public function store(ServiceRequest $request)
     {
         // Tworzenie nowej firmy
@@ -49,10 +56,18 @@ class ServiceController extends Controller
             return redirect()->route('service')->with('fail', 'Coś poszło nie tak.');
         }
     }
+
+    /**
+     * Pokazuje formularz edytowania usługi.
+     */
     public function edit(Service $service)
     {
         return view('admin.service.edit', compact('service')); // Widok formularza tworzenia
     }
+
+    /**
+     * Aktualizuje dane usługi.
+     */
     public function update(ServiceRequest $request, Service $service)
     {
         // Aktualizacja danych usługi
@@ -69,17 +84,16 @@ class ServiceController extends Controller
             return redirect()->route('service')->with('fail', 'Coś poszło nie tak.');
         }
     }
+
+    /**
+     * Usuwa usługę.
+     */
     public function delete(Service $service)
     {
-        // Sprawdzenie, czy usługa istnieje
         if ($service) {
-            // Usunięcie usługi
             $service->delete();
-
-            // Przekierowanie z komunikatem sukcesu
             return redirect()->route('service')->with('success', 'Usługa została usunięta.');
         } else {
-            // Przekierowanie z komunikatem o błędzie
             return redirect()->route('service')->with('fail', 'Nie znaleziono usługi.');
         }
     }

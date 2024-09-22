@@ -19,4 +19,8 @@ class DashboardController extends Controller
 
         return view('dashboard', compact('newClientsCount'));
     }
+    public function version()
+    {
+        return view('admin.version.index');
+    }
 }

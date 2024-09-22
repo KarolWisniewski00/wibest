@@ -17,11 +17,18 @@ class SettingController extends Controller
     {
         return view('admin.setting.index');
     }
+
+    /**
+     * Pokazuje formularz tworzenia ustawień.
+     */
     public function create()
     {
-        return view('admin.setting.create'); // Widok formularza tworzenia
+        return view('admin.setting.create');
     }
 
+    /**
+     * Zapisuje dane ustawień.
+     */
     public function store(StoreCompanyRequest $request)
     {
         $id = auth()->id();
@@ -34,7 +41,7 @@ class SettingController extends Controller
             'vat_number' => $request->vat_number,
         ]);
         $user->update([
-            'company_id'=>$res->id
+            'company_id' => $res->id
         ]);
         $user->save();
 
@@ -45,12 +52,17 @@ class SettingController extends Controller
             return redirect()->route('setting')->with('fail', 'Coś poszło nie tak.');
         }
     }
+
+    /**
+     * Pokazuje formularz edytowania ustawień.
+     */
     public function edit(Company $company)
     {
         return view('admin.setting.edit', compact('company'));
     }
+
     /**
-     * Zaktualizuj dane klienta.
+     * Zaktualizuj dane ustawień.
      */
     public function update(UpdateCompanyRequest $request, Company $company)
     {

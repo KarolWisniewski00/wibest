@@ -8,21 +8,34 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-
+    /**
+     * Pokazuje Produkty.
+     */
     public function index()
     {
-        $products = Product::paginate(10);
+        $products = Product::where('company_id', $this->get_company_id())->paginate(10);
         return view('admin.product.index', compact('products'));
     }
+
+    /**
+     * Pokazuje Produkt.
+     */
     public function show(Product $product)
     {
         return view('admin.product.show', compact('product'));
     }
+
+    /**
+     * Pokazuje formularz tworzenia nowego produktu.
+     */
     public function create()
     {
         return view('admin.product.create');
     }
 
+    /**
+     * Zapisuje nowego produkt w bazie danych.
+     */
     public function store(ServiceRequest $request)
     {
         // Tworzenie nowej firmy
@@ -43,10 +56,18 @@ class ProductController extends Controller
             return redirect()->route('product')->with('fail', 'Coś poszło nie tak.');
         }
     }
+
+    /**
+     * Pokazuje formularz edycji produktu.
+     */
     public function edit(Product $product)
     {
         return view('admin.product.edit', compact('product')); // Widok formularza tworzenia
     }
+
+    /**
+     * Aktualizuje produkt w bazie danych.
+     */
     public function update(ServiceRequest $request, Product $product)
     {
         // Aktualizacja danych usługi
@@ -63,6 +84,10 @@ class ProductController extends Controller
             return redirect()->route('service')->with('fail', 'Coś poszło nie tak.');
         }
     }
+
+    /**
+     * Usuwa produkt.
+     */
     public function delete(Product $product)
     {
         // Sprawdzenie, czy usługa istnieje
