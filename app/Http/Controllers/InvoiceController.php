@@ -12,12 +12,65 @@ use App\Models\Service;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
+use NumberToWords\NumberToWords;
 
 class InvoiceController extends Controller
 {
+    /**
+     * Zwraca kwotę słownie.
+     */
+    private function get_total_in_words($total)
+    {
+        $zlote = floor($total);
+        $grosze = round(($total - $zlote) * 100);
+
+        $numberToWords = new NumberToWords();
+
+        // Generowanie dla złotych
+        $numberTransformer = $numberToWords->getNumberTransformer('pl');
+        $zloteSlownie = $numberTransformer->toWords($zlote);
+        $groszeSlownie = $numberTransformer->toWords($grosze);
+
+        // Ustawienie poprawnej formy dla złotych
+        $zloteForm = $this->get_zlote_form($zlote);
+        // Ustawienie poprawnej formy dla groszy
+        $groszeForm = $this->get_grosze_form($grosze);
+
+        return "$zloteSlownie $zloteForm $groszeSlownie $groszeForm";
+    }
+
+    /**
+     * Zwraca odpowiednią formę słowa 'złoty' w zależności od liczby.
+     */
+    private function get_zlote_form($zlote)
+    {
+        if ($zlote == 1) {
+            return "złoty";
+        } elseif ($zlote % 10 >= 2 && $zlote % 10 <= 4 && ($zlote % 100 < 10 || $zlote % 100 >= 20)) {
+            return "złote";
+        } else {
+            return "złotych";
+        }
+    }
+
+    /**
+     * Zwraca odpowiednią formę słowa 'grosz' w zależności od liczby.
+     */
+    private function get_grosze_form($grosze)
+    {
+        if ($grosze == 1) {
+            return "grosz";
+        } elseif ($grosze % 10 >= 2 && $grosze % 10 <= 4 && ($grosze % 100 < 10 || $grosze % 100 >= 20)) {
+            return "grosze";
+        } else {
+            return "groszy";
+        }
+    }
+
     /**
      * Zwraca obiekt firmy zalogowanego użytkownika.
      */
@@ -95,13 +148,18 @@ class InvoiceController extends Controller
     }
 
     /**
-     * Pokazuje faktury.
+     * Pokazuje faktury od najnowszych.
      */
     public function index()
     {
-        $invoices = Invoice::where('company_id', $this->get_company_id())->paginate(10);
+        // Sortowanie po 'created_at' malejąco (od najnowszych)
+        $invoices = Invoice::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->paginate(10);
+
         return view('admin.invoice.index', compact('invoices'));
     }
+
 
     /**
      * Pokazuje fakturę.
@@ -137,8 +195,15 @@ class InvoiceController extends Controller
         $vatAmount = 0;
         $total = 0;
 
-        //obliczanie terminu płatności
+        // Obliczanie terminu płatności
         $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $invoice->issue_date);
+
+        // Zapisuje pusty numer konta
+        if ($request->input('bank') == null) {
+            $bank = '';
+        } else {
+            $bank = $request->input('bank');
+        }
 
         // Ustawiamy obliczoną datę jako termin płatności
         $invoice->due_date = $dueDate;
@@ -150,7 +215,7 @@ class InvoiceController extends Controller
         $invoice->seller_name = $request->input('seller_name');
         $invoice->seller_adress = $request->input('seller_adress');
         $invoice->seller_tax_id = $request->input('seller_vat_number');
-        $invoice->seller_bank = $request->input('bank');
+        $invoice->seller_bank = $bank;
         $invoice->buyer_name = $request->input('buyer_name');
         $invoice->buyer_adress = $request->input('buyer_adress');
         $invoice->buyer_tax_id = $request->input('buyer_vat_number');
@@ -176,6 +241,33 @@ class InvoiceController extends Controller
         $invoice->vat = $vatAmount;
         $invoice->total = $total;
 
+        // Zamiana kwoty na słownie i zapis do faktury
+        $invoice->total_in_words = $this->get_total_in_words($total);
+
+        // Pobierz informacje o zalogowanym użytkowniku
+        $user = User::where('id', auth()->id())->first();
+
+        // Jeśli nie ma klienta połączonego spróbuj utworzyć
+        if ($request->input('client_id') == null) {
+            try {
+                // Tworzenie nowego obiektu klienta
+                $client = new Client();
+                $client->name = $request->input('buyer_name');
+                $client->vat_number = $request->input('buyer_vat_number');
+                $client->adress = $request->input('buyer_adress');
+                $client->user_id = $user->id;
+                $client->company_id = $user->company_id;
+
+                // Przechowywanie danych w bazie
+                $client->save();
+            } catch (Exception) {
+                // Jeśli nie da się utworzyć to połącz
+                $client = Client::where('vat_number', $request->input('buyer_vat_number'))->where('company_id', $user->company_id)->first();
+                $invoice->client_id = $client->id;
+            }
+        }
+
+        // Zapisanie faktury
         $invoice->save();
 
         // Przekierowanie z komunikatem o sukcesie
@@ -188,7 +280,7 @@ class InvoiceController extends Controller
     public function edit(Invoice $invoice)
     {
         return redirect()->route('invoice')->with('fail', 'Tymczasowo niedostępne.');
-        
+
         $clients = Client::where('company_id', $this->get_company_id())->get();
         $company = $this->get_company();
         $items = InvoiceItem::where('invoice_id', $invoice->id)->get();
@@ -294,7 +386,8 @@ class InvoiceController extends Controller
             'vat' => $invoice_obj->vat,
             'total' => $invoice_obj->total,
             'notes' => $invoice_obj->notes,
-            'payment_method' => $invoice_obj->payment_method
+            'payment_method' => $invoice_obj->payment_method,
+            'total_in_words' => $invoice_obj->total_in_words
         ];
         return view('admin.template.invoice', compact('invoice'));
     }
@@ -328,7 +421,8 @@ class InvoiceController extends Controller
             'vat' => $invoice_obj->vat,
             'total' => $invoice_obj->total,
             'notes' => $invoice_obj->notes,
-            'payment_method' => $invoice_obj->payment_method
+            'payment_method' => $invoice_obj->payment_method,
+            'total_in_words' => $invoice_obj->total_in_words
         ];
 
         // Generowanie PDF

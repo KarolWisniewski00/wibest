@@ -30,6 +30,7 @@ class Invoice extends Model
         'buyer_tax_id', // NIP nabywcy
         'notes', // Dodatkowe uwagi do faktury
         'payment_method', // Metoda płatności
+        'total_in_words',
     ];
 
     /**

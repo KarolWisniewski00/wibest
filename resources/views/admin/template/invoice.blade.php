@@ -12,7 +12,6 @@
             margin: 0;
             padding: 0;
             font-size: 12px;
-            /* Zmniejszony rozmiar czcionki */
         }
 
         table {
@@ -108,16 +107,23 @@
         /* Styl dla uwag */
         .notes-section {
             margin-top: 20px;
-            /* Dodanie marginesu górnego */
+        }
+
+        /* Styl dla napisu w lewym dolnym rogu */
+        .footer-left {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            font-size: 10px;
+            color: #555;
         }
     </style>
 </head>
 
 <body>
     <div class="invoice-header">
-        <h2 class="h2"><span>Faktura numer:</span> {{ $invoice['number'] }}</h2><br>
+        <h2 class="h2"><span>Faktura numer:</span> {{ $invoice['number'] }}</h2>
         <p><span>Data wystawienia:</span> {{ $invoice['issue_date'] }}</p>
-        <p><span>Data sprzedaży:</span> {{ $invoice['issue_date'] }}</p>
         <p><span>Termin płatności:</span> {{ $invoice['due_date'] }}</p>
         <p><span>Płatność:</span> {{ $invoice['payment_method'] }}</p>
     </div>
@@ -127,15 +133,18 @@
         <tr>
             <td class="seller">
                 <h2 class="h2">Sprzedawca</h2>
-                <p><span>Nazwa:</span> {{ $invoice['seller']['name'] }}</p>
-                <p><span>Adres:</span> {{ $invoice['seller']['address'] }}</p>
+                <p>{{ $invoice['seller']['name'] }}</p>
+                <p>{{ $invoice['seller']['address'] }}</p>
                 <p><span>NIP:</span> {{ $invoice['seller']['tax_id'] }}</p>
+                @if($invoice['seller']['bank'] == '')
+                @else
                 <p><span>Numer konta:</span> {{ $invoice['seller']['bank'] }}</p>
+                @endif
             </td>
             <td class="buyer">
                 <h2 class="h2">Nabywca</h2>
-                <p><span>Nazwa:</span> {{ $invoice['client']['name'] }}</p>
-                <p><span>Adres:</span> {{ $invoice['client']['address'] }}</p>
+                <p>{{ $invoice['client']['name'] }}</p>
+                <p>{{ $invoice['client']['address'] }}</p>
                 <p><span>NIP:</span> {{ $invoice['client']['tax_id'] }}</p>
             </td>
         </tr>
@@ -172,12 +181,25 @@
     </table>
 
     <div class="summary">
-        <h2>Podsumowanie</h2>
+        <h2 class="h2">Podsumowanie</h2>
         <p>Razem netto: {{ $invoice['subtotal'] }} PLN</p>
         <p>VAT: {{ $invoice['vat'] }}</p>
         <p>Razem brutto: {{ $invoice['total'] }} PLN</p>
     </div>
+    <div class="summary">
+        <h2 class="h2">Słownie</h2>
+        <p>{{ $invoice['total_in_words'] }}</p>
+    </div>
+    @if($invoice['notes'] != null)
+    <div class="divider"></div>
+    <h2 class="h2">Uwagi</h2>
+    <p>{{$invoice['notes']}}</p>
+    @endif
 
+    <!-- Napis w lewym dolnym rogu -->
+    <div class="footer-left">
+        Faktura wystawiona w wibest.pl
+    </div>
 
 </body>
 

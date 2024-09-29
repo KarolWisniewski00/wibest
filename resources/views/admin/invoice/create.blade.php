@@ -344,7 +344,6 @@
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
-
                             <!-- Uwagi -->
                             <div class="mb-6">
                                 <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
@@ -576,7 +575,7 @@
 
                             // Wstawianie pełnego adresu
                             if (subject.workingAddress) {
-                                $('#buyer_adress').val(subject.workingAddress || '');
+                                $('#buyer_address').val(subject.workingAddress || '');
                             }
                             toastr.success('Operacja zakończona powodzeniem!');
                         },

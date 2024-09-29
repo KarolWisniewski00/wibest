@@ -47,6 +47,7 @@ class ServiceController extends Controller
             'vat_amount' => $request->vat_amount,
             'total' => $request->total,
             'description' => $request->description,
+            'company_id' => $this->get_company_id(),
         ]);
 
         // Przekierowanie z komunikatem

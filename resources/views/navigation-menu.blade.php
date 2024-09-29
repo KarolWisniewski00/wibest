@@ -6,14 +6,14 @@
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
-                        <span class="sm:order-1 text-indigo-600 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-indigo-400" style='font-family: "Raleway", sans-serif;'>SDF</span>
+                        <span class="sm:order-1 text-indigo-600 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-indigo-500" style='font-family: "Raleway", sans-serif;'>SDF</span>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('Wykresy') }}
                     </x-nav-link>
                     <x-nav-link href="{{ route('client') }}" :active="Str::startsWith(request()->path(), 'dashboard/client')">
                         {{ __('Klienci') }}
@@ -158,7 +158,7 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('Wykresy') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('client') }}" :active="Str::startsWith(request()->path(), 'dashboard/client')">
                 {{ __('Klienci') }}

@@ -23,6 +23,22 @@
                 <ol class="relative border-l border-gray-600">
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">29 wrzesień 2024 V 1.2.0</time>
+                        <h3 class="text-lg font-semibold text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-200 ">1. [Usługa] [Naprawa] Braku zapisywania usługi</p>
+                        <p class="text-base font-normal text-gray-200 ">2. [Produkt] [Naprawa] Braku zapisywania produktu</p>
+                        <p class="text-base font-normal text-gray-200 ">3. [Faktura] [Naprawa] Braku zapisywania nowej faktury gdy nie ma numeru konta</p>
+                        <p class="text-base font-normal text-gray-200 ">4. [Faktura] [Naprawa] Braku pokazywania uwag w fakturze</p>
+                        <p class="text-base font-normal text-gray-200 ">5. [Faktura] [Dodanie] Pokazania kwoty słownie w fakturze</p>
+                        <p class="text-base font-normal text-gray-200 ">6. [Faktura] [Dodanie] Pokazania napisu "Faktura wystawiona w wibest.pl"</p>
+                        <p class="text-base font-normal text-gray-200 ">7. [Faktura] [Zmiana] Wyświetlania nazw i adresów nabywcy i sprzedawcy w fakturze</p>
+                        <p class="text-base font-normal text-gray-200 ">8. [Faktura] [Naprawa] Podstawiania adresu po klieknięciu przycisku pobierającego dane płatnika VAT w tworzeniu faktury</p>
+                        <p class="text-base font-normal text-gray-200 ">9. [Faktura] [Usunięcie] Wyświetlania terminu sprzedaży"</p>
+                        <p class="text-base font-normal text-gray-200 ">10. [Faktura] [Doanie] Automatycznego zapisu nowego klienta i/lub połącznie klienta z istniejacym na podstawie numeru nip</p>
+                        <p class="text-base font-normal text-gray-200 ">11. [Wykresy] [Doanie] Statystyk</p>
+                    </li>
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">22 wrzesień 2024 V 1.1.1</time>
                         <h3 class="text-lg font-semibold text-gray-200">Aktualizacja</h3>
                         <p class="text-base font-normal text-gray-200 ">1. [Ogólna] [Zmiana] Optymalizacja kontrollerów</p>
