@@ -83,7 +83,83 @@
                                 </div>
                             </li>
                         </ul>
+                        <!-- Dodaj w sekcji head, jeśli jeszcze nie ma -->
+                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+                        <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-200">
+                            <span class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 text-gray-800 dark:text-gray-50">Sprzedaż łącznie ostatnie 31 dni</span>
+                        </h1>
+
+                        <div class="mt-8 w-full h-full">
+                            <div class="w-full h-full">
+                                <canvas id="invoiceChart"></canvas>
+                            </div>
+                        </div>
+
+                        <script>
+                            const ctx = document.getElementById('invoiceChart').getContext('2d');
+                            const invoiceChart = new Chart(ctx, {
+                                type: 'line', // lub 'bar', w zależności od preferencji
+                                data: {
+                                    labels: @json($dates), // daty z ostatnich 31 dni
+                                    datasets: [{
+                                        label: 'Brutto',
+                                        data: @json($totalValues), // sumy total
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                        borderWidth: 2
+                                    }, {
+                                        label: 'Netto',
+                                        data: @json($subTotalValues), // sumy sub_total
+                                        borderColor: 'rgba(153, 102, 255, 1)',
+                                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
+                        <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-200">
+                            <span class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 text-gray-800 dark:text-gray-50">Liczba wystawionych faktur w ostatnich 31 dniach</span>
+                        </h1>
+
+                        <div class="mt-8 w-full h-full">
+                            <div class="w-full h-full">
+                                <canvas id="documentChart"></canvas>
+                            </div>
+                        </div>
+
+                        <script>
+                            const docCtx = document.getElementById('documentChart').getContext('2d');
+                            const documentChart = new Chart(docCtx, {
+                                type: 'line', // lub 'bar', w zależności od preferencji
+                                data: {
+                                    labels: @json($dates), // daty z ostatnich 31 dni
+                                    datasets: [{
+                                        label: 'Liczba dokumentów',
+                                        data: @json($documentCounts), // liczba dokumentów
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
                     </div>
 
                 </div>

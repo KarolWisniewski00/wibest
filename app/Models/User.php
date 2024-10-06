@@ -72,4 +72,28 @@ class User extends Authenticatable
     {
         return $this->hasMany(Client::class); // Użytkownik może mieć wielu klientów
     }
+    /**
+     * Definiuje relację jeden-do-wielu (użytkownik -> faktury).
+     * Użytkownik może mieć wielu faktur.
+     */
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class); // Użytkownik może mieć wielu faktur
+    }
+    /**
+     * Definiuje relację jeden-do-wielu (użytkownik -> usługa).
+     * Użytkownik może mieć wielu usług.
+     */
+    public function services()
+    {
+        return $this->hasMany(Service::class); // Użytkownik może mieć wielu usług
+    }
+    /**
+     * Definiuje relację jeden-do-wielu (użytkownik -> produkt).
+     * Użytkownik może mieć wielu produktów.
+     */
+    public function products()
+    {
+        return $this->hasMany(Product::class); // Użytkownik może mieć wielu produktów
+    }
 }

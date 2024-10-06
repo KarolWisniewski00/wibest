@@ -22,74 +22,90 @@
                     </div>
                     <div class="mt-8">
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Nazwa
                             </p>
-                            <p class="text-gray-900 dark:text-gray-200">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->name }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Cena jednostkowa netto
                             </p>
-                            <p class="text-gray-900 dark:text-gray-200">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->unit_price ? number_format($product->unit_price, 2) . ' PLN' : '' }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Stawka VAT
                             </p>
-                            <p class="text-gray-900 dark:text-gray-200">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->vat_rate ? number_format($product->vat_rate, 2) . '%' : '' }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Kwota VAT
                             </p>
-                            <p class="text-gray-900 dark:text-gray-200">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->vat_amount ? number_format($product->vat_amount, 2) . ' PLN' : '' }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Wartość netto
                             </p>
-                            <p class="text-gray-900 dark:text-gray-200">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->subtotal ? number_format($product->subtotal, 2) . ' PLN' : '' }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Wartość brutto
                             </p>
-                            <p class="text-gray-900 dark:text-gray-200">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->total ? number_format($product->total, 2) . ' PLN' : '' }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Opis
                             </p>
-                            <p class="text-gray-900 dark:text-gray-200">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->description ?? '' }}
                             </p>
                         </div>
+                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                Utworzone przez
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                                {{ $service->user->name ?? '' }}
+                            </p>
+                        </div>
+                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                Dane należące do
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                                {{ $service->company->name ?? '' }}
+                            </p>
+                        </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-400 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-400">
                                 Data utworzenia
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->created_at->format('d-m-Y H:i') }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-400 font-semibold">
+                            <p class="text-gray-600 dark:text-gray-400">
                                 Data aktualizacji
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400">
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->updated_at->format('d-m-Y H:i') }}
                             </p>
                         </div>

@@ -31,6 +31,7 @@ class Invoice extends Model
         'notes', // Dodatkowe uwagi do faktury
         'payment_method', // Metoda płatności
         'total_in_words',
+        'user_id',
     ];
 
     /**
@@ -58,5 +59,13 @@ class Invoice extends Model
     public function items()
     {
         return $this->hasMany(InvoiceItem::class); // Faktura może mieć wiele pozycji
+    }
+    /**
+     * Definiuje relację odwrotną jeden-do-wielu (użytkownik -> faktura).
+     * Każda faktura należy do jednego użytkownika.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class); // Faktura należy do jednego użytkownika
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
+use App\Models\Invoice;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = Client::where('company_id', $this->get_company_id())->paginate(10);
+        $clients = Client::where('company_id', $this->get_company_id())->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.client.index', compact('clients'));
     }
 
@@ -25,7 +26,14 @@ class ClientController extends Controller
      */
     public function show(Client $client)
     {
-        return view('admin.client.show', compact('client'));
+        // Pobieranie faktur związanych z klientem
+        $invoices = Invoice::where('company_id', $this->get_company_id())
+            ->where('client_id', $client->id)
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->paginate(10);
+
+        // Przekazanie klienta oraz jego faktur do widoku
+        return view('admin.client.show', compact('client', 'invoices'));
     }
 
     /**

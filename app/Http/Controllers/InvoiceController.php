@@ -238,7 +238,7 @@ class InvoiceController extends Controller
         } else {
             $bank = $request->input('bank');
         }
-
+        $user = User::where('id', auth()->id())->first();
         // Ustawiamy obliczoną datę jako termin płatności
         $invoice->due_date = $dueDate;
         $invoice->number = $request->input('number');
@@ -258,6 +258,7 @@ class InvoiceController extends Controller
         $invoice->subtotal = $subtotal;
         $invoice->vat = $vatAmount;
         $invoice->total = $total;
+        $invoice->user_id = $user->id;
         $invoice->save();
 
         // Zapis pozycji faktury do tabeli 'invoice_items'
@@ -350,7 +351,6 @@ class InvoiceController extends Controller
         $invoice->number = $request->input('number');
         $invoice->invoice_type = $request->input('invoice_type');
         $invoice->issue_date = $request->input('issue_date');
-        $invoice->company_id = $request->input('company_id');
         $invoice->client_id = $request->input('client_id');
         $invoice->seller_name = $request->input('seller_name');
         $invoice->seller_adress = $request->input('seller_adress');

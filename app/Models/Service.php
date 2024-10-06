@@ -19,6 +19,7 @@ class Service extends Model
         'total', // Wartość brutto usługi (netto + VAT)
         'description', // Dodatkowy opis usługi
         'company_id', // Id firmy powiązanej z klientem
+        'user_id',
     ];
 
     /**
@@ -36,5 +37,13 @@ class Service extends Model
     public function company()
     {
         return $this->belongsTo(Company::class); // Usługa należy do jednej firmy
+    }
+    /**
+     * Definiuje relację odwrotną jeden-do-wielu (użytkownik -> usługa).
+     * Każda usługa należy do jednego użytkownika.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class); // Usługa należy do jednego użytkownika
     }
 }

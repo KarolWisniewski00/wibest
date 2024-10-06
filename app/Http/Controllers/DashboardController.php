@@ -33,6 +33,33 @@ class DashboardController extends Controller
         $currentYearTotal = $invoices->where('created_at', '>=', now()->startOfYear())->sum('total');
         $currentYearCount = $invoices->where('created_at', '>=', now()->startOfYear())->count();
 
+        // Dodaj dane do wykresu
+        $dailyTotals = [];
+        $dailySubTotals = [];
+        $dailyCounts = []; // Tablica do zliczania dokumentów
+
+        // Inicjalizacja tablic na 31 dni
+        for ($i = 0; $i < 31; $i++) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $dailyTotals[$date] = 0;
+            $dailySubTotals[$date] = 0;
+            $dailyCounts[$date] = 0; // Inicjalizuj liczbę dokumentów
+        }
+
+        // Zliczanie sum dla każdego dnia
+        foreach ($invoices as $invoice) {
+            $date = $invoice->created_at->format('Y-m-d');
+            $dailyTotals[$date] += $invoice->total; // sumuj total
+            $dailySubTotals[$date] += $invoice->subtotal; // sumuj sub_total
+            $dailyCounts[$date]++; // zwiększ licznik dokumentów
+        }
+
+        // Uporządkuj dane w tablicach
+        $dates = array_keys($dailyTotals);
+        $totalValues = array_values($dailyTotals);
+        $subTotalValues = array_values($dailySubTotals);
+        $documentCounts = array_values($dailyCounts); // Liczba dokumentów
+
         // Przekazanie danych do widoku
         return view('dashboard', compact(
             'todayTotal',
@@ -44,9 +71,16 @@ class DashboardController extends Controller
             'previousMonthTotal',
             'previousMonthCount',
             'currentYearTotal',
-            'currentYearCount'
+            'currentYearCount',
+            'dates',
+            'totalValues',
+            'subTotalValues',
+            'documentCounts' // Przekazanie liczby dokumentów
         ));
     }
+
+
+
 
     public function version()
     {

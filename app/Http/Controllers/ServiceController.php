@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ServiceRequest;
 use App\Models\Service;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
@@ -13,7 +14,7 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        $services = Service::where('company_id', $this->get_company_id())->paginate(10);
+        $services = Service::where('company_id', $this->get_company_id())->orderBy('created_at', 'desc')->paginate(10);
         return view('admin.service.index', compact('services'));
     }
 
@@ -38,25 +39,37 @@ class ServiceController extends Controller
      */
     public function store(ServiceRequest $request)
     {
-        // Tworzenie nowej firmy
+        $user = User::where('id', auth()->id())->first();
+    
+        // Obliczanie wartości
+        $quantity = $request->quantity ?? 1; // Ustal ilość, domyślnie 1, jeśli nie podano
+        $unitPrice = $request->unit_price;
+    
+        $subtotal = $unitPrice * $quantity; // Obliczenie subtotal
+        $vatAmount = $subtotal * ($request->vat_rate / 100); // Obliczenie kwoty VAT
+        $total = $subtotal + $vatAmount; // Obliczenie wartości całkowitej
+    
+        // Tworzenie nowego produktu
         $res = Service::create([
             'name' => $request->name,
-            'unit_price' => $request->unit_price,
-            'subtotal' => $request->subtotal,
+            'unit_price' => $unitPrice,
+            'subtotal' => $subtotal,
             'vat_rate' => $request->vat_rate,
-            'vat_amount' => $request->vat_amount,
-            'total' => $request->total,
+            'vat_amount' => $vatAmount,
+            'total' => $total,
             'description' => $request->description,
             'company_id' => $this->get_company_id(),
+            'user_id' => $user->id,
         ]);
-
+    
         // Przekierowanie z komunikatem
         if ($res) {
-            return redirect()->route('service')->with('success', 'Usługa została dodana.');
+            return redirect()->route('service')->with('success', 'Usługa został dodany.');
         } else {
             return redirect()->route('service')->with('fail', 'Coś poszło nie tak.');
         }
     }
+    
 
     /**
      * Pokazuje formularz edytowania usługi.

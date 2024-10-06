@@ -19,6 +19,7 @@ class Product extends Model
         'total', // Wartość brutto produktu (netto + VAT)
         'description', // Dodatkowy opis produktu
         'company_id', // Id firmy powiązanej z klientem
+        'user_id',
     ];
 
     /**
@@ -36,5 +37,13 @@ class Product extends Model
     public function company()
     {
         return $this->belongsTo(Company::class); // Produkt należy do jednej firmy
+    }
+    /**
+     * Definiuje relację odwrotną jeden-do-wielu (użytkownik -> produkt).
+     * Każda Produkt należy do jednego użytkownika.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class); // Produkt należy do jednego użytkownika
     }
 }

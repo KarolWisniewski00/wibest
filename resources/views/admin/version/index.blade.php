@@ -30,6 +30,17 @@
                 <ol class="relative border-l border-gray-600">
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">6 padździernika 2024 V 1.4.0</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Ogólne] [Naprawa] Wyglądu mobilnego</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. [Faktura] [Naprawa] Pozbycie sie unikalnego numeru faktury, koliduje z innymi użytkownikami</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">3. [Wykresy] [Dodanie] Dodanie wykresów</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">4. [Ogólne] [Dodanie] Informacji o tym który użytkownik stworzył usługę, produkt, fakturę</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">5. [Ogólne] [Naprawa] Wyświetlania informacji desing</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">6. [Klient] [Dodnie] Wyświetlania podglądu faktur</p>
+                    </li>
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">6 padździernika 2024 V 1.3.0</time>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Ogólne] [Zmiana] Wyglądu mobilnego</p>
