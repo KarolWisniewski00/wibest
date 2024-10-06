@@ -55,6 +55,7 @@ Route::middleware([
             Route::put('update/{invoice}', [InvoiceController::class, 'update'])->name('invoice.update');
             Route::delete('delete/{invoice}', [InvoiceController::class, 'delete'])->name('invoice.delete');
 
+            Route::get('create/{client}', [InvoiceController::class, 'create_client'])->name('invoice.create.client');
             Route::get('file/{invoice}', [InvoiceController::class, 'file'])->name('invoice.show.file');
             Route::get('download/{invoice}', [InvoiceController::class, 'download'])->name('invoice.download');
         });

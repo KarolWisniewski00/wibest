@@ -109,6 +109,26 @@ class InvoiceController extends Controller
     }
 
     /**
+     * Zamienia datę płatności na termin płatności typu string
+     */
+    private function due_date_to_payment_term($issue_date, $due_date)
+    {
+        // Obliczamy różnicę w dniach między due_date a issue_date
+        $daysDifference = Carbon::parse($due_date)->diffInDays(Carbon::parse($issue_date));
+
+        // Przygotowujemy dostępne opcje terminów płatności
+        $availableTerms = [0 => 'natychmiast', 1 => '1_dzien', 3 => '3_dni', 7 => '7_dni', 14 => '14_dni', 30 => '30_dni', 60 => '60_dni', 90 => '90_dni'];
+
+        // Szukamy odpowiedniego terminu płatności
+        if (array_key_exists($daysDifference, $availableTerms)) {
+            return $availableTerms[$daysDifference];
+        }
+
+        // Jeśli liczba dni nie pasuje do dostępnych opcji, zwracamy 'niestandardowy'
+        return 'niestandardowy';
+    }
+
+    /**
      * Zamienia termin płatności typu string na datę
      */
     private function item_create($item, $id)
@@ -167,7 +187,8 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice_obj = $invoice;
-        return view('admin.invoice.show', compact('invoice', 'invoice_obj'));
+        $invoiceItems = InvoiceItem::where('invoice_id', $invoice_obj->id)->get();
+        return view('admin.invoice.show', compact('invoice', 'invoice_obj', 'invoiceItems'));
     }
     /**
      * Pokazuje formularz tworzenia nowej faktury.
@@ -180,6 +201,19 @@ class InvoiceController extends Controller
         $invoiceNumber = $this->get_invoice_number();
         $company = $this->get_company();
         return view('admin.invoice.create', compact('clients', 'invoiceNumber', 'company', 'services', 'products'));
+    }
+    /**
+     * Pokazuje formularz tworzenia nowej faktury.
+     */
+    public function create_client(Client $client)
+    {
+        $create_client = $client;
+        $clients = Client::where('company_id', $this->get_company_id())->get();
+        $services = Service::where('company_id', $this->get_company_id())->get();
+        $products = Product::where('company_id', $this->get_company_id())->get();
+        $invoiceNumber = $this->get_invoice_number();
+        $company = $this->get_company();
+        return view('admin.invoice.create', compact('create_client','clients', 'invoiceNumber', 'company', 'services', 'products'));
     }
     /**
      * Zapisuje formularz tworzenia nowej faktury.
@@ -279,12 +313,16 @@ class InvoiceController extends Controller
      */
     public function edit(Invoice $invoice)
     {
-        return redirect()->route('invoice')->with('fail', 'Tymczasowo niedostępne.');
+        //return redirect()->route('invoice')->with('fail', 'Tymczasowo niedostępne.');
+        $services = Service::where('company_id', $this->get_company_id())->get();
+        $products = Product::where('company_id', $this->get_company_id())->get();
+
 
         $clients = Client::where('company_id', $this->get_company_id())->get();
         $company = $this->get_company();
         $items = InvoiceItem::where('invoice_id', $invoice->id)->get();
-        return view('admin.invoice.edit', compact('clients', 'invoice', 'company', 'items'));
+        $payment_term = $this->due_date_to_payment_term($invoice->issue_date, $invoice->due_date);
+        return view('admin.invoice.edit', compact('payment_term', 'clients', 'invoice', 'company', 'items', 'services', 'products'));
     }
 
     /**
@@ -300,6 +338,13 @@ class InvoiceController extends Controller
         //obliczanie terminu płatności
         $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $invoice->issue_date);
 
+        // Zapisuje pusty numer konta
+        if ($request->input('bank') == null) {
+            $bank = '';
+        } else {
+            $bank = $request->input('bank');
+        }
+
         // Ustawiamy obliczoną datę jako termin płatności
         $invoice->due_date = $dueDate;
         $invoice->number = $request->input('number');
@@ -310,12 +355,16 @@ class InvoiceController extends Controller
         $invoice->seller_name = $request->input('seller_name');
         $invoice->seller_adress = $request->input('seller_adress');
         $invoice->seller_tax_id = $request->input('seller_vat_number');
-        $invoice->seller_bank = $request->input('bank');
+        $invoice->seller_bank = $bank;
         $invoice->buyer_name = $request->input('buyer_name');
         $invoice->buyer_adress = $request->input('buyer_adress');
         $invoice->buyer_tax_id = $request->input('buyer_vat_number');
         $invoice->payment_method = $request->input('payment_method');
         $invoice->notes = $request->input('notes');
+        $invoice->subtotal = $subtotal;
+        $invoice->vat = $vatAmount;
+        $invoice->total = $total;
+        $invoice->save();
 
         // Usunięcie istniejących pozycji faktury, aby zapisać nowe
         InvoiceItem::where('invoice_id', $invoice->id)->delete();
@@ -335,7 +384,33 @@ class InvoiceController extends Controller
         $invoice->vat = $vatAmount;
         $invoice->total = $total;
 
-        // Zapisanie zaktualizowanej faktury
+        // Zamiana kwoty na słownie i zapis do faktury
+        $invoice->total_in_words = $this->get_total_in_words($total);
+
+        // Pobierz informacje o zalogowanym użytkowniku
+        $user = User::where('id', auth()->id())->first();
+
+        // Jeśli nie ma klienta połączonego spróbuj utworzyć
+        if ($request->input('client_id') == null) {
+            try {
+                // Tworzenie nowego obiektu klienta
+                $client = new Client();
+                $client->name = $request->input('buyer_name');
+                $client->vat_number = $request->input('buyer_vat_number');
+                $client->adress = $request->input('buyer_adress');
+                $client->user_id = $user->id;
+                $client->company_id = $user->company_id;
+
+                // Przechowywanie danych w bazie
+                $client->save();
+            } catch (Exception) {
+                // Jeśli nie da się utworzyć to połącz
+                $client = Client::where('vat_number', $request->input('buyer_vat_number'))->where('company_id', $user->company_id)->first();
+                $invoice->client_id = $client->id;
+            }
+        }
+
+        // Zapisanie faktury
         $invoice->save();
 
         // Przekierowanie z komunikatem o sukcesie

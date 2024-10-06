@@ -121,6 +121,9 @@
                                 <i class="fa-solid fa-trash mr-2"></i>Usuń
                             </button>
                         </form>
+                        <a href="{{route('invoice.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-green-600 border border-green-600 rounded-lg hover:bg-green-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300">
+                            <i class="fa-solid fa-file-invoice mr-2"></i>Nowa Faktura
+                        </a>
                     </div>
                 </div>
             </div>

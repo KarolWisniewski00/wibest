@@ -62,7 +62,7 @@
                             <!-- Termin płatności -->
                             <div class="mb-6">
                                 <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Termin płatności</h3>
-                                <ul class="grid w-full gap-6 md:grid-cols-3">
+                                <ul class="grid w-full grid-cols-2 gap-6 md:grid-cols-3">
                                     <li>
                                         <input name="payment_term" type="radio" id="payment_now" value="natychmiast" class="hidden peer">
                                         <label for="payment_now" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
@@ -142,11 +142,11 @@
                                 <!-- Dane sprzedawcy -->
                                 <div>
                                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane sprzedawcy</h3>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700 mt-6">
-                                        <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
+                                        <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Nazwa
                                         </p>
-                                        <p class="text-gray-900 dark:text-gray-200">
+                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                             <a href="{{route('setting')}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$company->name}}</a>
                                             <input type="hidden" value="{{$company->id}}" name="company_id">
                                             <input type="hidden" value="{{$company->name}}" name="seller_name">
@@ -158,11 +158,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                                        <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                        <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Adres
                                         </p>
-                                        <p class="text-gray-900 dark:text-gray-200">
+                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->adress}}
                                             <input type="hidden" value="{{$company->adress}}" name="seller_adress">
                                         </p>
@@ -170,11 +170,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                                        <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                        <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             NIP
                                         </p>
-                                        <p class="text-gray-900 dark:text-gray-200">
+                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->vat_number}}
                                             <input type="hidden" value="{{$company->vat_number}}" name="seller_vat_number">
                                         </p>
@@ -182,11 +182,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                                        <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                        <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Numer konta
                                         </p>
-                                        <p class="text-gray-900 dark:text-gray-200">
+                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->bank}}
                                             <input type="hidden" value="{{$company->bank}}" name="bank">
                                         </p>
@@ -196,6 +196,52 @@
                                     </div>
                                 </div>
 
+                                @if(isset($create_client))
+                                <!-- Dane nabywcy -->
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane nabywcy</h3>
+                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
+                                        <p class="text-gray-600 dark:text-gray-300 test-sm">
+                                            Nazwa
+                                        </p>
+                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                            <a href="{{route('client.show', $create_client)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$create_client->name}}</a>
+                                            <input type="hidden" id="client_id" name="client_id" value="{{$create_client->id}}">
+                                            <input type="hidden" value="{{$create_client->name}}" name="buyer_name">
+                                        </p>
+                                        @error('client_id')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                        @error('buyer_name')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                        <p class="text-gray-600 dark:text-gray-300 test-sm">
+                                            Adres
+                                        </p>
+                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                            {{$create_client->adress}}
+                                            <input type="hidden" value="{{$create_client->adress}}" name="buyer_adress">
+                                        </p>
+                                        @error('buyer_adress')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                        <p class="text-gray-600 dark:text-gray-300 test-sm">
+                                            NIP
+                                        </p>
+                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                            {{$create_client->vat_number}}
+                                            <input type="hidden" value="{{$create_client->vat_number}}" name="buyer_vat_number">
+                                        </p>
+                                        @error('buyer_vat_number')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+                                @else
                                 <!-- Dane nabywcy -->
                                 <div>
                                     <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane nabywcy</h3>
@@ -244,6 +290,7 @@
                                         <a href="https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat" class="text-blue-600 dark:text-blue-400 hover:underline text-xs mt-1">Źródło: https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat</a>
                                     </div>
                                 </div>
+                                @endif
                             </div>
 
                             <!-- DIVIDER -->
@@ -274,7 +321,7 @@
 
                                     <!-- Prawa kolumna (1/4 szerokości) - Podsumowanie -->
                                     <div class="md:col-span-1">
-                                        <div id="summary" class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+                                        <div id="summary" class="bg-gray-100 dark:bg-gray-800 py-4 rounded-lg">
                                             <h3 class="text-2xl font-semibold text-gray-700 dark:text-gray-300 text-end">Podsumowanie</h3>
                                             <div class="mt-4">
                                                 <p class="text-sm font-medium text-gray-700 dark:text-gray-300 text-end">Suma netto:
@@ -298,7 +345,7 @@
                             <!-- Metoda płatności -->
                             <div class="mb-6">
                                 <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Metoda płatności</h3>
-                                <ul class="grid w-full gap-6 md:grid-cols-3">
+                                <ul class="grid w-full gap-6 grid-cols-2 md:grid-cols-3">
                                     <li>
                                         <input name="payment_method" checked type="radio" id="payment_transfer" value="przelew" class="hidden peer">
                                         <label for="payment_transfer" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
@@ -469,6 +516,7 @@
 
                 //PODSTAWIANIE usługi i produktu
                 var len = this.length;
+                const self = this;
                 $('#item_name_' + len).on('input', function() {
                     var input = $(this).val();
                     var options = $('#name_item_suggestions_' + len + ' option');
@@ -482,6 +530,15 @@
                             // Pobierz NIP z atrybutu data i ustaw w polu NIP
                             var vat = $(this).data('vat_rate');
                             $('#item_vat_' + len).val(vat);
+                            var item_quantity = $('#item_quantity_' + len).val();
+
+                            var totalNetto = item_quantity * price;
+                            var totalVat = item_quantity * vat;
+                            var totalBrutto = totalNetto + totalVat;
+
+                            var item_netto = $('#item_netto_' + len).val(totalNetto);
+                            var item_brutto = $('#item_brutto_' + len).val(totalBrutto);
+                            self.updateSummary(); // Aktualizacja po dodaniu pozycji
                         }
                     });
                 });
@@ -515,12 +572,12 @@
         }
 
         function invoiceItems() {
-            const $item = new Item($('#invoice-items'));
-            $item.print();
+            const item = new Item($('#invoice-items'));
+            item.print();
 
             // Funkcja do dodawania nowych pozycji na fakturze
             $('#add-item').on('click', function() {
-                $item.print();
+                item.print();
                 toastr.success('Operacja zakończona powodzeniem!');
             });
         }

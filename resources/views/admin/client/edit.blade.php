@@ -57,7 +57,7 @@
                         <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                                <input type="email" id="email" name="email" value="{{ old('email', $client->email) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="email" id="email" name="email" value="{{ old('email', $client->email) }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                             </div>
                             <div>
                                 <label for="email2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email dodatkowy</label>
@@ -69,7 +69,7 @@
                         <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefon</label>
-                                <input type="text" id="phone" name="phone" value="{{ old('phone', $client->phone) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="text" id="phone" name="phone" value="{{ old('phone', $client->phone) }}"  class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                             </div>
                             <div>
                                 <label for="phone2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefon dodatkowy</label>
