@@ -40,7 +40,7 @@
                                         <input name="invoice_type" type="radio" id="invoice" value="faktura" class="hidden peer" checked>
                                         <label for="invoice" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">Faktura</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">Faktura</div>
                                             </div>
                                         </label>
                                     </li>
@@ -67,7 +67,7 @@
                                         <input name="payment_term" type="radio" id="payment_now" value="natychmiast" class="hidden peer">
                                         <label for="payment_now" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">Natychmiast</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">Natychmiast</div>
                                             </div>
                                         </label>
                                     </li>
@@ -75,7 +75,7 @@
                                         <input name="payment_term" type="radio" id="payment_1day" value="1_dzien" class="hidden peer">
                                         <label for="payment_1day" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">1 dzień</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">1 dzień</div>
                                             </div>
                                         </label>
                                     </li>
@@ -83,7 +83,7 @@
                                         <input name="payment_term" type="radio" id="payment_3days" value="3_dni" class="hidden peer">
                                         <label for="payment_3days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">3 dni</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">3 dni</div>
                                             </div>
                                         </label>
                                     </li>
@@ -91,7 +91,7 @@
                                         <input name="payment_term" type="radio" id="payment_7days" value="7_dni" class="hidden peer">
                                         <label for="payment_7days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">7 dni</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">7 dni</div>
                                             </div>
                                         </label>
                                     </li>
@@ -99,7 +99,7 @@
                                         <input name="payment_term" checked type="radio" id="payment_14days" value="14_dni" class="hidden peer">
                                         <label for="payment_14days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">14 dni</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">14 dni</div>
                                             </div>
                                         </label>
                                     </li>
@@ -107,7 +107,7 @@
                                         <input name="payment_term" type="radio" id="payment_30days" value="30_dni" class="hidden peer">
                                         <label for="payment_30days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">30 dni</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">30 dni</div>
                                             </div>
                                         </label>
                                     </li>
@@ -115,7 +115,7 @@
                                         <input name="payment_term" type="radio" id="payment_60days" value="60_dni" class="hidden peer">
                                         <label for="payment_60days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">60 dni</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">60 dni</div>
                                             </div>
                                         </label>
                                     </li>
@@ -123,7 +123,7 @@
                                         <input name="payment_term" type="radio" id="payment_90days" value="90_dni" class="hidden peer">
                                         <label for="payment_90days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">90 dni</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">90 dni</div>
                                             </div>
                                         </label>
                                     </li>
@@ -141,12 +141,12 @@
 
                                 <!-- Dane sprzedawcy -->
                                 <div>
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane sprzedawcy</h3>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
+                                    <h3 class="text-sm md:text-xl font-medium text-gray-900 dark:text-gray-100">Dane sprzedawcy</h3>
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Nazwa
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             <a href="{{route('setting')}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$company->name}}</a>
                                             <input type="hidden" value="{{$company->id}}" name="company_id">
                                             <input type="hidden" value="{{$company->name}}" name="seller_name">
@@ -158,11 +158,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Adres
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->adress}}
                                             <input type="hidden" value="{{$company->adress}}" name="seller_adress">
                                         </p>
@@ -170,11 +170,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             NIP
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->vat_number}}
                                             <input type="hidden" value="{{$company->vat_number}}" name="seller_vat_number">
                                         </p>
@@ -182,11 +182,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Numer konta
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->bank}}
                                             <input type="hidden" value="{{$company->bank}}" name="bank">
                                         </p>
@@ -199,12 +199,12 @@
                                 @if(isset($create_client))
                                 <!-- Dane nabywcy -->
                                 <div>
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane nabywcy</h3>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
+                                    <h3 class="text-sm md:text-xl font-medium text-gray-900 dark:text-gray-100">Dane nabywcy</h3>
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Nazwa
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             <a href="{{route('client.show', $create_client)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$create_client->name}}</a>
                                             <input type="hidden" id="client_id" name="client_id" value="{{$create_client->id}}">
                                             <input type="hidden" value="{{$create_client->name}}" name="buyer_name">
@@ -216,11 +216,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Adres
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$create_client->adress}}
                                             <input type="hidden" value="{{$create_client->adress}}" name="buyer_adress">
                                         </p>
@@ -228,11 +228,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             NIP
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$create_client->vat_number}}
                                             <input type="hidden" value="{{$create_client->vat_number}}" name="buyer_vat_number">
                                         </p>
@@ -244,7 +244,7 @@
                                 @else
                                 <!-- Dane nabywcy -->
                                 <div>
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane nabywcy</h3>
+                                    <h3 class="text-sm md:text-xl font-medium text-gray-900 dark:text-gray-100">Dane nabywcy</h3>
 
                                     <!-- Klient -->
                                     <div class="mb-6">
@@ -298,7 +298,7 @@
 
                             <!-- Pozycje faktury -->
                             <div class="mb-6">
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Pozycje na fakturze</h3>
+                                <h3 class="text-sm md:text-xl font-medium text-gray-900 dark:text-gray-100">Pozycje na fakturze</h3>
                                 <div id="invoice-items" class="mt-6">
 
                                     <!-- KONTERNER DLA POZYCJI -->
@@ -350,7 +350,7 @@
                                         <input name="payment_method" checked type="radio" id="payment_transfer" value="przelew" class="hidden peer">
                                         <label for="payment_transfer" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">Przelew</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">Przelew</div>
                                             </div>
                                         </label>
                                     </li>
@@ -358,7 +358,7 @@
                                         <input name="payment_method" type="radio" id="payment_cash" value="gotowka" class="hidden peer">
                                         <label for="payment_cash" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">Gotówka</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">Gotówka</div>
                                             </div>
                                         </label>
                                     </li>
@@ -366,7 +366,7 @@
                                         <input name="payment_method" type="radio" id="payment_card" value="karta" class="hidden peer">
                                         <label for="payment_card" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">Karta płatnicza</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">Karta płatnicza</div>
                                             </div>
                                         </label>
                                     </li>
@@ -374,7 +374,7 @@
                                         <input name="payment_method" type="radio" id="payment_cod" value="pobranie" class="hidden peer">
                                         <label for="payment_cod" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">Opłata za pobraniem</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">Opłata za pobraniem</div>
                                             </div>
                                         </label>
                                     </li>
@@ -382,7 +382,7 @@
                                         <input name="payment_method" type="radio" id="payment_online" value="online" class="hidden peer">
                                         <label for="payment_online" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
-                                                <div class="w-full text-lg font-semibold">Płatność On-Line</div>
+                                                <div class="w-full text-sm md:text-xl font-semibold">Płatność On-Line</div>
                                             </div>
                                         </label>
                                     </li>

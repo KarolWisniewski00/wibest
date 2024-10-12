@@ -30,36 +30,34 @@
                     @if ($company)
                     <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
                         <div>
-                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane sprzedawcy</h3>
-                            <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700 mt-6">
-                                <p class="text-gray-600 dark:text-gray-200 font-semibold">
-                                    Nazwa
-                                </p>
-                                <p class="text-gray-900 dark:text-gray-200">
+                            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Moja firma</h3>
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700 mt-6">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                     {{ $company->name }}
                                 </p>
                             </div>
-                            <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                                <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">
                                     Adres
                                 </p>
-                                <p class="text-gray-900 dark:text-gray-200">
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                     {{ $company->adress }}
                                 </p>
                             </div>
-                            <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                                <p class="text-gray-600 dark:text-gray-200 font-semibold">
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">
                                     NIP
                                 </p>
-                                <p class="text-gray-900 dark:text-gray-200">
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                     {{ $company->vat_number }}
                                 </p>
                             </div>
-                            <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                                <p class="text-gray-600 dark:text-gray-200 font-semibold">
-                                    Bank
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">
+                                    Numer konta bankowego
                                 </p>
-                                <p class="text-gray-900 dark:text-gray-200">
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                     {{ $company->bank }}
                                 </p>
                             </div>

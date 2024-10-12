@@ -66,161 +66,161 @@
                     </div>
                     <div class="mt-8 grid grid-cols-2 md:gap-4">
                         <div class="col-span-2 md:grid md:grid-cols-1 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <h2 class="text-lg font-semibold text-gray-600 dark:text-gray-50">FVS</h2>
+                            <h2 class="text-sm md:text-xl font-semibold text-gray-600 dark:text-gray-50">FVS</h2>
                         </div>
 
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Numer</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->number }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->number }}</p>
                         </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Typ</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->invoice_type }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->invoice_type }}</p>
                         </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Data wystawienia</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->issue_date }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->issue_date }}</p>
                         </div>
-                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Termin płatności</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->due_date }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->due_date }}</p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
 
                             </p>
                         </div>
-                        <div class="col-start-1 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 Sprzedawca
                             </p>
                         </div>
-                        <div class="col-start-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 Nabywca
                             </p>
                         </div>
-                        <div class="col-start-1 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa sprzedającego</p>
                             @if($invoice->client)
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 <a href="{{route('setting')}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $invoice_obj->seller_name }}</a>
                             </p>
                             @else
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $invoice_obj->seller_name }}
                             </p>
                             @endif
 
                         </div>
-                        <div class="col-start-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa kupującego</p>
                             @if($invoice->client)
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 <a href="{{route('client.show', $invoice->client_id)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $invoice_obj->buyer_name }}</a>
                             </p>
                             @else
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $invoice_obj->buyer_name }}
                             </p>
                             @endif
 
                         </div>
-                        <div class="col-start-1 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Adres sprzedającego</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $invoice_obj->seller_adress }}
                             </p>
                         </div>
-                        <div class="col-start-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Adres kupującego</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $invoice_obj->buyer_adress }}
                             </p>
                         </div>
-                        <div class="col-start-1 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">NIP sprzedającego</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $invoice_obj->seller_tax_id }}
                             </p>
                         </div>
-                        <div class="col-start-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">NIP kupującego</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $invoice_obj->buyer_tax_id }}
                             </p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
 
                             </p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold ">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold ">
                                 Pozycje
                             </p>
                         </div>
                         @foreach($invoiceItems as $item)
                         <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">{{$item->name}}</h2>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{$item->name}}</h2>
                             <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
                             <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
                         </div>
                         @endforeach
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold text-end">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
 
                             </p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold text-end">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
                                 Podsumowanie
                             </p>
                         </div>
-                        <div class="col-start-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota netto</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->subtotal }} PLN</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->subtotal }} PLN</p>
                         </div>
-                        <div class="col-start-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota VAT</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->vat }} PLN</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->vat }} PLN</p>
                         </div>
-                        <div class="col-start-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota brutto</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->total }} PLN</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->total }} PLN</p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Uwagi</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->notes }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->notes }}</p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Metoda płatności</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->payment_method }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->payment_method }}</p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-400">
                                 Utworzone przez
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-gray-900 dark:text-gray-400 text-sm md:text-xl font-semibold">
                                 {{ $invoice_obj->user->name ?? '' }}
                             </p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-400">
                                 Dane należące do
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-gray-900 dark:text-gray-400 text-sm md:text-xl font-semibold">
                                 {{ $invoice_obj->company->name ?? '' }}
                             </p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-400">Data utworzenia</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-400 font-semibold">{{ $invoice_obj->created_at->format('d-m-Y H:i') }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 font-semibold">{{ $invoice_obj->created_at->format('d-m-Y H:i') }}</p>
                         </div>
-                        <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-400">Data aktualizacji</p>
-                            <p class="text-lg text-gray-900 dark:text-gray-400 font-semibold">{{ $invoice_obj->updated_at->format('d-m-Y H:i') }}</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 font-semibold">{{ $invoice_obj->updated_at->format('d-m-Y H:i') }}</p>
                         </div>
                     </div>
                     <div class="mt-8 flex md:hidden justify-end space-x-4">

@@ -25,7 +25,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Nazwa
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $client->name }}
                             </p>
                         </div>
@@ -33,7 +33,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 NIP
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $client->vat_number }}
                             </p>
                         </div>
@@ -41,7 +41,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Adres
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $client->adress }}
                             </p>
                         </div>
@@ -49,7 +49,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Email
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 <a href="maito:{{ $client->email }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->email }}</a>
                                 @if($client->email2)
                                 <br>
@@ -61,7 +61,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Telefon
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 <a href="tel:{{ $client->phone }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->phone }}</a>
                                 @if($client->phone2)
                                 <br>
@@ -73,7 +73,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Uwagi
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $client->notes ?? '' }}
                             </p>
                         </div>
@@ -81,7 +81,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Utworzone przez
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $client->user->name ?? '' }}
                             </p>
                         </div>
@@ -89,7 +89,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Dane należące do
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $client->company->name ?? '' }}
                             </p>
                         </div>
@@ -97,7 +97,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Data utworzenia klienta
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $client->created_at->format('d-m-Y H:i') }}
                             </p>
                         </div>
@@ -105,7 +105,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Data aktualizacji klienta
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $client->updated_at->format('d-m-Y H:i') }}
                             </p>
                         </div>

@@ -11,22 +11,114 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-                    <!--Napis z przyciskiem tworzenia-->
-                    <div class="flex flex-row justify-between items-center">
-                        <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
-                            Faktury
-                        </h1>
-                        @if ($company)
-                        <a href="{{ route('invoice.create') }}" class="mt-8 mb-4 inline-flex items-center justify-center w-10 h-10 mr-2 text-green-100 transition-colors duration-150 bg-green-500 rounded-full focus:shadow-outline hover:bg-green-600">
-                            <i class="fa-solid fa-plus"></i>
-                        </a>
-                        @else
-                        @endif
+                    <style>
+                        .sticky {
+                            position: fixed;
+                            top: 0;
+                            width: 100%;
+                            z-index: 1000;
+                            padding-right: 48px;
+                        }
+
+                        /* Dodajemy styl na kontener z miesiącami, aby umożliwić przewijanie */
+                        #months-container {
+                            display: flex;
+                            flex-direction: row;
+                            overflow-x: auto;
+                            /* Przewijanie poziome */
+                            padding-bottom: 10px;
+                            gap: 8px;
+                            /* Odstępy między elementami */
+                            scrollbar-width: thin;
+                            /* Cieńszy pasek przewijania w przeglądarkach wspierających */
+                        }
+
+                        /* Stylizowanie paska przewijania dla WebKit (Chrome, Safari) */
+                        #months-container::-webkit-scrollbar {
+                            height: 8px;
+                        }
+
+                        #months-container::-webkit-scrollbar-thumb {
+                            background-color: #888;
+                            border-radius: 4px;
+                        }
+
+                        #months-container::-webkit-scrollbar-thumb:hover {
+                            background-color: #555;
+                        }
+                    </style>
+
+                    <!-- Napis z przyciskiem tworzenia -->
+                    <div id="fixed" class="pb-4 flex flex-col justify-between items-center bg-white dark:bg-gray-800">
+                        <div class="flex flex-row justify-between items-center w-full">
+                            <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
+                                Faktury
+                            </h1>
+                            @if ($company)
+                            <a href="{{ route('invoice.create') }}" class="mt-8 mb-4 inline-flex items-center justify-center w-10 h-10 mr-2 text-green-100 transition-colors duration-150 bg-green-500 rounded-full focus:shadow-outline hover:bg-green-600">
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                            @else
+                            @endif
+                        </div>
+
+                        <div id="months-container" class="w-full py-4">
+                            @if(isset($month))
+                            <a href="{{route('invoice')}}" class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium border border-indigo-500 text-indigo-500 dark:text-indigo-400 whitespace-nowrap">
+                                {{$month}}
+                            </a>
+                            @endif
+                            <!-- Tutaj będą dodane miesiące -->
+                        </div>
                     </div>
 
+                    <script>
+                        $(document).ready(function() {
+                            var element = $('#fixed');
+                            var elementOffset = element.offset().top;
+
+                            $(window).scroll(function() {
+                                if ($(window).scrollTop() > elementOffset) {
+                                    element.addClass('sticky');
+                                } else {
+                                    element.removeClass('sticky');
+                                }
+                            });
+
+                            // Funkcja do generowania nazw miesięcy po polsku
+                            function generateMonths() {
+                                const months = [
+                                    "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
+                                    "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+                                ];
+                                const today = new Date();
+                                const currentMonth = today.getMonth();
+                                const monthContainer = $('#months-container');
+
+                                // Dodaj 12 miesięcy zaczynając od aktualnego miesiąca
+                                for (let i = 0; i < 12; i++) {
+                                    const monthIndex = (currentMonth - i + 12) % 12; // Obliczanie indeksu miesiąca
+                                    const monthName = months[monthIndex];
+                                    // Tworzenie i dodawanie elementu Badge
+                                    const monthBadge = `
+                                    <a href="{{route('invoice.filter.month', '')}}/${monthName}" class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium border border-gray-500 text-gray-500 dark:text-neutral-400 whitespace-nowrap">
+                                    ${monthName}
+                                    </a>
+                                    `;
+                                    monthContainer.append(monthBadge);
+                                }
+                            }
+
+                            // Wywołaj funkcję generującą miesiące
+                            generateMonths();
+                        });
+                    </script>
+
+
                     <!--Tabela-->
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
+                    <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8">
                         @if ($company)
                         <ul class="grid w-full gap-y-4 block md:hidden">
                             @if ($invoices->isEmpty())

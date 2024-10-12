@@ -180,6 +180,41 @@ class InvoiceController extends Controller
         return view('admin.invoice.index', compact('invoices'));
     }
 
+    /**
+     * Pokazuje faktury z wybranego miesiąca od najnowszych.
+     */
+    public function filter_month($month)
+    {
+        // Tablica z nazwami miesięcy w języku polskim
+        $months = [
+            "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
+            "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
+        ];
+    
+        // Sprawdzenie czy podano poprawny miesiąc
+        if (in_array($month, $months)) {
+            // Ustalenie numeru miesiąca na podstawie jego nazwy (od 1 do 12)
+            $monthNumber = array_search($month, $months) + 1;
+    
+            // Oblicz początek i koniec wybranego miesiąca w bieżącym roku
+            $startOfMonth = Carbon::create(Carbon::now()->year, $monthNumber, 1)->startOfMonth();
+            $endOfMonth = $startOfMonth->copy()->endOfMonth();
+    
+            // Pobierz faktury tylko z wybranego miesiąca
+            $invoices = Invoice::where('company_id', $this->get_company_id())
+                ->whereBetween('created_at', [$startOfMonth, $endOfMonth])  // Filtruj po dacie
+                ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+                ->paginate(10);
+        } else {
+            // Jeśli podano niepoprawny miesiąc, zwróć wszystkie faktury
+            $invoices = Invoice::where('company_id', $this->get_company_id())
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        }
+    
+        return view('admin.invoice.index', compact('invoices','month'));
+    }
+    
 
     /**
      * Pokazuje fakturę.

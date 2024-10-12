@@ -25,7 +25,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Nazwa
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->name }}
                             </p>
                         </div>
@@ -33,7 +33,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Cena jednostkowa netto
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->unit_price ? number_format($product->unit_price, 2) . ' PLN' : '' }}
                             </p>
                         </div>
@@ -41,7 +41,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Stawka VAT
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->vat_rate ? number_format($product->vat_rate, 2) . '%' : '' }}
                             </p>
                         </div>
@@ -49,7 +49,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Kwota VAT
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->vat_amount ? number_format($product->vat_amount, 2) . ' PLN' : '' }}
                             </p>
                         </div>
@@ -57,7 +57,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Wartość netto
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->subtotal ? number_format($product->subtotal, 2) . ' PLN' : '' }}
                             </p>
                         </div>
@@ -65,7 +65,7 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">
                                 Wartość brutto
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->total ? number_format($product->total, 2) . ' PLN' : '' }}
                             </p>
                         </div>
@@ -81,7 +81,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Utworzone przez
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $service->user->name ?? '' }}
                             </p>
                         </div>
@@ -89,7 +89,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Dane należące do
                             </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-lg font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $service->company->name ?? '' }}
                             </p>
                         </div>
@@ -97,7 +97,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Data utworzenia
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->created_at->format('d-m-Y H:i') }}
                             </p>
                         </div>
@@ -105,7 +105,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Data aktualizacji
                             </p>
-                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                 {{ $product->updated_at->format('d-m-Y H:i') }}
                             </p>
                         </div>
