@@ -30,9 +30,6 @@
                     <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                         {{ __('Ustawienia') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('version') }}" :active="Str::startsWith(request()->path(), 'dashboard/version')">
-                        {{ __('Wersje') }}
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -174,9 +171,6 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                 {{ __('Ustawienia') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('version') }}" :active="Str::startsWith(request()->path(), 'dashboard/version')">
-                {{ __('Wersje') }}
             </x-responsive-nav-link>
         </div>
 

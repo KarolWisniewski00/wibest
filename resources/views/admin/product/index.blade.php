@@ -57,6 +57,9 @@
                                             <div class="text-lg dark:text-gray-50">
                                                 Brutto <span class="font-semibold">{{ $product->total }}</span> zł
                                             </div>
+                                            <div class="text-lg dark:text-gray-50">
+                                                {{ $product->magazine }}
+                                            </div>
                                         </div>
                                         <div class="flex space-x-4 mt-4">
                                             <a href="{{route('product.show', $product)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
@@ -83,6 +86,9 @@
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         Stawka VAT (%)
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Stan magazynowy
                                     </th>
                                     <th scope="col" class="px-6 py-3">
                                         Podgląd
@@ -112,11 +118,14 @@
                                         {{ $product->name }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $product->unit_price }}</div>
+                                        <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $product->unit_price }} zł</div>
 
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $product->vat_rate }}</div>
+                                        <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $product->vat_rate }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        {{ $product->magazine }}
                                     </td>
                                     <td class="px-6 py-4">
                                         <a href="{{route('product.show', $product)}}" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-4 focus:ring-gray-200"><i class="fa-solid fa-eye"></i></a>

@@ -63,6 +63,12 @@
                             </div>
                         </div>
                     </div>
+                    <div class="mt-8 flex justify-end space-x-4">
+                            <!-- Green button for marking as completed -->
+                            <a href="{{route('version')}}"  class="inline-flex items-center px-4 py-2 bg-indigo-900 dark:bg-indigo-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-800 dark:hover:bg-indigo-800 focus:bg-sky-800 dark:focus:bg-indigo-800 active:bg-indigo-800 dark:active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            <i class="fa-solid fa-clock-rotate-left mr-2"></i>Zobacz historę wersji systemu
+                            </a>
+                        </div>
                     @else
                     <div id="alert-additional-content-4" class="p-4 mb-4 text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 dark:border-yellow-800" role="alert">
                         <div class="flex items-center">

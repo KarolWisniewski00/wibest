@@ -144,8 +144,17 @@ class InvoiceController extends Controller
             $itemVatAmount = 0;
         }
 
+        try {
+            $product = Product::where('id', $item['product_id'])->first();
+            $product->magazine = $product->magazine - $item['quantity'];
+            $product->save();
+        } catch (Exception) {
+        }
+
         $invoiceItem = new InvoiceItem();
         $invoiceItem->invoice_id = $id;
+        $invoiceItem->product_id = $item['product_id'];
+        $invoiceItem->service_id = $item['service_id'];
         $invoiceItem->name = $item['name'];
         $invoiceItem->quantity = $item['quantity'];
         $invoiceItem->unit_price = $item['price'];
@@ -177,44 +186,99 @@ class InvoiceController extends Controller
             ->orderBy('created_at', 'desc')  // Sortowanie malejąco
             ->paginate(10);
 
-        return view('admin.invoice.index', compact('invoices'));
+        // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
+        $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->get();
+
+        $invoices_all =  Invoice::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->get();
+
+        return view('admin.invoice.index', compact('invoices', 'invoices_sugestion', 'invoices_all'));
+    }
+    /**
+     * Pokazuje faktury z aktualnego miesiąca od najnowszych.
+     */
+    public function index_now()
+    {
+        $currentMonth = now()->month; // Pobiera bieżący miesiąc
+        $currentYear = now()->year;   // Pobiera bieżący rok
+
+        // Sortowanie faktur po 'created_at' malejąco (od najnowszych), tylko dla bieżącego miesiąca i roku
+        $invoices = Invoice::where('company_id', $this->get_company_id())
+            ->whereMonth('created_at', $currentMonth)  // Tylko bieżący miesiąc
+            ->whereYear('created_at', $currentYear)    // Tylko bieżący rok
+            ->orderBy('created_at', 'desc')            // Sortowanie malejąco
+            ->paginate(10);                            // Paginacja
+
+        // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
+        $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
+            ->whereMonth('created_at', $currentMonth)  // Tylko bieżący miesiąc
+            ->whereYear('created_at', $currentYear)    // Tylko bieżący rok
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->get();
+
+        $invoices_all =  Invoice::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->get();
+
+        return view('admin.invoice.index', compact('invoices', 'invoices_sugestion', 'invoices_all'));
+    }
+    /**
+     * Pokazuje faktury z poprzedniego miesiąca od najnowszych.
+     */
+    public function index_last()
+    {
+        // Pobierz datę dla poprzedniego miesiąca
+        $previousMonth = now()->subMonth()->month;  // Poprzedni miesiąc
+        $previousMonthYear = now()->subMonth()->year;  // Rok poprzedniego miesiąca
+
+        // Sortowanie faktur po 'created_at' malejąco (od najnowszych), tylko dla poprzedniego miesiąca i odpowiedniego roku
+        $invoices = Invoice::where('company_id', $this->get_company_id())
+            ->whereMonth('created_at', $previousMonth)  // Tylko poprzedni miesiąc
+            ->whereYear('created_at', $previousMonthYear)  // Rok poprzedniego miesiąca
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->paginate(10);  // Paginacja
+
+
+        // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
+        $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
+            ->whereMonth('created_at', $previousMonth)  // Tylko bieżący miesiąc
+            ->whereYear('created_at', $previousMonthYear)    // Tylko bieżący rok
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->get();
+
+        $invoices_all =  Invoice::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->get();
+
+        return view('admin.invoice.index', compact('invoices', 'invoices_sugestion', 'invoices_all'));
     }
 
-    /**
-     * Pokazuje faktury z wybranego miesiąca od najnowszych.
-     */
-    public function filter_month($month)
+    public function search(Request $request)
     {
-        // Tablica z nazwami miesięcy w języku polskim
-        $months = [
-            "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
-            "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
-        ];
-    
-        // Sprawdzenie czy podano poprawny miesiąc
-        if (in_array($month, $months)) {
-            // Ustalenie numeru miesiąca na podstawie jego nazwy (od 1 do 12)
-            $monthNumber = array_search($month, $months) + 1;
-    
-            // Oblicz początek i koniec wybranego miesiąca w bieżącym roku
-            $startOfMonth = Carbon::create(Carbon::now()->year, $monthNumber, 1)->startOfMonth();
-            $endOfMonth = $startOfMonth->copy()->endOfMonth();
-    
-            // Pobierz faktury tylko z wybranego miesiąca
-            $invoices = Invoice::where('company_id', $this->get_company_id())
-                ->whereBetween('created_at', [$startOfMonth, $endOfMonth])  // Filtruj po dacie
-                ->orderBy('created_at', 'desc')  // Sortowanie malejąco
-                ->paginate(10);
-        } else {
-            // Jeśli podano niepoprawny miesiąc, zwróć wszystkie faktury
-            $invoices = Invoice::where('company_id', $this->get_company_id())
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
-        }
-    
-        return view('admin.invoice.index', compact('invoices','month'));
+        $query = $request->input('query');
+
+        // Wyszukiwanie faktur na podstawie numeru lub klienta
+        $invoices = Invoice::where('company_id', $this->get_company_id())
+            ->where(function ($q) use ($query) {
+                $q->where('number', 'like', "%{$query}%")
+                    ->orWhereHas('client', function ($q) use ($query) {
+                        $q->where('name', 'like', "%{$query}%");
+                    });
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(10) // Pobranie maksymalnie 10 wyników
+            ->get();
+
+        // Zwracamy faktury jako JSON
+        return response()->json($invoices);
     }
-    
+
 
     /**
      * Pokazuje fakturę.
@@ -248,14 +312,13 @@ class InvoiceController extends Controller
         $products = Product::where('company_id', $this->get_company_id())->get();
         $invoiceNumber = $this->get_invoice_number();
         $company = $this->get_company();
-        return view('admin.invoice.create', compact('create_client','clients', 'invoiceNumber', 'company', 'services', 'products'));
+        return view('admin.invoice.create', compact('create_client', 'clients', 'invoiceNumber', 'company', 'services', 'products'));
     }
     /**
      * Zapisuje formularz tworzenia nowej faktury.
      */
     public function store(Request $request)
     {
-
         // Zapis faktury do tabeli 'invoices'
         $invoice = new Invoice();
 
@@ -342,6 +405,70 @@ class InvoiceController extends Controller
 
         // Przekierowanie z komunikatem o sukcesie
         return redirect()->route('invoice')->with('success', 'Faktura została pomyślnie utworzona.');
+    }
+
+    /**
+     * Zapisuje nową fakturę sprzedażową.
+     */
+    public function store_from(Invoice $invoice)
+    {
+        // Zapis faktury sprzedażowej na podstawie proformy
+        $invoice_new_record = new Invoice();
+
+        $user = User::where('id', auth()->id())->first();
+        $invoice_new_record->due_date = $invoice->due_date;
+        $invoice_new_record->number = $invoice->number;
+        $invoice_new_record->invoice_type = 'faktura sprzedażowa'; // Zmieniamy typ faktury na sprzedażową
+        $invoice_new_record->issue_date = $invoice->issue_date;
+        $invoice_new_record->company_id = $invoice->company_id;
+        $invoice_new_record->client_id = $invoice->client_id;
+        $invoice_new_record->seller_name = $invoice->seller_name;
+        $invoice_new_record->seller_adress = $invoice->seller_adress;
+        $invoice_new_record->seller_tax_id = $invoice->seller_tax_id;
+        $invoice_new_record->seller_bank = $invoice->seller_bank;
+        $invoice_new_record->buyer_name = $invoice->buyer_name;
+        $invoice_new_record->buyer_adress = $invoice->buyer_adress;
+        $invoice_new_record->buyer_tax_id = $invoice->buyer_tax_id;
+        $invoice_new_record->payment_method = $invoice->payment_method;
+        $invoice_new_record->notes = $invoice->notes;
+        $invoice_new_record->subtotal = $invoice->subtotal;
+        $invoice_new_record->vat = $invoice->vat;
+        $invoice_new_record->total = $invoice->total;
+        $invoice_new_record->user_id = $user->id;
+        $invoice_new_record->total_in_words = $invoice->total_in_words;
+
+        // Zapisanie nowego rekordu faktury sprzedażowej
+        $invoice_new_record->save();
+
+        // Przypisanie ID nowej faktury do starej (proforma)
+        $invoice->invoice_id = $invoice_new_record->id;
+        $invoice->save();
+
+        // Przypisanie ID proformy do nowo utworzonej faktury sprzedażowej
+        $invoice_new_record->invoice_id = $invoice->id;
+        $invoice_new_record->save();
+
+        // Zapis pozycji faktury do tabeli 'invoice_items'
+        $invoice_items = InvoiceItem::where('invoice_id', $invoice->id)->get();
+        foreach ($invoice_items as $item) {
+            $item_new_record = new InvoiceItem();
+            $item_new_record->invoice_id = $invoice_new_record->id; // Przypisanie pozycji do nowej faktury sprzedażowej
+            $item_new_record->product_id = $item->product_id;
+            $item_new_record->service_id = $item->service_id;
+            $item_new_record->name = $item->name;
+            $item_new_record->quantity = $item->quantity;
+            $item_new_record->unit_price = $item->unit_price;
+            $item_new_record->subtotal = $item->subtotal;
+            $item_new_record->vat_rate = $item->vat_rate;
+            $item_new_record->vat_amount = $item->vat_amount;
+            $item_new_record->total = $item->total;
+
+            // Zapisanie pozycji nowej faktury sprzedażowej
+            $item_new_record->save();
+        }
+
+        // Przekierowanie z komunikatem o sukcesie
+        return redirect()->route('invoice')->with('success', 'Faktura sprzedażowa została pomyślnie utworzona na podstawie proformy.');
     }
 
     /**
@@ -477,6 +604,7 @@ class InvoiceController extends Controller
 
         $invoice = [
             'number' => $invoice_obj->number,
+            'invoice_type' => $invoice_obj->invoice_type,
             'issue_date' => $invoice_obj->issue_date,
             'due_date' => $invoice_obj->due_date,
             'status' => $invoice_obj->status,
@@ -512,6 +640,7 @@ class InvoiceController extends Controller
         $invoice_obj = Invoice::where('id', $invoice_str)->first();
         $invoice = [
             'number' => $invoice_obj->number,
+            'invoice_type' => $invoice_obj->invoice_type,
             'issue_date' => $invoice_obj->issue_date,
             'due_date' => $invoice_obj->due_date,
             'status' => $invoice_obj->status,

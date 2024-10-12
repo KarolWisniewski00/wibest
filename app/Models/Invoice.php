@@ -68,4 +68,19 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class); // Faktura należy do jednego użytkownika
     }
+    // Faktura sprzedażowa powiązana z proformą
+    public function proforma()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
+
+    // Proforma, która ma powiązaną fakturę sprzedażową
+    public function salesInvoice()
+    {
+        return $this->hasOne(Invoice::class, 'invoice_id');
+    }
+    public function related_invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_id');
+    }
 }

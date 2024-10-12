@@ -32,8 +32,54 @@ class ClientController extends Controller
             ->orderBy('created_at', 'desc')  // Sortowanie malejąco
             ->paginate(10);
 
+        // Dodaj dane do wykresu
+        $dailyTotals = [];
+        $dailySubTotals = [];
+        $dailyCounts = []; // Tablica do zliczania dokumentów
+
+        // Dodaj dane do informacji
+        $dailyTotalsCount = 0;
+        $dailySubTotalsCount = 0;
+        $dailyCountsCount = 0;
+
+        // Inicjalizacja tablic na 31 dni
+        for ($i = 0; $i < 31; $i++) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $dailyTotals[$date] = 0;
+            $dailySubTotals[$date] = 0;
+            $dailyCounts[$date] = 0; // Inicjalizuj liczbę dokumentów
+        }
+
+        // Zliczanie sum dla każdego dnia
+        foreach ($invoices as $invoice) {
+            $date = $invoice->created_at->format('Y-m-d');
+            $dailyTotals[$date] += $invoice->total; // sumuj total
+            $dailySubTotals[$date] += $invoice->subtotal; // sumuj sub_total
+            $dailyCounts[$date]++; // zwiększ licznik dokumentów
+
+            $dailyTotalsCount += $dailyTotals[$date] + $invoice->total;
+            $dailySubTotalsCount += $dailySubTotals[$date] + $invoice->subtotal;
+            $dailyCountsCount += 1;
+        }
+
+        // Uporządkuj dane w tablicach
+        $dates = array_keys($dailyTotals);
+        $totalValues = array_values($dailyTotals);
+        $subTotalValues = array_values($dailySubTotals);
+        $documentCounts = array_values($dailyCounts); // Liczba dokumentów
+
         // Przekazanie klienta oraz jego faktur do widoku
-        return view('admin.client.show', compact('client', 'invoices'));
+        return view('admin.client.show', compact(
+            'client',
+            'invoices',
+            'dates',
+            'totalValues',
+            'subTotalValues',
+            'documentCounts',
+            'dailyTotalsCount',
+            'dailySubTotalsCount',
+            'dailyCountsCount'
+        ));
     }
 
     /**

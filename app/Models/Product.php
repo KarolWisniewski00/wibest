@@ -20,6 +20,7 @@ class Product extends Model
         'description', // Dodatkowy opis produktu
         'company_id', // Id firmy powiązanej z klientem
         'user_id',
+        'magazine',
     ];
 
     /**

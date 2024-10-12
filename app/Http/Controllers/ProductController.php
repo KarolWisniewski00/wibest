@@ -37,7 +37,7 @@ class ProductController extends Controller
     /**
      * Zapisuje nowego produkt w bazie danych.
      */
-    public function store(ServiceRequest $request)
+    public function store(Request $request)
     {
         $user = User::where('id', auth()->id())->first();
 
@@ -55,6 +55,7 @@ class ProductController extends Controller
             'unit_price' => $unitPrice,
             'subtotal' => $subtotal,
             'vat_rate' => $request->vat_rate,
+            'magazine' => $request->magazine,
             'vat_amount' => $vatAmount,
             'total' => $total,
             'description' => $request->description,
@@ -82,7 +83,7 @@ class ProductController extends Controller
     /**
      * Aktualizuje produkt w bazie danych.
      */
-    public function update(ServiceRequest $request, Product $product)
+    public function update(Request $request, Product $product)
     {
         // Aktualizacja danych usługi
         $res = $product->update([
@@ -90,12 +91,13 @@ class ProductController extends Controller
             'unit_price' => $request->unit_price,
             'vat_rate' => $request->vat_rate,
             'description' => $request->description,
+            'magazine' => $request->magazine,
         ]);
 
         if ($res) {
-            return redirect()->route('service')->with('success', 'Produkt został zaktualizowany.');
+            return redirect()->route('product')->with('success', 'Produkt został zaktualizowany.');
         } else {
-            return redirect()->route('service')->with('fail', 'Coś poszło nie tak.');
+            return redirect()->route('product')->with('fail', 'Coś poszło nie tak.');
         }
     }
 

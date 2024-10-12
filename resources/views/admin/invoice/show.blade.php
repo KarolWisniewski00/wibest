@@ -45,6 +45,15 @@
                         <iframe src="{{route('invoice.show.file', $invoice_obj)}}" width="100%" height="100%" style="border:none;"></iframe>
                     </div>
                     <div class="mt-8 hidden md:flex justify-end space-x-4">
+                        <!-- Utwórz Fakturę Sprzedaży -->
+                        @if($invoice['invoice_type'] == 'faktura proforma')
+                        @if($invoice->invoice_id == null)
+                        <a href="{{route('invoice.store.from', $invoice_obj)}}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                            <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Utwórz Fakturę Sprzedaży
+                        </a>
+                        @endif
+                        @endif
+
                         <!-- Pobierz PDF -->
                         <a href="{{route('invoice.download', $invoice_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
                             <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
@@ -66,12 +75,30 @@
                     </div>
                     <div class="mt-8 grid grid-cols-2 md:gap-4">
                         <div class="col-span-2 md:grid md:grid-cols-1 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <h2 class="text-sm md:text-xl font-semibold text-gray-600 dark:text-gray-50">FVS</h2>
+                            <h2 class="text-sm md:text-xl font-semibold text-gray-600 dark:text-gray-50">FV</h2>
                         </div>
 
                         <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Numer</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->number }}</p>
+                            <div class="flex flex-row justify-start items-center">
+                                @if($invoice_obj->invoice_type == "faktura proforma")
+                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->number }}</p>
+                                @if($invoice_obj->invoice_id)
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold"><i class="fa-solid fa-arrow-right-arrow-left mx-2"></i></p>
+                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
+                                <a href="{{ route('invoice.show', $invoice_obj->invoice_id) }}" class="text-sm md:text-xl text-blue-600 dark:text-blue-400 hover:underline font-semibold">{{ $invoice_obj->number }}</a>
+                                @endif
+                                @elseif($invoice_obj->invoice_type == "faktura sprzedażowa")
+                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->number }}</p>
+                                @if($invoice_obj->invoice_id)
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold"><i class="fa-solid fa-arrow-right-arrow-left mx-2"></i></p>
+                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
+                                <a href="{{ route('invoice.show', $invoice_obj->invoice_id) }}" class="text-sm md:text-xl text-blue-600 dark:text-blue-400 hover:underline font-semibold">{{ $invoice_obj->number }}</a>
+                                @endif
+                                @endif
+                            </div>
                         </div>
                         <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Typ</p>
@@ -161,12 +188,28 @@
                             </p>
                         </div>
                         @foreach($invoiceItems as $item)
+                        @if($item->product_id != null)
+                        <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <a href="{{route('product.show', $item->product)}}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm md:text-xl font-semibold">{{$item->name}}</a>
+                            <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
+                        </div>
+                        @elseif($item->service_id != null)
+                        <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <a href="{{route('service.show', $item->service)}}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm md:text-xl font-semibold">{{$item->name}}</a>
+                            <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
+                        </div>
+                        @else
                         <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{$item->name}}</h2>
                             <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
                             <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
                         </div>
+                        @endif
                         @endforeach
                         <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
@@ -242,6 +285,16 @@
                                 <i class="fa-solid fa-trash"></i>
                             </button>
                         </form>
+                    </div>
+                    <div class="mt-8 flex md:hidden justify-start space-x-4">
+                        <!-- Utwórz Fakturę Sprzedaży -->
+                        @if($invoice['invoice_type'] == 'faktura proforma')
+                        @if($invoice->invoice_id == null)
+                        <a href="{{route('invoice.store.from', $invoice_obj)}}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                            <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Utwórz Fakturę Sprzedaży
+                        </a>
+                        @endif
+                        @endif
                     </div>
 
                 </div>

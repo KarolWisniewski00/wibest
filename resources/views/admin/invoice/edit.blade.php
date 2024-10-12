@@ -37,10 +37,32 @@
                                 <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Typ</h3>
                                 <ul class="grid w-full gap-6 md:grid-cols-3">
                                     <li>
-                                        <input name="invoice_type" type="radio" id="invoice" value="faktura" class="hidden peer" checked>
+                                        <!-- Zaznaczenie faktury, jeśli w bazie danych jest "faktura" lub "faktura sprzedażowa" -->
+                                        <input
+                                            name="invoice_type"
+                                            type="radio"
+                                            id="invoice"
+                                            value="{{ ($invoice->invoice_type == 'faktura sprzedażowa') ? 'faktura sprzedażowa' : 'faktura' }}"
+                                            class="hidden peer"
+                                            {{ ($invoice->invoice_type == 'faktura' || $invoice->invoice_type == 'faktura sprzedażowa') ? 'checked' : '' }}>
                                         <label for="invoice" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Faktura</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <!-- Zaznaczenie faktury proforma, jeśli w bazie danych jest "faktura proforma" -->
+                                        <input
+                                            name="invoice_type"
+                                            type="radio"
+                                            id="proform"
+                                            value="faktura proforma"
+                                            class="hidden peer"
+                                            {{ $invoice->invoice_type == 'faktura proforma' ? 'checked' : '' }}>
+                                        <label for="proform" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
+                                            <div class="block">
+                                                <div class="w-full text-lg font-semibold">Faktura proforma</div>
                                             </div>
                                         </label>
                                     </li>
@@ -96,7 +118,7 @@
                                         </label>
                                     </li>
                                     <li>
-                                        <input {{ $payment_term == '14_dni' ? 'checked' : '' }} name="payment_term"  type="radio" id="payment_14days" value="14_dni" class="hidden peer">
+                                        <input {{ $payment_term == '14_dni' ? 'checked' : '' }} name="payment_term" type="radio" id="payment_14days" value="14_dni" class="hidden peer">
                                         <label for="payment_14days" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">14 dni</div>
@@ -300,7 +322,7 @@
                                 <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Metoda płatności</h3>
                                 <ul class="grid w-full gap-6 grid-cols-2 md:grid-cols-3">
                                     <li>
-                                        <input {{ $invoice->payment_method == 'przelew' ? 'checked' : '' }} name="payment_method"  type="radio" id="payment_transfer" value="przelew" class="hidden peer">
+                                        <input {{ $invoice->payment_method == 'przelew' ? 'checked' : '' }} name="payment_method" type="radio" id="payment_transfer" value="przelew" class="hidden peer">
                                         <label for="payment_transfer" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
                                             <div class="block">
                                                 <div class="w-full text-lg font-semibold">Przelew</div>
@@ -447,6 +469,8 @@
                 <p class="text-indigo-500 text-xs mt-1">Wartość automatycznie obliczana</p>
             </div>
         </div>
+                <input type="hidden" value="" name="items[${this.length}][product_id]" id="item_product_id_${this.length}">
+        <input type="hidden" value="" name="items[${this.length}][service_id]" id="item_service_id_${this.length}">
         <div id="item2_id_${this.length}" class="flex gap-4 mb-4 relative justify-end">
             <button type="button" id="remove_item_${this.length}" class=" w-fit inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                 <i class="fa-solid fa-trash"></i>
@@ -484,6 +508,11 @@
                             var vat = $(this).data('vat_rate');
                             $('#item_vat_' + len).val(vat);
                             var item_quantity = $('#item_quantity_' + len).val();
+                            if ($(this).data('type') == 'product') {
+                                $('#item_product_id_' + len).val($(this).data('id'));
+                            } else {
+                                $('#item_service_id_' + len).val($(this).data('id'));
+                            }
 
                             var totalNetto = item_quantity * price;
                             var totalVat = item_quantity * vat;
@@ -541,7 +570,7 @@
             item.printEdit('{{$item->name}}',
                 '{{$item->quantity}}',
                 '{{$item->unit_price}}',
-                '{{$item->vat_amount}}',
+                '{{$item->vat_rate}}',
                 '{{$item->subtotal}}',
                 '{{$item->total}}'
             );

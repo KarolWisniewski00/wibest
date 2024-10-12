@@ -13,6 +13,9 @@
             <div class="p-6 lg:p-8 mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 @if ($company)
                 <div class="bg-white dark:bg-gray-800">
+                    <a href="{{ route('setting') }}" class="mb-8 inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                        <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do Ustawień
+                    </a>
                     <div class="flex flex-row justify-between items-center">
                         <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-800 dark:text-gray-200">
                             <span class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-white" style='font-family: "Raleway", sans-serif;'>WIBEST SDF </span>
@@ -28,18 +31,38 @@
                 dodaj jednostki
                 dodać opłacone
                 dodać korygujące
-                dodać proformy
                 dodać plik jpk
                 dodać raporty
                 dodac wysyłanie mailem
                 dodać paragony MODUŁ KASA FISKALNA
                 dodać stan kasy MODUŁ KASA FISKALNA
-                dodać stan magazynowy do produktów
+                dodać stan magazynowy przy edycji i usuwaniu
                 dodać role
                 dodać logowanie przez google
                 dodać filtry
                 -->
                 <ol class="relative border-l border-gray-600">
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">12 padździernika 2024 V 1.5.0</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Produkty] [Dodanie] Stanu magazynowego</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. [Ogólne] [Zmiana] Poprawki kosmetyczne desing</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">3. [Wersje] [Zmiana] Przeniesienie z paska nawigacyjnego do ustawień jako przycisk</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">4. [Faktury] [Usunięcie] Filtrów ze względu na miesiąc, słabe rozwiązanie</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">5. [Faktury] [Dodanie] Połączenia między produktami i usługami</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">6. [Faktury] [Dodanie] Typu faktury proforma</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">7. [Faktury] [Dodanie] Połączenia między fakturą sprzedażową a faktuą proforma</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">8. [Faktury] [Dodanie] Labela odruzniającego proformy od reszty i faktury sprzedażowej na podstawie proformy od reszty</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">9. [Faktury] [Dodanie] Przycisku do utworzenia faktury sprzedażowej na podstawie faktury proforma</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">10. [Faktury] [Dodanie] Automatycznego usuwania stanu magazynowego z prodyktu przy tworzeniu, przy edycji i usuwaniu nic sie nie dzieje</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">11. [Faktury] [Dodanie] Wyszukiwarki ajax za pomocą numeru faktury</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">12. [Faktury] [Dodanie] Zakładek aktualny i poprzedni miesiąc</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">13. [Faktury] [Dodanie] Informacji w tabeli i liście o miesiącu</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">14. [Faktury] [Dodanie] Na urządzeniach mobilnych przyczepione info o tym gdzie jesteś</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">15. [Klient] [Dodanie] Wykresów</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">16. [Klient] [Dodanie] Podsumowania</p>
+                    </li>
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">9 padździernika 2024 V 1.4.1</time>

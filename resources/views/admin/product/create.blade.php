@@ -54,6 +54,14 @@
                             @enderror
                         </div>
 
+                        <div class="mb-6">
+                            <label for="magazine" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stan magazynowy</label>
+                            <input type="number" id="magazine" name="magazine" step="1" value="{{ old('magazine') }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            @error('magazine')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <!-- Przycisk dodawania usługi -->
                         <div class="mt-8 flex justify-end space-x-4">
                             <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-400 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">

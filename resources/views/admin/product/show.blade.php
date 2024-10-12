@@ -77,12 +77,20 @@
                                 {{ $product->description ?? '' }}
                             </p>
                         </div>
+                        <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-300 test-sm">
+                                Stan magazynowy
+                            </p>
+                            <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                {{ $product->magazine ?? '' }}
+                            </p>
+                        </div>
                         <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-400">
                                 Utworzone przez
                             </p>
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
-                                {{ $service->user->name ?? '' }}
+                                {{ $product->user->name ?? '' }}
                             </p>
                         </div>
                         <div class="col-span-2 md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
@@ -90,14 +98,14 @@
                                 Dane należące do
                             </p>
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
-                                {{ $service->company->name ?? '' }}
+                                {{ $product->company->name ?? '' }}
                             </p>
                         </div>
                         <div class="md:grid md:grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-400">
                                 Data utworzenia
                             </p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $product->created_at->format('d-m-Y H:i') }}
                             </p>
                         </div>
@@ -105,7 +113,7 @@
                             <p class="text-gray-600 dark:text-gray-400">
                                 Data aktualizacji
                             </p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 text-lg font-semibold">
                                 {{ $product->updated_at->format('d-m-Y H:i') }}
                             </p>
                         </div>

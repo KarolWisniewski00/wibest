@@ -112,11 +112,11 @@
                                         {{ $service->name }}
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $service->unit_price }}</div>
+                                        <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $service->unit_price }} zł</div>
 
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $service->vat_rate }}</div>
+                                        <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $service->vat_rate }}</div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <a href="{{route('service.show', $service)}}" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-4 focus:ring-gray-200"><i class="fa-solid fa-eye"></i></a>

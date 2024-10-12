@@ -10,8 +10,9 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Pobierz wszystkie faktury dla bieżącej firmy
+        // Pobierz wszystkie faktury dla bieżącej firmy, z wyjątkiem faktur proforma
         $invoices = Invoice::where('company_id', $this->get_company_id())
+            ->where('invoice_type', '!=', 'faktura proforma') // Dodaj warunek, aby wykluczyć faktury proforma
             ->orderBy('created_at', 'desc')
             ->get(); // Pobieramy wszystkie faktury bez paginacji dla obliczeń
 

@@ -122,7 +122,13 @@
 
 <body>
     <div class="invoice-header">
-        <h2 class="h2"><span>Faktura numer:</span> {{ $invoice['number'] }}</h2>
+        @if($invoice['invoice_type'] == 'faktura')
+        <p><span>Faktura numer</span><h2 class="h2">{{ $invoice['number'] }}</h2></p>
+        @elseif($invoice['invoice_type'] == 'faktura sprzedażowa')
+        <p><span>Faktura numer</span><h2 class="h2">{{ $invoice['number'] }}</h2></p>
+        @else
+        <p><span>Faktura pro-forma numer</span><h2 class="h2">PRO {{ $invoice['number'] }}</h2></p>
+        @endif
         <p><span>Data wystawienia:</span> {{ $invoice['issue_date'] }}</p>
         <p><span>Termin płatności:</span> {{ $invoice['due_date'] }}</p>
         <p><span>Płatność:</span> {{ $invoice['payment_method'] }}</p>
