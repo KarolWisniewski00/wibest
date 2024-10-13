@@ -26,7 +26,7 @@
             <a class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80" href="#" style='font-family: "Raleway", sans-serif;'>WIBEST</a>
             <div class="sm:order-3 flex items-center gap-x-2">
                 <!--Button-->
-                <a href="{{route('login')}}" class="py-2 px-8 inline-flex items-center gap-x-2 text-sm font-medium border border-gray-800 bg-black text-white hover:bg-gray-800 focus:outline-none focus:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none">
+                <a href="{{route('login.google')}}" class="py-2 px-8 inline-flex items-center gap-x-2 text-sm font-medium border border-gray-800 bg-black text-white hover:bg-gray-800 focus:outline-none focus:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none">
                     <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i>Logowanie
                 </a>
                 <!--Button-->
@@ -61,7 +61,7 @@
 
                     <!-- Buttons -->
                     <div class="mt-7 grid gap-3 w-full sm:inline-flex">
-                        <a href="{{route('login')}}" class="mb-6 py-2 px-8 inline-flex items-center justify-center gap-x-2 text-sm font-medium border border-gray-800 bg-black text-white hover:bg-gray-800 focus:outline-none focus:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none">
+                        <a href="{{route('login.google')}}" class="mb-6 py-2 px-8 inline-flex items-center justify-center gap-x-2 text-sm font-medium border border-gray-800 bg-black text-white hover:bg-gray-800 focus:outline-none focus:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none">
                             <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i>Logowanie
                         </a>
                     </div>

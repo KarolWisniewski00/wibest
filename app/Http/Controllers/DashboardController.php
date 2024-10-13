@@ -61,6 +61,13 @@ class DashboardController extends Controller
         $subTotalValues = array_values($dailySubTotals);
         $documentCounts = array_values($dailyCounts); // Liczba dokumentów
 
+        // Odwróć tablice, aby daty były od najstarszych
+        $dates = array_reverse($dates);
+        $totalValues = array_reverse($totalValues);
+        $subTotalValues = array_reverse($subTotalValues);
+        $documentCounts = array_reverse($documentCounts); // Odwróć liczbę dokumentów
+
+
         // Przekazanie danych do widoku
         return view('dashboard', compact(
             'todayTotal',

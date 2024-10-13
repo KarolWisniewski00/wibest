@@ -183,7 +183,8 @@ class InvoiceController extends Controller
     {
         // Sortowanie po 'created_at' malejąco (od najnowszych)
         $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
+            ->orderBy('created_at', 'desc')
             ->paginate(10);
 
         // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
@@ -208,15 +209,14 @@ class InvoiceController extends Controller
 
         // Sortowanie faktur po 'created_at' malejąco (od najnowszych), tylko dla bieżącego miesiąca i roku
         $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->whereMonth('created_at', $currentMonth)  // Tylko bieżący miesiąc
-            ->whereYear('created_at', $currentYear)    // Tylko bieżący rok
-            ->orderBy('created_at', 'desc')            // Sortowanie malejąco
+            ->whereMonth('issue_date', $currentMonth)  // Tylko bieżący miesiąc
+            ->whereYear('issue_date', $currentYear)    // Tylko bieżący rok
+            ->orderBy('issue_date', 'desc')            // Sortowanie malejąco
+            ->orderBy('created_at', 'desc')
             ->paginate(10);                            // Paginacja
 
         // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
         $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
-            ->whereMonth('created_at', $currentMonth)  // Tylko bieżący miesiąc
-            ->whereYear('created_at', $currentYear)    // Tylko bieżący rok
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
             ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
             ->get();
@@ -238,16 +238,15 @@ class InvoiceController extends Controller
 
         // Sortowanie faktur po 'created_at' malejąco (od najnowszych), tylko dla poprzedniego miesiąca i odpowiedniego roku
         $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->whereMonth('created_at', $previousMonth)  // Tylko poprzedni miesiąc
-            ->whereYear('created_at', $previousMonthYear)  // Rok poprzedniego miesiąca
-            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->whereMonth('issue_date', $previousMonth)  // Tylko poprzedni miesiąc
+            ->whereYear('issue_date', $previousMonthYear)  // Rok poprzedniego miesiąca
+            ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
+            ->orderBy('created_at', 'desc')
             ->paginate(10);  // Paginacja
 
 
         // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
         $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
-            ->whereMonth('created_at', $previousMonth)  // Tylko bieżący miesiąc
-            ->whereYear('created_at', $previousMonthYear)    // Tylko bieżący rok
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
             ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
             ->get();
@@ -328,7 +327,7 @@ class InvoiceController extends Controller
         $total = 0;
 
         // Obliczanie terminu płatności
-        $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $invoice->issue_date);
+        $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $request->input('issue_date'));
 
         // Zapisuje pusty numer konta
         if ($request->input('bank') == null) {
@@ -383,20 +382,10 @@ class InvoiceController extends Controller
         // Jeśli nie ma klienta połączonego spróbuj utworzyć
         if ($request->input('client_id') == null) {
             try {
-                // Tworzenie nowego obiektu klienta
-                $client = new Client();
-                $client->name = $request->input('buyer_name');
-                $client->vat_number = $request->input('buyer_vat_number');
-                $client->adress = $request->input('buyer_adress');
-                $client->user_id = $user->id;
-                $client->company_id = $user->company_id;
-
-                // Przechowywanie danych w bazie
-                $client->save();
-            } catch (Exception) {
                 // Jeśli nie da się utworzyć to połącz
                 $client = Client::where('vat_number', $request->input('buyer_vat_number'))->where('company_id', $user->company_id)->first();
                 $invoice->client_id = $client->id;
+            } catch (Exception) {
             }
         }
 
@@ -499,7 +488,7 @@ class InvoiceController extends Controller
         $total = 0;
 
         //obliczanie terminu płatności
-        $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $invoice->issue_date);
+        $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $request->input('issue_date'));
 
         // Zapisuje pusty numer konta
         if ($request->input('bank') == null) {
@@ -555,20 +544,10 @@ class InvoiceController extends Controller
         // Jeśli nie ma klienta połączonego spróbuj utworzyć
         if ($request->input('client_id') == null) {
             try {
-                // Tworzenie nowego obiektu klienta
-                $client = new Client();
-                $client->name = $request->input('buyer_name');
-                $client->vat_number = $request->input('buyer_vat_number');
-                $client->adress = $request->input('buyer_adress');
-                $client->user_id = $user->id;
-                $client->company_id = $user->company_id;
-
-                // Przechowywanie danych w bazie
-                $client->save();
-            } catch (Exception) {
                 // Jeśli nie da się utworzyć to połącz
                 $client = Client::where('vat_number', $request->input('buyer_vat_number'))->where('company_id', $user->company_id)->first();
                 $invoice->client_id = $client->id;
+            } catch (Exception) {
             }
         }
 

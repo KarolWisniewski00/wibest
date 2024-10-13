@@ -26,7 +26,7 @@
                             <!-- Numer faktury -->
                             <div class="mb-6">
                                 <label for="number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer faktury</label>
-                                <input type="text" id="number" name="number" value="{{ $invoice->number }}" readonly required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="text" id="number" name="number" value="{{ $invoice->number }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('number')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror

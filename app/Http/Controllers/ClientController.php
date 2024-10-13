@@ -68,6 +68,12 @@ class ClientController extends Controller
         $subTotalValues = array_values($dailySubTotals);
         $documentCounts = array_values($dailyCounts); // Liczba dokumentów
 
+        // Odwróć tablice, aby daty były od najstarszych
+        $dates = array_reverse($dates);
+        $totalValues = array_reverse($totalValues);
+        $subTotalValues = array_reverse($subTotalValues);
+        $documentCounts = array_reverse($documentCounts); // Odwróć liczbę dokumentów
+        
         // Przekazanie klienta oraz jego faktur do widoku
         return view('admin.client.show', compact(
             'client',

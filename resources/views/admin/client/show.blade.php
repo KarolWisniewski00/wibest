@@ -184,10 +184,20 @@
                                 <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
-                                            <div>
+                                            <div class="flex justify-start items-center w-full">
                                                 @if($invoice->invoice_type == "faktura proforma")
                                                 <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
+                                                @if($invoice->invoice_id)
+                                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
+                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
+                                                @endif
                                                 @elseif($invoice->invoice_type == "faktura sprzedażowa")
+                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
+                                                @if($invoice->invoice_id)
+                                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
+                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
+                                                @endif
+                                                @elseif($invoice->invoice_type == "faktura")
                                                 <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
                                                 @endif
                                                 <span class="text-lg font-semibold dark:text-gray-50">{{ $invoice->number }}</span>
@@ -313,10 +323,20 @@
 
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                     <td class="px-6 py-4 min-w-48">
-                                        <div>
+                                        <div class="flex justify-start items-center w-full">
                                             @if($invoice->invoice_type == "faktura proforma")
                                             <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
+                                            @if($invoice->invoice_id)
+                                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
+                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
+                                            @endif
                                             @elseif($invoice->invoice_type == "faktura sprzedażowa")
+                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
+                                            @if($invoice->invoice_id)
+                                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
+                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
+                                            @endif
+                                            @elseif($invoice->invoice_type == "faktura")
                                             <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
                                             @endif
                                             {{ $invoice->number }}
@@ -376,9 +396,9 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ $dailyTotalsCount }}</span>
-                                            <span class="text-lg font-semibold text-gray-50">Suma brutto</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Suma brutto</span>
                                         </div>
-                                        <div class="text-sm text-gray-400"></div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-400"></div>
                                     </div>
                                 </div>
                             </li>
@@ -387,7 +407,7 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ $dailySubTotalsCount }}</span>
-                                            <span class="text-lg font-semibold text-gray-50">Suma netto</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Suma netto</span>
                                         </div>
                                     </div>
                                 </div>
@@ -397,7 +417,7 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ $dailyCountsCount }}</span>
-                                            <span class="text-lg font-semibold text-gray-50">Suma faktur</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Suma faktur</span>
                                         </div>
                                     </div>
                                 </div>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ServiceController;
@@ -25,6 +26,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/login/google', [GoogleController::class, 'redirect'])->name('login.google');
+Route::get('/login/google/callback', [GoogleController::class, 'callback']);
 
 //LOGGED IN
 Route::middleware([

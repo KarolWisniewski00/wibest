@@ -24,9 +24,9 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ number_format($todayTotal, 2) }} zł</span>
-                                            <span class="text-lg font-semibold text-gray-50">Dziś</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Dziś</span>
                                         </div>
-                                        <div class="text-sm text-gray-400">{{ $todayCount }} sprzedaży</div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-400">{{ $todayCount }} sprzedaży</div>
                                     </div>
                                 </div>
                             </li>
@@ -37,9 +37,9 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ number_format($last7DaysTotal, 2) }} zł</span>
-                                            <span class="text-lg font-semibold text-gray-50">Ostatnie 7 dni</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Ostatnie 7 dni</span>
                                         </div>
-                                        <div class="text-sm text-gray-400">{{ $last7DaysCount }} sprzedaży</div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-400">{{ $last7DaysCount }} sprzedaży</div>
                                     </div>
                                 </div>
                             </li>
@@ -50,9 +50,9 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ number_format($currentMonthTotal, 2) }} zł</span>
-                                            <span class="text-lg font-semibold text-gray-50">Bieżący miesiąc</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Bieżący miesiąc</span>
                                         </div>
-                                        <div class="text-sm text-gray-400">{{ $currentMonthCount }} sprzedaży</div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-400">{{ $currentMonthCount }} sprzedaży</div>
                                     </div>
                                 </div>
                             </li>
@@ -63,9 +63,9 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ number_format($previousMonthTotal, 2) }} zł</span>
-                                            <span class="text-lg font-semibold text-gray-50">Ubiegły miesiąc</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Ubiegły miesiąc</span>
                                         </div>
-                                        <div class="text-sm text-gray-400">{{ $previousMonthCount }} sprzedaży</div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-400">{{ $previousMonthCount }} sprzedaży</div>
                                     </div>
                                 </div>
                             </li>
@@ -76,9 +76,9 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <span class="text-2xl font-semibold text-indigo-500">{{ number_format($currentYearTotal, 2) }} zł</span>
-                                            <span class="text-lg font-semibold text-gray-50">Ten rok</span>
+                                            <span class="text-lg font-semibold text-gray-900 dark:text-gray-50">Ten rok</span>
                                         </div>
-                                        <div class="text-sm text-gray-400">{{ $currentYearCount }} sprzedaży</div>
+                                        <div class="text-sm text-gray-900 dark:text-gray-400">{{ $currentYearCount }} sprzedaży</div>
                                     </div>
                                 </div>
                             </li>
