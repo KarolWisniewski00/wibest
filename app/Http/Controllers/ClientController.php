@@ -73,7 +73,7 @@ class ClientController extends Controller
         $totalValues = array_reverse($totalValues);
         $subTotalValues = array_reverse($subTotalValues);
         $documentCounts = array_reverse($documentCounts); // Odwróć liczbę dokumentów
-        
+
         // Przekazanie klienta oraz jego faktur do widoku
         return view('admin.client.show', compact(
             'client',
@@ -99,22 +99,19 @@ class ClientController extends Controller
     /**
      * Zapisuje nowego klienta w bazie danych.
      */
-    public function store(StoreClientRequest $request)
+    public function store(Request $request)
     {
-        // Walidacja danych
-        $validatedData = $request->validated();
-
         $user = User::where('id', auth()->id())->first();
         // Tworzenie nowego obiektu klienta
         $client = new Client();
-        $client->name = $validatedData['name'];
-        $client->email = $validatedData['email'];
-        $client->email2 = $validatedData['email2'];
-        $client->phone = $validatedData['phone'];
-        $client->phone2 = $validatedData['phone2'];
-        $client->vat_number = $validatedData['tax_id'];
-        $client->adress = $validatedData['adress'];
-        $client->notes = $validatedData['notes'];
+        $client->name = $request->name;
+        $client->email = $request->email;
+        $client->email2 = $request->email2;
+        $client->phone = $request->phone;
+        $client->phone2 = $request->phone2;
+        $client->vat_number = $request->tax_id;
+        $client->adress = $request->adress;
+        $client->notes = $request->notes;
         $client->user_id = $user->id;
         $client->company_id = $user->company_id;
 
@@ -140,20 +137,19 @@ class ClientController extends Controller
     /**
      * Zaktualizuj dane klienta.
      */
-    public function update(UpdateClientRequest $request, Client $client)
+    public function update(Request $request, Client $client)
     {
-        $validatedData = $request->validated();
 
         // Próbuj zaktualizować dane klienta
         $res = $client->update([
-            'name' => $validatedData['name'],
-            'email' => $validatedData['email'],
-            'email2' => $validatedData['email2'],
-            'phone' => $validatedData['phone'],
-            'phone2' => $validatedData['phone2'],
-            'vat_number' => $validatedData['tax_id'],
-            'adress' => $validatedData['adress'],
-            'notes' => $validatedData['notes'],
+            'name' => $request->name,
+            'email' => $request->email,
+            'email2' => $request->email2,
+            'phone' => $request->phone,
+            'phone2' => $request->phone2,
+            'vat_number' => $request->tax_id,
+            'adress' => $request->adress,
+            'notes' => $request->notes,
         ]);
 
         // Sprawdzanie, czy klient został zaktualizowany pomyślnie
