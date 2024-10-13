@@ -112,8 +112,11 @@
                                         {{ $service->name }}
                                     </td>
                                     <td class="px-6 py-4">
+                                        @if($service->unit_price != null)
                                         <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $service->unit_price }} zł</div>
-
+                                        @else
+                                        <div class="font-medium text-indigo-900 dark:text-indigo-100"></div>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $service->vat_rate }}</div>

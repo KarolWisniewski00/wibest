@@ -118,8 +118,11 @@
                                         {{ $product->name }}
                                     </td>
                                     <td class="px-6 py-4">
+                                        @if($product->unit_price != null)
                                         <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $product->unit_price }} zł</div>
-
+                                        @else
+                                        <div class="font-medium text-indigo-900 dark:text-indigo-100"></div>
+                                        @endif
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="font-medium text-indigo-900 dark:text-indigo-100">{{ $product->vat_rate }}</div>

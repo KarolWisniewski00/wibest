@@ -160,8 +160,8 @@
 
                             @foreach ($invoices as $invoice)
                             @php
-                            // Pobieramy miesiąc z daty faktury (załóżmy, że jest polem created_at)
-                            $invoiceMonth = \Carbon\Carbon::parse($invoice->created_at)->month;
+                            // Pobieramy miesiąc z daty faktury (załóżmy, że jest polem issue_date)
+                            $invoiceMonth = \Carbon\Carbon::parse($invoice->issue_date)->month;
 
                             // Jeśli miesiąc zmienił się w stosunku do poprzedniego, wyświetlamy nazwę nowego miesiąca
                             if ($invoiceMonth !== $currentMonth) {
@@ -301,8 +301,8 @@
 
                                 @foreach ($invoices as $invoice)
                                 @php
-                                // Pobieramy miesiąc z daty faktury (załóżmy, że jest polem created_at)
-                                $invoiceMonth = \Carbon\Carbon::parse($invoice->created_at)->month;
+                                // Pobieramy miesiąc z daty faktury (załóżmy, że jest polem issue_date)
+                                $invoiceMonth = \Carbon\Carbon::parse($invoice->issue_date)->month;
 
                                 // Jeśli miesiąc zmienił się w stosunku do poprzedniego, wyświetlamy nazwę nowego miesiąca
                                 if ($invoiceMonth !== $currentMonth) {

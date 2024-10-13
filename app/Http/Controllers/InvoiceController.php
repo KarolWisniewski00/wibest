@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\InvoiceRequest;
+use App\Mail\InvoiceMail;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Invoice;
@@ -16,6 +17,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Mail;
 use NumberToWords\NumberToWords;
 
 class InvoiceController extends Controller
@@ -644,9 +646,62 @@ class InvoiceController extends Controller
         ];
 
         // Generowanie PDF
+        $invoiceNumber = str_replace([' ', '/'], '-', $invoice_obj->number);
         $pdf = PDF::loadView('admin.template.invoice', compact('invoice'));
 
         // Pobranie pliku PDF
-        return $pdf->download('faktura' . $invoice_obj->id . '.pdf');
+        return $pdf->download('faktura-'.$invoice_obj->seller_name.'-' . $invoiceNumber . '.pdf');
+    }
+    public function send_invoice(Invoice $invoice)
+    {
+        // Weryfikacja, czy klient ma adres e-mail
+        if ($invoice->client->email == null && $invoice->client->email2 == null) {
+            return redirect()->back()->with('fail', 'Klient nie ma adresu e-mail do wysłania faktury.');
+        }
+
+        $items = InvoiceItem::where('invoice_id', $invoice->id)->get();
+        $invoice_obj = Invoice::where('id', $invoice->id)->first();
+        $invoice = [
+            'number' => $invoice_obj->number,
+            'invoice_type' => $invoice_obj->invoice_type,
+            'issue_date' => $invoice_obj->issue_date,
+            'due_date' => $invoice_obj->due_date,
+            'status' => $invoice_obj->status,
+            'client' => [
+                'name' => $invoice_obj->buyer_name,
+                'address' => $invoice_obj->buyer_adress,
+                'tax_id' => $invoice_obj->seller_tax_id
+            ],
+            'items' => $items,
+            'seller' => [
+                'name' => $invoice_obj->seller_name,
+                'address' => $invoice_obj->seller_adress,
+                'tax_id' => $invoice_obj->seller_tax_id,
+                'bank' => $invoice_obj->seller_bank
+            ],
+            'subtotal' => $invoice_obj->subtotal,
+            'vat' => $invoice_obj->vat,
+            'total' => $invoice_obj->total,
+            'notes' => $invoice_obj->notes,
+            'payment_method' => $invoice_obj->payment_method,
+            'total_in_words' => $invoice_obj->total_in_words
+        ];
+
+        // Generowanie PDF
+        $pdf = PDF::loadView('admin.template.invoice', compact('invoice'));
+
+        // Wysłanie e-maila z załącznikiem
+        try {
+            Mail::to($invoice_obj->client->email)->send(new InvoiceMail($invoice_obj, $pdf));
+        } catch (Exception) {
+
+        }
+        try {
+            Mail::to($invoice_obj->client->email2)->send(new InvoiceMail($invoice_obj, $pdf));
+        } catch (Exception) {
+
+        }
+
+        return redirect()->back()->with('success', 'Faktura została wysłana pomyślnie!');
     }
 }

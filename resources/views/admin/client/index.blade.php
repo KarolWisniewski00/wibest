@@ -91,9 +91,13 @@
                                 </tr>
                                 @else
                                 @foreach ($clients as $client)
-                                <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 ">
                                     <td class="px-6 py-4">{{ $client->name }}</td>
-                                    <td class="px-6 py-4"><a href="mailto:{{ $client->email }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->email }}</a></td>
+                                    <td class="px-6 py-4 break-all">
+                                        <a href="mailto:{{ $client->email }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                                            {{ $client->email }}
+                                        </a>
+                                    </td>
                                     <td class="px-6 py-4"><a href="tel:{{ $client->phone }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->phone }}</a></td>
                                     <td class="px-6 py-4">{{ $client->adress }}</td>
                                     <td class="px-6 py-4">

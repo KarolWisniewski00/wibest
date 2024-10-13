@@ -45,6 +45,17 @@
                 <ol class="relative border-l border-gray-600">
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">13 padździernika 2024 V 1.6.1</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Produkty] [Naprawa] Pokazywania waluty bez ceny</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. [Usługi] [Naprawa] Pokazywania waluty bez ceny</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">3. [Faktury] [Naprawa] Pokazywania listy według daty wystawienia</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">4. [Klienci] [Naprawa] Pokazywania listy według daty wystawienia</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">5. [Klienci] [Naprawa] Wyświetlania adresów email</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">6. [Faktury] [Dodano] Przycisk do wysyłania faktury na email</p>
+                    </li>
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">13 padździernika 2024 V 1.6.0</time>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Logowanie] [Dodanie] Logowanie przez google</p>
@@ -53,6 +64,7 @@
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">4. [Faktury] [Naprawa] Sortowania</p>
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">5. [Faktury] [Usunięcie] Sugestii</p>
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">6. [Faktury] [Naprawa] Wystawiania faktury z datą w wstecz</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">7. [Faktury] [Usunięcie] Tworzenie klienta po utworzeniu faktury</p>
                     </li>
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
