@@ -58,6 +58,7 @@ class ProductController extends Controller
             'magazine' => $request->magazine,
             'vat_amount' => $vatAmount,
             'total' => $total,
+            'unit' => null,
             'description' => $request->description,
             'company_id' => $this->get_company_id(),
             'user_id' => $user->id,

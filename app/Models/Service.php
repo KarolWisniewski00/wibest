@@ -13,6 +13,7 @@ class Service extends Model
     protected $fillable = [
         'name', // Nazwa usługi
         'unit_price', // Cena jednostkowa netto
+        'unit',
         'subtotal', // Wartość netto usługi (ilość * cena jednostkowa)
         'vat_rate', // Stawka VAT w procentach
         'vat_amount', // Kwota VAT obliczona na podstawie wartości netto

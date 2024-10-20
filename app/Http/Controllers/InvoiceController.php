@@ -23,181 +23,13 @@ use NumberToWords\NumberToWords;
 class InvoiceController extends Controller
 {
     /**
-     * Zwraca kwotę słownie.
-     */
-    private function get_total_in_words($total)
-    {
-        $zlote = floor($total);
-        $grosze = round(($total - $zlote) * 100);
-
-        $numberToWords = new NumberToWords();
-
-        // Generowanie dla złotych
-        $numberTransformer = $numberToWords->getNumberTransformer('pl');
-        $zloteSlownie = $numberTransformer->toWords($zlote);
-        $groszeSlownie = $numberTransformer->toWords($grosze);
-
-        // Ustawienie poprawnej formy dla złotych
-        $zloteForm = $this->get_zlote_form($zlote);
-        // Ustawienie poprawnej formy dla groszy
-        $groszeForm = $this->get_grosze_form($grosze);
-
-        return "$zloteSlownie $zloteForm $groszeSlownie $groszeForm";
-    }
-
-    /**
-     * Zwraca odpowiednią formę słowa 'złoty' w zależności od liczby.
-     */
-    private function get_zlote_form($zlote)
-    {
-        if ($zlote == 1) {
-            return "złoty";
-        } elseif ($zlote % 10 >= 2 && $zlote % 10 <= 4 && ($zlote % 100 < 10 || $zlote % 100 >= 20)) {
-            return "złote";
-        } else {
-            return "złotych";
-        }
-    }
-
-    /**
-     * Zwraca odpowiednią formę słowa 'grosz' w zależności od liczby.
-     */
-    private function get_grosze_form($grosze)
-    {
-        if ($grosze == 1) {
-            return "grosz";
-        } elseif ($grosze % 10 >= 2 && $grosze % 10 <= 4 && ($grosze % 100 < 10 || $grosze % 100 >= 20)) {
-            return "grosze";
-        } else {
-            return "groszy";
-        }
-    }
-
-    /**
-     * Zwraca obiekt firmy zalogowanego użytkownika.
-     */
-    private function get_invoice_number()
-    {
-        // Pobierz aktualny miesiąc i rok
-        $month = Carbon::now()->format('m');
-        $year = Carbon::now()->format('Y');
-
-        // Znajdź ostatnią fakturę, aby określić autoinkrementację
-        $lastInvoice = Invoice::where('company_id', $this->get_company_id())->orderBy('id', 'desc')->first();
-
-        if ($lastInvoice) {
-            // Pobierz numer z poprzedniej faktury i zwiększ go o 1
-            $lastNumber = explode('/', $lastInvoice->number)[0];
-            $newNumber = intval($lastNumber) + 1;
-        } else {
-            // Jeśli nie ma wcześniejszych faktur, rozpocznij od 1
-            $newNumber = 1;
-        }
-
-        // Utwórz nowy numer faktury
-        return sprintf('%d/%s/%s', $newNumber, $month, $year);
-    }
-
-    /**
-     * Zamienia termin płatności typu string na datę
-     */
-    private function payment_term_to_due_date($paymentTerm, $issue_date)
-    {
-        // Wyciągamy liczbę dni z terminu płatności (zakładając format 'X_dni')
-        $days = intval(explode('_', $paymentTerm)[0]);
-
-        // Obliczamy datę płatności na podstawie issue_date + $days
-        return Carbon::parse($issue_date)->addDays($days);
-    }
-
-    /**
-     * Zamienia datę płatności na termin płatności typu string
-     */
-    private function due_date_to_payment_term($issue_date, $due_date)
-    {
-        // Obliczamy różnicę w dniach między due_date a issue_date
-        $daysDifference = Carbon::parse($due_date)->diffInDays(Carbon::parse($issue_date));
-
-        // Przygotowujemy dostępne opcje terminów płatności
-        $availableTerms = [0 => 'natychmiast', 1 => '1_dzien', 3 => '3_dni', 7 => '7_dni', 14 => '14_dni', 30 => '30_dni', 60 => '60_dni', 90 => '90_dni'];
-
-        // Szukamy odpowiedniego terminu płatności
-        if (array_key_exists($daysDifference, $availableTerms)) {
-            return $availableTerms[$daysDifference];
-        }
-
-        // Jeśli liczba dni nie pasuje do dostępnych opcji, zwracamy 'niestandardowy'
-        return 'niestandardowy';
-    }
-
-    /**
-     * Zamienia termin płatności typu string na datę
-     */
-    private function item_create($item, $id)
-    {
-        // Obliczanie wartości netto pozycji (quantity * unit_price)
-        $itemSubtotal = $item['quantity'] * $item['price'];
-
-        // Obliczanie VAT (jeśli nie jest 'zw' czyli zwolnione z VAT)
-        if ($item['vat'] != 'zw') {
-            $vatRate = floatval($item['vat']); // np. 23% VAT
-            $itemVatAmount = $itemSubtotal * ($vatRate / 100);
-        } else {
-            $itemVatAmount = 0;
-        }
-
-        try {
-            $product = Product::where('id', $item['product_id'])->first();
-            $product->magazine = $product->magazine - $item['quantity'];
-            $product->save();
-        } catch (Exception) {
-        }
-
-        $invoiceItem = new InvoiceItem();
-        $invoiceItem->invoice_id = $id;
-        $invoiceItem->product_id = $item['product_id'];
-        $invoiceItem->service_id = $item['service_id'];
-        $invoiceItem->name = $item['name'];
-        $invoiceItem->quantity = $item['quantity'];
-        $invoiceItem->unit_price = $item['price'];
-        $invoiceItem->subtotal = $itemSubtotal;
-        $invoiceItem->vat_rate = $item['vat'] != 'zw' ? $item['vat'] : 0;
-        $invoiceItem->vat_amount = $itemVatAmount;
-
-        // Wartość brutto pozycji (subtotal + VAT)
-        $itemTotal = $itemSubtotal + $itemVatAmount;
-        $invoiceItem->total = $itemTotal;
-
-        // Zapis pozycji faktury
-        $invoiceItem->save();
-
-        return [
-            'itemSubtotal' => $itemSubtotal,
-            'itemVatAmount' => $itemVatAmount,
-            'itemTotal' => $itemTotal,
-        ];
-    }
-
-    /**
      * Pokazuje faktury od najnowszych.
      */
     public function index()
     {
-        // Sortowanie po 'created_at' malejąco (od najnowszych)
-        $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
-        $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
-            ->get();
-
-        $invoices_all =  Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
-            ->get();
+        $invoices = $this->get_invoices();
+        $invoices_sugestion = $this->get_sugestion_invoices();
+        $invoices_all =  $this->get_all_invoices();
 
         return view('admin.invoice.index', compact('invoices', 'invoices_sugestion', 'invoices_all'));
     }
@@ -209,23 +41,9 @@ class InvoiceController extends Controller
         $currentMonth = now()->month; // Pobiera bieżący miesiąc
         $currentYear = now()->year;   // Pobiera bieżący rok
 
-        // Sortowanie faktur po 'created_at' malejąco (od najnowszych), tylko dla bieżącego miesiąca i roku
-        $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->whereMonth('issue_date', $currentMonth)  // Tylko bieżący miesiąc
-            ->whereYear('issue_date', $currentYear)    // Tylko bieżący rok
-            ->orderBy('issue_date', 'desc')            // Sortowanie malejąco
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);                            // Paginacja
-
-        // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
-        $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
-            ->get();
-
-        $invoices_all =  Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
-            ->get();
+        $invoices = $this->get_invoices_by($currentMonth, $currentYear);
+        $invoices_sugestion = $this->get_sugestion_invoices();
+        $invoices_all =  $this->get_all_invoices();
 
         return view('admin.invoice.index', compact('invoices', 'invoices_sugestion', 'invoices_all'));
     }
@@ -238,24 +56,9 @@ class InvoiceController extends Controller
         $previousMonth = now()->subMonth()->month;  // Poprzedni miesiąc
         $previousMonthYear = now()->subMonth()->year;  // Rok poprzedniego miesiąca
 
-        // Sortowanie faktur po 'created_at' malejąco (od najnowszych), tylko dla poprzedniego miesiąca i odpowiedniego roku
-        $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->whereMonth('issue_date', $previousMonth)  // Tylko poprzedni miesiąc
-            ->whereYear('issue_date', $previousMonthYear)  // Rok poprzedniego miesiąca
-            ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);  // Paginacja
-
-
-        // Pobieranie tylko pierwszych 10 faktur z sugestii, sortowanie po 'updated_at'
-        $invoices_sugestion = Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
-            ->get();
-
-        $invoices_all =  Invoice::where('company_id', $this->get_company_id())
-            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
-            ->get();
+        $invoices = $this->get_invoices_by($previousMonth, $previousMonthYear);
+        $invoices_sugestion = $this->get_sugestion_invoices();
+        $invoices_all =  $this->get_all_invoices();
 
         return view('admin.invoice.index', compact('invoices', 'invoices_sugestion', 'invoices_all'));
     }
@@ -265,16 +68,7 @@ class InvoiceController extends Controller
         $query = $request->input('query');
 
         // Wyszukiwanie faktur na podstawie numeru lub klienta
-        $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->where(function ($q) use ($query) {
-                $q->where('number', 'like', "%{$query}%")
-                    ->orWhereHas('client', function ($q) use ($query) {
-                        $q->where('name', 'like', "%{$query}%");
-                    });
-            })
-            ->orderBy('created_at', 'desc')
-            ->take(10) // Pobranie maksymalnie 10 wyników
-            ->get();
+        $invoices = $this->get_invoices_by_query($query);
 
         // Zwracamy faktury jako JSON
         return response()->json($invoices);
@@ -287,7 +81,7 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         $invoice_obj = $invoice;
-        $invoiceItems = InvoiceItem::where('invoice_id', $invoice_obj->id)->get();
+        $invoiceItems = $this->get_invoice_items_by_invoice_id($invoice_obj->id);
         return view('admin.invoice.show', compact('invoice', 'invoice_obj', 'invoiceItems'));
     }
     /**
@@ -582,32 +376,7 @@ class InvoiceController extends Controller
     {
         $invoice_obj = $invoice;
         $items = InvoiceItem::where('invoice_id', $invoice_obj->id)->get();
-
-        $invoice = [
-            'number' => $invoice_obj->number,
-            'invoice_type' => $invoice_obj->invoice_type,
-            'issue_date' => $invoice_obj->issue_date,
-            'due_date' => $invoice_obj->due_date,
-            'status' => $invoice_obj->status,
-            'client' => [
-                'name' => $invoice_obj->buyer_name,
-                'address' => $invoice_obj->buyer_adress,
-                'tax_id' => $invoice_obj->seller_tax_id
-            ],
-            'items' => $items,
-            'seller' => [
-                'name' => $invoice_obj->seller_name,
-                'address' => $invoice_obj->seller_adress,
-                'tax_id' => $invoice_obj->seller_tax_id,
-                'bank' => $invoice_obj->seller_bank
-            ],
-            'subtotal' => $invoice_obj->subtotal,
-            'vat' => $invoice_obj->vat,
-            'total' => $invoice_obj->total,
-            'notes' => $invoice_obj->notes,
-            'payment_method' => $invoice_obj->payment_method,
-            'total_in_words' => $invoice_obj->total_in_words
-        ];
+        $invoice = $this->get_invoice_data_from_obj($invoice_obj, $items);
         return view('admin.template.invoice', compact('invoice'));
     }
 
@@ -619,38 +388,14 @@ class InvoiceController extends Controller
         $invoice_str = $invoice;
         $items = InvoiceItem::where('invoice_id', $invoice_str)->get();
         $invoice_obj = Invoice::where('id', $invoice_str)->first();
-        $invoice = [
-            'number' => $invoice_obj->number,
-            'invoice_type' => $invoice_obj->invoice_type,
-            'issue_date' => $invoice_obj->issue_date,
-            'due_date' => $invoice_obj->due_date,
-            'status' => $invoice_obj->status,
-            'client' => [
-                'name' => $invoice_obj->buyer_name,
-                'address' => $invoice_obj->buyer_adress,
-                'tax_id' => $invoice_obj->seller_tax_id
-            ],
-            'items' => $items,
-            'seller' => [
-                'name' => $invoice_obj->seller_name,
-                'address' => $invoice_obj->seller_adress,
-                'tax_id' => $invoice_obj->seller_tax_id,
-                'bank' => $invoice_obj->seller_bank
-            ],
-            'subtotal' => $invoice_obj->subtotal,
-            'vat' => $invoice_obj->vat,
-            'total' => $invoice_obj->total,
-            'notes' => $invoice_obj->notes,
-            'payment_method' => $invoice_obj->payment_method,
-            'total_in_words' => $invoice_obj->total_in_words
-        ];
+        $invoice = $this->get_invoice_data_from_obj($invoice_obj, $items);
 
         // Generowanie PDF
         $invoiceNumber = str_replace([' ', '/'], '-', $invoice_obj->number);
         $pdf = PDF::loadView('admin.template.invoice', compact('invoice'));
 
         // Pobranie pliku PDF
-        return $pdf->download('faktura-'.$invoice_obj->seller_name.'-' . $invoiceNumber . '.pdf');
+        return $pdf->download('faktura-' . $invoice_obj->seller_name . '-' . $invoiceNumber . '.pdf');
     }
     public function send_invoice(Invoice $invoice)
     {
@@ -661,45 +406,19 @@ class InvoiceController extends Controller
 
         $items = InvoiceItem::where('invoice_id', $invoice->id)->get();
         $invoice_obj = Invoice::where('id', $invoice->id)->first();
-        $invoice = [
-            'number' => $invoice_obj->number,
-            'invoice_type' => $invoice_obj->invoice_type,
-            'issue_date' => $invoice_obj->issue_date,
-            'due_date' => $invoice_obj->due_date,
-            'status' => $invoice_obj->status,
-            'client' => [
-                'name' => $invoice_obj->buyer_name,
-                'address' => $invoice_obj->buyer_adress,
-                'tax_id' => $invoice_obj->seller_tax_id
-            ],
-            'items' => $items,
-            'seller' => [
-                'name' => $invoice_obj->seller_name,
-                'address' => $invoice_obj->seller_adress,
-                'tax_id' => $invoice_obj->seller_tax_id,
-                'bank' => $invoice_obj->seller_bank
-            ],
-            'subtotal' => $invoice_obj->subtotal,
-            'vat' => $invoice_obj->vat,
-            'total' => $invoice_obj->total,
-            'notes' => $invoice_obj->notes,
-            'payment_method' => $invoice_obj->payment_method,
-            'total_in_words' => $invoice_obj->total_in_words
-        ];
+        $invoice = $this->get_invoice_data_from_obj($invoice_obj, $items);
 
         // Generowanie PDF
         $pdf = PDF::loadView('admin.template.invoice', compact('invoice'));
 
         // Wysłanie e-maila z załącznikiem
         try {
-            Mail::to($invoice_obj->client->email)->send(new InvoiceMail($invoice_obj, $pdf));
-        } catch (Exception) {
-
-        }
-        try {
             Mail::to($invoice_obj->client->email2)->send(new InvoiceMail($invoice_obj, $pdf));
         } catch (Exception) {
-
+        }
+        try {
+            Mail::to($invoice_obj->client->email)->send(new InvoiceMail($invoice_obj, $pdf));
+        } catch (Exception) {
         }
 
         return redirect()->back()->with('success', 'Faktura została wysłana pomyślnie!');

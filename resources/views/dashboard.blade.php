@@ -17,6 +17,13 @@
                         <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-200">
                             <span class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 text-gray-800 dark:text-gray-50" style='font-family: "Raleway", sans-serif;'>WIBEST SDF </span>
                         </h1>
+                        <!--
+                        <form action="{{route('ocr')}}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <input type="file" name="image" required>
+                            <button type="submit">Rozpoznaj tekst</button>
+                        </form>
+-->
                         <ul class="grid w-full gap-6 md:grid-cols-2">
                             <!-- Dziś -->
                             <li class="md:col-span-2">
@@ -147,6 +154,39 @@
                                         data: @json($documentCounts), // liczba dokumentów
                                         borderColor: 'rgba(255, 99, 132, 1)',
                                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                        borderWidth: 2
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
+                        <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-200">
+                            <span class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 text-gray-800 dark:text-gray-50">Koszta łącznie ostatnie 31 dni</span>
+                        </h1>
+                        <div class="mt-8 w-full h-full">
+                            <div class="w-full h-full">
+                                <canvas id="costChart"></canvas>
+                            </div>
+                        </div>
+
+                        <script>
+                            const costCtx = document.getElementById('costChart').getContext('2d');
+                            const costChart = new Chart(costCtx, {
+                                type: 'line', // lub 'bar', w zależności od preferencji
+                                data: {
+                                    labels: @json($costDates), // daty z ostatnich 31 dni
+                                    datasets: [{
+                                        label: 'Brutto Kosztów',
+                                        data: @json($costTotalValues), // sumy kwot brutto
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                         borderWidth: 2
                                     }]
                                 },

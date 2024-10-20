@@ -80,6 +80,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Invoice::class); // Użytkownik może mieć wielu faktur
     }
+    public function costs()
+    {
+        return $this->hasMany(Cost::class);
+    }
     /**
      * Definiuje relację jeden-do-wielu (użytkownik -> usługa).
      * Użytkownik może mieć wielu usług.

@@ -45,6 +45,25 @@
                 <ol class="relative border-l border-gray-600">
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">20 padździernika 2024 V 1.7.0</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Ogólnie] [Dodanie] Zakładki Koszta - skończone CRUD</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. [Wykresy] [Dodanie] Z zakłdadki koszta</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">3. [Ogólnie] [Dodanie] OCR tesowego - nie widoczne dla użytkownika</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">4. [Ogólnie] [Dodanie] Kolumn jednostek</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">5. [Ogólnie] [Dodanie] Zakładki oferta - zaczęte CRUD</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">6. [Ogólnie] [Zmiana] Zakładkek produkty i usługi w magazyn</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">7. [Magazyn] [Dodanie] Zakładki zestawy - nie zaczęte CRUD</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">8. [Oferta] [Dodanie] Pobierania</p>
+                    </li>
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">13 padździernika 2024 V 1.6.1</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Faktury] [Naprawa] Błednie przekazywanego numeru nip</p>
+                    </li>
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">13 padździernika 2024 V 1.6.1</time>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Produkty] [Naprawa] Pokazywania waluty bez ceny</p>

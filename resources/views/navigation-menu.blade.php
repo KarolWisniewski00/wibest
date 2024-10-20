@@ -21,11 +21,14 @@
                     <x-nav-link href="{{ route('invoice') }}" :active="Str::startsWith(request()->path(), 'dashboard/invoice')">
                         {{ __('Faktury') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('product') }}" :active="Str::startsWith(request()->path(), 'dashboard/product')">
-                        {{ __('Produkty') }}
+                    <x-nav-link href="{{ route('offer') }}" :active="Str::startsWith(request()->path(), 'dashboard/offer')">
+                        {{ __('Oferty') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('service') }}" :active="Str::startsWith(request()->path(), 'dashboard/service')">
-                        {{ __('Usługi') }}
+                    <x-nav-link href="{{ route('cost') }}" :active="Str::startsWith(request()->path(), 'dashboard/cost')">
+                        {{ __('Koszta') }}
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('set') }}" :active="Str::startsWith(request()->path(), 'dashboard/magazine')">
+                        {{ __('Magazyn') }}
                     </x-nav-link>
                     <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                         {{ __('Ustawienia') }}
@@ -163,11 +166,14 @@
             <x-responsive-nav-link href="{{ route('invoice') }}" :active="Str::startsWith(request()->path(), 'dashboard/invoice')">
                 {{ __('Faktury') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('product') }}" :active="Str::startsWith(request()->path(), 'dashboard/product')">
-                {{ __('Produkty') }}
+            <x-responsive-nav-link href="{{ route('offer') }}" :active="Str::startsWith(request()->path(), 'dashboard/offer')">
+                {{ __('Oferty') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('service') }}" :active="Str::startsWith(request()->path(), 'dashboard/service')">
-                {{ __('Usługi') }}
+            <x-responsive-nav-link href="{{ route('cost') }}" :active="Str::startsWith(request()->path(), 'dashboard/cost')">
+                {{ __('Koszta') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('set') }}" :active="Str::startsWith(request()->path(), 'dashboard/magazine')">
+                {{ __('Magazyn') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                 {{ __('Ustawienia') }}

@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\CostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\OcrController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +41,8 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::prefix('dashboard')->group(function () {
+
+        Route::post('/ocr', [OcrController::class, 'extractText'])->name('ocr'); //TEST
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -69,24 +75,68 @@ Route::middleware([
             Route::get('store/from/{invoice}', [InvoiceController::class, 'store_from'])->name('invoice.store.from');
         });
 
-        Route::prefix('product')->group(function () {
-            Route::get('/', [ProductController::class, 'index'])->name('product');
-            Route::get('create', [ProductController::class, 'create'])->name('product.create');
-            Route::post('store', [ProductController::class, 'store'])->name('product.store');
-            Route::get('show/{product}', [ProductController::class, 'show'])->name('product.show');
-            Route::get('edit/{product}', [ProductController::class, 'edit'])->name('product.edit');
-            Route::put('update/{product}', [ProductController::class, 'update'])->name('product.update');
-            Route::delete('delete/{product}', [ProductController::class, 'delete'])->name('product.delete');
+        Route::prefix('cost')->group(function () {
+            Route::get('/', [CostController::class, 'index'])->name('cost');
+            Route::get('create', [CostController::class, 'create'])->name('cost.create');
+            Route::post('store', [CostController::class, 'store'])->name('cost.store');
+            Route::get('show/{cost}', [CostController::class, 'show'])->name('cost.show');
+            Route::get('edit/{cost}', [CostController::class, 'edit'])->name('cost.edit');
+            Route::put('update/{cost}', [CostController::class, 'update'])->name('cost.update');
+            Route::delete('delete/{cost}', [CostController::class, 'delete'])->name('cost.delete');
+
+            Route::get('now', [CostController::class, 'index_now'])->name('cost.now');
+            Route::get('last', [CostController::class, 'index_last'])->name('cost.last');
+            Route::get('search', [CostController::class, 'search'])->name('cost.search');
         });
 
-        Route::prefix('service')->group(function () {
-            Route::get('/', [ServiceController::class, 'index'])->name('service');
-            Route::get('create', [ServiceController::class, 'create'])->name('service.create');
-            Route::post('store', [ServiceController::class, 'store'])->name('service.store');
-            Route::get('show/{service}', [ServiceController::class, 'show'])->name('service.show');
-            Route::get('edit/{service}', [ServiceController::class, 'edit'])->name('service.edit');
-            Route::put('update/{service}', [ServiceController::class, 'update'])->name('service.update');
-            Route::delete('delete/{service}', [ServiceController::class, 'delete'])->name('service.delete');
+        Route::prefix('offer')->group(function () {
+            Route::get('/', [OfferController::class, 'index'])->name('offer');
+            Route::get('create', [OfferController::class, 'create'])->name('offer.create');
+            Route::post('store', [OfferController::class, 'store'])->name('offer.store');
+            Route::get('show/{offer}', [OfferController::class, 'show'])->name('offer.show');
+            Route::get('edit/{offer}', [OfferController::class, 'edit'])->name('offer.edit');
+            Route::put('update/{offer}', [OfferController::class, 'update'])->name('offer.update');
+            Route::delete('delete/{offer}', [OfferController::class, 'delete'])->name('offer.delete');
+
+            Route::get('now', [OfferController::class, 'index_now'])->name('offer.now');
+            Route::get('last', [OfferController::class, 'index_last'])->name('offer.last');
+            Route::get('/search', [OfferController::class, 'search'])->name('offer.search');
+            Route::get('create/{client}', [OfferController::class, 'create_client'])->name('offer.create.client');
+            Route::get('/send/{offer}', [OfferController::class, 'send_offer'])->name('offer.send');
+            Route::get('file/{offer}', [OfferController::class, 'file'])->name('offer.show.file');
+            Route::get('download/{offer}', [OfferController::class, 'download'])->name('offer.download');
+            Route::get('store/from/{offer}', [OfferController::class, 'store_from'])->name('offer.store.from');
+        });
+        Route::prefix('magazine')->group(function () {
+            Route::prefix('set')->group(function () {
+                Route::get('/', [SetController::class, 'index'])->name('set');
+                Route::get('create', [SetController::class, 'create'])->name('set.create');
+                Route::post('store', [SetController::class, 'store'])->name('set.store');
+                Route::get('show/{set}', [SetController::class, 'show'])->name('set.show');
+                Route::get('edit/{set}', [SetController::class, 'edit'])->name('set.edit');
+                Route::put('update/{set}', [SetController::class, 'update'])->name('set.update');
+                Route::delete('delete/{set}', [SetController::class, 'delete'])->name('set.delete');
+            });
+
+            Route::prefix('product')->group(function () {
+                Route::get('/', [ProductController::class, 'index'])->name('product');
+                Route::get('create', [ProductController::class, 'create'])->name('product.create');
+                Route::post('store', [ProductController::class, 'store'])->name('product.store');
+                Route::get('show/{product}', [ProductController::class, 'show'])->name('product.show');
+                Route::get('edit/{product}', [ProductController::class, 'edit'])->name('product.edit');
+                Route::put('update/{product}', [ProductController::class, 'update'])->name('product.update');
+                Route::delete('delete/{product}', [ProductController::class, 'delete'])->name('product.delete');
+            });
+
+            Route::prefix('service')->group(function () {
+                Route::get('/', [ServiceController::class, 'index'])->name('service');
+                Route::get('create', [ServiceController::class, 'create'])->name('service.create');
+                Route::post('store', [ServiceController::class, 'store'])->name('service.store');
+                Route::get('show/{service}', [ServiceController::class, 'show'])->name('service.show');
+                Route::get('edit/{service}', [ServiceController::class, 'edit'])->name('service.edit');
+                Route::put('update/{service}', [ServiceController::class, 'update'])->name('service.update');
+                Route::delete('delete/{service}', [ServiceController::class, 'delete'])->name('service.delete');
+            });
         });
 
         Route::prefix('setting')->group(function () {
@@ -95,9 +145,10 @@ Route::middleware([
             Route::post('store', [SettingController::class, 'store'])->name('setting.store');
             Route::get('edit/{company}', [SettingController::class, 'edit'])->name('setting.edit');
             Route::put('update/{company}', [SettingController::class, 'update'])->name('setting.update');
-        });
-        Route::prefix('version')->group(function () {
-            Route::get('/', [DashboardController::class, 'version'])->name('version');
+
+            Route::prefix('version')->group(function () {
+                Route::get('/', [DashboardController::class, 'version'])->name('version');
+            });
         });
     });
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
+use App\Models\Cost;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 
@@ -39,7 +40,37 @@ class DashboardController extends Controller
         $dailySubTotals = [];
         $dailyCounts = []; // Tablica do zliczania dokumentów
 
+        // Zliczanie danych dla kosztów
+        $costs = Cost::where('company_id', $this->get_company_id())
+            ->where('created_at', '>=', now()->subDays(31)) // Ostatnie 31 dni
+            ->orderBy('created_at', 'desc')
+            ->get();
         // Inicjalizacja tablic na 31 dni
+        $dailyCostTotals = [];
+        $dailyCostCounts = [];
+
+        for ($i = 0; $i < 31; $i++) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $dailyCostTotals[$date] = 0;
+            $dailyCostCounts[$date] = 0; // Inicjalizuj liczbę dokumentów
+        }
+        // Zliczanie sum dla każdego dnia
+        foreach ($costs as $cost) {
+            $date = $cost->created_at->format('Y-m-d');
+            $dailyCostTotals[$date] += $cost->total; // sumuj total
+            $dailyCostCounts[$date]++; // zwiększ licznik dokumentów
+        }
+
+        // Uporządkuj dane w tablicach
+        $costDates = array_keys($dailyCostTotals);
+        $costTotalValues = array_values($dailyCostTotals);
+        $costDocumentCounts = array_values($dailyCostCounts); // Liczba dokumentów
+
+        // Odwróć tablice, aby daty były od najstarszych
+        $costDates = array_reverse($costDates);
+        $costTotalValues = array_reverse($costTotalValues);
+        $costDocumentCounts = array_reverse($costDocumentCounts); // Odwróć liczbę dokumentów
+
         for ($i = 0; $i < 31; $i++) {
             $date = now()->subDays($i)->format('Y-m-d');
             $dailyTotals[$date] = 0;
@@ -83,7 +114,10 @@ class DashboardController extends Controller
             'dates',
             'totalValues',
             'subTotalValues',
-            'documentCounts' // Przekazanie liczby dokumentów
+            'documentCounts', // Przekazanie liczby dokumentów
+            'costDates',
+            'costTotalValues',
+            'costDocumentCounts' // Przekazanie liczby dokumentów kosztów
         ));
     }
 
