@@ -45,11 +45,6 @@
                         <iframe src="{{route('offer.show.file', $offer_obj)}}" width="100%" height="100%" style="border:none;"></iframe>
                     </div>
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
-                        <!-- Pobierz PDF -->
-                        <a href="{{route('offer.download', $offer_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                            <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
-                        </a>
-
                         <!-- Edytuj -->
                         <a href="{{ route('offer.edit', $offer) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
                             <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
@@ -64,7 +59,18 @@
                             </button>
                         </form>
                     </div>
+                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
+                        <a href="{{route('invoice.store.from.ofr', $offer)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">
+                            <i class="fa-solid fa-file-invoice mr-2"></i>Nowa Faktura
+                        </a>
+                        <!-- Pobierz PDF -->
+                        <a href="{{route('offer.download', $offer_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                            <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
+                        </a>
+                    </div>
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4 w-full">
+                        @if(isset($offer_obj->client->email))
+                        @if(isset($offer_obj->client->email2))
                         @if($offer_obj->client->email != null || $offer_obj->client->email2 != null)
                         @else
                         <div class="relative mt-2 bg-yellow-100 border border-yellow-300 text-yellow-900 rounded-lg p-4 w-full flex items-center justify-between" role="alert" tabindex="-1" aria-labelledby="hs-soft-color-light-label">
@@ -82,6 +88,8 @@
                                 <i class="fa-solid fa-times"></i>
                             </button>
                         </div>
+                        @endif
+                        @endif
                         @endif
                     </div>
                     <script>

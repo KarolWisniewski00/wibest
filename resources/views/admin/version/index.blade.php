@@ -25,7 +25,6 @@
                 <!--
                 Przed wersją 2.0 ogarnąć
                 nazewnictwo tax_id i vat_number
-                nullable w numerze konta w fakturze
                 dodaj waluty MODUŁ WALUTY I JĘZYKI
                 dodaj języki MODUŁ WALUTY I JĘZYKI
                 dodaj jednostki
@@ -40,9 +39,23 @@
                 dodać role
                 dodać filtry
                 Na iphone nie działa podpowiadanie przy klawiaturze
-                brak alertu przy dodaniu produktu
+                dodać koszta do wykresów
+                ogarnąć wykresy i pokazywanie według daty wystawienia a nie daty stworzenia
+                dadać wysyłkę mailem w ofertach
                 -->
                 <ol class="relative border-l border-gray-600">
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">12 listopada 2024 V 1.8.0</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Oferta] [Zmiana] wyglądu + drobne inne poprawki</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. [Wykresy] [Naprawa] błędu gdy przyszło co do liczenia faktur spoza okresu ostanich 31 dni</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">3. [Klienci] [Naprawa] ww. w wykresach klientów</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">4. [Klienci] [Dodanie] Wyszukiwarki</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">5. [Oferty] [Dodanie] Usuwania</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">6. [Oferty] [Dodanie] Edycji</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">7. [Oferty] [Dodanie] wstępnego tworzenie faktury z oferty</p>
+                    </li>
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">20 padździernika 2024 V 1.7.0</time>

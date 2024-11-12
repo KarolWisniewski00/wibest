@@ -50,6 +50,7 @@ Route::middleware([
             Route::get('/', [ClientController::class, 'index'])->name('client');
             Route::get('create', [ClientController::class, 'create'])->name('client.create');
             Route::post('store', [ClientController::class, 'store'])->name('client.store');
+            Route::get('/search', [ClientController::class, 'search'])->name('client.search');
             Route::get('show/{client}', [ClientController::class, 'show'])->name('client.show');
             Route::get('edit/{client}', [ClientController::class, 'edit'])->name('client.edit');
             Route::put('update/{client}', [ClientController::class, 'update'])->name('client.update');
@@ -69,10 +70,12 @@ Route::middleware([
             Route::get('last', [InvoiceController::class, 'index_last'])->name('invoice.last');
             Route::get('/search', [InvoiceController::class, 'search'])->name('invoice.search');
             Route::get('create/{client}', [InvoiceController::class, 'create_client'])->name('invoice.create.client');
+            Route::get('create/pro/{client}', [InvoiceController::class, 'create_pro_client'])->name('invoice.create.pro.client');
             Route::get('/send/{invoice}', [InvoiceController::class, 'send_invoice'])->name('invoice.send');
             Route::get('file/{invoice}', [InvoiceController::class, 'file'])->name('invoice.show.file');
             Route::get('download/{invoice}', [InvoiceController::class, 'download'])->name('invoice.download');
             Route::get('store/from/{invoice}', [InvoiceController::class, 'store_from'])->name('invoice.store.from');
+            Route::get('store/from/ofr/{offer}', [InvoiceController::class, 'store_from_ofr'])->name('invoice.store.from.ofr');
         });
 
         Route::prefix('cost')->group(function () {

@@ -17,8 +17,11 @@ class ClientController extends Controller
      */
     public function index()
     {
-        $clients = Client::where('company_id', $this->get_company_id())->orderBy('created_at', 'desc')->paginate(10);
-        return view('admin.client.index', compact('clients'));
+        $clients = $this->get_clients();
+        $clients_sugestion = $this->get_sugestion_clients();
+        $clients_all =  $this->get_all_clients();
+
+        return view('admin.client.index', compact('clients', 'clients_sugestion', 'clients_all'));
     }
 
     /**
@@ -29,6 +32,7 @@ class ClientController extends Controller
         // Pobieranie faktur związanych z klientem
         $invoices = Invoice::where('company_id', $this->get_company_id())
             ->where('client_id', $client->id)
+            ->where('created_at', '>=', now()->subDays(31)) // Dodajemy warunek daty
             ->orderBy('created_at', 'desc')  // Sortowanie malejąco
             ->paginate(10);
 
@@ -171,5 +175,16 @@ class ClientController extends Controller
         } else {
             return redirect()->route('client')->with('fail', 'Wystąpił błąd podczas usuwania klienta. Proszę spróbować ponownie.');
         }
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+
+        // Wyszukiwanie faktur na podstawie numeru lub klienta
+        $clients = $this->get_clients_by_query($query);
+
+        // Zwracamy faktury jako JSON
+        return response()->json($clients);
     }
 }

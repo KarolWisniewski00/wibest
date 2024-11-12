@@ -13,9 +13,10 @@ class DashboardController extends Controller
     {
         // Pobierz wszystkie faktury dla bieżącej firmy, z wyjątkiem faktur proforma
         $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->where('invoice_type', '!=', 'faktura proforma') // Dodaj warunek, aby wykluczyć faktury proforma
+            ->where('invoice_type', '!=', 'faktura proforma')
+            ->where('created_at', '>=', now()->subDays(31)) // Dodajemy warunek daty
             ->orderBy('created_at', 'desc')
-            ->get(); // Pobieramy wszystkie faktury bez paginacji dla obliczeń
+            ->get();
 
         // Obliczenia
         $todayTotal = $invoices->where('created_at', '>=', now()->startOfDay())->sum('total');

@@ -55,7 +55,7 @@ class OfferController extends Controller
         return view('admin.offer.index', compact('offers', 'offers_sugestion', 'offers_all'));
     }
     /**
-     * Pokazuje formularz tworzenia nowej faktury.
+     * Pokazuje formularz tworzenia nowej oferty.
      */
     public function create()
     {
@@ -65,6 +65,19 @@ class OfferController extends Controller
         $offerNumber = $this->get_offer_number();
         $company = $this->get_company();
         return view('admin.offer.create', compact('clients', 'offerNumber', 'company', 'services', 'products'));
+    }
+    /**
+     * Pokazuje formularz tworzenia nowej oferty.
+     */
+    public function create_client(Client $client)
+    {
+        $create_client = $client;
+        $clients = Client::where('company_id', $this->get_company_id())->get();
+        $services = Service::where('company_id', $this->get_company_id())->get();
+        $products = Product::where('company_id', $this->get_company_id())->get();
+        $offerNumber = $this->get_offer_number();
+        $company = $this->get_company();
+        return view('admin.offer.create', compact('create_client', 'clients', 'offerNumber', 'company', 'services', 'products'));
     }
     /**
      * Zapisuje formularz tworzenia nowej oferty.
@@ -188,12 +201,34 @@ class OfferController extends Controller
         // Pobranie pliku PDF
         return $pdf->download('oferta-' . $offer_obj->seller_name . '-' . $offerNumber . '.pdf');
     }
+    /**
+     * Pokazuje formularz edycji faktury.
+     */
     public function edit(Offer $offer)
     {
-        return redirect()->route('offer')->with('fail', 'Wkrótce dostępne.');
+        $services = Service::where('company_id', $this->get_company_id())->get();
+        $products = Product::where('company_id', $this->get_company_id())->get();
+
+
+        $clients = Client::where('company_id', $this->get_company_id())->get();
+        $company = $this->get_company();
+        $items = OfferItem::where('offer_id', $offer->id)->get();
+        $payment_term = $this->due_date_to_payment_term($offer->issue_date, $offer->due_date);
+        return view('admin.offer.edit', compact('payment_term', 'clients', 'offer', 'company', 'items', 'services', 'products'));
     }
+
+    /**
+     * Usuwa ofertę z pozycjami.
+     */
     public function delete(Offer $offer)
     {
-        return redirect()->route('offer')->with('fail', 'Wkrótce dostępne.');
+        // Usuń powiązane pozycje faktury
+        $offer->items()->delete();
+
+        // Usuń fakturę
+        $offer->delete();
+
+        // Przekierowanie z komunikatem o sukcesie
+        return redirect()->route('offer')->with('success', 'Oferta została pomyślnie usunięta.');
     }
 }

@@ -36,6 +36,24 @@
                             <div class="mb-6">
                                 <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Typ</h3>
                                 <ul class="grid w-full gap-6 md:grid-cols-3">
+                                    @if(isset($pro))
+                                    <li>
+                                        <input name="invoice_type" type="radio" id="invoice" value="faktura" class="hidden peer">
+                                        <label for="invoice" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
+                                            <div class="block">
+                                                <div class="w-full text-sm md:text-xl font-semibold">Faktura</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <li>
+                                        <input name="invoice_type" type="radio" id="proform" value="faktura proforma" class="hidden peer" checked>
+                                        <label for="proform" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
+                                            <div class="block">
+                                                <div class="w-full text-sm md:text-xl font-semibold">Faktura proforma</div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    @else
                                     <li>
                                         <input name="invoice_type" type="radio" id="invoice" value="faktura" class="hidden peer" checked>
                                         <label for="invoice" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
@@ -52,6 +70,7 @@
                                             </div>
                                         </label>
                                     </li>
+                                    @endif
                                 </ul>
                                 @error('invoice_type')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

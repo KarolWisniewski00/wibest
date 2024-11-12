@@ -11,21 +11,258 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!--WIDGET TASK-->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-                <div class="p-4 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <div class="flex flex-row justify-between items-center">
-                        <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
-                            Klienci
-                        </h1>
-                        @if ($company)
-                        <a href="{{ route('client.create') }}" class="mt-8 mb-4 inline-flex items-center justify-center w-10 h-10 text-green-100 transition-colors duration-150 bg-green-500 rounded-full focus:shadow-outline hover:bg-green-600">
-                            <i class="fa-solid fa-plus"></i>
-                        </a>
-                        @else
-                        @endif
+                <div class="px-6 lg:px-8 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+                        <x-nav-link class="h-full text-center" href="{{ route('client') }}" :active="request()->routeIs('client')">
+                            Wszystko
+                        </x-nav-link>
+                    </nav>
+                </div>
+                <div class="px-6 lg:px-8 pb-6 lg:pb-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <style>
+                        .sticky {
+                            position: fixed;
+                            top: 0;
+                            width: 100%;
+                            z-index: 1000;
+                            padding-right: 48px;
+                        }
+
+                        @media (min-width: 640px) {
+                            .sticky {
+                                padding-right: 96px;
+                            }
+                        }
+
+                        @media (min-width: 1024px) {
+                            .sticky {
+                                padding-right: 128px;
+                            }
+                        }
+
+                        @media (min-width: 1280px) {
+                            .sticky {
+                                position: relative;
+                                padding-right: 0px;
+                            }
+                        }
+                    </style>
+                    <div id="space" class="xl:hidden"></div>
+                    <!-- Napis z przyciskiem tworzenia -->
+                    <div id="fixed" class="pb-4 flex flex-col justify-between items-center">
+                        <div class="flex flex-row justify-between items-center w-full bg-white dark:bg-gray-800">
+                            <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
+                                Klienci
+                            </h1>
+                            @if ($company)
+                            <a href="{{ route('client.create') }}" class="mt-8 mb-4 inline-flex items-center justify-center w-10 h-10 text-green-100 transition-colors duration-150 bg-green-500 rounded-full focus:shadow-outline hover:bg-green-600">
+                                <i class="fa-solid fa-plus"></i>
+                            </a>
+                            @else
+                            @endif
+                        </div>
                     </div>
-                    <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8">
+
+                    <script>
+                        $(document).ready(function() {
+                            var element = $('#fixed');
+                            var space = $('#space');
+                            var elementOffset = element.offset().top;
+                            var elementHeight = element.outerHeight(); // Pobieranie wysokości elementu
+
+                            $(window).scroll(function() {
+                                if ($(window).scrollTop() > elementOffset) {
+                                    element.addClass('sticky');
+                                    space.height(elementHeight); // Dodawanie wysokości do space
+                                } else {
+                                    element.removeClass('sticky');
+                                    space.height(0); // Usuwanie wysokości z space
+                                }
+                            });
+                        });
+                    </script>
+                    <div class="max-w">
+                        <!-- SearchBox -->
+                        <div class="relative">
+                            <div id="search-container" class="relative flex flex-row justify-center items-center">
+                                <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-3.5">
+                                    <i class="text-gray-400 dark:text-gray-400 fa-solid fa-magnifying-glass"></i>
+                                </div>
+                                <input id="search" class="py-3 ps-10 pe-4 block w-full border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none" type="text" aria-expanded="false" placeholder="Wyszukaj fakturę po numerze" value="">
+                            </div>
+                        </div>
+                        <!-- End SearchBox -->
+                    </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#suggestions-container').hide(); // Początkowo ukrywamy sugestie
+
+                            function toggleElements() {
+                                var windowWidth = $(window).width();
+
+                                // Nasłuchiwanie na focus w polu #search
+                                $('#search').on('focus', function() {
+                                    if (windowWidth <= 768) {
+                                        // Dla szerokości 768px i mniej, pokazujemy tylko #suggestions-container
+                                        $('#suggestions-container').show();
+                                        $('#list').hide();
+                                        $('#links').hide();
+                                    } else {
+                                        // Dla szerokości powyżej 768px, chowamy tylko #table i #links
+                                        $('#suggestions-container').show();
+                                        $('#table').hide();
+                                        $('#links').hide();
+                                    }
+                                });
+                                $('#search').on('blur', function() {
+                                    if (windowWidth <= 768) {
+                                        // Dla szerokości 768px i mniej, chowamy listę z sugestiami
+                                        $('#suggestions-container').hide();
+                                        $('#list').show();
+                                        $('#links').show();
+                                    } else {
+                                        // Dla szerokości powyżej 768px, chowamy sugestie, pokazujemy tabelę
+                                        $('#suggestions-container').hide();
+                                        $('#table').show();
+                                        $('#links').show();
+                                    }
+                                });
+                                // Wysłanie AJAX po wpisaniu tekstu
+                                $('#search').on('input', function() {
+                                    $('#under-input').html('Wyniki wyszkiwania')
+                                    var query = $(this).val();
+
+                                    if (query.length > 0) {
+                                        $.ajax({
+                                            url: '{{route("client.search")}}', // Endpoint Laravel
+                                            method: 'GET',
+                                            data: {
+                                                query: query
+                                            }, // Wysłanie zapytania z inputa
+                                            success: function(data) {
+                                                // Wyczyść poprzednie wyniki
+                                                $('#suggestions-list').empty();
+
+                                                if (data.length > 0) {
+                                                    $('#suggestions-container').show(); // Pokaż kontener z sugestiami
+
+                                                    // Przetwarzanie wyników i dodanie do listy
+                                                    data.forEach(function(client) {
+
+                                                        $('#suggestions-list').append(
+                                                            '<li class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">' +
+                                                            '<div class="block w-full">' +
+                                                            '<div class="flex justify-between w-full">' +
+                                                            '<div>' +
+                                                            '<span class="text-lg font-semibold dark:text-gray-50">' + client.name + '</span>' +
+                                                            '</div>' +
+                                                            '</div>' +
+                                                            '<div class="text-sm text-gray-400">'+client.adress+'</div>'+
+                                                            '<div class="flex space-x-4 mt-4">' +
+                                                            '<a href="{{route("client.show","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">' +
+                                                            '<i class="fa-solid fa-eye"></i>' +
+                                                            '</a>' +
+                                                            '</div>' +
+                                                            '<div class="flex space-x-4 mt-4">' +
+                                                            '<a href="{{route("offer.create.client","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300">' +
+                                                            '<i class="fa-solid fa-file-invoice"></i>' +
+                                                            '</a>' +
+                                                            '<a href="{{route("invoice.create.pro.client","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300">' +
+                                                            '<i class="fa-solid fa-file-invoice"></i>' +
+                                                            '</a>' +
+                                                            '<a href="{{route("invoice.create.client","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">' +
+                                                            '<i class="fa-solid fa-file-invoice"></i>' +
+                                                            '</a>' +
+                                                            '</div>' +
+                                                            '</div>' +
+                                                            '</li>'
+                                                        );
+                                                    });
+                                                } else {
+                                                    $('#under-input').html('Wyniki wyszkiwania')
+                                                    // Gdy nie ma wyników
+                                                    $('#suggestions-list').append(`
+                                                    <div class="text-center py-8">
+                                                        <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
+                                                        <p class="text-gray-500 dark:text-gray-400">Brak faktur do wyświetlenia.</p>
+                                                    </div>
+                                                    `);
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        $('#under-input').html('Sugerowi klienci')
+                                        $('#suggestions-container').hide(); // Ukryj, jeśli pole puste
+                                    }
+                                });
+
+                                // Zapobieganie znikaniu sugestii przy klikaniu w #suggestions-container
+                                $('#suggestions-container').on('mousedown', function(event) {
+                                    event.preventDefault(); // Blokujemy ukrycie kontenera podczas kliknięcia
+                                });
+
+                                // Nasłuchiwanie na kliknięcia poza polem wyszukiwania lub kontenerem sugestii
+                                $(document).on('click', function(event) {
+                                    if (!$(event.target).closest('#search, #suggestions-container').length) {
+                                        $('#suggestions-container').hide();
+                                    }
+                                });
+                            }
+
+                            // Wywołaj funkcję na załadowanie strony
+                            toggleElements();
+
+                            // Wywołaj ponownie funkcję, gdy rozmiar okna się zmieni (resize event)
+                            $(window).on('resize', function() {
+                                toggleElements();
+                            });
+                        });
+                    </script>
+                    <div class="relative overflow-x-auto sm:rounded-lg mt-8">
                         @if ($company)
-                        <ul class="grid w-full gap-y-4 block md:hidden">
+                        <div id="suggestions-container">
+                            <small id="under-input" class="text-gray-400 dark:text-gray-500">Sugerowani klienci</small>
+                            <ul id="suggestions-list" class="space-y-4 mt-4">
+                                @if ($clients_sugestion->isEmpty())
+                                <div class="text-center py-8">
+                                    <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
+                                    <p class="text-gray-500 dark:text-gray-400">Brak faktur do wyświetlenia.</p>
+                                </div>
+                                @else
+                                @foreach ($clients_sugestion as $client)
+                                <li>
+                                    <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                                        <div class="block w-full">
+                                            <div class="flex justify-between w-full">
+                                                <div>
+                                                    <span class="text-lg font-semibold dark:text-gray-50">{{ $client->name }}</span>
+                                                </div>
+                                            </div>
+                                            <div class="text-sm text-gray-400">{{ $client->adress }}</div>
+                                            <div class="flex space-x-4 mt-4">
+                                                <a href="{{route('client.show', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                            </div>
+                                            <div class="flex space-x-4 mt-4">
+                                                <a href="{{route('offer.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300">
+                                                    <i class="fa-solid fa-file-invoice"></i>
+                                                </a>
+                                                <a href="{{route('invoice.create.pro.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300">
+                                                    <i class="fa-solid fa-file-invoice"></i>
+                                                </a>
+                                                <a href="{{route('invoice.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">
+                                                    <i class="fa-solid fa-file-invoice"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                @endforeach
+                                @endif
+                            </ul>
+                        </div>
+                        <ul id="list" class="grid w-full gap-y-4 block md:hidden">
                             @if ($clients->isEmpty())
                             <div class="text-center py-8">
                                 <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
@@ -51,11 +288,16 @@
                                             <a href="{{route('client.show', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>
-                                            <a href="{{route('client.edit', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300">
-                                                <i class="fa-solid fa-pen-to-square"></i>
+                                        </div>
+                                        <div class="flex space-x-4 mt-4">
+                                            <a href="{{route('offer.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300">
+                                                <i class="fa-solid fa-file-invoice"></i>
                                             </a>
-                                            <a href="{{route('invoice.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-green-600 border border-green-600 rounded-lg hover:bg-green-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300">
-                                                <i class="fa-solid fa-file-invoice mr-2"></i>Nowa Faktura
+                                            <a href="{{route('invoice.create.pro.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300">
+                                                <i class="fa-solid fa-file-invoice"></i>
+                                            </a>
+                                            <a href="{{route('invoice.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">
+                                                <i class="fa-solid fa-file-invoice"></i>
                                             </a>
                                         </div>
                                     </div>
@@ -66,7 +308,7 @@
                         </ul>
 
                         <!-- Tabelaryczny widok klientów (desktop) -->
-                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden md:table">
+                        <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400  hidden md:table">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                                 <tr>
                                     <th scope="col" class="px-6 py-3">Nazwa</th>
@@ -74,9 +316,9 @@
                                     <th scope="col" class="px-6 py-3">Telefon</th>
                                     <th scope="col" class="px-6 py-3">Adres</th>
                                     <th scope="col" class="px-6 py-3">Podgląd</th>
-                                    <th scope="col" class="px-6 py-3">Edycja</th>
-                                    <th scope="col" class="px-6 py-3">Usuwanie</th>
-                                    <th scope="col" class="px-6 py-3">Nowa Faktura</th> <!-- Dodana kolumna -->
+                                    <th scope="col" class="px-6 py-3">Nowa oferta</th>
+                                    <th scope="col" class="px-6 py-3">Nowa pro forma</th>
+                                    <th scope="col" class="px-6 py-3">Nowa Faktura</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -106,21 +348,17 @@
                                         </a>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <a href="{{route('client.edit', $client)}}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        <a href="{{route('offer.create.client', $client)}}" class="text-sky-600 border border-sky-600 hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                            <i class="fa-solid fa-file-invoice"></i>
                                         </a>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <form class="" action="{{route('client.delete', $client)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tego klienta?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:text-white border border-red-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <a href="{{route('invoice.create.pro.client', $client)}}" class="text-indigo-600 border border-indigo-600 hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                            <i class="fa-solid fa-file-invoice"></i>
+                                        </a>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <a href="{{route('invoice.create.client', $client)}}" class="text-green-600 border border-green-600 hover:bg-green-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">
+                                        <a href="{{route('invoice.create.client', $client)}}" class="text-emerald-600 border border-emerald-600 hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5">
                                             <i class="fa-solid fa-file-invoice"></i>
                                         </a>
                                     </td>

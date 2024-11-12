@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Client;
 use App\Models\Company;
 use App\Models\Cost;
 use App\Models\Invoice;
@@ -47,11 +48,30 @@ class Controller extends BaseController
             ->get();
     }
     /**
+     * Zwraca sugestie klientów, ostatnio aktualizowane
+     */
+    public function get_sugestion_clients()
+    {
+        return Client::where('company_id', $this->get_company_id())
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->get();
+    }
+    /**
      * Zwraca wszystkie faktury
      */
     public function get_all_invoices()
     {
         return Invoice::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->get();
+    }
+    /**
+     * Zwraca wszystkich klientów
+     */
+    public function get_all_clients()
+    {
+        return Client::where('company_id', $this->get_company_id())
             ->orderBy('created_at', 'desc')  // Sortowanie malejąco
             ->get();
     }
@@ -62,6 +82,15 @@ class Controller extends BaseController
     {
         return Invoice::where('company_id', $this->get_company_id())
             ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    }
+    /**
+     * Zwraca klientów domyślnie
+     */
+    public function get_clients()
+    {
+        return Client::where('company_id', $this->get_company_id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);
     }
@@ -170,6 +199,19 @@ class Controller extends BaseController
                     ->orWhereHas('client', function ($q) use ($query) {
                         $q->where('name', 'like', "%{$query}%");
                     });
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(10) // Pobranie maksymalnie 10 wyników
+            ->get();
+    }
+    /**
+     * Zwraca klientów po nazwie
+     */
+    public function get_clients_by_query($query)
+    {
+        return Client::where('company_id', $this->get_company_id())
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
             ->take(10) // Pobranie maksymalnie 10 wyników

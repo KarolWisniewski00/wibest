@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edytowanie Faktury') }}
+            {{ __('Edytowanie Oferty') }}
         </h2>
     </x-slot>
 
@@ -13,61 +13,21 @@
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
 
                     <!--POWRÓT-->
-                    <a href="{{ route('invoice') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                        <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do listy Faktur
+                    <a href="{{ route('offer') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                        <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do listy Ofert
                     </a>
 
                     <!--FORMULARZ-->
                     <div class="mt-8">
-                        <h1 class="text-2xl font-medium text-gray-900 dark:text-gray-100">Edytowanie Faktury</h1>
-                        <form method="POST" action="{{ route('invoice.update', $invoice) }}" class="mt-6">
+                        <h1 class="text-2xl font-medium text-gray-900 dark:text-gray-100">Edytowanie Oferty</h1>
+                        <form method="POST" action="{{ route('offer.update', $offer) }}" class="mt-6">
                             @csrf
                             @method('PUT')
                             <!-- Numer faktury -->
                             <div class="mb-6">
                                 <label for="number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer faktury</label>
-                                <input type="text" id="number" name="number" value="{{ $invoice->number }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="text" id="number" name="number" value="{{ $offer->number }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('number')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
-
-                            <!-- Typ Faktury -->
-                            <div class="mb-6">
-                                <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Typ</h3>
-                                <ul class="grid w-full gap-6 md:grid-cols-3">
-                                    <li>
-                                        <!-- Zaznaczenie faktury, jeśli w bazie danych jest "faktura" lub "faktura sprzedażowa" -->
-                                        <input
-                                            name="invoice_type"
-                                            type="radio"
-                                            id="invoice"
-                                            value="{{ ($invoice->invoice_type == 'faktura sprzedażowa') ? 'faktura sprzedażowa' : 'faktura' }}"
-                                            class="hidden peer"
-                                            {{ ($invoice->invoice_type == 'faktura' || $invoice->invoice_type == 'faktura sprzedażowa') ? 'checked' : '' }}>
-                                        <label for="invoice" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Faktura</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <!-- Zaznaczenie faktury proforma, jeśli w bazie danych jest "faktura proforma" -->
-                                        <input
-                                            name="invoice_type"
-                                            type="radio"
-                                            id="proform"
-                                            value="faktura proforma"
-                                            class="hidden peer"
-                                            {{ $invoice->invoice_type == 'faktura proforma' ? 'checked' : '' }}>
-                                        <label for="proform" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Faktura proforma</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                </ul>
-                                @error('invoice_type')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
                             </div>
@@ -75,7 +35,7 @@
                             <!-- Data wystawienia -->
                             <div class="mb-6">
                                 <label for="issue_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data wystawienia</label>
-                                <input type="date" id="issue_date" name="issue_date" value="{{ $invoice->issue_date }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="date" id="issue_date" name="issue_date" value="{{ $offer->issue_date }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('issue_date')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -225,7 +185,7 @@
                                     <!-- Klient -->
                                     <div class="mb-6">
                                         <label for="buyer_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa nabywcy</label>
-                                        <input value="{{ $invoice->buyer_name }}" list="buyer_name_suggestions" id="buyer_name" name="buyer_name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input value="{{ $offer->buyer_name }}" list="buyer_name_suggestions" id="buyer_name" name="buyer_name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         <datalist id="buyer_name_suggestions">
                                             @foreach ($clients as $client)
                                             <option value="{{ $client->name }}" data-id="{{ $client->id }}" data-name="{{ $client->name }}" data-address="{{ $client->adress }}" data-vat-number="{{ $client->vat_number }}">
@@ -233,7 +193,7 @@
                                             </option>
                                             @endforeach
                                         </datalist>
-                                        <input type="hidden" id="client_id" name="client_id" value="{{ $invoice->client_id }}">
+                                        <input type="hidden" id="client_id" name="client_id" value="{{ $offer->client_id }}">
                                         @error('client_id')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
@@ -245,7 +205,7 @@
                                     <!-- Adres -->
                                     <div class="mb-6">
                                         <label for="buyer_adress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres nabywcy</label>
-                                        <input value="{{ $invoice->buyer_adress }}" type="text" id="buyer_address" name="buyer_adress" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input value="{{ $offer->buyer_adress }}" type="text" id="buyer_address" name="buyer_adress" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         @error('buyer_adress')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
@@ -258,7 +218,7 @@
                                             <button type="button" id="fetch_vat_data" class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:bg-indigo-700 dark:focus:bg-indigo-400 active:bg-indigo-800 dark:active:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 Pobierz dane podatnika VAT
                                             </button>
-                                            <input value="{{ $invoice->buyer_tax_id }}" type="text" id="buyer_vat_number" name="buyer_vat_number" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                            <input value="{{ $offer->buyer_tax_id }}" type="text" id="buyer_vat_number" name="buyer_vat_number" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                             @error('buyer_vat_number')
                                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                             @enderror
@@ -274,10 +234,10 @@
                             <!-- Pozycje faktury -->
                             <div class="mb-6">
                                 <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Pozycje na fakturze</h3>
-                                <div id="invoice-items" class="mt-6">
+                                <div id="offer-items" class="mt-6">
 
                                     <!-- KONTERNER DLA POZYCJI -->
-                                    <div class="invoice-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
+                                    <div class="offer-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4">
 
                                     </div>
                                 </div>
@@ -317,55 +277,7 @@
                             <!-- DIVIDER -->
                             <hr class="border-t border-gray-300 dark:border-gray-700 my-6">
 
-                            <!-- Metoda płatności -->
-                            <div class="mb-6">
-                                <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Metoda płatności</h3>
-                                <ul class="grid w-full gap-6 grid-cols-2 md:grid-cols-3">
-                                    <li>
-                                        <input {{ $invoice->payment_method == 'przelew' ? 'checked' : '' }} name="payment_method" type="radio" id="payment_transfer" value="przelew" class="hidden peer">
-                                        <label for="payment_transfer" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Przelew</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <input {{ $invoice->payment_method == 'gotowka' ? 'checked' : '' }} name="payment_method" type="radio" id="payment_cash" value="gotowka" class="hidden peer">
-                                        <label for="payment_cash" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Gotówka</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <input {{ $invoice->payment_method == 'karta' ? 'checked' : '' }} name="payment_method" type="radio" id="payment_card" value="karta" class="hidden peer">
-                                        <label for="payment_card" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Karta płatnicza</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <input {{ $invoice->payment_method == 'pobranie' ? 'checked' : '' }} name="payment_method" type="radio" id="payment_cod" value="pobranie" class="hidden peer">
-                                        <label for="payment_cod" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Opłata za pobraniem</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                    <li>
-                                        <input {{ $invoice->payment_method == 'online' ? 'checked' : '' }} name="payment_method" type="radio" id="payment_online" value="online" class="hidden peer">
-                                        <label for="payment_online" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Płatność On-Line</div>
-                                            </div>
-                                        </label>
-                                    </li>
-                                </ul>
-                                @error('payment_method')
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                                @enderror
-                            </div>
+
                             <!-- Uwagi -->
                             <div class="mb-6">
                                 <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
@@ -380,7 +292,7 @@
                                 <button type="summit" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-400 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     <i class="fa-solid fa-check mr-2"></i>Zapisz
                                 </button>
-                                <a href="{{ route('invoice') }}" class="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <a href="{{ route('offer') }}" class="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     <i class="fa-solid fa-trash mr-2"></i>Anuluj
                                 </a>
                             </div>
@@ -429,7 +341,7 @@
 
             getItem() {
                 const itemElement = $(`
-        <div id="item_id_${this.length}" class="invoice-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 relative" data-index="${this.length}">
+        <div id="item_id_${this.length}" class="offer-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 relative" data-index="${this.length}">
             <div>
             <label for="item_name_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa produktu/usługi</label>
             <input list="name_item_suggestions_${this.length}" type="text" name="items[${this.length}][name]" id="item_name_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
@@ -546,7 +458,7 @@
                 let totalBrutto = 0;
                 let totalVat = 0;
 
-                $('.invoice-item').each(function() {
+                $('.offer-item').each(function() {
                     const netto = parseFloat($(this).find('[id^="item_netto_"]').val()) || 0;
                     const brutto = parseFloat($(this).find('[id^="item_brutto_"]').val()) || 0;
                     const vat = brutto - netto;
@@ -562,8 +474,8 @@
             }
         }
 
-        function invoiceItems() {
-            const item = new Item($('#invoice-items'));
+        function offerItems() {
+            const item = new Item($('#offer-items'));
 
             @foreach($items as $item)
 
@@ -657,7 +569,7 @@
                 "closeButton": true, // Dodanie przycisku zamknięcia
                 "progressBar": true // Pokaż pasek postępu
             };
-            invoiceItems();
+            offerItems();
             addClient();
             addClientByTaxId();
         });

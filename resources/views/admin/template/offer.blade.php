@@ -11,7 +11,7 @@
             font-family: DejaVu Sans, sans-serif;
             margin: 0;
             padding: 0;
-            font-size: 12px;
+            font-size: 10px;
         }
 
         table {
@@ -21,7 +21,7 @@
 
         th,
         td {
-            padding: 8px;
+            padding: 4px;
             border: 1px solid #ddd;
             text-align: left;
         }
@@ -44,7 +44,7 @@
 
         /* Styl dla nagłówka faktury */
         .offer-header {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .offer-header span {
@@ -54,21 +54,21 @@
         /* Styl dla podziału */
         .divider {
             border-bottom: 1px solid #000;
-            margin-top: 20px;
-            margin-bottom: 20px;
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
 
         /* Styl dla tabeli sprzedawcy i nabywcy */
         .seller-buyer-table {
             width: 100%;
-            margin-top: 20px;
+            margin-top: 8px;
             /* Dodanie marginesu górnego */
             border-collapse: collapse;
             border: none;
         }
 
         .seller-buyer-table td {
-            padding: 10px;
+            padding: 4px;
             margin: 0px;
             border: none;
             box-sizing: border-box;
@@ -95,26 +95,26 @@
         .summary {
             text-align: right;
             /* Wyrównanie tekstu do prawej */
-            margin-top: 20px;
+            margin-top: 12px;
             /* Dodanie marginesu górnego */
         }
 
         .summary p {
-            margin: 5px 0;
+            margin: 4px 0;
             /* Dodanie marginesu górnego i dolnego */
         }
 
         /* Styl dla uwag */
         .notes-section {
-            margin-top: 20px;
+            margin-top: 8px;
         }
 
         /* Styl dla napisu w lewym dolnym rogu */
         .footer-left {
             position: fixed;
-            bottom: 10px;
-            left: 10px;
-            font-size: 10px;
+            bottom: 8px;
+            left: 0px;
+            font-size: 8px;
             color: #555;
         }
     </style>
@@ -139,20 +139,27 @@
                 @else
                 <p><span>Numer konta:</span> {{ $offer['seller']['bank'] }}</p>
                 @endif
-                @if(isset($user))
-                <div class="divider"></div>
-                <p>Oferta przygotowana przez</p>
-                <p><span>{{ $user->name }}</span>,</p>
-                <p>{{ $user->email }}</p>
-                @endif
             </td>
             <td class="buyer">
                 <h2 class="h2">Nabywca</h2>
                 <p>{{ $offer['client']['name'] }}</p>
                 <p>{{ $offer['client']['address'] }}</p>
                 <p><span>NIP:</span> {{ $offer['client']['tax_id'] }}</p>
+            </td>
+        </tr>
+    </table>
+    <div class="divider"></div>
+    <table class="seller-buyer-table">
+        <tr>
+            <td class="seller">
+                @if(isset($user))
+                <p>Oferta przygotowana przez</p>
+                <p><span>{{ $user->name }}</span>,</p>
+                <p>{{ $user->email }}</p>
+                @endif
+            </td>
+            <td class="buyer">
                 @if($offer['client']['buyer_person_name'] && $offer['client']['buyer_person_email'])
-                <div class="divider"></div>
                 <p>Oferta przygotowana dla</p>
                 <p><span>{{ $offer['client']['buyer_person_name'] }}</span>,</p>
                 <p>{{ $offer['client']['buyer_person_email'] }}</p>
@@ -179,7 +186,7 @@
             @foreach ($offer['items'] as $key => $item)
             <tr>
                 <td>{{$key + 1}}.</td>
-                <td>{{ $item['name'] }}</td>
+                <td>{{ $item['name'] }}<br><span style="color: #71717a;">{{ $item['service']->description ?? '' }}</span></td>
                 <td>{{ $item['quantity'] }}</td>
                 <td>{{ number_format($item['unit_price'], 2) }} PLN</td>
                 <td>{{ number_format($item['subtotal'], 2) }} PLN</td>
@@ -209,7 +216,7 @@
 
     <!-- Napis w lewym dolnym rogu -->
     <div class="footer-left">
-        Faktura wystawiona w wibest.pl
+        Oferta wystawiona w wibest.pl
     </div>
 
 </body>

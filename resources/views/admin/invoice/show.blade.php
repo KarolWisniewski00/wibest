@@ -45,6 +45,21 @@
                         <iframe src="{{route('invoice.show.file', $invoice_obj)}}" width="100%" height="100%" style="border:none;"></iframe>
                     </div>
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
+                        <!-- Edytuj -->
+                        <a href="{{ route('invoice.edit', $invoice) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                            <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
+                        </a>
+
+                        <!-- Usuń -->
+                        <form action="{{ route('invoice.delete', $invoice) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tą fakturę?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-white border border-red-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                                <i class="fa-solid fa-trash mr-2"></i>Usuń
+                            </button>
+                        </form>
+                    </div>
+                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
                         <!-- Utwórz Fakturę Sprzedaży -->
                         @if($invoice_obj['invoice_type'] == 'faktura proforma')
                         @if($invoice_obj->invoice_id == null)
@@ -66,26 +81,10 @@
                         </button>
                         @endif
 
-
-
                         <!-- Pobierz PDF -->
                         <a href="{{route('invoice.download', $invoice_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
                             <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
                         </a>
-
-                        <!-- Edytuj -->
-                        <a href="{{ route('invoice.edit', $invoice) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                            <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
-                        </a>
-
-                        <!-- Usuń -->
-                        <form action="{{ route('invoice.delete', $invoice) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tą fakturę?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-white border border-red-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                <i class="fa-solid fa-trash mr-2"></i>Usuń
-                            </button>
-                        </form>
                     </div>
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4 w-full">
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
