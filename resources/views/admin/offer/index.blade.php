@@ -60,8 +60,9 @@
                                 Oferty
                             </h1>
                             @if ($company)
-                            <a href="{{ route('offer.create') }}" class="mt-8 mb-4 inline-flex items-center justify-center w-10 h-10 mr-2 text-green-100 transition-colors duration-150 bg-green-500 rounded-full focus:shadow-outline hover:bg-green-600">
-                                <i class="fa-solid fa-plus"></i>
+                            <!-- Nowa Faktura -->
+                            <a href="{{ route('offer.create') }}" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                <i class="fa-solid fa-plus mr-2"></i>Nowa Oferta
                             </a>
                             @else
                             @endif
@@ -188,8 +189,13 @@
                                                             '<a href="{{route("offer.show","")}}/' + offer.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">' +
                                                             '<i class="fa-solid fa-eye"></i>' +
                                                             '</a>' +
-                                                            '<a href="{{route("offer.edit","")}}/' + offer.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300">' +
-                                                            '<i class="fa-solid fa-pen-to-square"></i>' +
+                                                            '</a>' +
+                                                            '<a href="{{route("offer.send","")}}/' + offer.id + '" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">' +
+                                                            '<i class="fa-solid fa-paper-plane"></i>' +
+                                                            '</a>' +
+                                                            '</a>' +
+                                                            '<a href="{{route("offer.download","")}}/' + offer.id + '" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">' +
+                                                            '<i class="fa-solid fa-file-pdf"></i>' +
                                                             '</a>' +
                                                             '</div>' +
                                                             '</div>' +
@@ -266,13 +272,6 @@
                                                     @endif
                                                     <span class="text-lg font-semibold dark:text-gray-50">{{ $offer->number }}</span>
                                                 </div>
-                                                <form action="{{route('offer.delete', $offer)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tą ofertę?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="mb-4 ml-4 inline-flex items-center py-2 px-4 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
                                             </div>
                                             <div class="text-sm text-gray-400 w-2/3">
                                                 @if($offer->client)
@@ -296,8 +295,11 @@
                                                 <a href="{{route('offer.show', $offer)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </a>
-                                                <a href="{{route('offer.edit', $offer)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                <a href="{{route('offer.send',$offer)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                                    <i class="fa-solid fa-paper-plane"></i>
+                                                </a>
+                                                <a href="{{route('offer.download', $offer)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                                    <i class="fa-solid fa-file-pdf"></i>
                                                 </a>
                                             </div>
                                         </div>
@@ -361,30 +363,9 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <div class="flex justify-start items-center w-full">
-                                                @if($offer->offer_type == "oferta proforma")
-                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
-                                                @if($offer->offer_id)
-                                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
-                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                                @endif
-                                                @elseif($offer->offer_type == "oferta sprzedażowa")
-                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                                @if($offer->offer_id)
-                                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
-                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
-                                                @endif
-                                                @elseif($offer->offer_type == "oferta")
-                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                                @endif
+                                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-sky-500 dark:text-white  mr-2">OFR</span>
                                                 <span class="text-lg font-semibold dark:text-gray-50">{{ $offer->number }}</span>
                                             </div>
-                                            <form action="{{route('offer.delete', $offer)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tą ofertę?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="mb-4 ml-4 inline-flex items-center py-2 px-4 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
                                         </div>
                                         <div class="text-sm text-gray-400 w-2/3">
                                             @if($offer->client)
@@ -408,8 +389,11 @@
                                             <a href="{{route('offer.show', $offer)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>
-                                            <a href="{{route('offer.edit', $offer)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300">
-                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            <a href="{{route('offer.send',$offer)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                                <i class="fa-solid fa-paper-plane"></i>
+                                            </a>
+                                            <a href="{{route('offer.download', $offer)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                                <i class="fa-solid fa-file-pdf"></i>
                                             </a>
                                         </div>
                                     </div>
@@ -438,10 +422,10 @@
                                         Podgląd
                                     </th>
                                     <th scope="col" class="px-6 py-3">
-                                        Edycja
+                                        Wyślij mailem
                                     </th>
                                     <th scope="col" class="px-6 py-3">
-                                        Usuwanie
+                                        Pobierz PDF
                                     </th>
                                 </tr>
                             </thead>
@@ -499,7 +483,7 @@
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                                     <td class="px-6 py-4 min-w-48">
                                         <div class="flex justify-start items-center w-full">
-                                        <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-sky-500 dark:text-white  mr-2">OFR</span>
+                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-sky-500 dark:text-white  mr-2">OFR</span>
                                             {{ $offer->number }}
                                         </div>
                                     </td>
@@ -522,18 +506,14 @@
                                         </a>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <a href="{{ route('offer.edit', $offer) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                                            <i class="fa-solid fa-pen-to-square"></i>
+                                        <a href="{{route('offer.send',$offer)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                            <i class="fa-solid fa-paper-plane"></i>
                                         </a>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <form action="{{ route('offer.delete', $offer) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tę ofertę?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:text-white border border-red-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
+                                        <a href="{{route('offer.download', $offer)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                                            <i class="fa-solid fa-file-pdf"></i>
+                                        </a>
                                     </td>
                                 </tr>
                                 @endforeach

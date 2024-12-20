@@ -25,7 +25,7 @@
                         {{ __('Oferty') }}
                     </x-nav-link>
                     <x-nav-link href="{{ route('cost') }}" :active="Str::startsWith(request()->path(), 'dashboard/cost')">
-                        {{ __('Koszta') }}
+                        {{ __('Wydatki') }}
                     </x-nav-link>
                     <x-nav-link href="{{ route('set') }}" :active="Str::startsWith(request()->path(), 'dashboard/magazine')">
                         {{ __('Magazyn') }}
@@ -170,7 +170,7 @@
                 {{ __('Oferty') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('cost') }}" :active="Str::startsWith(request()->path(), 'dashboard/cost')">
-                {{ __('Koszta') }}
+                {{ __('Wydatki') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('set') }}" :active="Str::startsWith(request()->path(), 'dashboard/magazine')">
                 {{ __('Magazyn') }}

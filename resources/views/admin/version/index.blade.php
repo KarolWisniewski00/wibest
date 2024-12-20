@@ -42,6 +42,7 @@
                 dodać koszta do wykresów
                 ogarnąć wykresy i pokazywanie według daty wystawienia a nie daty stworzenia
                 dadać wysyłkę mailem w ofertach
+                pomysł na przy wprowdzaniu faktury kosztowej odrazu uzupełnić stan magazynowy
                 -->
                 <ol class="relative border-l border-gray-600">
                     <li class="mb-10 ml-4">

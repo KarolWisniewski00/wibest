@@ -264,6 +264,31 @@ class Controller extends BaseController
     /**
      * Zwraca obiekt firmy zalogowanego użytkownika.
      */
+    public function get_invoice_number_by_month_year($month, $year, $type)
+    {
+        // Znajdź ostatnią fakturę, aby określić autoinkrementację
+        $lastInvoice = Invoice::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->where('invoice_type', $type)
+            ->where('company_id', $this->get_company_id())
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($lastInvoice) {
+            // Pobierz numer z poprzedniej faktury i zwiększ go o 1
+            $lastNumber = explode('/', $lastInvoice->number)[0];
+            $newNumber = intval($lastNumber) + 1;
+        } else {
+            // Jeśli nie ma wcześniejszych faktur, rozpocznij od 1
+            $newNumber = 1;
+        }
+
+        // Utwórz nowy numer faktury
+        return sprintf('%d', $newNumber);
+    }
+    /**
+     * Zwraca obiekt firmy zalogowanego użytkownika.
+     */
     public function get_invoice_number()
     {
         // Pobierz aktualny miesiąc i rok
@@ -284,6 +309,23 @@ class Controller extends BaseController
 
         // Utwórz nowy numer faktury
         return sprintf('%d/%s/%s', $newNumber, $month, $year);
+    }
+    public function get_number()
+    {
+        // Znajdź ostatnią fakturę, aby określić autoinkrementację
+        $lastInvoice = Invoice::where('company_id', $this->get_company_id())->orderBy('id', 'desc')->first();
+
+        if ($lastInvoice) {
+            // Pobierz numer z poprzedniej faktury i zwiększ go o 1
+            $lastNumber = explode('/', $lastInvoice->number)[0];
+            $newNumber = intval($lastNumber) + 1;
+        } else {
+            // Jeśli nie ma wcześniejszych faktur, rozpocznij od 1
+            $newNumber = 1;
+        }
+
+        // Utwórz nowy numer faktury
+        return sprintf('%d', $newNumber);
     }
     /**
      * Zwraca numer oferty w formacie {numer}/{rok}.

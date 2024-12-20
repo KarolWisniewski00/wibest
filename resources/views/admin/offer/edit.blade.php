@@ -13,8 +13,8 @@
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
 
                     <!--POWRÓT-->
-                    <a href="{{ route('offer') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                        <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do listy Ofert
+                    <a href="{{ route('offer.show', $offer) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                        <i class="fa-solid fa-chevron-left mr-2"></i>Powrót Do Podglądu Oferty
                     </a>
 
                     <!--FORMULARZ-->
@@ -43,16 +43,8 @@
 
                             <!-- Termin płatności -->
                             <div class="mb-6">
-                                <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Termin płatności</h3>
+                                <h3 class="mb-5 block text-sm font-medium text-gray-700 dark:text-gray-300">Termin ważności</h3>
                                 <ul class="grid w-full grid-cols-2 gap-6 md:grid-cols-3">
-                                    <li>
-                                        <input {{ $payment_term == 'natychmiast' ? 'checked' : '' }} name="payment_term" type="radio" id="payment_now" value="natychmiast" class="hidden peer">
-                                        <label for="payment_now" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
-                                            <div class="block">
-                                                <div class="w-full text-lg font-semibold">Natychmiast</div>
-                                            </div>
-                                        </label>
-                                    </li>
                                     <li>
                                         <input {{ $payment_term == '1_dzien' ? 'checked' : '' }} name="payment_term" type="radio" id="payment_1day" value="1_dzien" class="hidden peer">
                                         <label for="payment_1day" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer peer-checked:border-indigo-600 hover:text-gray-600  hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 peer-checked:dark:border-indigo-600">
@@ -123,12 +115,12 @@
 
                                 <!-- Dane sprzedawcy -->
                                 <div>
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Dane sprzedawcy</h3>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
+                                    <h3 class="text-sm md:text-xl font-medium text-gray-900 dark:text-gray-100">Dane sprzedawcy</h3>
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700 mt-6">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Nazwa
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             <a href="{{route('setting')}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$company->name}}</a>
                                             <input type="hidden" value="{{$company->id}}" name="company_id">
                                             <input type="hidden" value="{{$company->name}}" name="seller_name">
@@ -140,11 +132,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Adres
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->adress}}
                                             <input type="hidden" value="{{$company->adress}}" name="seller_adress">
                                         </p>
@@ -152,11 +144,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             NIP
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->vat_number}}
                                             <input type="hidden" value="{{$company->vat_number}}" name="seller_vat_number">
                                         </p>
@@ -164,11 +156,11 @@
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
                                     </div>
-                                    <div class="md:grid md:grid-cols-2 md:gap-4 py-4 border-b dark:border-gray-700">
+                                    <div class="md:grid md:gap-4 py-4 border-b dark:border-gray-700">
                                         <p class="text-gray-600 dark:text-gray-300 test-sm">
                                             Numer konta
                                         </p>
-                                        <p class="text-lg text-gray-900 dark:text-gray-50 font-semibold">
+                                        <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
                                             {{$company->bank}}
                                             <input type="hidden" value="{{$company->bank}}" name="bank">
                                         </p>
@@ -224,6 +216,22 @@
                                             @enderror
                                         </div>
                                         <a href="https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat" class="text-blue-600 dark:text-blue-400 hover:underline text-xs mt-1">Źródło: https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat</a>
+                                    </div>
+                                    <!-- Imię i nazwisko -->
+                                    <div class="mb-6">
+                                        <label for="buyer_person_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Imię i nazwisko</label>
+                                        <input type="text" id="buyer_person_name" value="{{ $offer->buyer_person_name }}" name="buyer_person_name" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        @error('buyer_person_name')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                    <!-- Email -->
+                                    <div class="mb-6">
+                                        <label for="buyer_person_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres email</label>
+                                        <input type="text" id="buyer_person_email" value="{{ $offer->buyer_person_email }}" name="buyer_person_email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        @error('buyer_person_email')
+                                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -292,7 +300,7 @@
                                 <button type="summit" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-400 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     <i class="fa-solid fa-check mr-2"></i>Zapisz
                                 </button>
-                                <a href="{{ route('offer') }}" class="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <a href="{{ route('offer.show', $offer) }}" class="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     <i class="fa-solid fa-trash mr-2"></i>Anuluj
                                 </a>
                             </div>

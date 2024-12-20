@@ -89,15 +89,29 @@ class InvoiceController extends Controller
     /**
      * Pokazuje formularz tworzenia nowej faktury.
      */
+    //public function create()
+    //{
+    //    $clients = Client::where('company_id', $this->get_company_id())->get();
+    //    $services = Service::where('company_id', $this->get_company_id())->get();
+    //    $products = Product::where('company_id', $this->get_company_id())->get();
+    //    $invoiceNumber = $this->get_invoice_number();
+    //    $company = $this->get_company();
+    //    return view('admin.invoice.create', compact('clients', 'invoiceNumber', 'company', 'services', 'products'));
+    //}
     public function create()
     {
+
         $clients = Client::where('company_id', $this->get_company_id())->get();
-        $services = Service::where('company_id', $this->get_company_id())->get();
-        $products = Product::where('company_id', $this->get_company_id())->get();
-        $invoiceNumber = $this->get_invoice_number();
+        $value = $this->get_number();
         $company = $this->get_company();
-        return view('admin.invoice.create', compact('clients', 'invoiceNumber', 'company', 'services', 'products'));
+        $form = 'formdate';
+        return view('admin.invoice.createn', compact('company', 'value','form', 'clients'));
     }
+    public function value($month, $year, $type)
+    {
+        return $this->get_invoice_number_by_month_year($month, $year, $type);
+    }
+
     /**
      * Pokazuje formularz tworzenia nowej faktury.
      */

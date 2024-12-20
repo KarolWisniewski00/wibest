@@ -33,7 +33,11 @@ Route::get('/', function () {
 
 Route::get('/login/google', [GoogleController::class, 'redirect'])->name('login.google');
 Route::get('/login/google/callback', [GoogleController::class, 'callback']);
-
+Route::prefix('api')->group(function () {
+    Route::prefix('invoice')->group(function () {
+        Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
+    });
+});
 //LOGGED IN
 Route::middleware([
     'auth:sanctum',

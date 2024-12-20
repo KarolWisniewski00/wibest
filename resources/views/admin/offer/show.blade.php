@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Faktury') }}
+            {{ __('Podgląd oferty') }}
         </h2>
     </x-slot>
 
@@ -9,17 +9,24 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!--WIDGET TASK-->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                    <!--POWRÓT-->
                     <a href="{{ route('offer') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                         <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do listy ofert
                     </a>
+                    <!--END POWRÓT-->
+
+                    <!--PODGLĄD-->
+                    <!--NAPIS-->
                     <div class="hidden md:flex flex-row justify-between items-center">
                         <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
                             Podgląd oferty
                         </h1>
                     </div>
+                    <!--END NAPIS-->
+
+                    <!--STYLE KARTKI PAPIERU-->
                     <style>
                         .a4-paper {
                             width: 794px;
@@ -40,13 +47,19 @@
                             /* Ukrycie nadmiaru treści */
                         }
                     </style>
+                    <!--END STYLE KARTKI PAPIERU-->
+
+                    <!--KARTKA PAIERU-->
                     <div class="bg-white a4-paper hidden md:block">
-                        <!-- Tutaj wstawiamy zawartość podglądu oferty -->
                         <iframe src="{{route('offer.show.file', $offer_obj)}}" width="100%" height="100%" style="border:none;"></iframe>
                     </div>
+                    <!--END KARTKA PAIERU-->
+                    <!--END PODGLĄD-->
+
+                    <!--PRZYCISKI-->
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
                         <!-- Edytuj -->
-                        <a href="{{ route('offer.edit', $offer) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                        <a href="{{ route('offer.edit', $offer) }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-blue-500 border border-blue-500 rounded-lg hover:bg-blue-400 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-200">
                             <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
                         </a>
 
@@ -59,15 +72,30 @@
                             </button>
                         </form>
                     </div>
-                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
-                        <a href="{{route('invoice.store.from.ofr', $offer)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">
+                    <div class="mt-8 hidden md:flex justify-start items-center space-x-4">
+                        <!-- Nowa Faktura -->
+                        <a href="{{route('invoice.store.from.ofr', $offer)}}" class="text-white bg-emerald-500 hover:bg-emerald-600 focus:ring-4 focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
                             <i class="fa-solid fa-file-invoice mr-2"></i>Nowa Faktura
                         </a>
+
+                        <!-- Nowa PRO FORMA -->
+                        <a href="" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                            <i class="fa-solid fa-file-invoice mr-2"></i>Nowa Pro Forma
+                        </a>
+
                         <!-- Pobierz PDF -->
                         <a href="{{route('offer.download', $offer_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
                             <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
                         </a>
+
+                        <!-- Wyślij Fakturę do Klienta -->
+                        <a href="{{route('offer.send',$offer_obj)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                            <i class="fa-solid fa-paper-plane mr-2"></i>Wyślij Ofertę
+                        </a>
                     </div>
+                    <!--END PRZYCISKI-->
+
+                    <!--ALERT-->
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4 w-full">
                         @if(isset($offer_obj->client->email))
                         @if(isset($offer_obj->client->email2))
@@ -99,8 +127,10 @@
                             });
                         });
                     </script>
+                    <!--END ALERT-->
 
-                    <div class="mt-8 grid grid-cols-2 md:gap-4">
+                    <!--BLUE WINDOW-->
+                    <div class="mt-8 grid grid-cols-2 md:gap-4 border-2 border-gray-700 rounded-lg p-4 pb-8">
                         <div class="col-span-2 md:grid md:grid-cols-1 md:gap-4 p-4 border-b dark:border-gray-700">
                             <h2 class="text-sm md:text-xl font-semibold text-gray-600 dark:text-gray-50">OFR</h2>
                         </div>
@@ -120,101 +150,100 @@
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Termin ważności</p>
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $offer_obj->due_date }}</p>
                         </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                    </div>
+                    <!--END BLUE WINDOW-->
 
-                            </p>
+
+                    <div class="mt-8 grid grid-cols-2 md:gap-4">
+                        <!--GREEN WINDOW-->
+                        <div class="grid grid-cols-1 md:gap-4 border-2 border-gray-700 rounded-lg p-4 pb-8">
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    Sprzedawca
+                                </p>
+                            </div>
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa sprzedającego</p>
+                                @if($offer->client)
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    <a href="{{route('setting')}}" class="text-blue-600 dark:text-blue-400 hover:underline">
+                                        {{ $offer_obj->seller_name }}
+                                    </a>
+                                </p>
+                                @else
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->seller_name }}
+                                </p>
+                                @endif
+                            </div>
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">Adres sprzedającego</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->seller_adress }}
+                                </p>
+                            </div>
+                            <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">NIP sprzedającego</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->seller_tax_id }}
+                                </p>
+                            </div>
                         </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                Sprzedawca
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                Nabywca
-                            </p>
-                        </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa sprzedającego</p>
-                            @if($offer->client)
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                <a href="{{route('setting')}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $offer_obj->seller_name }}</a>
-                            </p>
-                            @else
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->seller_name }}
-                            </p>
+                        <!--END GREEN WINDOW-->
+
+                        <!--ORANGE WINDOW-->
+                        <div class="grid grid-cols-1 md:gap-4 border-2 border-gray-700 rounded-lg p-4 pb-8">
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    Nabywca
+                                </p>
+                            </div>
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa kupującego</p>
+                                @if($offer->client)
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    <a href="{{route('client.show', $offer->client_id)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $offer_obj->buyer_name }}</a>
+                                </p>
+                                @else
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->buyer_name }}
+                                </p>
+                                @endif
+                            </div>
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">Adres kupującego</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->buyer_adress }}
+                                </p>
+                            </div>
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">NIP kupującego</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->buyer_tax_id }}
+                                </p>
+                            </div>
+                            @if($offer_obj->buyer_person_name)
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">Imię i nazwisko kupującego</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->buyer_person_name }}
+                                </p>
+                            </div>
                             @endif
-
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa kupującego</p>
-                            @if($offer->client)
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                <a href="{{route('client.show', $offer->client_id)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $offer_obj->buyer_name }}</a>
-                            </p>
-                            @else
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->buyer_name }}
-                            </p>
+                            @if($offer_obj->buyer_person_email)
+                            <div class="md:grid md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">Adres email kupującego</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $offer_obj->buyer_person_email }}
+                                </p>
+                            </div>
                             @endif
+                        </div>
+                        <!--END ORANGE WINDOW-->
+                    </div>
 
-                        </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Adres sprzedającego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->seller_adress }}
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Adres kupującego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->buyer_adress }}
-                            </p>
-                        </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">NIP sprzedającego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->seller_tax_id }}
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">NIP kupującego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->buyer_tax_id }}
-                            </p>
-                        </div>
-                        @if($offer_obj->buyer_person_name)
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Imię i nazwisko kupującego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->buyer_person_name }}
-                            </p>
-                        </div>
-                        @endif
-                        @if($offer_obj->buyer_person_email)
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Adres email kupującego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $offer_obj->buyer_person_email }}
-                            </p>
-                        </div>
-                        @endif
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-
-                            </p>
-                        </div>
+                    <!--GRAY WINDOW-->
+                    <div class="mt-8 grid grid-cols-2 md:gap-4 border-2 border-gray-700 rounded-lg p-4 pb-8">
                         <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold ">
                                 Pozycje
@@ -244,28 +273,33 @@
                         </div>
                         @endif
                         @endforeach
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
+                    </div>
+                    <!--END GRAY WINDOW-->
 
-                            </p>
+                    <div class="grid grid-cols-2 md:gap-4">
+                        <div>
                         </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
-                                Podsumowanie
-                            </p>
+                        <div class="mt-8 grid grid-cols-1 md:gap-4 border-2 border-gray-700 rounded-lg p-4 pb-8">
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
+                                    Podsumowanie
+                                </p>
+                            </div>
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota netto</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $offer_obj->subtotal }} PLN</p>
+                            </div>
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota VAT</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $offer_obj->vat }} PLN</p>
+                            </div>
+                            <div class="md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                                <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota brutto</p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $offer_obj->total }} PLN</p>
+                            </div>
                         </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota netto</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $offer_obj->subtotal }} PLN</p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota VAT</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $offer_obj->vat }} PLN</p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota brutto</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $offer_obj->total }} PLN</p>
-                        </div>
+                    </div>
+                    <div class="mt-8 grid grid-cols-2 md:gap-4 p-4 pb-8 border-2 border-gray-700 rounded-lg p-4 pb-8">
                         <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
                             <p class="text-gray-600 dark:text-gray-300 test-sm">Uwagi</p>
                             <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $offer_obj->notes }}</p>
@@ -317,7 +351,6 @@
                     </div>
                 </div>
             </div>
-            <!--END WIDGET TASK-->
         </div>
     </div>
 </x-app-layout>

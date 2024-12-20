@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OfferMail;
 use App\Models\Client;
 use App\Models\Offer;
 use App\Models\OfferItem;
@@ -11,6 +12,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Illuminate\Support\Facades\Mail;
 
 class OfferController extends Controller
 {
@@ -230,5 +232,29 @@ class OfferController extends Controller
 
         // Przekierowanie z komunikatem o sukcesie
         return redirect()->route('offer')->with('success', 'Oferta została pomyślnie usunięta.');
+    }
+
+    public function send_offer(Offer $offer)
+    {
+        // Weryfikacja, czy klient ma adres e-mail
+        if ($offer->client->email == null && $offer->client->email2 == null) {
+            return redirect()->back()->with('fail', 'Klient nie ma adresu e-mail do wysłania faktury.');
+        }
+
+        $items = OfferItem::where('offer_id', $offer->id)->get();
+        $offer_obj = Offer::where('id', $offer->id)->first();
+        $offer = $this->get_offer_data_from_obj($offer_obj, $items);
+
+        // Generowanie PDF
+        $pdf = PDF::loadView('admin.template.offer', compact('offer'));
+
+        // Wysłanie e-maila z załącznikiem
+        $om = new OfferMail($offer_obj, $pdf);
+        try {
+            Mail::to('karol.wisniewski2901@gmail.com')->send($om);
+        } catch (Exception) {
+        }
+
+        return redirect()->back()->with('success', 'Oferta została wysłana pomyślnie!');
     }
 }

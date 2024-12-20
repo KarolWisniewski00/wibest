@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Tworzenie Faktury') }}
+            {{ __('Tworzenie Oferty') }}
         </h2>
     </x-slot>
 
@@ -19,7 +19,7 @@
 
                     <!--FORMULARZ-->
                     <div class="mt-8">
-                        <h1 class="text-2xl font-medium text-gray-900 dark:text-gray-100">Nowa Faktura</h1>
+                        <h1 class="text-2xl font-medium text-gray-900 dark:text-gray-100">Nowa Oferta</h1>
                         <form method="POST" action="{{ route('offer.store') }}" class="mt-6">
                             @csrf
 
