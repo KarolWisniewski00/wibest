@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Mail;
 use NumberToWords\NumberToWords;
+use SoapClient;
+use GuzzleHttp\Client as GHC;
 
 class InvoiceController extends Controller
 {
@@ -100,12 +102,158 @@ class InvoiceController extends Controller
     //}
     public function create()
     {
-
         $clients = Client::where('company_id', $this->get_company_id())->get();
         $value = $this->get_number();
         $company = $this->get_company();
-        $form = 'formdate';
-        return view('admin.invoice.createn', compact('company', 'value','form', 'clients'));
+        $user = User::where('id', auth()->id())->first();
+        $form = $user->setting_format;
+        $set_client = $user->setting_client;
+        return view('admin.invoice.createn', compact('company', 'value', 'form', 'clients','set_client'));
+    }
+    public function gus($nip)
+    {
+        // URL usługi SOAP
+        $wsdl = 'https://wyszukiwarkaregon.stat.gov.pl/wsBIR/UslugaBIRzewnPubl.svc';
+        $action = 'http://CIS/BIR/PUBL/2014/07/IUslugaBIRzewnPubl/Zaloguj';
+
+
+        $soapRequest =
+            '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                    xmlns:ns="http://CIS/BIR/PUBL/2014/07">
+                        <soap:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
+                            <wsa:To>https://wyszukiwarkaregon.stat.gov.pl/wsBIR/UslugaBIRzewnPubl.svc</wsa:To>
+                            <wsa:Action>' . $action . '</wsa:Action>
+                        </soap:Header>
+                        <soap:Body>
+                            <ns:Zaloguj>
+                                <ns:pKluczUzytkownika>e6b53a07ba8b47318a0a</ns:pKluczUzytkownika>
+                            </ns:Zaloguj>
+                        </soap:Body>
+                    </soap:Envelope>
+                    ';
+        try {
+            // Użycie GuzzleHTTP do obsługi MTOM
+            $client = new GHC();
+
+            $response = $client->request('POST', $wsdl, [
+                'headers' => [
+                    'Content-Type' => 'application/soap+xml; charset=utf-8; action="' . $action . '"',
+                    'Accept-Encoding' => 'gzip,deflate',
+                    'Connection' => 'Keep-Alive',
+                    'SOAPAction' => $action,
+                ],
+                'body' => $soapRequest,
+            ]);
+            // Odpowiedź, którą otrzymujesz
+            $responseBody = $response->getBody()->getContents();
+
+            // Wzorzec do wyodrębnienia wartości z <ZalogujResult>...</ZalogujResult>
+            preg_match('/<ZalogujResult>(.*?)<\/ZalogujResult>/', $responseBody, $matches);
+
+            // Jeśli dopasowanie zostało znalezione, wartość ZalogujResult
+            if (isset($matches[1])) {
+                $sid = $matches[1];
+            } else {
+                $sid = null; // Jeżeli nie znaleziono wyniku
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+        try {
+            $soapRequest =
+                '<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope"
+                xmlns:ns="http://CIS/BIR/PUBL/2014/07" xmlns:dat="http://CIS/BIR/PUBL/2014/07/DataContract">
+                    <soap:Header xmlns:wsa="http://www.w3.org/2005/08/addressing">
+                        <wsa:To>https://wyszukiwarkaregon.stat.gov.pl/wsBIR/UslugaBIRzewnPubl.svc</wsa:To>
+                        <wsa:Action>http://CIS/BIR/PUBL/2014/07/IUslugaBIRzewnPubl/DaneSzukajPodmioty</wsa:Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <ns:DaneSzukajPodmioty>
+                        <ns:pParametryWyszukiwania>
+                            <dat:Nip>' . $nip . '</dat:Nip>
+                        </ns:pParametryWyszukiwania>
+                        </ns:DaneSzukajPodmioty>
+                    </soap:Body>
+                </soap:Envelope>
+            ';
+            $response = $client->request('POST', $wsdl, [
+                'headers' => [
+                    'Content-Type' => 'application/soap+xml; charset=utf-8;',
+                    'SOAPAction' => 'http://CIS/BIR/PUBL/2014/07/IUslugaBIRzewnPubl/DaneSzukajPodmioty',
+                    'sid' => $sid,
+                ],
+                'body' => $soapRequest,
+            ]);
+
+            // Odpowiedź, którą otrzymujesz
+            $responseBody = $response->getBody()->getContents();
+
+            // Wzorzec do wyodrębnienia wartości z <ZalogujResult>...</ZalogujResult>
+            preg_match('/&lt;Nazwa&gt;(.*?)&lt;\/Nazwa&gt;&#xD;/', $responseBody, $matches);
+
+            // Jeśli dopasowanie zostało znalezione, wartość ZalogujResult
+            if (isset($matches[1])) {
+                $name = $matches[1];
+            } else {
+                $name = null; // Jeżeli nie znaleziono wyniku
+            }
+            // Wzorzec do wyodrębnienia wartości z <ZalogujResult>...</ZalogujResult>
+            preg_match('/&lt;Miejscowosc&gt;(.*?)&lt;\/Miejscowosc&gt;&#xD;/', $responseBody, $matches);
+
+            // Jeśli dopasowanie zostało znalezione, wartość ZalogujResult
+            if (isset($matches[1])) {
+                $city = $matches[1];
+            } else {
+                $city = null; // Jeżeli nie znaleziono wyniku
+            }
+
+            // Wzorzec do wyodrębnienia wartości z <ZalogujResult>...</ZalogujResult>
+            preg_match('/&lt;Ulica&gt;(.*?)&lt;\/Ulica&gt;&#xD;/', $responseBody, $matches);
+
+            // Jeśli dopasowanie zostało znalezione, wartość ZalogujResult
+            if (isset($matches[1])) {
+                $street = $matches[1];
+            } else {
+                $street = null; // Jeżeli nie znaleziono wyniku
+            }
+
+            // Wzorzec do wyodrębnienia wartości z <ZalogujResult>...</ZalogujResult>
+            preg_match('/&lt;NrNieruchomosci&gt;(.*?)&lt;\/NrNieruchomosci&gt;&#xD;/', $responseBody, $matches);
+
+            // Jeśli dopasowanie zostało znalezione, wartość ZalogujResult
+            if (isset($matches[1])) {
+                $number = $matches[1];
+            } else {
+                $number = null; // Jeżeli nie znaleziono wyniku
+            }
+
+            // Wzorzec do wyodrębnienia wartości z <ZalogujResult>...</ZalogujResult>
+            preg_match('/&lt;NrNieruchomosci&gt;(.*?)&lt;\/NrNieruchomosci&gt;&#xD;/', $responseBody, $matches);
+
+            // Jeśli dopasowanie zostało znalezione, wartość ZalogujResult
+            if (isset($matches[1])) {
+                $number = $matches[1];
+            } else {
+                $number = null; // Jeżeli nie znaleziono wyniku
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'response' => [
+                    'name' => $name,
+                    'adres' => $city . ', ' . $street . ' ' . $number,
+                    'nip' => $nip,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
     public function value($month, $year, $type)
     {
@@ -142,7 +290,7 @@ class InvoiceController extends Controller
     /**
      * Zapisuje formularz tworzenia nowej faktury.
      */
-    public function store(Request $request)
+    public function store(InvoiceRequest $request)
     {
         // Zapis faktury do tabeli 'invoices'
         $invoice = new Invoice();
@@ -152,37 +300,80 @@ class InvoiceController extends Controller
         $vatAmount = 0;
         $total = 0;
 
-        // Obliczanie terminu płatności
-        $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $request->input('issue_date'));
-
         // Zapisuje pusty numer konta
         if ($request->input('bank') == null) {
             $bank = '';
         } else {
             $bank = $request->input('bank');
         }
+        if ($request->input('invoice_type') == 'faktura proforma') {
+            $type = 'PRO';
+        } else {
+            $type = 'FVS';
+        }
+        if ($request->input('number') == null) {
+            // Konwersja daty za pomocą Carbon
+            $date = Carbon::createFromFormat('d/m/Y', $request->input('issue_date'));
+
+            // Wydobycie miesiąca i roku
+            $month = $date->format('m'); // 12
+            $year = $date->format('Y');  // 2024
+            $numc = $this->get_invoice_number_by_month_year($month, $year, $request->input('invoice_type'));
+            switch ($request->input('setting_format')) {
+                case 'prosty':
+                    $number = $type . '/' . $numc;
+                    break;
+                case 'podstawowy':
+                    $number = $type . '/' . $numc.'/'.$year;
+                    break;
+                case 'data':
+                    $number = $type . '/' . $numc.'/'.$month.'/'.$year;
+                    break;
+                case 'wlasny':
+                    $number = $type . '/' .$request->input('number');
+                    break;
+                default:
+                    $number = '';
+                    break;
+            }
+        } else {
+            $number = $type . '/' .$request->input('number');
+        }
+        if($request->input('paid') == 'opłacono'){
+            $status = 'opłacona';
+        }else{
+            $status = 'wystawiona';
+        }
         $user = User::where('id', auth()->id())->first();
         // Ustawiamy obliczoną datę jako termin płatności
-        $invoice->due_date = $dueDate;
-        $invoice->number = $request->input('number');
+        $invoice->number = $number;
+        $user->setting_format = $request->input('setting_format'); //new setting
+        $invoice->issue_date = Carbon::createFromFormat('d/m/Y', $request->input('issue_date'))->format('Y-m-d');
+        $invoice->sale_date = Carbon::createFromFormat('d/m/Y', $request->input('sale_date'))->format('Y-m-d'); //new
         $invoice->invoice_type = $request->input('invoice_type');
-        $invoice->issue_date = $request->input('issue_date');
+        $invoice->due_date = Carbon::createFromFormat('d/m/Y', $request->input('payment_date'))->format('Y-m-d');
+        $invoice->payment_term = $request->input('payment_term'); //new
         $invoice->company_id = $request->input('company_id');
-        $invoice->client_id = $request->input('client_id');
         $invoice->seller_name = $request->input('seller_name');
         $invoice->seller_adress = $request->input('seller_adress');
         $invoice->seller_tax_id = $request->input('seller_vat_number');
         $invoice->seller_bank = $bank;
         $invoice->buyer_name = $request->input('buyer_name');
+        $invoice->client_id = $request->input('client_id');
         $invoice->buyer_adress = $request->input('buyer_adress');
         $invoice->buyer_tax_id = $request->input('buyer_vat_number');
+        $user->setting_client = $request->input('setting_client'); //new setting
+        $invoice->paid = $request->input('paid'); //new
+        $invoice->paid_part = $request->input('paid_part'); //new
         $invoice->payment_method = $request->input('payment_method');
         $invoice->notes = $request->input('notes');
         $invoice->subtotal = $subtotal;
         $invoice->vat = $vatAmount;
         $invoice->total = $total;
         $invoice->user_id = $user->id;
+        $invoice->status = $status;
         $invoice->save();
+        $user->save();
 
         // Zapis pozycji faktury do tabeli 'invoice_items'
         foreach ($request->input('items') as $item) {
@@ -372,6 +563,7 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, Invoice $invoice)
     {
+        return redirect()->back()->with('error', 'tymczasowo niedostępne.');
         // Inicjalizacja zmiennych do obliczeń
         $subtotal = 0;
         $vatAmount = 0;

@@ -267,24 +267,21 @@ class Controller extends BaseController
     public function get_invoice_number_by_month_year($month, $year, $type)
     {
         // Znajdź ostatnią fakturę, aby określić autoinkrementację
-        $lastInvoice = Invoice::whereYear('created_at', $year)
+        $invoices = Invoice::whereYear('created_at', $year)
             ->whereMonth('created_at', $month)
             ->where('invoice_type', $type)
             ->where('company_id', $this->get_company_id())
             ->orderBy('id', 'desc')
-            ->first();
+            ->get();
 
-        if ($lastInvoice) {
-            // Pobierz numer z poprzedniej faktury i zwiększ go o 1
-            $lastNumber = explode('/', $lastInvoice->number)[0];
-            $newNumber = intval($lastNumber) + 1;
-        } else {
-            // Jeśli nie ma wcześniejszych faktur, rozpocznij od 1
-            $newNumber = 1;
+        $count = 1;
+
+        foreach ($invoices as $invoice) {
+            $count++;
         }
 
         // Utwórz nowy numer faktury
-        return sprintf('%d', $newNumber);
+        return sprintf('%d', $count);
     }
     /**
      * Zwraca obiekt firmy zalogowanego użytkownika.
@@ -438,44 +435,29 @@ class Controller extends BaseController
         // Obliczanie wartości netto pozycji (quantity * unit_price)
         $itemSubtotal = $item['quantity'] * $item['price'];
 
-        // Obliczanie VAT (jeśli nie jest 'zw' czyli zwolnione z VAT)
-        if ($item['vat'] != 'zw') {
-            $vatRate = floatval($item['vat']); // np. 23% VAT
-            $itemVatAmount = $itemSubtotal * ($vatRate / 100);
-        } else {
-            $itemVatAmount = 0;
-        }
-
-        try {
-            $product = Product::where('id', $item['product_id'])->first();
-            $product->magazine = $product->magazine - $item['quantity'];
-            $product->save();
-        } catch (Exception) {
-        }
+        $vatRate = floatval($item['vat']); // np. 23% VAT
+        $itemVatAmount = $itemSubtotal * ($vatRate / 100);
 
         $invoiceItem = new InvoiceItem();
         $invoiceItem->invoice_id = $id;
-        $invoiceItem->product_id = $item['product_id'];
-        $invoiceItem->service_id = $item['service_id'];
+        $invoiceItem->product_id = null;
+        $invoiceItem->service_id = null;
         $invoiceItem->name = $item['name'];
         $invoiceItem->quantity = $item['quantity'];
         $invoiceItem->unit_price = $item['price'];
-        $invoiceItem->unit = null;
-        $invoiceItem->subtotal = $itemSubtotal;
-        $invoiceItem->vat_rate = $item['vat'] != 'zw' ? $item['vat'] : 0;
+        $invoiceItem->unit = $item['unit'];
+        $invoiceItem->subtotal = $item['netto'];
+        $invoiceItem->vat_rate = $item['vat'];
         $invoiceItem->vat_amount = $itemVatAmount;
-
-        // Wartość brutto pozycji (subtotal + VAT)
-        $itemTotal = $itemSubtotal + $itemVatAmount;
-        $invoiceItem->total = $itemTotal;
+        $invoiceItem->total = $item['brutto'];
 
         // Zapis pozycji faktury
         $invoiceItem->save();
 
         return [
-            'itemSubtotal' => $itemSubtotal,
+            'itemSubtotal' => $item['netto'],
             'itemVatAmount' => $itemVatAmount,
-            'itemTotal' => $itemTotal,
+            'itemTotal' => $item['brutto'],
         ];
     }
     public function item_create_offer($item, $id)

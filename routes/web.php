@@ -37,6 +37,9 @@ Route::prefix('api')->group(function () {
     Route::prefix('invoice')->group(function () {
         Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
     });
+    Route::prefix('search')->group(function () {
+        Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.search.gus');
+    });
 });
 //LOGGED IN
 Route::middleware([

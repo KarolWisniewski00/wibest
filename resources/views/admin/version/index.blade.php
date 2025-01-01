@@ -23,12 +23,9 @@
                     </div>
                 </div>
                 <!--
-                Przed wersją 2.0 ogarnąć
                 nazewnictwo tax_id i vat_number
                 dodaj waluty MODUŁ WALUTY I JĘZYKI
                 dodaj języki MODUŁ WALUTY I JĘZYKI
-                dodaj jednostki
-                dodać opłacone
                 dodać korygujące
                 dodać plik jpk
                 dodać raporty
@@ -43,8 +40,27 @@
                 ogarnąć wykresy i pokazywanie według daty wystawienia a nie daty stworzenia
                 dadać wysyłkę mailem w ofertach
                 pomysł na przy wprowdzaniu faktury kosztowej odrazu uzupełnić stan magazynowy
+                tworzenie faktury dodać old
                 -->
                 <ol class="relative border-l border-gray-600">
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">1 Stycznia 2025 V 1.9.0</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. [Faktury] [Zmiana] Przebudowa tworzenia faktury</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. [Faktury] [Dodanie] Statusu</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">3. [Faktury] [Dodanie] Jednostek w pozycjach</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">4. [Faktury] [Dodanie] Opłaty częściowej</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">5. [Faktury] [Dodanie] Wyboru daty sprzedaży</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">6. [Faktury] [Dodanie] Wyszukiwarki NIP z bazy GUS</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">7. [Faktury] [Zmiana] Przebudowa na włany system numerowania</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">8. [Faktury] [Zmiana] Przebudowa wyszukiwarki NIP</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">9. [Faktury] [Usunięto] Połączenie z magazynem</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">10. [Faktury] [Dodanie] Ustawień numerowania</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">11. [Faktury] [Dodanie] Ustawień wyszukiwania</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">12. [Faktury] [Naprawa] Podglądu z powodu braku połączenia z klientem</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">13. [Faktury] [Zmiana] Wyglądu podglądu wszystkich faktur</p>
+                    </li>
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">12 listopada 2024 V 1.8.0</time>

@@ -32,6 +32,10 @@ class Invoice extends Model
         'payment_method', // Metoda płatności
         'total_in_words',
         'user_id',
+        'sale_date',
+        'payment_term',
+        'paid',
+        'paid_part',
     ];
 
     /**

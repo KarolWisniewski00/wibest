@@ -68,7 +68,7 @@
                         </a>
                         @endif
                         @endif
-
+                        @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
                         <!-- Wyślij Fakturę do Klienta -->
                         <a href="{{route('invoice.send', $invoice_obj)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
@@ -80,6 +80,7 @@
                             <i class="fa-solid fa-paper-plane mr-2"></i>Brak adresu e-mail
                         </button>
                         @endif
+                        @endif
 
                         <!-- Pobierz PDF -->
                         <a href="{{route('invoice.download', $invoice_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
@@ -87,6 +88,7 @@
                         </a>
                     </div>
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4 w-full">
+                        @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
                         @else
                         <div class="relative mt-2 bg-yellow-100 border border-yellow-300 text-yellow-900 rounded-lg p-4 w-full flex items-center justify-between" role="alert" tabindex="-1" aria-labelledby="hs-soft-color-light-label">
@@ -104,6 +106,7 @@
                                 <i class="fa-solid fa-times"></i>
                             </button>
                         </div>
+                        @endif
                         @endif
                     </div>
                     <script>
@@ -338,6 +341,7 @@
                         @endif
                     </div>
                     <div class="mt-8 flex md:hidden justify-start items-center space-x-4">
+                        @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
                         <!-- Wyślij Fakturę do Klienta -->
                         <a href="{{route('invoice.send', $invoice_obj)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
@@ -349,8 +353,10 @@
                             <i class="fa-solid fa-paper-plane mr-2"></i>Brak adresu e-mail
                         </button>
                         @endif
+                        @endif
                     </div>
                     <div class="mt-8 flex md:hidden justify-start items-center space-x-4 w-full">
+                        @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
                         @else
                         <div class="relative mt-2 bg-yellow-100 border border-yellow-300 text-yellow-900 rounded-lg p-4 w-full flex items-center justify-between" role="alert" tabindex="-1" aria-labelledby="hs-soft-color-light-label">
@@ -369,6 +375,7 @@
                             </button>
                         </div>
                         @endif
+                        @endif
                     </div>
                 </div>
             </div>
@@ -376,3 +383,17 @@
         </div>
     </div>
 </x-app-layout>
+@if(session('error'))
+<script>
+    $(document).ready(function() {
+        toastr.error("{{ session('error') }}")
+    });
+</script>
+@endif
+@if(session('success'))
+<script>
+    $(document).ready(function() {
+        toastr.success("{{ session('success') }}")
+    });
+</script>
+@endif
