@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Cost;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -99,9 +100,16 @@ class DashboardController extends Controller
         $subTotalValues = array_reverse($subTotalValues);
         $documentCounts = array_reverse($documentCounts); // Odwróć liczbę dokumentów
 
+        //////////////////////////
+        $company_id = $this->get_company_id();
+        $user_id = Auth::id();
+        $work_sessions_all =  $this->get_work_sessions_logged_user_by_get();
 
         // Przekazanie danych do widoku
         return view('dashboard', compact(
+            'company_id',
+            'user_id',
+            'work_sessions_all',
             'todayTotal',
             'todayCount',
             'last7DaysTotal',

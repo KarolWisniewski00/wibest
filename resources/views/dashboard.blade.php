@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Wykresy') }}
+            {{ __('Panel Główny') }}
         </h2>
     </x-slot>
 
@@ -15,17 +15,234 @@
                 <div class="bg-white dark:bg-gray-800">
                     <div class="flex flex-col justify-between items-center">
                         <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-200">
-                            <span class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 text-gray-800 dark:text-gray-50" style='font-family: "Raleway", sans-serif;'>WIBEST SDF </span>
+                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-4xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150" style='font-family: "Raleway", sans-serif;'>WIBEST</span>
                         </h1>
+
+
+                        <div class="w-full grid grid-cols-3 grid-rows-1 gap-4 appearance-none rounded-lg bg-white border border-white dark:border-gray-700 p-4 outline-none dark:bg-gray-700 dark:text-gray-50">
+                            <div class="col-span-2">
+                                <!-- Data -->
+                                <div class="text-center mb-4">
+                                    <p id="date" class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-lg uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150"></p>
+                                </div>
+
+                                <!-- Timer -->
+                                <div class="text-center mb-6">
+                                    <p id="timer" class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-4xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">00:00:00</p>
+                                </div>
+                            </div>
+                            <div class="col-start-3 h-full">
+                                <!-- Przycisk Start -->
+                                <div class="text-center flex justify-center items-center h-full">
+                                    <button
+                                        id="startButton"
+                                        class="whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Start
+                                    </button>
+                                    <!-- Przycisk Stop -->
+                                    <button
+                                        id="stopButton"
+                                        class="hidden whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Stop
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="work_start" value="{{ route('api.work.start', '') }}">
+                        <input type="hidden" id="work_stop" value="{{ route('api.work.stop', '') }}">
+                        <input type="hidden" id="work_sessions" value="{{ route('api.work.session', ['','']) }}">
+                        <input type="hidden" id="user_id" value="{{ $user_id }}">
+                        <input type="hidden" id="company_id" value="{{ $company_id }}">
+                        <input type="hidden" id="work_sessions_all" value="{{ $work_sessions_all }}">
+                        <div id="calendar" class="w-full my-4 appearance-none rounded-lg bg-white border border-white p-4 outline-none"></div>
+                        <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+                        <script>
+                            $(document).ready(function() {
+                                class WorkSessions {
+                                    constructor() {
+                                        const self = this;
+                                        self.timerInterval = null; // Zmienna do przechowywania interwału
+                                        self.elapsedSeconds = 0; // Licznik sekund
+                                        self.workStart = $('#work_start').val(); // Adres do rozpoczęcia pracy
+                                        self.workStop = $('#work_stop').val(); // Adres do zakończenia pracy
+                                        self.workSessions = $('#work_sessions').val(); // Adres do sesji pracy
+                                        self.userId = $('#user_id').val(); // Id użytkownika
+                                        self.companyId = $('#company_id').val(); // Id firmy
+                                        self.session_id = null; // Id sesji
+                                        self.session_status = false; // Status sesji
+                                    }
+                                    // Funkcja do liczenia czasu
+                                    counting() {
+                                        const self = this;
+                                        self.timerInterval = setInterval(() => {
+                                            self.elapsedSeconds++;
+                                            $('#timer').text(self.formatTime(self.elapsedSeconds));
+                                        }, 1000);
+                                        $('#startButton').addClass('hidden');
+                                        $('#stopButton').removeClass('hidden');
+                                    }
+
+                                    // Funkcja do pobierania sesji pracy
+                                    updateWidgetWorkSession() {
+                                        const self = this;
+                                        $.ajax({
+                                            url: self.workSessions + '/' + self.userId,
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            success: function(response) {
+                                                if (response.message === 'W trakcie pracy') {
+                                                    self.session_id = response.work_session_id;
+                                                    self.session_status = response.work_session_status;
+                                                    const dateString = response.work_session_start_time;
+                                                    const date = new Date(dateString.replace(" ", "T")); // Konwersja na format ISO 8601
+                                                    const now = new Date(); // Aktualny czas
+                                                    const diffInSeconds = Math.floor((now - date) / 1000);
+                                                    self.elapsedSeconds = diffInSeconds;
+                                                    self.counting();
+                                                }
+                                            },
+                                            error: function(xhr, status, error) {}
+                                        });
+                                    }
+
+                                    // Funkcja do rozpoczęcia pracy
+                                    ajaxStart() {
+                                        const self = this;
+                                        $.ajax({
+                                            url: self.workStart + '/' + self.userId,
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            success: function(response) {
+                                                console.log(self.workStart + '/' + self.userId)
+                                                self.session_id = response.work_session_id;
+                                                console.log(response)
+                                            },
+                                            error: function(xhr, status, error) {}
+                                        });
+                                    }
+
+                                    // Funkcja do zakończenia pracy
+                                    ajaxStop() {
+                                        const self = this;
+                                        $.ajax({
+                                            url: self.workStop + '/' + self.session_id,
+                                            type: 'GET',
+                                            dataType: 'json',
+                                            success: function(response) {
+                                                console.log(self.workStop + '/' + self.session_id)
+                                                console.log(response)
+                                            },
+                                            error: function(xhr, status, error) {}
+                                        });
+                                    }
+
+                                    // Funkcja do aktualizacji daty
+                                    updateTodayDate() {
+                                        const self = this;
+                                        const days = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+                                        const months = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
+                                        const today = new Date();
+                                        const formattedDate = `${days[today.getDay()]} ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+                                        $('#date').text(formattedDate);
+                                    }
+
+                                    // Funkcja do formatowania czasu
+                                    formatTime(seconds) {
+                                        const self = this;
+                                        const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                                        const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                                        const secs = String(seconds % 60).padStart(2, '0');
+                                        return `${hrs}:${mins}:${secs}`;
+                                    }
+
+                                    // Funkcja do rozpoczęcia liczenia czasu
+                                    startTimer() {
+                                        const self = this;
+                                        self.ajaxStart();
+                                        self.counting();
+                                    }
+
+                                    // Funka do zakończenia liczenia czasu
+                                    stopTimer() {
+                                        const self = this;
+                                        self.ajaxStop();
+                                        clearInterval(self.timerInterval);
+                                        self.elapsedSeconds = 0;
+                                        $('#timer').text(self.formatTime(self.elapsedSeconds));
+                                        $('#stopButton').addClass('hidden');
+                                        $('#startButton').removeClass('hidden');
+                                    }
+
+                                    // Funkcja do uruchomienia
+                                    run() {
+                                        const self = this;
+                                        self.updateTodayDate();
+                                        self.updateWidgetWorkSession();
+
+                                        $('#startButton').click(function() {
+                                            self.startTimer();
+                                        });
+
+                                        $('#stopButton').click(function() {
+                                            self.stopTimer();
+                                        });
+                                    }
+                                }
+                                class WorkSessionsCalendar {
+                                    constructor() {
+                                        // Inicjalizacja FullCalendar
+                                        let calendarEl = $('#calendar')[0]; // Pobierz element kalendarza
+                                        let work_sessions_all = $('#work_sessions_all').val(); // Pobierz sesje pracy
+                                        let work_sessions = JSON.parse(work_sessions_all); // Parsowanie sesji pracy
+                                        var eventsFromDB = [];
+                                        work_sessions.forEach(element => {
+                                            eventsFromDB.push({
+                                                title: element.status,
+                                                start: element.start_time,
+                                                end: element.end_time,
+                                                color: element.status === 'W trakcie pracy' ? '#eab308' : '#84cc16'
+                                            });
+                                        });
+                                        let calendar = new FullCalendar.Calendar(calendarEl, {
+                                            locale: 'pl',
+                                            initialView: 'timeGridWeek', // Widok miesięczny
+                                            selectable: true, // Możliwość zaznaczania dat
+                                            editable: true, // Edytowalne wydarzenia
+                                            events: eventsFromDB,
+                                            header: {
+                                                left: 'prev,next today',
+                                                center: 'title',
+                                                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                                            },
+                                            dateClick: function(info) {
+                                                alert('Kliknięto datę: ' + info.dateStr); // Obsługa kliknięcia w datę
+                                            },
+                                            eventClick: function(info) {
+                                                alert('Kliknięto wydarzenie: ' + info.event.title); // Kliknięcie wydarzenia
+                                            }
+                                        });
+                                        calendar.render(); // Renderowanie kalendarza
+                                    }
+                                }
+                                // Main
+                                var workSessions = new WorkSessions();
+                                workSessions.run();
+                                var workSessionsCalendar = new WorkSessionsCalendar();
+
+                            });
+                        </script>
+
+
+
+
                         <!--
                         <form action="{{route('ocr')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <input type="file" name="image" required>
                             <button type="submit">Rozpoznaj tekst</button>
                         </form>
--->
                         <ul class="grid w-full gap-6 md:grid-cols-2">
-                            <!-- Dziś -->
+                            <!-- Dziś 
                             <li class="md:col-span-2">
                                 <div class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                                     <div class="block w-full">
@@ -38,7 +255,7 @@
                                 </div>
                             </li>
 
-                            <!-- Ostatnie 7 dni -->
+                            <!-- Ostatnie 7 dni 
                             <li class="md:col-span-2">
                                 <div class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                                     <div class="block w-full">
@@ -51,7 +268,7 @@
                                 </div>
                             </li>
 
-                            <!-- Bieżący miesiąc -->
+                            <!-- Bieżący miesiąc 
                             <li>
                                 <div class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                                     <div class="block w-full">
@@ -64,7 +281,7 @@
                                 </div>
                             </li>
 
-                            <!-- Ubiegły miesiąc -->
+                            <!-- Ubiegły miesiąc
                             <li>
                                 <div class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                                     <div class="block w-full">
@@ -77,7 +294,7 @@
                                 </div>
                             </li>
 
-                            <!-- Ten rok -->
+                            <!-- Ten rok 
                             <li class="md:col-span-2">
                                 <div class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                                     <div class="block w-full">
@@ -90,7 +307,7 @@
                                 </div>
                             </li>
                         </ul>
-                        <!-- Dodaj w sekcji head, jeśli jeszcze nie ma -->
+                        <!-- Dodaj w sekcji head, jeśli jeszcze nie ma 
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
                         <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-200">
@@ -200,8 +417,8 @@
                                 }
                             });
                         </script>
+                        -->
                     </div>
-
                 </div>
                 @else
                 @include('admin.elements.end_config')

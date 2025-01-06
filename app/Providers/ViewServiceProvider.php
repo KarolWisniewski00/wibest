@@ -25,10 +25,11 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // Ustawienie zmiennej `$company` dostępnej we wszystkich widokach
+        // Ustawienie zmiennych `$company` i `$role` dostępnych we wszystkich widokach
         View::composer('*', function ($view) {
             if (Auth::check()) {
-                $view->with('company', Auth::user()->company);
+            $view->with('company', Auth::user()->company);
+            $view->with('role', Auth::user()->role);
             }
         });
     }

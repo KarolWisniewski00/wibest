@@ -22,7 +22,36 @@
                         </h1>
                     </div>
                 </div>
-                <!--
+                <ol class="relative border-l border-gray-600">
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">1 Stycznia 2025 V 2.0.0</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">ZMIANA NA MIERZENIE CZASU PRACY</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">DAWNE ZAKŁADKI</p>
+                        <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
+                            {{ __('Wykresy') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('client') }}" :active="Str::startsWith(request()->path(), 'dashboard/client')">
+                            {{ __('Klienci') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('invoice') }}" :active="Str::startsWith(request()->path(), 'dashboard/invoice')">
+                            {{ __('Faktury') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('offer') }}" :active="Str::startsWith(request()->path(), 'dashboard/offer')">
+                            {{ __('Oferty') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('cost') }}" :active="Str::startsWith(request()->path(), 'dashboard/cost')">
+                            {{ __('Wydatki') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('set') }}" :active="Str::startsWith(request()->path(), 'dashboard/magazine')">
+                            {{ __('Magazyn') }}
+                        </x-nav-link>
+                        <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
+                            {{ __('Ustawienia') }}
+                        </x-nav-link>
+                    </li>
+                    <!--
                 nazewnictwo tax_id i vat_number
                 dodaj waluty MODUŁ WALUTY I JĘZYKI
                 dodaj języki MODUŁ WALUTY I JĘZYKI
@@ -42,7 +71,6 @@
                 pomysł na przy wprowdzaniu faktury kosztowej odrazu uzupełnić stan magazynowy
                 tworzenie faktury dodać old
                 -->
-                <ol class="relative border-l border-gray-600">
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">1 Stycznia 2025 V 1.9.0</time>

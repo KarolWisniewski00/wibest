@@ -57,7 +57,7 @@
                 </div>
                 <div>
                     <h1 class="block text-3xl font-bold text-gray-800 sm:text-4xl lg:text-6xl lg:leading-tight"><span class="text-indigo-600 " style='font-family: "Raleway", sans-serif;'>SDF</span></h1>
-                    <p class="mt-3 text-lg text-gray-800 ">System do fakturowania.</p>
+                    <p class="mt-3 text-lg text-gray-800 ">System w fazie testowej.</p>
 
                     <!-- Buttons -->
                     <div class="mt-7 grid gap-3 w-full sm:inline-flex">

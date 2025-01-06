@@ -62,4 +62,12 @@ class Company extends Model
     {
         return $this->hasMany(Client::class); // Firma może mieć wiele usług
     }
+    public function work_sessions()
+    {
+        return $this->hasMany(WorkSession::class);
+    }
+    public function invitations()
+    {
+        return $this->hasMany(Invitation::class);
+    }
 }

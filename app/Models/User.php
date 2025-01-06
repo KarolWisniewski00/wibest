@@ -102,4 +102,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Product::class); // Użytkownik może mieć wielu produktów
     }
+    public function work_sessions()
+    {
+        return $this->hasMany(WorkSession::class);
+    }
+    public function invitations()
+    {
+        return $this->hasMany(Invitation::class);
+    }
 }

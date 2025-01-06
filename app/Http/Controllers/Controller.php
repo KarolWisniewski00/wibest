@@ -11,6 +11,7 @@ use App\Models\Offer;
 use App\Models\OfferItem;
 use App\Models\Product;
 use App\Models\User;
+use App\Models\WorkSession;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -29,6 +30,39 @@ class Controller extends BaseController
     {
         return User::find(auth()->id())->company_id;
     }
+    /**
+     * Zwraca Id firmy na podstawie id użytkownika
+     */
+    public function get_company_id_by_user_id($id)
+    {
+        return User::find($id)->company_id;
+    }
+    public function isAdmin()
+    {
+        $user = User::where('id', auth()->id())->first();
+        if ($user) {
+            if ($user->role == 'admin') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+    public function get_work_sessions_logged_user()
+    {
+        return WorkSession::where('company_id', $this->get_company_id())
+            ->where('user_id', auth()->id())
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->paginate(10);
+    }
+    public function get_work_sessions_logged_user_by_get()
+    {
+        return WorkSession::where('company_id', $this->get_company_id())
+            ->where('user_id', auth()->id())
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->get();
+    }
 
     /**
      * Zwraca obiekt firmy zalogowanego użytkownika.
@@ -43,6 +77,16 @@ class Controller extends BaseController
     public function get_sugestion_invoices()
     {
         return Invoice::where('company_id', $this->get_company_id())
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->get();
+    }
+    /**
+     * Zwraca sugestie historii czasu pracy, ostatnio aktualizowane
+     */
+    public function get_sugestion_work_sessions()
+    {
+        return WorkSession::where('company_id', $this->get_company_id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
             ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
             ->get();
@@ -67,6 +111,15 @@ class Controller extends BaseController
             ->get();
     }
     /**
+     * Zwraca całą historię czasu pracy
+     */
+    public function get_all_work_sessions()
+    {
+        return WorkSession::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->paginate(10);
+    }
+    /**
      * Zwraca wszystkich klientów
      */
     public function get_all_clients()
@@ -82,6 +135,16 @@ class Controller extends BaseController
     {
         return Invoice::where('company_id', $this->get_company_id())
             ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    }
+    /**
+     * Zwraca historię czasu pracy domyślnie
+     */
+    public function get_work_sessions()
+    {
+        return WorkSession::where('company_id', $this->get_company_id())
+            ->orderBy('start_time', 'desc')  // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
             ->paginate(10);
     }
@@ -165,6 +228,18 @@ class Controller extends BaseController
             ->paginate(10);
     }
     /**
+     * Zwraca historię czasu pracy za pomocą miesiąca i roku
+     */
+    public function get_work_sessions_by($currentMonth, $currentYear)
+    {
+        return WorkSession::where('company_id', $this->get_company_id())
+            ->whereMonth('start_time', $currentMonth)  // Tylko bieżący miesiąc
+            ->whereYear('start_time', $currentYear)    // Tylko bieżący rok
+            ->orderBy('start_time', 'desc')            // Sortowanie malejąco
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+    }
+    /**
      * Zwraca oferty za pomocą miesiąca i roku
      */
     public function get_offers_by($currentMonth, $currentYear)
@@ -197,6 +272,22 @@ class Controller extends BaseController
             ->where(function ($q) use ($query) {
                 $q->where('number', 'like', "%{$query}%")
                     ->orWhereHas('client', function ($q) use ($query) {
+                        $q->where('name', 'like', "%{$query}%");
+                    });
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(10) // Pobranie maksymalnie 10 wyników
+            ->get();
+    }
+    /**
+     * Zwraca wyniki wyskukiwania historii czasu pracy
+     */
+    public function get_work_sessions_by_query($query)
+    {
+        return WorkSession::where('company_id', $this->get_company_id())
+            ->where(function ($q) use ($query) {
+                $q->where('start_day_of_week', 'like', "%{$query}%")
+                    ->orWhereHas('user', function ($q) use ($query) {
                         $q->where('name', 'like', "%{$query}%");
                     });
             })

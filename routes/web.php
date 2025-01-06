@@ -13,6 +13,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WorkSessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,11 +35,19 @@ Route::get('/', function () {
 Route::get('/login/google', [GoogleController::class, 'redirect'])->name('login.google');
 Route::get('/login/google/callback', [GoogleController::class, 'callback']);
 Route::prefix('api')->group(function () {
+    Route::prefix('work')->group(function () {
+        Route::get('/start/{user_id}', [WorkSessionController::class, 'startWork'])->name('api.work.start');
+        Route::get('/stop/{id}', [WorkSessionController::class, 'stopWork'])->name('api.work.stop');
+        Route::get('/session/{user_id}', [WorkSessionController::class, 'getWorkSession'])->name('api.work.session');
+    });
     Route::prefix('invoice')->group(function () {
         Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
     });
     Route::prefix('search')->group(function () {
         Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.search.gus');
+    });
+    Route::prefix('user')->group(function () {
+        Route::get('update/role/{id}/{role}', [UserController::class, 'updateRole'])->name('api.user.update.role');
     });
 });
 //LOGGED IN
@@ -52,6 +61,20 @@ Route::middleware([
         Route::post('/ocr', [OcrController::class, 'extractText'])->name('ocr'); //TEST
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+
+        Route::prefix('work')->group(function () {
+            Route::get('/', [WorkSessionController::class, 'index'])->name('work.session');
+            Route::get('create', [WorkSessionController::class, 'create'])->name('work.session.create');
+            Route::post('store', [WorkSessionController::class, 'store'])->name('work.session.store');
+            Route::get('search', [WorkSessionController::class, 'search'])->name('work.session.search');
+            Route::get('show/{work_session}', [WorkSessionController::class, 'show'])->name('work.session.show');
+            Route::get('edit/{work_session}', [WorkSessionController::class, 'edit'])->name('work.session.edit');
+            Route::put('update/{work_session}', [WorkSessionController::class, 'update'])->name('work.session.update');
+            Route::delete('delete/{work_session}', [WorkSessionController::class, 'delete'])->name('work.session.delete');
+
+            Route::get('now', [WorkSessionController::class, 'index_now'])->name('work.session.now');
+            Route::get('last', [WorkSessionController::class, 'index_last'])->name('work.session.last');
+        });
 
         Route::prefix('client')->group(function () {
             Route::get('/', [ClientController::class, 'index'])->name('client');
@@ -155,6 +178,9 @@ Route::middleware([
             Route::post('store', [SettingController::class, 'store'])->name('setting.store');
             Route::get('edit/{company}', [SettingController::class, 'edit'])->name('setting.edit');
             Route::put('update/{company}', [SettingController::class, 'update'])->name('setting.update');
+            Route::get('disconnect/{user}', [SettingController::class, 'disconnect'])->name('setting.user.disconnect');
+            Route::get('invitations/accept/{id}', [SettingController::class, 'acceptInvitation'])->name('setting.user.invitations.accept');
+            Route::get('invitations/reject/{id}', [SettingController::class, 'rejectInvitation'])->name('setting.user.invitations.reject');
 
             Route::prefix('version')->group(function () {
                 Route::get('/', [DashboardController::class, 'version'])->name('version');
