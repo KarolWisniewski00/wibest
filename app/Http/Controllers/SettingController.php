@@ -116,7 +116,6 @@ class SettingController extends Controller
         }
 
         // Accept the invitation
-        $invitation->status = 'zaakceptowano';
         $invitation->delete();
 
         // Assign the user to the company

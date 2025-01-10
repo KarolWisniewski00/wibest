@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Mierzenie Czasu Pracy') }}
+            {{ __('Raport Czasu Pracy') }}
         </h2>
     </x-slot>
 
@@ -12,20 +12,20 @@
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="px-6 lg:px-8 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                        <x-nav-link class="h-full text-center" href="{{ route('work.session') }}" :active="request()->routeIs('work.session')">
+                        <x-nav-link class="h-full text-center" href="{{ route('work.raport') }}" :active="request()->routeIs('work.raport')">
                             Wszystko
                         </x-nav-link>
-                        <x-nav-link class="h-full text-center" href="{{ route('work.session.now') }}" :active="request()->routeIs('work.session.now')">
+                        <x-nav-link class="h-full text-center" href="{{ route('work.raport.now') }}" :active="request()->routeIs('work.raport.now')">
                             Aktualny miesiąc
                         </x-nav-link>
-                        <x-nav-link class="h-full text-center" href="{{ route('work.session.last') }}" :active="request()->routeIs('work.session.last')">
+                        <x-nav-link class="h-full text-center" href="{{ route('work.raport.last') }}" :active="request()->routeIs('work.raport.last')">
                             Poprzedni miesiąc
                         </x-nav-link>
                     </nav>
                 </div>
                 <div class="px-6 lg:px-8 pb-6 lg:pb-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <x-header-display href="{{ route('work.session.create') }}">
-                        Mierzenie Czasu Pracy
+                    <x-header-display href="{{ route('work.raport.create') }}">
+                        Raport Czasu Pracy
                     </x-header-display>
                     <x-search-display />
                     <script>
@@ -69,72 +69,13 @@
 
                                     if (query.length > 0) {
                                         $.ajax({
-                                            url: '{{route("work.session.search")}}', // Endpoint Laravel
+                                            url: '{{route("work.raport.search")}}', // Endpoint Laravel
                                             method: 'GET',
                                             data: {
                                                 query: query
                                             }, // Wysłanie zapytania z inputa
                                             success: function(data) {
-                                                // Wyczyść poprzednie wyniki
-                                                $('#suggestions-list').empty();
 
-                                                if (data.length > 0) {
-                                                    $('#suggestions-container').show(); // Pokaż kontener z sugestiami
-
-                                                    // Przetwarzanie wyników i dodanie do listy
-                                                    data.forEach(function(work_session) {
-                                                        var work_sessionTypeBadge = '';
-                                                        if (work_session.work_session_type === 'faktura proforma') {
-                                                            work_sessionTypeBadge = '<span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white mr-2">PRO</span>';
-                                                        } else if (work_session.work_session_type === 'faktura sprzedażowa') {
-                                                            work_sessionTypeBadge = '<span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white mr-2">FVS</span>';
-                                                        }
-
-                                                        $('#suggestions-list').append(
-                                                            '<li class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">' +
-                                                            '<div class="block w-full">' +
-                                                            '<div class="flex justify-between w-full">' +
-                                                            '<div>' +
-                                                            work_sessionTypeBadge +
-                                                            '<span class="text-lg font-semibold dark:text-gray-50">' + work_session.number + '</span>' +
-                                                            '</div>' +
-                                                            '<form action="{{route("work.session.delete","")}}/' + work_session.id + '" method="POST" onsubmit="return confirm(\'Czy na pewno chcesz usunąć tą fakturę?\');">' +
-                                                            '@csrf @method("DELETE")' +
-                                                            '<button type="submit" class="mb-4 ml-4 inline-flex items-center py-2 px-4 text-sm font-medium text-red-600 border border-red-600 rounded-lg hover:bg-red-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-red-300">' +
-                                                            '<i class="fa-solid fa-trash"></i>' +
-                                                            '</button>' +
-                                                            '</form>' +
-                                                            '</div>' +
-                                                            '<div class="text-sm text-gray-400 w-2/3">' +
-                                                            (work_session.client ? '<a href="{{route("work.session.show","")}}/' + work_session.client_id + '" class="text-blue-600 dark:text-blue-400 hover:underline">' + work_session.client_name + '</a>' : work_session.buyer_name) +
-                                                            '</div>' +
-                                                            '<div class="flex flex-col items-end">' +
-                                                            '<div>Netto <span class="font-semibold">' + work_session.subtotal + '</span> zł</div>' +
-                                                            '<div>VAT <span class="font-semibold">' + work_session.vat + '</span> zł</div>' +
-                                                            '<div class="text-lg dark:text-gray-50">Brutto <span class="font-semibold">' + work_session.total + '</span> zł</div>' +
-                                                            '</div>' +
-                                                            '<div class="flex space-x-4 mt-4">' +
-                                                            '<a href="{{route("work.session.show","")}}/' + work_session.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">' +
-                                                            '<i class="fa-solid fa-eye"></i>' +
-                                                            '</a>' +
-                                                            '<a href="{{route("work.session.edit","")}}/' + work_session.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-white bg-indigo-500 rounded-lg hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300">' +
-                                                            '<i class="fa-solid fa-pen-to-square"></i>' +
-                                                            '</a>' +
-                                                            '</div>' +
-                                                            '</div>' +
-                                                            '</li>'
-                                                        );
-                                                    });
-                                                } else {
-                                                    $('#under-input').html('Wyniki wyszkiwania')
-                                                    // Gdy nie ma wyników
-                                                    $('#suggestions-list').append(`
-                                                    <div class="text-center py-8">
-                                                        <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
-                                                        <p class="text-gray-500 dark:text-gray-400">Brak faktur do wyświetlenia.</p>
-                                                    </div>
-                                                    `);
-                                                }
                                             }
                                         });
                                     } else {
@@ -173,28 +114,28 @@
                         <div id="suggestions-container">
                             <small id="under-input" class="text-gray-400 dark:text-gray-500">Sugerowane</small>
                             <ul id="suggestions-list" class="space-y-4 mt-4">
-                                @if ($work_sessions_sugestion->isEmpty())
+                                @if ($work_raports_sugestion->isEmpty())
                                 <x-empty-place />
                                 @else
-                                @foreach ($work_sessions_sugestion as $work_session)
+                                @foreach ($work_raports_sugestion as $work_raport)
                                 <li>
                                     <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
                                         <div class="block w-full">
                                             <div class="flex justify-between w-full">
                                                 <div class="flex justify-start items-center w-full justify-start">
-                                                    @if($work_session->status == 'W trakcie pracy')
+                                                    @if($work_raport->status == 'W trakcie pracy')
                                                     <x-status-yellow class="text-xl">
-                                                        {{ $work_session->status }}
+                                                        {{ $work_raport->status }}
                                                     </x-status-yellow>
                                                     @endif
-                                                    @if($work_session->status == 'Praca zakończona')
+                                                    @if($work_raport->status == 'Praca zakończona')
                                                     <x-status-green class="text-xl">
-                                                        {{ $work_session->status }}
+                                                        {{ $work_raport->status }}
                                                     </x-status-green>
                                                     @endif
                                                 </div>
                                                 @if($role == 'admin')
-                                                <form action="{{route('work.session.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                                                <form action="{{route('work.raport.delete', $work_raport)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <x-button-red type="submit" class="min-h-[38px]">
@@ -204,17 +145,17 @@
                                                 @endif
                                             </div>
                                             <x-paragraf-display class="text-xl">
-                                                {{ $work_session->time_in_work }}
+                                                {{ $work_raport->time_in_work }}
                                             </x-paragraf-display>
-                                            @if($work_session->status == 'Praca zakończona')
+                                            @if($work_raport->status == 'Praca zakończona')
                                             <div class="text-sm text-gray-400 dark:text-gray-300 flex justify-start w-full my-2 gap-x-4">
-                                                @if($work_session->start_day_of_week != $work_session->end_day_of_week)
+                                                @if($work_raport->start_day_of_week != $work_raport->end_day_of_week)
                                                 <div class="flex flex-col">
                                                     <x-label-display>
                                                         Od
                                                     </x-label-display>
                                                     <x-paragraf-display class="text-xs">
-                                                        {{ $work_session->start_day_of_week }}
+                                                        {{ $work_raport->start_day_of_week }}
                                                     </x-paragraf-display>
                                                 </div>
                                                 <div class="flex flex-col">
@@ -222,13 +163,13 @@
                                                         Do
                                                     </x-label-display>
                                                     <x-paragraf-display class="text-xs">
-                                                        {{ $work_session->end_day_of_week }}
+                                                        {{ $work_raport->end_day_of_week }}
                                                     </x-paragraf-display>
                                                 </div>
                                                 @else
                                                 <div class="flex flex-col">
                                                     <x-paragraf-display class="text-xs">
-                                                        {{ $work_session->end_day_of_week }}
+                                                        {{ $work_raport->end_day_of_week }}
                                                     </x-paragraf-display>
                                                 </div>
                                                 @endif
@@ -240,27 +181,27 @@
                                                         Od
                                                     </x-label-display>
                                                     <x-paragraf-display class="text-xs">
-                                                        {{$work_session->start_time}}
+                                                        {{$work_raport->start_time}}
                                                     </x-paragraf-display>
                                                 </div>
                                             </div>
                                             @endif
                                             <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
                                                 <div class="flex flex-col">
-                                                    {{$work_session->user->name}}
+                                                    {{$work_raport->user->name}}
                                                 </div>
                                             </div>
                                             <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
                                                 <div class="flex flex-col">
-                                                    {{$work_session->company->name}}
+                                                    {{$work_raport->company->name}}
                                                 </div>
                                             </div>
                                             <div class="flex space-x-4 mt-4">
-                                                <x-button-link-neutral href="{{route('work.session.show', $work_session)}}" class="min-h-[38px]">
+                                                <x-button-link-neutral href="{{route('work.raport.show', $work_raport)}}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </x-button-link-neutral>
                                                 @if($role == 'admin')
-                                                <x-button-link-blue href="{{route('work.session.edit', $work_session)}}" class="min-h-[38px]">
+                                                <x-button-link-blue href="{{route('work.raport.edit', $work_raport)}}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-pen-to-square"></i>
                                                 </x-button-link-blue>
                                                 @endif
@@ -274,7 +215,7 @@
                         </div>
 
                         <ul id="list" class="grid w-full gap-y-4 block md:hidden">
-                            @if ($work_sessions->isEmpty())
+                            @if ($work_raports->isEmpty())
                             <x-empty-place />
                             @else
                             @php
@@ -295,15 +236,15 @@
                             ];
                             @endphp
 
-                            @foreach ($work_sessions as $key => $work_session)
+                            @foreach ($work_raports as $key => $work_raport)
                             @php
                             // Pobieramy miesiąc z daty faktury (załóżmy, że jest polem issue_date)
-                            $work_sessionMonth = \Carbon\Carbon::parse($work_session->issue_date)->month;
+                            $work_raportMonth = \Carbon\Carbon::parse($work_raport->issue_date)->month;
 
                             // Jeśli miesiąc zmienił się w stosunku do poprzedniego, wyświetlamy nazwę nowego miesiąca
-                            if ($work_sessionMonth !== $currentMonth) {
-                            $currentMonth = $work_sessionMonth;
-                            $monthName = $months[$work_sessionMonth];
+                            if ($work_raportMonth !== $currentMonth) {
+                            $currentMonth = $work_raportMonth;
+                            $monthName = $months[$work_raportMonth];
                             @endphp
                             <!-- Sekcja wyświetlająca nazwę miesiąca z ikoną strzałki w dół -->
                             <div id="s-{{$key}}"></div>
@@ -323,19 +264,19 @@
                                     <div class="block w-full">
                                         <div class="flex justify-between w-full">
                                             <div class="flex justify-start items-center w-full justify-start">
-                                                @if($work_session->status == 'W trakcie pracy')
+                                                @if($work_raport->status == 'W trakcie pracy')
                                                 <x-status-yellow class="text-xl">
-                                                    {{ $work_session->status }}
+                                                    {{ $work_raport->status }}
                                                 </x-status-yellow>
                                                 @endif
-                                                @if($work_session->status == 'Praca zakończona')
+                                                @if($work_raport->status == 'Praca zakończona')
                                                 <x-status-green class="text-xl">
-                                                    {{ $work_session->status }}
+                                                    {{ $work_raport->status }}
                                                 </x-status-green>
                                                 @endif
                                             </div>
                                             @if($role == 'admin')
-                                            <form action="{{route('work.session.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                                            <form action="{{route('work.raport.delete', $work_raport)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <x-button-red type="submit" class="min-h-[38px]">
@@ -345,17 +286,17 @@
                                             @endif
                                         </div>
                                         <x-paragraf-display class="text-xl">
-                                            {{ $work_session->time_in_work }}
+                                            {{ $work_raport->time_in_work }}
                                         </x-paragraf-display>
-                                        @if($work_session->status == 'Praca zakończona')
+                                        @if($work_raport->status == 'Praca zakończona')
                                         <div class="text-sm text-gray-400 dark:text-gray-300 flex justify-start w-full my-2 gap-x-4">
-                                            @if($work_session->start_day_of_week != $work_session->end_day_of_week)
+                                            @if($work_raport->start_day_of_week != $work_raport->end_day_of_week)
                                             <div class="flex flex-col">
                                                 <x-label-display>
                                                     Od
                                                 </x-label-display>
                                                 <x-paragraf-display class="text-xs">
-                                                    {{ $work_session->start_day_of_week }}
+                                                    {{ $work_raport->start_day_of_week }}
                                                 </x-paragraf-display>
                                             </div>
                                             <div class="flex flex-col">
@@ -363,13 +304,13 @@
                                                     Do
                                                 </x-label-display>
                                                 <x-paragraf-display class="text-xs">
-                                                    {{ $work_session->end_day_of_week }}
+                                                    {{ $work_raport->end_day_of_week }}
                                                 </x-paragraf-display>
                                             </div>
                                             @else
                                             <div class="flex flex-col">
                                                 <x-paragraf-display class="text-xs">
-                                                    {{ $work_session->end_day_of_week }}
+                                                    {{ $work_raport->end_day_of_week }}
                                                 </x-paragraf-display>
                                             </div>
                                             @endif
@@ -381,27 +322,27 @@
                                                     Od
                                                 </x-label-display>
                                                 <x-paragraf-display class="text-xs">
-                                                    {{$work_session->start_time}}
+                                                    {{$work_raport->start_time}}
                                                 </x-paragraf-display>
                                             </div>
                                         </div>
                                         @endif
                                         <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
                                             <div class="flex flex-col">
-                                                {{$work_session->user->name}}
+                                                {{$work_raport->user->name}}
                                             </div>
                                         </div>
                                         <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
                                             <div class="flex flex-col">
-                                                {{$work_session->company->name}}
+                                                {{$work_raport->company->name}}
                                             </div>
                                         </div>
                                         <div class="flex space-x-4 mt-4">
-                                            <x-button-link-neutral href="{{route('work.session.show', $work_session)}}" class="min-h-[38px]">
+                                            <x-button-link-neutral href="{{route('work.raport.show', $work_raport)}}" class="min-h-[38px]">
                                                 <i class="fa-solid fa-eye"></i>
                                             </x-button-link-neutral>
                                             @if($role == 'admin')
-                                            <x-button-link-blue href="{{route('work.session.edit', $work_session)}}" class="min-h-[38px]">
+                                            <x-button-link-blue href="{{route('work.raport.edit', $work_raport)}}" class="min-h-[38px]">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </x-button-link-blue>
                                             @endif
@@ -445,7 +386,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if ($work_sessions->isEmpty())
+                                @if ($work_raports->isEmpty())
                                 <tr class="bg-white dark:bg-gray-800">
                                     <td colspan="8" class="px-3 py-2">
                                         <x-empty-place />
@@ -470,13 +411,13 @@
                                 ];
                                 @endphp
 
-                                @foreach ($work_sessions as $work_session)
+                                @foreach ($work_raports as $work_raport)
 
                                 @php
-                                $work_session_month = \Carbon\Carbon::parse($work_session->start_time)->month;
-                                if ($work_session_month !== $current_month) {
-                                $current_month = $work_session_month;
-                                $monthName = $months[$work_session_month];
+                                $work_raport_month = \Carbon\Carbon::parse($work_raport->start_time)->month;
+                                if ($work_raport_month !== $current_month) {
+                                $current_month = $work_raport_month;
+                                $monthName = $months[$work_raport_month];
                                 @endphp
 
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -497,31 +438,31 @@
 
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
                                     <td class="px-3 py-2 text-sm min-w-32">
-                                        @if($work_session->status == 'W trakcie pracy')
+                                        @if($work_raport->status == 'W trakcie pracy')
                                         <x-status-yellow class="text-xs">
-                                            {{ $work_session->status }}
+                                            {{ $work_raport->status }}
                                         </x-status-yellow>
                                         @endif
-                                        @if($work_session->status == 'Praca zakończona')
+                                        @if($work_raport->status == 'Praca zakończona')
                                         <x-status-green class="text-xs">
-                                            {{ $work_session->status }}
+                                            {{ $work_raport->status }}
                                         </x-status-green>
                                         @endif
                                     </td>
                                     <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
                                         <x-paragraf-display class="text-xl">
-                                            {{ $work_session->time_in_work }}
+                                            {{ $work_raport->time_in_work }}
                                         </x-paragraf-display>
                                     </td>
-                                    @if($work_session->status == 'Praca zakończona')
+                                    @if($work_raport->status == 'Praca zakończona')
                                     <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                        @if($work_session->start_day_of_week != $work_session->end_day_of_week)
+                                        @if($work_raport->start_day_of_week != $work_raport->end_day_of_week)
                                         <div class="flex flex-col">
                                             <x-label-display>
                                                 Od
                                             </x-label-display>
                                             <x-paragraf-display class="text-xs">
-                                                {{ $work_session->start_day_of_week }}
+                                                {{ $work_raport->start_day_of_week }}
                                             </x-paragraf-display>
                                         </div>
                                         <div class="flex flex-col">
@@ -529,12 +470,12 @@
                                                 Do
                                             </x-label-display>
                                             <x-paragraf-display class="text-xs">
-                                                {{ $work_session->end_day_of_week }}
+                                                {{ $work_raport->end_day_of_week }}
                                             </x-paragraf-display>
                                         </div>
                                         @else
                                         <x-paragraf-display class="text-xs">
-                                            {{ $work_session->end_day_of_week }}
+                                            {{ $work_raport->end_day_of_week }}
                                         </x-paragraf-display>
                                         @endif
                                     </td>
@@ -542,21 +483,21 @@
                                     @if($role == 'admin')
                                     <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
                                         <x-paragraf-display class="text-xs">
-                                            {{$work_session->user->name}}
+                                            {{$work_raport->user->name}}
                                         </x-paragraf-display>
                                     </td>
                                     @else
                                     <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
                                         <x-paragraf-display class="text-xs">
-                                            {{$work_session->start_day_of_week}}
+                                            {{$work_raport->start_day_of_week}}
                                         </x-paragraf-display>
                                     </td>
                                     @endif
                                     @endif
-                                    <x-show-cell href="{{ route('work.session.show', $work_session) }}" />
+                                    <x-show-cell href="{{ route('work.raport.show', $work_raport) }}" />
                                     @if($role == 'admin')
-                                    <x-edit-cell href="{{route('work.session.edit', $work_session)}}" />
-                                    <x-delete-cell action="{{route('work.session.delete', $work_session)}}" />
+                                    <x-edit-cell href="{{route('work.raport.edit', $work_raport)}}" />
+                                    <x-delete-cell action="{{route('work.raport.delete', $work_raport)}}" />
                                     @endif
                                 </tr>
                                 @endforeach
@@ -566,7 +507,7 @@
 
                         <!--Links-->
                         <div id="links" class="md:px-2 py-4">
-                            {{ $work_sessions->links() }}
+                            {{ $work_raports->links() }}
                         </div>
                         @else
                         @include('admin.elements.end_config')

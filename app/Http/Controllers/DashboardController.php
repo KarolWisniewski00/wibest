@@ -103,13 +103,41 @@ class DashboardController extends Controller
         //////////////////////////
         $company_id = $this->get_company_id();
         $user_id = Auth::id();
-        $work_sessions_all =  $this->get_work_sessions_logged_user_by_get();
+        $work_sessions_all = $this->get_all_work_sessions();
+        $work_sessions_logged_user = $this->get_work_sessions_logged_user_by_get();
+
+        // Zlicz sumę 'time_in_work' w formacie HH:mm:ss
+        $total_time_in_seconds = 0;
+        foreach ($work_sessions_all as $session) {
+            $timeParts = explode(':', $session->time_in_work);
+            if (count($timeParts) === 3) {
+                list($hours, $minutes, $seconds) = $timeParts;
+                $total_time_in_seconds += $hours * 3600 + $minutes * 60 + $seconds;
+            }
+        }
+        // Przelicz sumę na godziny
+        $total_time_in_hours_all = floor($total_time_in_seconds / 3600);
+
+        // Zlicz sumę 'time_in_work' w formacie HH:mm:ss
+        $total_time_in_seconds = 0;
+        foreach ($work_sessions_logged_user as $session) {
+            $timeParts = explode(':', $session->time_in_work);
+            if (count($timeParts) === 3) {
+                list($hours, $minutes, $seconds) = $timeParts;
+                $total_time_in_seconds += $hours * 3600 + $minutes * 60 + $seconds;
+            }
+        }
+        // Przelicz sumę na godziny
+        $total_time_in_hours_logged_user = floor($total_time_in_seconds / 3600);
 
         // Przekazanie danych do widoku
         return view('dashboard', compact(
             'company_id',
             'user_id',
             'work_sessions_all',
+            'work_sessions_logged_user',
+            'total_time_in_hours_all',
+            'total_time_in_hours_logged_user',
             'todayTotal',
             'todayCount',
             'last7DaysTotal',

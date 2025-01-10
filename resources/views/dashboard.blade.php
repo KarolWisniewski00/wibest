@@ -14,21 +14,23 @@
                 @if ($company)
                 <div class="bg-white dark:bg-gray-800">
                     <div class="flex flex-col justify-between items-center">
-                        <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-200">
-                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-4xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150" style='font-family: "Raleway", sans-serif;'>WIBEST</span>
-                        </h1>
-
-
-                        <div class="w-full grid grid-cols-3 grid-rows-1 gap-4 appearance-none rounded-lg bg-white border border-white dark:border-gray-700 p-4 outline-none dark:bg-gray-700 dark:text-gray-50">
+                        <x-wibest-text />
+                        <x-widget-display class="grid-cols-3 grid-rows-1">
                             <div class="col-span-2">
                                 <!-- Data -->
-                                <div class="text-center mb-4">
-                                    <p id="date" class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-lg uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150"></p>
+                                <div>
+                                    <x-flex-center class="mb-4">
+                                        <x-paragraf-display id="date" class="text-lg">
+                                        </x-paragraf-display>
+                                    </x-flex-center>
                                 </div>
-
                                 <!-- Timer -->
-                                <div class="text-center mb-6">
-                                    <p id="timer" class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-4xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">00:00:00</p>
+                                <div>
+                                    <x-flex-center class="mb-6">
+                                        <x-paragraf-display id="timer" class="text-4xl">
+                                            00:00:00
+                                        </x-paragraf-display>
+                                    </x-flex-center>
                                 </div>
                             </div>
                             <div class="col-start-3 h-full">
@@ -47,13 +49,65 @@
                                     </button>
                                 </div>
                             </div>
-                        </div>
+                        </x-widget-display>
+                        <x-widget-display class="mt-4 grid-cols-3 grid-rows-1">
+                            <div class="col-span-2">
+                                <div>
+                                    <x-flex-center class="mb-4">
+                                        <x-paragraf-display class="text-lg">
+                                            Moje godziny w tym miesiącu
+                                        </x-paragraf-display>
+                                    </x-flex-center>
+                                </div>
+                                <div>
+                                    <x-flex-center class="mb-4">
+                                        <x-paragraf-display class="text-4xl">
+                                            {{$total_time_in_hours_logged_user}} H
+                                        </x-paragraf-display>
+                                    </x-flex-center>
+                                </div>
+                            </div>
+                            <div class="col-start-3 h-full">
+                                <x-flex-center class="h-full">
+                                    <x-button-link-cello class="mt-4" href="">
+                                        <i class="fa-solid fa-file-circle-plus mr-2"></i>Mój Raport
+                                    </x-button-link-cello>
+                                </x-flex-center>
+                            </div>
+                        </x-widget-display>
+
+                        <x-widget-display class="mt-4 grid-cols-3 grid-rows-1">
+                            <div class="col-span-2">
+                                <div>
+                                    <x-flex-center class="mb-4">
+                                        <x-paragraf-display class="text-lg">
+                                            Wszystkie godziny w tym miesiącu
+                                        </x-paragraf-display>
+                                    </x-flex-center>
+                                </div>
+                                <div>
+                                    <x-flex-center class="mb-4">
+                                        <x-paragraf-display class="text-4xl">
+                                            {{$total_time_in_hours_all}} H
+                                        </x-paragraf-display>
+                                    </x-flex-center>
+                                </div>
+                            </div>
+                            <div class="col-start-3 h-full">
+                                <x-flex-center class="h-full">
+                                    <x-button-link-cello class="mt-4" href="">
+                                        <i class="fa-solid fa-file-circle-plus mr-2"></i>Firmowy Raport
+                                    </x-button-link-cello>
+                                </x-flex-center>
+                            </div>
+                        </x-widget-display>
+
                         <input type="hidden" id="work_start" value="{{ route('api.work.start', '') }}">
                         <input type="hidden" id="work_stop" value="{{ route('api.work.stop', '') }}">
                         <input type="hidden" id="work_sessions" value="{{ route('api.work.session', ['','']) }}">
                         <input type="hidden" id="user_id" value="{{ $user_id }}">
                         <input type="hidden" id="company_id" value="{{ $company_id }}">
-                        <input type="hidden" id="work_sessions_all" value="{{ $work_sessions_all }}">
+                        <input type="hidden" id="work_sessions_logged_user" value="{{ $work_sessions_logged_user }}">
                         <div id="calendar" class="w-full my-4 appearance-none rounded-lg bg-white border border-white p-4 outline-none"></div>
                         <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
                         <script>
@@ -192,8 +246,8 @@
                                     constructor() {
                                         // Inicjalizacja FullCalendar
                                         let calendarEl = $('#calendar')[0]; // Pobierz element kalendarza
-                                        let work_sessions_all = $('#work_sessions_all').val(); // Pobierz sesje pracy
-                                        let work_sessions = JSON.parse(work_sessions_all); // Parsowanie sesji pracy
+                                        let work_sessions_logged_user = $('#work_sessions_logged_user').val(); // Pobierz sesje pracy
+                                        let work_sessions = JSON.parse(work_sessions_logged_user); // Parsowanie sesji pracy
                                         var eventsFromDB = [];
                                         work_sessions.forEach(element => {
                                             eventsFromDB.push({

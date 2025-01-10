@@ -15,8 +15,11 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         {{ __('Panel główny') }}
                     </x-nav-link>
-                    <x-nav-link href="{{ route('work.session') }}" :active="Str::startsWith(request()->path(), 'dashboard/work')">
-                        {{ __('Historia Czasu Pracy') }}
+                    <x-nav-link href="{{ route('work.session') }}" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
+                        {{ __('Mierzenie Czasu Pracy') }}
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('work.raport') }}" :active="Str::startsWith(request()->path(), 'dashboard/work/raport')">
+                        {{ __('Raport Czasu Pracy') }}
                     </x-nav-link>
                     <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                         {{ __('Ustawienia') }}
@@ -149,7 +152,10 @@
                 {{ __('Panel główny') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('work.session') }}" :active="Str::startsWith(request()->path(), 'dashboard/work')">
-                {{ __('Historia Czasu Pracy') }}
+                {{ __('Mierzenie Czasu Pracy') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('work.raport') }}" :active="Str::startsWith(request()->path(), 'dashboard/raport')">
+                {{ __('Raport Czasu Pracy') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                 {{ __('Ustawienia') }}

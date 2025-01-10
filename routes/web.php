@@ -9,6 +9,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OcrController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RaportController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
@@ -63,18 +64,35 @@ Route::middleware([
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::prefix('work')->group(function () {
-            Route::get('/', [WorkSessionController::class, 'index'])->name('work.session');
-            Route::get('create', [WorkSessionController::class, 'create'])->name('work.session.create');
-            Route::post('store', [WorkSessionController::class, 'store'])->name('work.session.store');
-            Route::get('search', [WorkSessionController::class, 'search'])->name('work.session.search');
-            Route::get('show/{work_session}', [WorkSessionController::class, 'show'])->name('work.session.show');
-            Route::get('edit/{work_session}', [WorkSessionController::class, 'edit'])->name('work.session.edit');
-            Route::put('update/{work_session}', [WorkSessionController::class, 'update'])->name('work.session.update');
-            Route::delete('delete/{work_session}', [WorkSessionController::class, 'delete'])->name('work.session.delete');
+            Route::prefix('session')->group(function () {
+                Route::get('/', [WorkSessionController::class, 'index'])->name('work.session');
+                Route::get('create', [WorkSessionController::class, 'create'])->name('work.session.create');
+                Route::post('store', [WorkSessionController::class, 'store'])->name('work.session.store');
+                Route::get('search', [WorkSessionController::class, 'search'])->name('work.session.search');
+                Route::get('show/{work_session}', [WorkSessionController::class, 'show'])->name('work.session.show');
+                Route::get('edit/{work_session}', [WorkSessionController::class, 'edit'])->name('work.session.edit');
+                Route::put('update/{work_session}', [WorkSessionController::class, 'update'])->name('work.session.update');
+                Route::delete('delete/{work_session}', [WorkSessionController::class, 'delete'])->name('work.session.delete');
 
-            Route::get('now', [WorkSessionController::class, 'index_now'])->name('work.session.now');
-            Route::get('last', [WorkSessionController::class, 'index_last'])->name('work.session.last');
+                Route::get('now', [WorkSessionController::class, 'index_now'])->name('work.session.now');
+                Route::get('last', [WorkSessionController::class, 'index_last'])->name('work.session.last');
+            });
+
+            Route::prefix('raport')->group(function () {
+                Route::get('/', [RaportController::class, 'index'])->name('work.raport');
+                Route::get('create', [WorkSessionController::class, 'create'])->name('work.raport.create');
+                Route::post('store', [WorkSessionController::class, 'store'])->name('work.raport.store');
+                Route::get('search', [WorkSessionController::class, 'search'])->name('work.raport.search');
+                Route::get('show/{work_session}', [WorkSessionController::class, 'show'])->name('work.raport.show');
+                Route::get('edit/{work_session}', [WorkSessionController::class, 'edit'])->name('work.raport.edit');
+                Route::put('update/{work_session}', [WorkSessionController::class, 'update'])->name('work.raport.update');
+                Route::delete('delete/{work_session}', [WorkSessionController::class, 'delete'])->name('work.raport.delete');
+
+                Route::get('now', [WorkSessionController::class, 'index_now'])->name('work.raport.now');
+                Route::get('last', [WorkSessionController::class, 'index_last'])->name('work.raport.last');
+            });
         });
+
 
         Route::prefix('client')->group(function () {
             Route::get('/', [ClientController::class, 'index'])->name('client');
