@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test</title>
+    <title>Raport</title>
     <style>
         body {
             font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif;
@@ -146,14 +146,61 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Test</h1>
+            <h1>Raport</h1>
         </div>
 
         <div class="invoice-details">
             <h2>Szanowny Kliencie,</h2>
-            <p>test.</p>
+            <p>Niżej przedstawiamy raport czasu pracy z ostatniego tygodnia.</p>
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Lp.</th>
+                        <th>Imię i nazwisko</th>
+                        <th>Czas pracy</th>
+                        <th>Dzień tygodnia</th>
+                        <th>Data i czas startu</th>
+                        <th>Data i czas zakończenia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($work_sessions as $key => $work)
+                    <tr>
+                        <td>{{$key + 1}}.</td>
+                        <td>{{ $work->user->name }}</td>
+                        <td>{{ $work->time_in_work }}</td>
+                        <td>
+                        @if($work->start_day_of_week != $work->end_day_of_week)
+                        <div>
+                            <div>
+                                Od
+                            </div>
+                            <div>
+                                {{ $work->start_day_of_week }}
+                            </div>
+                        </div>
+                        <div>
+                            <div>
+                                Do
+                            </div>
+                            <div>
+                                {{ $work->end_day_of_week }}
+                            </div>
+                        </div>
+                        @else
+                        <div>
+                            {{ $work->end_day_of_week }}
+                        </div>
+                        @endif
+                        </td>
+                        <td>{{ $work->start_time }}</td>
+                        <td>{{ $work->end_time }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    
+
         <div class="header">
             <a href="{{route('login.google')}}"
                 style="text-align: center; display: inline-flex; align-items: center; padding: 0.5rem 1rem; background-color: #000; color: #fff; border: none; border-radius: 0.375rem; font-weight: bold; text-transform: uppercase; text-decoration: none; transition: background-color 0.15s ease-in-out;"
@@ -161,7 +208,7 @@
                 onmouseout="this.style.backgroundColor='#000'"
                 onfocus="this.style.backgroundColor='#333'"
                 onblur="this.style.backgroundColor='#000'">
-                Załóż bezpłatne konto do fakturowania - Logowanie przez Google
+                Logowanie przez Google
             </a>
         </div>
 

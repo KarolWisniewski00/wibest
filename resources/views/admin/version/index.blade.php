@@ -23,9 +23,16 @@
                     </div>
                 </div>
                 <ol class="relative border-l border-gray-600">
+                <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">10 Stycznia 2025 V 2.0.1</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. Dodanie raportowania</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. Dodanie podsumowania statystyk</p>
+                    </li>
                     <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
-                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">1 Stycznia 2025 V 2.0.0</time>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">6 Stycznia 2025 V 2.0.0</time>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">ZMIANA NA MIERZENIE CZASU PRACY</p>
                         <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">DAWNE ZAKŁADKI</p>

@@ -16,9 +16,11 @@ class DailyReportMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public $work_sessions;
+    
+    public function __construct($work_sessions)
     {
-        //
+        $this->work_sessions = $work_sessions;
     }
 
     /**
@@ -42,7 +44,7 @@ class DailyReportMail extends Mailable
     }
     public function build()
     {
-        return $this->subject('Test')
+        return $this->subject('Raport')
             ->from(env('MAIL_USERNAME'), env('MAIL_FROM_NAME'))
             ->view('emails.raport');
     }

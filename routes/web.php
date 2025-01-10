@@ -79,17 +79,7 @@ Route::middleware([
             });
 
             Route::prefix('raport')->group(function () {
-                Route::get('/', [RaportController::class, 'index'])->name('work.raport');
-                Route::get('create', [WorkSessionController::class, 'create'])->name('work.raport.create');
-                Route::post('store', [WorkSessionController::class, 'store'])->name('work.raport.store');
-                Route::get('search', [WorkSessionController::class, 'search'])->name('work.raport.search');
-                Route::get('show/{work_session}', [WorkSessionController::class, 'show'])->name('work.raport.show');
-                Route::get('edit/{work_session}', [WorkSessionController::class, 'edit'])->name('work.raport.edit');
-                Route::put('update/{work_session}', [WorkSessionController::class, 'update'])->name('work.raport.update');
-                Route::delete('delete/{work_session}', [WorkSessionController::class, 'delete'])->name('work.raport.delete');
 
-                Route::get('now', [WorkSessionController::class, 'index_now'])->name('work.raport.now');
-                Route::get('last', [WorkSessionController::class, 'index_last'])->name('work.raport.last');
             });
         });
 

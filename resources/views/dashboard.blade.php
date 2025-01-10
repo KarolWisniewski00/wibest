@@ -50,54 +50,36 @@
                                 </div>
                             </div>
                         </x-widget-display>
-                        <x-widget-display class="mt-4 grid-cols-3 grid-rows-1">
-                            <div class="col-span-2">
-                                <div>
-                                    <x-flex-center class="mb-4">
-                                        <x-paragraf-display class="text-lg">
-                                            Moje godziny w tym miesiącu
-                                        </x-paragraf-display>
-                                    </x-flex-center>
-                                </div>
-                                <div>
-                                    <x-flex-center class="mb-4">
-                                        <x-paragraf-display class="text-4xl">
-                                            {{$total_time_in_hours_logged_user}} H
-                                        </x-paragraf-display>
-                                    </x-flex-center>
-                                </div>
+                        <x-widget-display class="mt-4">
+                            <div>
+                                <x-flex-center class="mb-4">
+                                    <x-paragraf-display class="text-lg">
+                                        Moje godziny w tym miesiącu
+                                    </x-paragraf-display>
+                                </x-flex-center>
                             </div>
-                            <div class="col-start-3 h-full">
-                                <x-flex-center class="h-full">
-                                    <x-button-link-cello class="mt-4" href="">
-                                        <i class="fa-solid fa-file-circle-plus mr-2"></i>Mój Raport
-                                    </x-button-link-cello>
+                            <div>
+                                <x-flex-center class="mb-4">
+                                    <x-paragraf-display class="text-4xl">
+                                        {{$total_time_in_hours_logged_user}} H
+                                    </x-paragraf-display>
                                 </x-flex-center>
                             </div>
                         </x-widget-display>
 
-                        <x-widget-display class="mt-4 grid-cols-3 grid-rows-1">
-                            <div class="col-span-2">
-                                <div>
-                                    <x-flex-center class="mb-4">
-                                        <x-paragraf-display class="text-lg">
-                                            Wszystkie godziny w tym miesiącu
-                                        </x-paragraf-display>
-                                    </x-flex-center>
-                                </div>
-                                <div>
-                                    <x-flex-center class="mb-4">
-                                        <x-paragraf-display class="text-4xl">
-                                            {{$total_time_in_hours_all}} H
-                                        </x-paragraf-display>
-                                    </x-flex-center>
-                                </div>
+                        <x-widget-display class="mt-4">
+                            <div>
+                                <x-flex-center class="mb-4">
+                                    <x-paragraf-display class="text-lg">
+                                        Wszystkie godziny w tym miesiącu
+                                    </x-paragraf-display>
+                                </x-flex-center>
                             </div>
-                            <div class="col-start-3 h-full">
-                                <x-flex-center class="h-full">
-                                    <x-button-link-cello class="mt-4" href="">
-                                        <i class="fa-solid fa-file-circle-plus mr-2"></i>Firmowy Raport
-                                    </x-button-link-cello>
+                            <div>
+                                <x-flex-center class="mb-4">
+                                    <x-paragraf-display class="text-4xl">
+                                        {{$total_time_in_hours_all}} H
+                                    </x-paragraf-display>
                                 </x-flex-center>
                             </div>
                         </x-widget-display>

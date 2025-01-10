@@ -8,6 +8,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Mail\DailyReportMail; // Importuj swoją klasę mailową
+use App\Models\User;
+use App\Models\WorkSession;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 class SendDailyEmails implements ShouldQueue
@@ -27,6 +30,17 @@ class SendDailyEmails implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to('karol.wisniewski2901@gmail.com')->send(new DailyReportMail());
+        $oneWeekAgo = Carbon::now()->subWeek();
+
+        $work_sessions = WorkSession::where('company_id', User::find(auth()->id())->company_id)
+            ->where('user_id', auth()->id())
+            ->where('status', 'Praca zakończona')
+            ->where('start_time', '>=', $oneWeekAgo)
+            ->orderBy('updated_at', 'desc')
+            ->get();
+        $users = User::where('company_id', User::find(auth()->id())->company_id)->where('role', 'admin')->get();
+        foreach ($users as $key => $user) {
+            Mail::to($user->email)->send(new DailyReportMail($work_sessions));
+        }
     }
 }

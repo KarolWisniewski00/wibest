@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\DailyReportMail;
 use App\Models\Client;
 use App\Models\Cost;
 use App\Models\Invoice;
+use App\Models\WorkSession;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class DashboardController extends Controller
 {
