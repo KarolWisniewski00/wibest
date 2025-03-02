@@ -1,13 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Ustawienia') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- WIDGET TASK -->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">

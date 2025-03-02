@@ -1,13 +1,7 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Edytowanie Oferty') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
+        @include('admin.elements.alerts')
+        <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">

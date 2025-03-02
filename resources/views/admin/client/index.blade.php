@@ -1,15 +1,8 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Klienci') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
+        @include('admin.elements.alerts')
+        <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!--WIDGET TASK-->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="px-6 lg:px-8 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
@@ -48,21 +41,21 @@
                         }
                     </style>
                     <div id="space" class="xl:hidden"></div>
+
                     <!-- Napis z przyciskiem tworzenia -->
                     <div id="fixed" class="pb-4 flex flex-col justify-between items-center">
                         <div class="flex flex-row justify-between items-center w-full bg-white dark:bg-gray-800">
-                            <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
+                            <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-700 dark:text-gray-100">
                                 Klienci
                             </h1>
                             @if ($company)
-                            <a href="{{ route('client.create') }}" class="mt-8 mb-4 inline-flex items-center justify-center w-10 h-10 text-green-100 transition-colors duration-150 bg-green-500 rounded-full focus:shadow-outline hover:bg-green-600">
-                                <i class="fa-solid fa-plus"></i>
+                            <a href="{{ route('client.create') }}" class="whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-sm md:text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-300 focus:bg-green-700 dark:focus:bg-green-300 active:bg-green-900 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-green-800 transition ease-in-out duration-150">
+                                <i class="fa-solid fa-plus mr-2"></i>NOWY KLIENT
                             </a>
                             @else
                             @endif
                         </div>
                     </div>
-
                     <script>
                         $(document).ready(function() {
                             var element = $('#fixed');
@@ -81,6 +74,8 @@
                             });
                         });
                     </script>
+                    <!-- Napis z przyciskiem tworzenia -->
+
                     <div class="max-w">
                         <!-- SearchBox -->
                         <div class="relative">
@@ -88,7 +83,7 @@
                                 <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none z-20 ps-3.5">
                                     <i class="text-gray-400 dark:text-gray-400 fa-solid fa-magnifying-glass"></i>
                                 </div>
-                                <input id="search" class="py-3 ps-10 pe-4 block w-full border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none" type="text" aria-expanded="false" placeholder="Wyszukaj fakturę po numerze" value="">
+                                <input id="search" class="py-3 ps-10 pe-4 block w-full border-gray-300 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-600 disabled:opacity-50 disabled:pointer-events-none" type="text" aria-expanded="false" placeholder="Wyszukaj Klienta po nazwie" value="">
                             </div>
                         </div>
                         <!-- End SearchBox -->
@@ -157,19 +152,13 @@
                                                             '<span class="text-lg font-semibold dark:text-gray-50">' + client.name + '</span>' +
                                                             '</div>' +
                                                             '</div>' +
-                                                            '<div class="text-sm text-gray-400">'+client.adress+'</div>'+
+                                                            '<div class="text-sm text-gray-400">' + client.adress + '</div>' +
                                                             '<div class="flex space-x-4 mt-4">' +
                                                             '<a href="{{route("client.show","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600">' +
                                                             '<i class="fa-solid fa-eye"></i>' +
                                                             '</a>' +
                                                             '</div>' +
                                                             '<div class="flex space-x-4 mt-4">' +
-                                                            '<a href="{{route("offer.create.client","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300">' +
-                                                            '<i class="fa-solid fa-file-invoice"></i>' +
-                                                            '</a>' +
-                                                            '<a href="{{route("invoice.create.pro.client","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300">' +
-                                                            '<i class="fa-solid fa-file-invoice"></i>' +
-                                                            '</a>' +
                                                             '<a href="{{route("invoice.create.client","")}}/' + client.id + '" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">' +
                                                             '<i class="fa-solid fa-file-invoice"></i>' +
                                                             '</a>' +
@@ -245,12 +234,6 @@
                                                 </a>
                                             </div>
                                             <div class="flex space-x-4 mt-4">
-                                                <a href="{{route('offer.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300">
-                                                    <i class="fa-solid fa-file-invoice"></i>
-                                                </a>
-                                                <a href="{{route('invoice.create.pro.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300">
-                                                    <i class="fa-solid fa-file-invoice"></i>
-                                                </a>
                                                 <a href="{{route('invoice.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">
                                                     <i class="fa-solid fa-file-invoice"></i>
                                                 </a>
@@ -290,12 +273,6 @@
                                             </a>
                                         </div>
                                         <div class="flex space-x-4 mt-4">
-                                            <a href="{{route('offer.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-sky-600 border border-sky-600 rounded-lg hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300">
-                                                <i class="fa-solid fa-file-invoice"></i>
-                                            </a>
-                                            <a href="{{route('invoice.create.pro.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-indigo-600 border border-indigo-600 rounded-lg hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300">
-                                                <i class="fa-solid fa-file-invoice"></i>
-                                            </a>
                                             <a href="{{route('invoice.create.client', $client)}}" class="inline-flex items-center py-2 px-4 text-sm font-medium text-emerald-600 border border-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300">
                                                 <i class="fa-solid fa-file-invoice"></i>
                                             </a>
@@ -312,54 +289,31 @@
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                                 <tr>
                                     <th scope="col" class="px-6 py-3">Nazwa</th>
-                                    <th scope="col" class="px-6 py-3">Email</th>
-                                    <th scope="col" class="px-6 py-3">Telefon</th>
                                     <th scope="col" class="px-6 py-3">Adres</th>
                                     <th scope="col" class="px-6 py-3">Podgląd</th>
-                                    <th scope="col" class="px-6 py-3">Nowa oferta</th>
-                                    <th scope="col" class="px-6 py-3">Nowa pro forma</th>
-                                    <th scope="col" class="px-6 py-3">Nowa Faktura</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @if ($clients->isEmpty())
                                 <tr class="bg-white dark:bg-gray-800">
                                     <td colspan="8" class="px-6 py-4">
-                                        <div class="text-center py-8">
-                                            <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
-                                            <p class="text-gray-500 dark:text-gray-400">Brak klientów do wyświetlenia.</p>
-                                        </div>
+                                        <x-empty-place />
                                     </td>
                                 </tr>
                                 @else
                                 @foreach ($clients as $client)
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 ">
-                                    <td class="px-6 py-4">{{ $client->name }}</td>
-                                    <td class="px-6 py-4 break-all">
-                                        <a href="mailto:{{ $client->email }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                                            {{ $client->email }}
-                                        </a>
+                                    <td class="px-6 py-4">
+                                        <p class="text-gray-900 dark:text-gray-50 font-semibold">
+                                            <x-label-link-company href="{{ route('client.show', $client->id) }}">
+                                                {{ $client->name }}
+                                            </x-label-link-company>
+                                        </p>
                                     </td>
-                                    <td class="px-6 py-4"><a href="tel:{{ $client->phone }}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">{{ $client->phone }}</a></td>
                                     <td class="px-6 py-4">{{ $client->adress }}</td>
                                     <td class="px-6 py-4">
                                         <a href="{{route('client.show', $client)}}" class="py-2.5 px-5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-4 focus:ring-gray-200">
                                             <i class="fa-solid fa-eye"></i>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{route('offer.create.client', $client)}}" class="text-sky-600 border border-sky-600 hover:bg-sky-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-sky-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                                            <i class="fa-solid fa-file-invoice"></i>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{route('invoice.create.pro.client', $client)}}" class="text-indigo-600 border border-indigo-600 hover:bg-indigo-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                                            <i class="fa-solid fa-file-invoice"></i>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{route('invoice.create.client', $client)}}" class="text-emerald-600 border border-emerald-600 hover:bg-emerald-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5">
-                                            <i class="fa-solid fa-file-invoice"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -367,11 +321,6 @@
                                 @endif
                             </tbody>
                         </table>
-
-                        <div class="md:px-2 py-4">
-                            {{ $clients->links() }}
-                        </div>
-
                         @else
                         <div id="alert-additional-content-4" class="p-4 mb-4 text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 dark:border-yellow-800" role="alert">
                             <div class="flex items-center">

@@ -91,15 +91,6 @@ class InvoiceController extends Controller
     /**
      * Pokazuje formularz tworzenia nowej faktury.
      */
-    //public function create()
-    //{
-    //    $clients = Client::where('company_id', $this->get_company_id())->get();
-    //    $services = Service::where('company_id', $this->get_company_id())->get();
-    //    $products = Product::where('company_id', $this->get_company_id())->get();
-    //    $invoiceNumber = $this->get_invoice_number();
-    //    $company = $this->get_company();
-    //    return view('admin.invoice.create', compact('clients', 'invoiceNumber', 'company', 'services', 'products'));
-    //}
     public function create()
     {
         $clients = Client::where('company_id', $this->get_company_id())->get();
@@ -108,7 +99,7 @@ class InvoiceController extends Controller
         $user = User::where('id', auth()->id())->first();
         $form = $user->setting_format;
         $set_client = $user->setting_client;
-        return view('admin.invoice.createn', compact('company', 'value', 'form', 'clients','set_client'));
+        return view('admin.invoice.create', compact('company', 'value', 'form', 'clients', 'set_client'));
     }
     public function gus($nip)
     {
@@ -265,27 +256,14 @@ class InvoiceController extends Controller
      */
     public function create_client(Client $client)
     {
-        $create_client = $client;
         $clients = Client::where('company_id', $this->get_company_id())->get();
-        $services = Service::where('company_id', $this->get_company_id())->get();
-        $products = Product::where('company_id', $this->get_company_id())->get();
-        $invoiceNumber = $this->get_invoice_number();
-        $company = $this->get_company();
-        return view('admin.invoice.create', compact('create_client', 'clients', 'invoiceNumber', 'company', 'services', 'products'));
-    }
-    /**
-     * Pokazuje formularz tworzenia nowej faktury proformy.
-     */
-    public function create_pro_client(Client $client)
-    {
         $create_client = $client;
-        $clients = Client::where('company_id', $this->get_company_id())->get();
-        $services = Service::where('company_id', $this->get_company_id())->get();
-        $products = Product::where('company_id', $this->get_company_id())->get();
-        $invoiceNumber = $this->get_invoice_number();
+        $value = $this->get_number();
         $company = $this->get_company();
-        $pro = true;
-        return view('admin.invoice.create', compact('pro', 'create_client', 'clients', 'invoiceNumber', 'company', 'services', 'products'));
+        $user = User::where('id', auth()->id())->first();
+        $form = $user->setting_format;
+        $set_client = $user->setting_client;
+        return view('admin.invoice.create', compact('create_client', 'value', 'form', 'clients', 'set_client'));
     }
     /**
      * Zapisuje formularz tworzenia nowej faktury.
@@ -301,11 +279,8 @@ class InvoiceController extends Controller
         $total = 0;
 
         // Zapisuje pusty numer konta
-        if ($request->input('bank') == null) {
-            $bank = '';
-        } else {
-            $bank = $request->input('bank');
-        }
+        $bank = $this->validate_bank_number($request);
+        
         if ($request->input('invoice_type') == 'faktura proforma') {
             $type = 'PRO';
         } else {
@@ -324,24 +299,24 @@ class InvoiceController extends Controller
                     $number = $type . '/' . $numc;
                     break;
                 case 'podstawowy':
-                    $number = $type . '/' . $numc.'/'.$year;
+                    $number = $type . '/' . $numc . '/' . $year;
                     break;
                 case 'data':
-                    $number = $type . '/' . $numc.'/'.$month.'/'.$year;
+                    $number = $type . '/' . $numc . '/' . $month . '/' . $year;
                     break;
                 case 'wlasny':
-                    $number = $type . '/' .$request->input('number');
+                    $number = $type . '/' . $request->input('number');
                     break;
                 default:
                     $number = '';
                     break;
             }
         } else {
-            $number = $type . '/' .$request->input('number');
+            $number = $type . '/' . $request->input('number');
         }
-        if($request->input('paid') == 'opłacono'){
+        if ($request->input('paid') == 'opłacono') {
             $status = 'opłacona';
-        }else{
+        } else {
             $status = 'wystawiona';
         }
         $user = User::where('id', auth()->id())->first();
@@ -418,14 +393,41 @@ class InvoiceController extends Controller
      */
     public function store_from(Invoice $invoice)
     {
+        $user = User::where('id', auth()->id())->first();
         // Zapis faktury sprzedażowej na podstawie proformy
         $invoice_new_record = new Invoice();
+        $type = 'FVS';
 
-        $user = User::where('id', auth()->id())->first();
-        $invoice_new_record->due_date = $invoice->due_date;
-        $invoice_new_record->number = $this->get_invoice_number();
-        $invoice_new_record->invoice_type = 'faktura sprzedażowa'; // Zmieniamy typ faktury na sprzedażową
+        // Konwersja daty za pomocą Carbon
+        $date = Carbon::parse($invoice->issue_date);
+
+        // Wydobycie miesiąca i roku
+        $month = $date->format('m'); // 12
+        $year = $date->format('Y');  // 2024
+        $numc = $this->get_invoice_number_by_month_year($month, $year, 'faktura sprzedażowa');
+        switch ($user->setting_format) {
+            case 'prosty':
+                $number = $type . '/' . $numc;
+                break;
+            case 'podstawowy':
+                $number = $type . '/' . $numc . '/' . $year;
+                break;
+            case 'data':
+                $number = $type . '/' . $numc . '/' . $month . '/' . $year;
+                break;
+            case 'wlasny':
+                $number = $type . '/' . $invoice->number;
+                break;
+            default:
+                $number = $type . '/' . $numc . '/' . $year;
+                break;
+        }
+        $invoice_new_record->number = $number;
         $invoice_new_record->issue_date = $invoice->issue_date;
+        $invoice_new_record->sale_date = $invoice->sale_date;
+        $invoice_new_record->invoice_type = 'faktura sprzedażowa';
+        $invoice_new_record->due_date = $invoice->due_date;
+        $invoice_new_record->payment_term = $invoice->payment_term;
         $invoice_new_record->company_id = $invoice->company_id;
         $invoice_new_record->client_id = $invoice->client_id;
         $invoice_new_record->seller_name = $invoice->seller_name;
@@ -435,6 +437,8 @@ class InvoiceController extends Controller
         $invoice_new_record->buyer_name = $invoice->buyer_name;
         $invoice_new_record->buyer_adress = $invoice->buyer_adress;
         $invoice_new_record->buyer_tax_id = $invoice->buyer_tax_id;
+        $invoice_new_record->paid = $invoice->paid;
+        $invoice_new_record->paid_part = $invoice->paid_part;
         $invoice_new_record->payment_method = $invoice->payment_method;
         $invoice_new_record->notes = $invoice->notes;
         $invoice_new_record->subtotal = $invoice->subtotal;
@@ -442,6 +446,7 @@ class InvoiceController extends Controller
         $invoice_new_record->total = $invoice->total;
         $invoice_new_record->user_id = $user->id;
         $invoice_new_record->total_in_words = $invoice->total_in_words;
+        $invoice_new_record->status = $invoice->status;
 
         // Zapisanie nowego rekordu faktury sprzedażowej
         $invoice_new_record->save();
@@ -555,7 +560,12 @@ class InvoiceController extends Controller
         $company = $this->get_company();
         $items = InvoiceItem::where('invoice_id', $invoice->id)->get();
         $payment_term = $this->due_date_to_payment_term($invoice->issue_date, $invoice->due_date);
-        return view('admin.invoice.edit', compact('payment_term', 'clients', 'invoice', 'company', 'items', 'services', 'products'));
+
+
+        $user = User::where('id', auth()->id())->first();
+        $form = $user->setting_format;
+        $set_client = $user->setting_client;
+        return view('admin.invoice.edit', compact('form', 'set_client', 'payment_term', 'clients', 'invoice', 'company', 'items', 'services', 'products'));
     }
 
     /**
@@ -563,40 +573,20 @@ class InvoiceController extends Controller
      */
     public function update(Request $request, Invoice $invoice)
     {
-        return redirect()->back()->with('error', 'tymczasowo niedostępne.');
         // Inicjalizacja zmiennych do obliczeń
         $subtotal = 0;
         $vatAmount = 0;
         $total = 0;
 
-        //obliczanie terminu płatności
-        $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $request->input('issue_date'));
-
-        // Zapisuje pusty numer konta
-        if ($request->input('bank') == null) {
-            $bank = '';
-        } else {
-            $bank = $request->input('bank');
-        }
-
         // Ustawiamy obliczoną datę jako termin płatności
-        $invoice->due_date = $dueDate;
-        $invoice->number = $request->input('number');
-        $invoice->invoice_type = $request->input('invoice_type');
-        $invoice->issue_date = $request->input('issue_date');
-        $invoice->client_id = $request->input('client_id');
-        $invoice->seller_name = $request->input('seller_name');
-        $invoice->seller_adress = $request->input('seller_adress');
-        $invoice->seller_tax_id = $request->input('seller_vat_number');
-        $invoice->seller_bank = $bank;
-        $invoice->buyer_name = $request->input('buyer_name');
-        $invoice->buyer_adress = $request->input('buyer_adress');
-        $invoice->buyer_tax_id = $request->input('buyer_vat_number');
+        $invoice->issue_date = Carbon::createFromFormat('d/m/Y', $request->input('issue_date'))->format('Y-m-d');
+        $invoice->sale_date = Carbon::createFromFormat('d/m/Y', $request->input('sale_date'))->format('Y-m-d'); //new
+        $invoice->due_date = Carbon::createFromFormat('d/m/Y', $request->input('payment_date'))->format('Y-m-d');
+        $invoice->payment_term = $request->input('payment_term');
+        $invoice->paid = $request->input('paid'); //new
+        $invoice->paid_part = $request->input('paid_part'); //new
         $invoice->payment_method = $request->input('payment_method');
         $invoice->notes = $request->input('notes');
-        $invoice->subtotal = $subtotal;
-        $invoice->vat = $vatAmount;
-        $invoice->total = $total;
         $invoice->save();
 
         // Usunięcie istniejących pozycji faktury, aby zapisać nowe

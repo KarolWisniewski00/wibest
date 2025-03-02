@@ -6,6 +6,7 @@ use App\Mail\DailyReportMail;
 use App\Models\Client;
 use App\Models\Cost;
 use App\Models\Invoice;
+use App\Models\User;
 use App\Models\WorkSession;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -109,7 +110,7 @@ class DashboardController extends Controller
         $user_id = Auth::id();
         $work_sessions_all = $this->get_all_work_sessions();
         $work_sessions_logged_user = $this->get_work_sessions_logged_user_by_get();
-
+        $user = User::where('id', $user_id)->first();
         // Zlicz sumę 'time_in_work' w formacie HH:mm:ss
         $total_time_in_seconds = 0;
         foreach ($work_sessions_all as $session) {
@@ -138,6 +139,7 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'company_id',
             'user_id',
+            'user',
             'work_sessions_all',
             'work_sessions_logged_user',
             'total_time_in_hours_all',

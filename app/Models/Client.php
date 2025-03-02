@@ -48,4 +48,8 @@ class Client extends Model
     {
         return $this->belongsTo(Company::class); // Klient należy do jednego firmy
     }
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
 }

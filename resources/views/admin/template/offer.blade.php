@@ -122,7 +122,9 @@
 
 <body>
     <div class="offer-header">
-        <p><span>Oferta handlowa numer</span><h2 class="h2">{{ $offer['number'] }}</h2></p>
+        <p><span>Oferta handlowa numer</span>
+        <h2 class="h2">{{ $offer['number'] }}</h2>
+        </p>
         <p><span>Data wystawienia:</span> {{ $offer['issue_date'] }}</p>
         <p><span>Termin ważności:</span> {{ $offer['due_date'] }}</p>
     </div>
@@ -155,19 +157,36 @@
                 @if(isset($user))
                 <p>Oferta przygotowana przez</p>
                 <p><span>{{ $user->name }}</span>,</p>
-                <p>{{ $user->email }}</p>
+                <p><span style="color: #71717a;">Project Manager</span>,</p>
+                <p><span style="color: #71717a;">{{ $user->email }}</span></p>
                 @endif
             </td>
             <td class="buyer">
                 @if($offer['client']['buyer_person_name'] && $offer['client']['buyer_person_email'])
                 <p>Oferta przygotowana dla</p>
                 <p><span>{{ $offer['client']['buyer_person_name'] }}</span>,</p>
-                <p>{{ $offer['client']['buyer_person_email'] }}</p>
+                <p><span style="color: #71717a;">{{ $offer['client']['buyer_person_email'] }}</span></p>
                 @endif
             </td>
         </tr>
     </table>
-
+    <div class="divider"></div>
+    <table class="seller-buyer-table">
+        <tr>
+            <td class="seller">
+                <p><span>{{ $offer['project_id']->name }}</span>,</p>
+                @if($offer['project_id']->production_domain != ' ')
+                <p><span style="color: #71717a;">{{ $offer['project_id']->production_domain }}</span>,</p>
+                @else
+                <p><span style="color: #71717a;">{{ $offer['project_id']->sandbox_domain }}</span>,</p>
+                @endif
+            </td>
+            <td class="buyer">
+                <p>Zakres prac</p>
+                <p><span>{{ $offer['project_scope'] }}</span>,</p>
+            </td>
+        </tr>
+    </table>
     <h2>Pozycje</h2>
     <table>
         <thead>
@@ -177,6 +196,8 @@
                 <th>Ilość</th>
                 <th>Cena netto</th>
                 <th>Wartość netto</th>
+                <th>Rabat</th>
+                <th>Cena po rabacie</th>
                 <th>Stawka VAT</th>
                 <th>Kwota VAT</th>
                 <th>Wartość brutto</th>
@@ -187,9 +208,11 @@
             <tr>
                 <td>{{$key + 1}}.</td>
                 <td>{{ $item['name'] }}<br><span style="color: #71717a;">{{ $item['service']->description ?? '' }}</span></td>
-                <td>{{ $item['quantity'] }}</td>
+                <td>{{ $item['quantity'] }} {{ $item['unit'] }}</td>
                 <td>{{ number_format($item['unit_price'], 2) }} PLN</td>
                 <td>{{ number_format($item['subtotal'], 2) }} PLN</td>
+                <td>{{ number_format($item['discount'], 0) }} %</td>
+                <td>{{ number_format($item['price_after_discount'], 2) }} PLN</td>
                 <td>{{ $item['vat_rate'] }}</td>
                 <td>{{ $item['vat_amount'] }}</td>
                 <td>{{ number_format($item['total'], 2) }} PLN</td>

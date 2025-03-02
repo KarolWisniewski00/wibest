@@ -31,6 +31,10 @@ class Offer extends Model
         'notes', // Dodatkowe uwagi do oferty
         'total_in_words',
         'user_id',
+        'project_id',
+        'project_scope',
+        'due_term',
+        'status'
     ];
     /**
      * Relacja z modelem `Company`.
@@ -66,5 +70,9 @@ class Offer extends Model
     {
         return $this->belongsTo(User::class); // Oferta należy do jednego użytkownika
     }
-
+    public function project()
+    {
+        return $this->belongsTo(Project::class);
+    }
+    
 }

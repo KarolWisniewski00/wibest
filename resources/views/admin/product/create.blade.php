@@ -1,15 +1,8 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Dodaj produkt') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
+        @include('admin.elements.alerts')
+        <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Formularz tworzenia usługi -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <a href="{{ route('product') }}" class="mb-8 inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">

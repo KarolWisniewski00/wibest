@@ -1,13 +1,6 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Historia wersji') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
+        @include('admin.elements.alerts')
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- WIDGET -->
             <div class="p-6 lg:p-8 mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
@@ -23,7 +16,14 @@
                     </div>
                 </div>
                 <ol class="relative border-l border-gray-600">
-                <li class="mb-10 ml-4">
+                    <li class="mb-10 ml-4">
+                        <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
+                        <time class="mb-1 text-sm font-normal leading-none text-gray-400">2 Marca 2025 V 2.0.2</time>
+                        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">1. Reorganizacja starych zakładek</p>
+                        <p class="text-base font-normal text-gray-800 dark:text-gray-200 ">2. Zrobienie projektów i ofert</p>
+                    </li>
+                    <li class="mb-10 ml-4">
                         <div class="absolute w-3 h-3 bg-gray-600 rounded-full mt-1.5 -left-1.5 border border-gray-800"></div>
                         <time class="mb-1 text-sm font-normal leading-none text-gray-400">10 Stycznia 2025 V 2.0.1</time>
                         <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">Aktualizacja</h3>

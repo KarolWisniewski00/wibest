@@ -25,11 +25,11 @@
         <nav class="max-w-[85rem] w-full mx-auto px-4 flex flex-wrap basis-full items-center justify-between">
             <a class="sm:order-1 flex-none text-xl font-semibold focus:outline-none focus:opacity-80" href="#" style='font-family: "Raleway", sans-serif;'>WIBEST</a>
             <div class="sm:order-3 flex items-center gap-x-2">
-                <!--Button-->
+                <!--Button
                 <a href="{{route('login.google')}}" class="py-2 px-8 inline-flex items-center gap-x-2 text-sm font-medium border border-gray-800 bg-black text-white hover:bg-gray-800 focus:outline-none focus:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none">
                     <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i>Logowanie
                 </a>
-                <!--Button-->
+                Button-->
             </div>
             <div id="hs-navbar-alignment" class="hs-collapse hidden overflow-hidden transition-all duration-300 basis-full grow sm:grow-0 sm:basis-auto sm:block sm:order-2" aria-labelledby="hs-navbar-alignment-collapse">
                 <div class="flex flex-col gap-5 mt-5 sm:flex-row sm:items-center sm:mt-0 sm:ps-5">
@@ -46,35 +46,6 @@
             <h1 class="mb-4 text-4xl tracking-tight leading-none text-gray-900 md:text-5xl lg:text-6xl" style='font-family: "Raleway", sans-serif;'>WIBEST</h1>
             <p class="mb-8 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48">Aplikacje, które tworzą przyszłość.</p>
         </div>
-    </section>
-    <section>
-        <!-- Hero -->
-        <div class="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Grid -->
-            <div class="grid md:grid-cols-2 gap-4 md:gap-8 xl:gap-20 md:items-center">
-                <div class="text-center py-8">
-                    <img src="{{ asset('hero.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
-                </div>
-                <div>
-                    <h1 class="block text-3xl font-bold text-gray-800 sm:text-4xl lg:text-6xl lg:leading-tight"><span class="text-indigo-600 " style='font-family: "Raleway", sans-serif;'>SDF</span></h1>
-                    <p class="mt-3 text-lg text-gray-800 ">System w fazie testowej.</p>
-
-                    <!-- Buttons -->
-                    <div class="mt-7 grid gap-3 w-full sm:inline-flex">
-                        <a href="{{route('login.google')}}" class="mb-6 py-2 px-8 inline-flex items-center justify-center gap-x-2 text-sm font-medium border border-gray-800 bg-black text-white hover:bg-gray-800 focus:outline-none focus:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none">
-                            <i class="fa-solid fa-arrow-right-to-bracket mr-1"></i>Logowanie
-                        </a>
-                    </div>
-                    <!-- End Buttons -->
-
-                </div>
-                <!-- End Col -->
-
-                <!-- End Col -->
-            </div>
-            <!-- End Grid -->
-        </div>
-        <!-- End Hero -->
     </section>
     <div class="mb-6 py-3 flex items-center text-xs text-gray-400 uppercase before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6 "></div>
     <section>

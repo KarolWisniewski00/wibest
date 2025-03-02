@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
@@ -9,10 +10,12 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OcrController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RaportController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkSessionController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +47,9 @@ Route::prefix('api')->group(function () {
     Route::prefix('invoice')->group(function () {
         Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
     });
+    Route::prefix('offer')->group(function () {
+        Route::get('/{year}', [OfferController::class, 'value'])->name('api.offer.value');
+    });
     Route::prefix('search')->group(function () {
         Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.search.gus');
     });
@@ -63,6 +69,10 @@ Route::middleware([
 
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+        Route::prefix('team')->group(function () {
+            Route::get('/', [TeamController::class, 'index'])->name('team');
+        });
+
         Route::prefix('work')->group(function () {
             Route::prefix('session')->group(function () {
                 Route::get('/', [WorkSessionController::class, 'index'])->name('work.session');
@@ -76,10 +86,6 @@ Route::middleware([
 
                 Route::get('now', [WorkSessionController::class, 'index_now'])->name('work.session.now');
                 Route::get('last', [WorkSessionController::class, 'index_last'])->name('work.session.last');
-            });
-
-            Route::prefix('raport')->group(function () {
-
             });
         });
 
@@ -106,16 +112,35 @@ Route::middleware([
 
             Route::get('now', [InvoiceController::class, 'index_now'])->name('invoice.now');
             Route::get('last', [InvoiceController::class, 'index_last'])->name('invoice.last');
-            Route::get('/search', [InvoiceController::class, 'search'])->name('invoice.search');
+            Route::get('search', [InvoiceController::class, 'search'])->name('invoice.search');
             Route::get('create/{client}', [InvoiceController::class, 'create_client'])->name('invoice.create.client');
-            Route::get('create/pro/{client}', [InvoiceController::class, 'create_pro_client'])->name('invoice.create.pro.client');
-            Route::get('/send/{invoice}', [InvoiceController::class, 'send_invoice'])->name('invoice.send');
+            Route::get('create/pro/{client}', [InvoiceController::class, 'create_client'])->name('invoice.create.pro.client');
+            Route::get('send/{invoice}', [InvoiceController::class, 'send_invoice'])->name('invoice.send');
             Route::get('file/{invoice}', [InvoiceController::class, 'file'])->name('invoice.show.file');
             Route::get('download/{invoice}', [InvoiceController::class, 'download'])->name('invoice.download');
             Route::get('store/from/{invoice}', [InvoiceController::class, 'store_from'])->name('invoice.store.from');
             Route::get('store/from/ofr/{offer}', [InvoiceController::class, 'store_from_ofr'])->name('invoice.store.from.ofr');
         });
-
+        Route::prefix('project')->group(function () {
+            Route::get('/', [ProjectController::class, 'index'])->name('project');
+            Route::get('refresh', [ProjectController::class, 'index_refresh'])->name('project.refresh');
+            Route::get('create/{client}', [ProjectController::class, 'create'])->name('project.create.client');
+            Route::post('store', [ProjectController::class, 'store'])->name('project.store');
+            Route::get('show/{project}', [ProjectController::class, 'show'])->name('project.show');
+            Route::get('edit/{project}', [ProjectController::class, 'edit'])->name('project.edit');
+            Route::put('update/{project}', [ProjectController::class, 'update'])->name('project.update');
+            Route::delete('delete/{project}', [ProjectController::class, 'delete'])->name('project.delete');
+            Route::get('search', [ProjectController::class, 'search'])->name('project.search');
+        });
+        Route::prefix('contract')->group(function () {
+            Route::get('/', [ContractController::class, 'index'])->name('contract');
+        });
+        Route::prefix('order')->group(function () {
+            Route::get('/', [ContractController::class, 'index'])->name('order');
+        });
+        Route::prefix('raport')->group(function () {
+            Route::get('/', [ContractController::class, 'index'])->name('raport');
+        });
         Route::prefix('cost')->group(function () {
             Route::get('/', [CostController::class, 'index'])->name('cost');
             Route::get('create', [CostController::class, 'create'])->name('cost.create');
@@ -132,7 +157,7 @@ Route::middleware([
 
         Route::prefix('offer')->group(function () {
             Route::get('/', [OfferController::class, 'index'])->name('offer');
-            Route::get('create', [OfferController::class, 'create'])->name('offer.create');
+            Route::get('create/{project}', [OfferController::class, 'create'])->name('offer.create.project');
             Route::post('store', [OfferController::class, 'store'])->name('offer.store');
             Route::get('show/{offer}', [OfferController::class, 'show'])->name('offer.show');
             Route::get('edit/{offer}', [OfferController::class, 'edit'])->name('offer.edit');
@@ -142,7 +167,6 @@ Route::middleware([
             Route::get('now', [OfferController::class, 'index_now'])->name('offer.now');
             Route::get('last', [OfferController::class, 'index_last'])->name('offer.last');
             Route::get('/search', [OfferController::class, 'search'])->name('offer.search');
-            Route::get('create/{client}', [OfferController::class, 'create_client'])->name('offer.create.client');
             Route::get('/send/{offer}', [OfferController::class, 'send_offer'])->name('offer.send');
             Route::get('file/{offer}', [OfferController::class, 'file'])->name('offer.show.file');
             Route::get('download/{offer}', [OfferController::class, 'download'])->name('offer.download');

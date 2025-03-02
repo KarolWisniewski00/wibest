@@ -10,6 +10,7 @@ use App\Models\InvoiceItem;
 use App\Models\Offer;
 use App\Models\OfferItem;
 use App\Models\Product;
+use App\Models\Project;
 use App\Models\User;
 use App\Models\WorkSession;
 use Carbon\Carbon;
@@ -17,12 +18,79 @@ use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Http;
 use NumberToWords\NumberToWords;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    public function is_website_work($url)
+    {
+        try {
+            $response = Http::get($url);
+
+            return true;
+        } catch (Exception) {
+            return false;
+        }
+    }
+    public function get_new_status($is_website_work)
+    {
+        switch ($is_website_work) {
+            case true:
+                return 'Aktywne';
+                break;
+            case false:
+                return 'Error';
+                break;
+            default:
+                return 'Error';
+                break;
+        }
+    }
+    public function check_website_and_update_status($project)
+    {
+        switch ($project->status) {
+            case 'Aktywne':
+                $is_website_work = $this->is_website_work($project->production_domain);
+                $project->status = $this->get_new_status($is_website_work);
+                $project->save();
+                break;
+            case 'Wyłączone':
+                break;
+            case 'Error':
+                $is_website_work = $this->is_website_work($project->production_domain);
+                $project->status = $this->get_new_status($is_website_work);
+                $project->save();
+                break;
+            case 'W budowie':
+                break;
+            default:
+                $is_website_work = $this->is_website_work($project->production_domain);
+                $project->status = $this->get_new_status($is_website_work);
+                $project->save();
+                break;
+        }
+        return $project;
+    }
+
+    public function check_all_websites_and_update_status()
+    {
+        $projects = Project::where('company_id', $this->get_company_id())->get();
+        foreach ($projects as $key => $value) {
+            $projects[$key] = $this->check_website_and_update_status($value);
+            $projects[$key]->save();
+        }
+    }
+    public function validate_bank_number($request)
+    {
+        if ($request->input('bank') == null) {
+            return '';
+        } else {
+            return $request->input('bank');
+        }
+    }
     /**
      * Zwraca Id firmy zalogowanego użytkownika.
      */
@@ -156,6 +224,13 @@ class Controller extends BaseController
         return Client::where('company_id', $this->get_company_id())
             ->orderBy('created_at', 'desc')
             ->paginate(10);
+    }
+
+    public function get_projects()
+    {
+        return Project::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')
+            ->paginate(18);
     }
     /**
      * Zwraca sugestie ofert, ostatnio aktualizowane
@@ -374,6 +449,23 @@ class Controller extends BaseController
         // Utwórz nowy numer faktury
         return sprintf('%d', $count);
     }
+    public function get_offer_number_by_year($year)
+    {
+        // Znajdź ostatnią fakturę, aby określić autoinkrementację
+        $offers = Offer::whereYear('created_at', $year)
+            ->where('company_id', $this->get_company_id())
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $count = 1;
+
+        foreach ($offers as $offer) {
+            $count++;
+        }
+
+        // Utwórz nowy numer faktury
+        return sprintf('%d', $count);
+    }
     /**
      * Zwraca obiekt firmy zalogowanego użytkownika.
      */
@@ -554,7 +646,7 @@ class Controller extends BaseController
     public function item_create_offer($item, $id)
     {
         // Obliczanie wartości netto pozycji (quantity * unit_price)
-        $itemSubtotal = $item['quantity'] * $item['price'];
+        $itemSubtotal = $item['quantity'] * $item['price_after_discount'];
 
         // Obliczanie VAT (jeśli nie jest 'zw' czyli zwolnione z VAT)
         if ($item['vat'] != 'zw') {
@@ -573,13 +665,15 @@ class Controller extends BaseController
 
         $offerItem = new OfferItem();
         $offerItem->offer_id = $id;
-        $offerItem->product_id = $item['product_id'];
-        $offerItem->service_id = $item['service_id'];
+        $offerItem->product_id = null;
+        $offerItem->service_id = null;
         $offerItem->name = $item['name'];
         $offerItem->quantity = $item['quantity'];
         $offerItem->unit_price = $item['price'];
-        $offerItem->unit = null;
+        $offerItem->unit = $item['unit'];
         $offerItem->subtotal = $itemSubtotal;
+        $offerItem->discount = $item['discount'];
+        $offerItem->price_after_discount = $item['price_after_discount'];
         $offerItem->vat_rate = $item['vat'] != 'zw' ? $item['vat'] : 0;
         $offerItem->vat_amount = $itemVatAmount;
 
@@ -599,11 +693,15 @@ class Controller extends BaseController
 
     public function get_offer_data_from_obj(Offer $offer, $items)
     {
+        $project = Project::where('id', $offer->project_id)->first();
         return [
             'number' => $offer->number,
             'issue_date' => $offer->issue_date,
             'due_date' => $offer->due_date,
             'status' => $offer->status,
+            'project_id' => $project,
+            'project_scope' => $offer->project_scope,
+            'due_term' => $offer->due_term,
             'client' => [
                 'name' => $offer->buyer_name,
                 'address' => $offer->buyer_adress,
@@ -631,6 +729,7 @@ class Controller extends BaseController
             'number' => $invoice->number,
             'invoice_type' => $invoice->invoice_type,
             'issue_date' => $invoice->issue_date,
+            'sale_date' => $invoice->sale_date,
             'due_date' => $invoice->due_date,
             'status' => $invoice->status,
             'client' => [

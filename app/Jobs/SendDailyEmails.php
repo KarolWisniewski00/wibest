@@ -32,13 +32,12 @@ class SendDailyEmails implements ShouldQueue
     {
         $oneWeekAgo = Carbon::now()->subWeek();
 
-        $work_sessions = WorkSession::where('company_id', User::find(auth()->id())->company_id)
-            ->where('user_id', auth()->id())
+        $work_sessions = WorkSession::where('company_id', 2)
             ->where('status', 'Praca zakończona')
             ->where('start_time', '>=', $oneWeekAgo)
             ->orderBy('updated_at', 'desc')
             ->get();
-        $users = User::where('company_id', User::find(auth()->id())->company_id)->where('role', 'admin')->get();
+        $users = User::where('company_id', 2)->where('role', 'admin')->get();
         foreach ($users as $key => $user) {
             Mail::to($user->email)->send(new DailyReportMail($work_sessions));
         }

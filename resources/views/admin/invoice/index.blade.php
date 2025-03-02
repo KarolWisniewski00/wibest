@@ -1,13 +1,7 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Faktury') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
+        @include('admin.elements.alerts')
+        <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="px-6 lg:px-8 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -53,6 +47,7 @@
                         }
                     </style>
                     <div id="space" class="xl:hidden"></div>
+
                     <!-- Napis z przyciskiem tworzenia -->
                     <div id="fixed" class="pb-4 flex flex-col justify-between items-center">
                         <div class="flex flex-row justify-between items-center w-full bg-white dark:bg-gray-800">
@@ -67,7 +62,6 @@
                             @endif
                         </div>
                     </div>
-
                     <script>
                         $(document).ready(function() {
                             var element = $('#fixed');
@@ -86,7 +80,8 @@
                             });
                         });
                     </script>
-
+                    <!-- Napis z przyciskiem tworzenia -->
+                     
                     <div class="max-w">
                         <!-- SearchBox -->
                         <div class="relative">
@@ -449,10 +444,7 @@
                                 @if ($invoices->isEmpty())
                                 <tr class="bg-white dark:bg-gray-800">
                                     <td colspan="8" class="px-3 py-2">
-                                        <div class="text-center py-8">
-                                            <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
-                                            <p class="text-gray-500 dark:text-gray-400">Brak faktur do wyświetlenia.</p>
-                                        </div>
+                                        <x-empty-place />
                                     </td>
                                 </tr>
                                 @else
@@ -497,94 +489,16 @@
                                 @endphp
 
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                                    @if($invoice->paid == null)
-                                    <td class="px-6 py-4 min-w-48">
-                                        <div class="flex justify-start items-center w-full">
-                                            @if($invoice->invoice_type == "faktura proforma")
-                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
-                                            @if($invoice->invoice_id)
-                                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
-                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                            @endif
-                                            @elseif($invoice->invoice_type == "faktura sprzedażowa")
-                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                            @if($invoice->invoice_id)
-                                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mr-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
-                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
-                                            @endif
-                                            @elseif($invoice->invoice_type == "faktura")
-                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                            @endif
-                                            {{ $invoice->number }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        @if($invoice->client)
-                                        <a href="{{ route('client.show', $invoice->client->id) }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$invoice->client->name}}</a>
-                                        @else
-                                        {{$invoice->buyer_name}}
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-sm min-w-32">
-                                        {{ $invoice->subtotal }} zł
-                                    </td>
-                                    <td class="px-6 py-4 font-semibold text-lg min-w-32 text-gray-50">
-                                        {{ $invoice->total }} zł
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{ route('invoice.show', $invoice) }}" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-4 focus:ring-gray-200">
-                                            <i class="fa-solid fa-eye"></i>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{ route('invoice.edit', $invoice) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                                            <i class="fa-solid fa-pen-to-square"></i>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <form action="{{ route('invoice.delete', $invoice) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tę fakturę?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-red-500 hover:text-white border border-red-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                    @else
                                     <td class="px-3 py-2 min-w-48">
-                                        <div class="flex justify-start items-center w-full">
-                                            @if($invoice->invoice_type == "faktura proforma")
-                                            <span class="inline-flex p-2 items-center bg-violet-500 dark:bg-violet-300 border border-transparent rounded-full font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-violet-700 dark:hover:bg-violet-300 focus:bg-violet-700 dark:focus:bg-violet-300 active:bg-violet-900 dark:active:bg-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:focus:ring-offset-violet-800 transition ease-in-out duration-150">PRO</span>
-                                            @if($invoice->invoice_id)
-                                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mx-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
-                                            <span class="inline-flex p-2 items-center bg-green-300 dark:bg-green-300 border border-transparent rounded-full font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-300 focus:bg-green-700 dark:focus:bg-green-300 active:bg-green-900 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-green-800 transition ease-in-out duration-150">FVS</span>
-                                            @endif
-                                            @elseif($invoice->invoice_type == "faktura sprzedażowa")
-                                            <span class="inline-flex p-2 items-center bg-green-300 dark:bg-green-300 border border-transparent rounded-full font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-300 focus:bg-green-700 dark:focus:bg-green-300 active:bg-green-900 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-green-800 transition ease-in-out duration-150">FVS</span>
-                                            @if($invoice->invoice_id)
-                                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold mx-2"><i class="fa-solid fa-arrow-right-arrow-left"></i></p>
-                                            <span class="inline-flex p-2 items-center bg-violet-500 dark:bg-violet-300 border border-transparent rounded-full font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-violet-700 dark:hover:bg-violet-300 focus:bg-violet-700 dark:focus:bg-violet-300 active:bg-violet-900 dark:active:bg-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 dark:focus:ring-offset-violet-800 transition ease-in-out duration-150">PRO</span>
-                                            @endif
-                                            @elseif($invoice->invoice_type == "faktura")
-                                            <span class="inline-flex p-2 items-center bg-green-300 dark:bg-green-300 border border-transparent rounded-full font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-300 focus:bg-green-700 dark:focus:bg-green-300 active:bg-green-900 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-green-800 transition ease-in-out duration-150">FVS</span>
-                                            @endif
-                                            <span class="ps-3 font-semibold text-lg text-gray-700 dark:text-gray-50">
-                                                {{ substr($invoice->number, 3) }}
-                                            </span>
-                                        </div>
+                                        <x-invoice-label :invoice="$invoice" />
                                     </td>
                                     <td class="px-3 py-2">
                                         @if($invoice->client)
-                                        <div class="flex flex-row">
-                                            <a href="{{ route('client.show', $invoice->client->id) }}" class="my-auto h-fit text-blue-600 dark:text-blue-400 hover:underline">
-                                                <span class="mr-2 h-fit my-auto inline-flex p-2 items-center bg-blue-300 dark:bg-blue-300 border border-transparent rounded-full font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-blue-700 dark:hover:bg-blue-300 focus:bg-blue-700 dark:focus:bg-blue-300 active:bg-blue-900 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-blue-800 transition ease-in-out duration-150">
-                                                    ORG
-                                                </span>
-                                            </a>
-                                            <a href="{{ route('client.show', $invoice->client->id) }}" class="text-blue-300 dark:text-blue-400 hover:underline">
+                                        <p class="text-gray-900 dark:text-gray-50 font-semibold">
+                                            <x-label-link-company href="{{ route('client.show', $invoice->client->id) }}">
                                                 {{$invoice->client->name}}
-                                            </a>
-                                        </div>
+                                            </x-label-link-company>
+                                        </p>
                                         @else
                                         {{$invoice->buyer_name}}
                                         @endif
@@ -596,52 +510,16 @@
                                         {{ $invoice->total }} zł
                                     </td>
                                     <td class="px-3 py-2 text-sm min-w-32">
-                                        @if($invoice->status == 'wystawiona')
-                                        <span class="inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold text-xs uppercase tracking-widest hover:text-yellow-700 dark:hover:text-yellow-300 transition ease-in-out duration-150">
-                                            {{ $invoice->status }}
-                                        </span>
-                                        @endif
-                                        @if($invoice->status == 'opłacona')
-                                        <span class="inline-flex p-2 items-center text-green-300 dark:text-green-300 font-semibold text-xs uppercase tracking-widest hover:text-green-700 dark:hover:text-green-300 transition ease-in-out duration-150">
-                                            {{ $invoice->status }}
-                                        </span>
-                                        @endif
+                                        <x-invoice-status :invoice="$invoice" />
                                     </td>
                                     <td colspan="2" class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-50">
-                                        @if($invoice->paid == 'opłacono')
-                                        <!-- Progress -->
-                                        <div class="flex w-full h-4 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                            <div class="flex flex-col justify-center rounded-full overflow-hidden bg-green-300 text-xs text-white text-center whitespace-nowrap dark:text-gray-900 dark:bg-green-300 transition duration-500" style="width: 100%">100%</div>
-                                        </div>
-                                        @else
-                                        @php
-                                        $brutto = $invoice->total;
-                                        $paid = $invoice->paid_part;
-                                        if($paid != null && $brutto != 0){
-                                        $remaining_percent = ($paid / $brutto) * 100;
-                                        }else{
-                                        $remaining_percent = 'error';
-                                        }
-                                        @endphp
-                                        @if($remaining_percent != 'error')
-                                        <!-- Progress -->
-                                        <div class="flex w-full h-4 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700" role="progressbar" aria-valuenow="{{round($remaining_percent, 2)}}" aria-valuemin="0" aria-valuemax="100">
-                                            <div class="flex flex-col justify-center rounded-full overflow-hidden bg-green-300 text-xs text-white text-center whitespace-nowrap dark:text-gray-900 dark:bg-green-300 transition duration-500" style="width: {{round($remaining_percent, 2)}}%">{{round($remaining_percent, 2)}}%</div>
-                                        </div>
-                                        @else
-                                        <!-- Progress -->
-                                        <div class="flex w-full h-4 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
-                                            <div class="flex flex-col justify-center rounded-full overflow-hidden bg-red-600 text-xs text-white text-center whitespace-nowrap dark:text-gray-900 dark:bg-red-300 transition duration-500" style="width: 100%">ERROR</div>
-                                        </div>
-                                        @endif
-                                        @endif
+                                        <x-invoice-progress :invoice="$invoice" />
                                     </td>
                                     <td class="px-3 py-2">
                                         <a href="{{ route('invoice.show', $invoice) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-lg font-semibold text-sm text-white dark:text-gray-900 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                             <i class="fa-solid fa-eye"></i>
                                         </a>
                                     </td>
-                                    @endif
                                 </tr>
                                 @endforeach
                                 @endif

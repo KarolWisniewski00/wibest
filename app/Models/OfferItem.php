@@ -22,6 +22,8 @@ class OfferItem extends Model
         'vat_rate', // Stawka VAT
         'vat_amount', // Kwota VAT
         'total', // Wartość brutto (netto + VAT)
+        'discount', // Wartość brutto (netto + VAT)
+        'price_after_discount', // Wartość brutto (netto + VAT)
     ];
     /**
      * Definiuje relację z modelem `Offer`.

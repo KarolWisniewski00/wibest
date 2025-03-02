@@ -127,9 +127,10 @@
         @elseif($invoice['invoice_type'] == 'faktura sprzedażowa')
         <p><span>Faktura numer</span><h2 class="h2">{{ $invoice['number'] }}</h2></p>
         @else
-        <p><span>Faktura pro-forma numer</span><h2 class="h2">PRO {{ $invoice['number'] }}</h2></p>
+        <p><span>Faktura pro-forma numer</span><h2 class="h2">{{ $invoice['number'] }}</h2></p>
         @endif
         <p><span>Data wystawienia:</span> {{ $invoice['issue_date'] }}</p>
+        <p><span>Data sprzedaży:</span> {{ $invoice['sale_date'] }}</p>
         <p><span>Termin płatności:</span> {{ $invoice['due_date'] }}</p>
         <p><span>Płatność:</span> {{ $invoice['payment_method'] }}</p>
     </div>
@@ -175,11 +176,11 @@
             <tr>
                 <td>{{$key + 1}}.</td>
                 <td>{{ $item['name'] }}</td>
-                <td>{{ $item['quantity'] }}</td>
+                <td>{{ $item['quantity'] }} {{ $item['unit'] }}</td>
                 <td>{{ number_format($item['unit_price'], 2) }} PLN</td>
                 <td>{{ number_format($item['subtotal'], 2) }} PLN</td>
-                <td>{{ $item['vat_rate'] }}</td>
-                <td>{{ $item['vat_amount'] }}</td>
+                <td>{{ $item['vat_rate'] }} %</td>
+                <td>{{ $item['vat_amount'] }} PLN</td>
                 <td>{{ number_format($item['total'], 2) }} PLN</td>
             </tr>
             @endforeach
@@ -189,7 +190,7 @@
     <div class="summary">
         <h2 class="h2">Podsumowanie</h2>
         <p>Razem netto: {{ $invoice['subtotal'] }} PLN</p>
-        <p>VAT: {{ $invoice['vat'] }}</p>
+        <p>VAT: {{ $invoice['vat'] }} PLN</p>
         <p>Razem brutto: {{ $invoice['total'] }} PLN</p>
     </div>
     <div class="summary">

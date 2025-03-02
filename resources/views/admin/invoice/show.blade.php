@@ -1,93 +1,83 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Faktury') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
+        @include('admin.elements.alerts')
+        <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!--WIDGET TASK-->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <a href="{{ route('invoice') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                        <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do listy faktur
-                    </a>
+                    <!--POWRÓT-->
+                    <x-button-link-back href="{{ route('invoice') }}" class="text-lg">
+                        <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do listy Faktur
+                    </x-button-link-back>
+                    <!--POWRÓT-->
+
+                    <!--TYTUŁ-->
                     <div class="hidden md:flex flex-row justify-between items-center">
                         <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
                             Podgląd faktury
                         </h1>
                     </div>
-                    <style>
-                        .a4-paper {
-                            width: 794px;
-                            /* Szerokość A4 w pikselach */
-                            height: 1123px;
-                            /* Wysokość A4 w pikselach */
-                            background-color: white;
-                            /* Białe tło, jak kartka papieru */
-                            margin: 20px auto;
-                            /* Środek strony z marginesem */
-                            padding: 40px;
-                            /* Wewnętrzny margines (odstęp od krawędzi) */
-                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-                            /* Delikatny cień, aby wyglądało jak kartka */
-                            border: 1px solid #e5e7eb;
-                            /* Opcjonalna, delikatna ramka */
-                            overflow: hidden;
-                            /* Ukrycie nadmiaru treści */
-                        }
-                    </style>
-                    <div class="bg-white a4-paper hidden md:block">
-                        <!-- Tutaj wstawiamy zawartość podglądu faktury -->
-                        <iframe src="{{route('invoice.show.file', $invoice_obj)}}" width="100%" height="100%" style="border:none;"></iframe>
-                    </div>
-                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
-                        <!-- Edytuj -->
-                        <a href="{{ route('invoice.edit', $invoice) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                            <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
-                        </a>
+                    <!--TYTUŁ-->
 
-                        <!-- Usuń -->
-                        <form action="{{ route('invoice.delete', $invoice) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tą fakturę?');">
+                    <!--A4-->
+                    <x-a4 src="{{route('invoice.show.file', $invoice_obj)}}" />
+                    <!--A4-->
+
+                    <!--PRZYCISKI POD A4-->
+                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
+                        <!-- EDYTUJ -->
+                        <x-button-link-blue href="{{ route('invoice.edit', $invoice) }}">
+                            <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
+                        </x-button-link-blue>
+                        <!--EDYTUJ-->
+
+                        <!--USUŃ-->
+                        <form action="{{ route('invoice.delete', $invoice) }}" method="POST"
+                            onsubmit="return confirm('Czy na pewno chcesz usunąć tą fakturę?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-white border border-red-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                            <x-button-red type="submit">
                                 <i class="fa-solid fa-trash mr-2"></i>Usuń
-                            </button>
+                            </x-button-red>
                         </form>
+                        <!--USUŃ-->
                     </div>
-                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
+                    <div class="mt-8 flex justify-end items-center space-x-4">
                         <!-- Utwórz Fakturę Sprzedaży -->
                         @if($invoice_obj['invoice_type'] == 'faktura proforma')
                         @if($invoice_obj->invoice_id == null)
-                        <a href="{{route('invoice.store.from', $invoice_obj)}}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                        <x-button-link-green href="{{route('invoice.store.from', $invoice_obj)}}">
                             <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Utwórz Fakturę Sprzedaży
-                        </a>
+                        </x-button-link-green>
                         @endif
                         @endif
+                        <!-- Utwórz Fakturę Sprzedaży -->
+
+                        <!-- Wyślij Fakturę do Klienta -->
                         @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
-                        <!-- Wyślij Fakturę do Klienta -->
-                        <a href="{{route('invoice.send', $invoice_obj)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                        <x-button-link-orange href="{{route('invoice.send', $invoice_obj)}}">
                             <i class="fa-solid fa-paper-plane mr-2"></i>Wyślij Fakturę
-                        </a>
+                        </x-button-link-orange>
                         @else
-                        <!-- Wyświetl informację o braku adresu e-mail -->
-                        <button type="button" class="text-gray-600 bg-gray-400 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" disabled>
+                        <x-button-link-disabled type="button" disabled>
                             <i class="fa-solid fa-paper-plane mr-2"></i>Brak adresu e-mail
-                        </button>
+                        </x-button-link-disabled>
                         @endif
                         @endif
+                        <!-- Wyślij Fakturę do Klienta -->
 
                         <!-- Pobierz PDF -->
-                        <a href="{{route('invoice.download', $invoice_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                        <x-button-link-blue href="{{route('invoice.download', $invoice_obj)}}">
                             <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
-                        </a>
+                        </x-button-link-blue>
+                        <!-- Pobierz PDF -->
                     </div>
-                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4 w-full">
+                    <!--PRZYCISKI POD A4-->
+
+                    <!--ALERT-->
+                    <div class="my-8 hidden md:flex justify-end items-center space-x-4 w-full">
                         @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
                         @else
@@ -116,246 +106,293 @@
                             });
                         });
                     </script>
+                    <!--ALERT-->
 
+                    <!--POWRÓT-->
+                    <x-button-link-back href="{{ route('invoice') }}" class="text-lg">
+                        <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do listy Faktur
+                    </x-button-link-back>
+                    <!--POWRÓT-->
+
+                    <!--GŁOWA-->
                     <div class="mt-8 grid grid-cols-2 md:gap-4">
-                        <div class="col-span-2 md:grid md:grid-cols-1 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <h2 class="text-sm md:text-xl font-semibold text-gray-600 dark:text-gray-50">FV</h2>
-                        </div>
+                        <x-container-gray>
+                            <!--NUMER-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Numer
+                                </p>
+                                <x-invoice-label :invoice="$invoice_obj" />
+                            </x-text-cell>
+                            <!--NUMER-->
 
-                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Numer</p>
-                            <div class="flex flex-row justify-start items-center">
-                                @if($invoice_obj->invoice_type == "faktura proforma")
-                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
-                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->number }}</p>
-                                @if($invoice_obj->invoice_id)
-                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold"><i class="fa-solid fa-arrow-right-arrow-left mx-2"></i></p>
-                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                <a href="{{ route('invoice.show', $invoice_obj->invoice_id) }}" class="text-sm md:text-xl text-blue-600 dark:text-blue-400 hover:underline font-semibold">{{ $invoice_obj->number }}</a>
+                            <!--TYP-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Typ
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->invoice_type }}
+                                </p>
+                            </x-text-cell>
+                            <!--TYP-->
+
+                            <!--DATY-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Data wystawienia
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->issue_date }}
+                                </p>
+                            </x-text-cell>
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Data sprzedaży
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->sale_date }}
+                                </p>
+                            </x-text-cell>
+                            <!--DATY-->
+
+                            <!--PŁATNOŚCI-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Termin płatności
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->due_date }}
+                                </p>
+                            </x-text-cell>
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Metoda płatności
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->payment_method }}
+                                </p>
+                            </x-text-cell>
+                            <!--PŁATNOŚCI-->
+                        </x-container-gray>
+                    </div>
+                    <!--NUMER PŁATNOŚCI DATY i TYP-->
+
+                    <!--BODY-->
+                    <div class="mt-8 grid grid-cols-2 md:gap-4">
+                        <!--SPRZEDAJĄCY-->
+                        <x-container-gray>
+                            <!--NAZWA-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Nazwa sprzedającego
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    <x-label-link-company href="{{route('setting')}}">
+                                        {{ $invoice_obj->seller_name }}
+                                    </x-label-link-company>
+                                </p>
+                            </x-text-cell>
+                            <!--NAZWA-->
+
+                            <!--ADRES-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Adres sprzedającego
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->seller_adress }}
+                                </p>
+                            </x-text-cell>
+                            <!--ADRES-->
+
+                            <!--NIP-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    NIP sprzedającego
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->seller_tax_id }}
+                                </p>
+                            </x-text-cell>
+                            <!--NIP-->
+
+                            <!--BANK-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Numer konta sprzedającego
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->seller_bank }}
+                                </p>
+                            </x-text-cell>
+                            <!--BANK-->
+                        </x-container-gray>
+                        <!--SPRZEDAJĄCY-->
+
+                        <!--KUPUJĄCY-->
+                        <x-container-gray>
+                            <!--NAZWA-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Nazwa kupującego
+                                </p>
+                                @if($invoice->client)
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    <x-label-link-company href="{{route('client.show', $invoice->client_id)}}">
+                                        {{ $invoice_obj->buyer_name }}
+                                    </x-label-link-company>
+                                </p>
+                                @else
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->buyer_name }}
+                                </p>
                                 @endif
-                                @elseif($invoice_obj->invoice_type == "faktura sprzedażowa")
-                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-emerald-700 dark:text-white  mr-2">FVS</span>
-                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->number }}</p>
-                                @if($invoice_obj->invoice_id)
-                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold"><i class="fa-solid fa-arrow-right-arrow-left mx-2"></i></p>
-                                <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-indigo-500 dark:text-white  mr-2">PRO</span>
-                                <a href="{{ route('invoice.show', $invoice_obj->invoice_id) }}" class="text-sm md:text-xl text-blue-600 dark:text-blue-400 hover:underline font-semibold">{{ $invoice_obj->number }}</a>
-                                @endif
-                                @endif
-                            </div>
-                        </div>
-                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Typ</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->invoice_type }}</p>
-                        </div>
-                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Data wystawienia</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->issue_date }}</p>
-                        </div>
-                        <div class="md:grid col-span-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Termin płatności</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->due_date }}</p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                            </x-text-cell>
+                            <!--NAZWA-->
 
-                            </p>
-                        </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                Sprzedawca
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                Nabywca
-                            </p>
-                        </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa sprzedającego</p>
-                            @if($invoice->client)
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                <a href="{{route('setting')}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $invoice_obj->seller_name }}</a>
-                            </p>
-                            @else
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $invoice_obj->seller_name }}
-                            </p>
-                            @endif
+                            <!--ADRES-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Adres kupującego
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->buyer_adress }}
+                                </p>
+                            </x-text-cell>
+                            <!--ADRES-->
 
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Nazwa kupującego</p>
-                            @if($invoice->client)
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                <a href="{{route('client.show', $invoice->client_id)}}" class="text-blue-600 dark:text-blue-400 hover:underline">{{ $invoice_obj->buyer_name }}</a>
-                            </p>
-                            @else
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $invoice_obj->buyer_name }}
-                            </p>
-                            @endif
+                            <!--NIP-->
+                            <x-text-cell>
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    NIP kupującego
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->buyer_tax_id }}
+                                </p>
+                            </x-text-cell>
+                            <!--NIP-->
+                        </x-container-gray>
+                        <!--KUPUJĄCY-->
 
-                        </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Adres sprzedającego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $invoice_obj->seller_adress }}
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Adres kupującego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $invoice_obj->buyer_adress }}
-                            </p>
-                        </div>
-                        <div class="col-start-1 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">NIP sprzedającego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $invoice_obj->seller_tax_id }}
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">NIP kupującego</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                {{ $invoice_obj->buyer_tax_id }}
-                            </p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-
-                            </p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold ">
-                                Pozycje
-                            </p>
-                        </div>
+                        <!--POZYCJE-->
                         @foreach($invoiceItems as $item)
                         @if($item->product_id != null)
-                        <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <a href="{{route('product.show', $item->product)}}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm md:text-xl font-semibold">{{$item->name}}</a>
-                            <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
-                        </div>
+                        <x-container-gray class="col-span-2">
+                            <x-text-cell>
+                                <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                                    <a href="{{route('product.show', $item->product)}}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm md:text-xl font-semibold">{{$item->name}}</a>
+                                    <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
+                                    <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
+                                    <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
+                                </div>
+                            </x-text-cell>
+                        </x-container-gray>
                         @elseif($item->service_id != null)
-                        <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <a href="{{route('service.show', $item->service)}}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm md:text-xl font-semibold">{{$item->name}}</a>
-                            <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
-                        </div>
+                        <x-container-gray class="col-span-2">
+                            <x-text-cell>
+                                <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                                    <a href="{{route('service.show', $item->service)}}" class="text-blue-600 dark:text-blue-400 hover:underline text-sm md:text-xl font-semibold">{{$item->name}}</a>
+                                    <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
+                                    <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
+                                    <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
+                                </div>
+                            </x-text-cell>
+                        </x-container-gray>
                         @else
-                        <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{$item->name}}</h2>
-                            <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
-                        </div>
+                        <x-container-gray class="col-span-2">
+                            <x-text-cell>
+                                <div class="col-span-2 grid grid-cols-2 md:gap-4 p-4 border-b dark:border-gray-700">
+                                    <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{$item->name}}</h2>
+                                    <p class="text-gray-600 dark:text-gray-300 test-sm text-end">VAT {{$item->vat_amount}}</h2>
+                                    <p class="text-gray-600 dark:text-gray-300 test-sm">{{ $invoice_obj->subtotal }} PLN</p>
+                                    <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">{{ $invoice_obj->total }} PLN</p>
+                                </div>
+                            </x-text-cell>
+                        </x-container-gray>
                         @endif
                         @endforeach
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
+                        <!--POZYCJE-->
 
-                            </p>
+                        <!--PODSUMOWANIE-->
+                        <div class="md:col-span-1 md:col-start-2">
+                            <x-invoice-summary />
                         </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold text-end">
-                                Podsumowanie
-                            </p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota netto</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->subtotal }} PLN</p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota VAT</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->vat }} PLN</p>
-                        </div>
-                        <div class="col-start-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm  text-end">Kwota brutto</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold  text-end">{{ $invoice_obj->total }} PLN</p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Uwagi</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->notes }}</p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-300 test-sm">Metoda płatności</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">{{ $invoice_obj->payment_method }}</p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-400">
-                                Utworzone przez
-                            </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-sm md:text-xl font-semibold">
-                                {{ $invoice_obj->user->name ?? '' }}
-                            </p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-400">
-                                Dane należące do
-                            </p>
-                            <p class="text-gray-900 dark:text-gray-400 text-sm md:text-xl font-semibold">
-                                {{ $invoice_obj->company->name ?? '' }}
-                            </p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-400">Data utworzenia</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 font-semibold">{{ $invoice_obj->created_at->format('d-m-Y H:i') }}</p>
-                        </div>
-                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
-                            <p class="text-gray-600 dark:text-gray-400">Data aktualizacji</p>
-                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 font-semibold">{{ $invoice_obj->updated_at->format('d-m-Y H:i') }}</p>
-                        </div>
+                        <!--PODSUMOWANIE-->
+
+                        <!--STATUS I UWAGI-->
+                        <x-container-gray class="col-span-2">
+                            <x-text-cell>
+                                <x-invoice-status :invoice="$invoice_obj" />
+                                <x-invoice-progress :invoice="$invoice_obj" />
+                            </x-text-cell>
+                            <x-text-cell>
+                                <p class="text-gray-600 dark:text-gray-300 test-sm">
+                                    Uwagi
+                                </p>
+                                <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
+                                    {{ $invoice_obj->notes }}
+                                </p>
+                            </x-text-cell>
+                        </x-container-gray>
+                        <!--STATUS I UWAGI-->
                     </div>
-                    <div class="mt-8 flex md:hidden justify-end items-center space-x-4">
-                        <!-- Pobierz PDF -->
-                        <a href="{{route('invoice.download', $invoice_obj)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                            <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
-                        </a>
+                    <!--BODY-->
 
-                        <!-- Edytuj -->
-                        <a href="{{ route('invoice.edit', $invoice) }}" class="text-white bg-indigo-500 hover:bg-indigo-600 focus:ring-4 focus:ring-indigo-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                    <!--PRZYCISKI POD A4-->
+                    <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
+                        <!-- EDYTUJ -->
+                        <x-button-link-blue href="{{ route('invoice.edit', $invoice) }}">
                             <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
-                        </a>
+                        </x-button-link-blue>
+                        <!--EDYTUJ-->
 
-                        <!-- Usuń -->
-                        <form action="{{ route('invoice.delete', $invoice) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tą fakturę?');">
+                        <!--USUŃ-->
+                        <form action="{{ route('invoice.delete', $invoice) }}" method="POST"
+                            onsubmit="return confirm('Czy na pewno chcesz usunąć tą fakturę?');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-red-500 hover:text-white border border-red-600 hover:bg-red-500 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
+                            <x-button-red type="submit">
+                                <i class="fa-solid fa-trash mr-2"></i>Usuń
+                            </x-button-red>
                         </form>
+                        <!--USUŃ-->
                     </div>
-                    <div class="mt-8 flex md:hidden justify-start items-center space-x-4">
+                    <div class="mt-8 flex justify-end items-center space-x-4">
                         <!-- Utwórz Fakturę Sprzedaży -->
                         @if($invoice_obj['invoice_type'] == 'faktura proforma')
                         @if($invoice_obj->invoice_id == null)
-                        <a href="{{route('invoice.store.from', $invoice_obj)}}" class="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                        <x-button-link-green href="{{route('invoice.store.from', $invoice_obj)}}">
                             <i class="fa-solid fa-file-invoice-dollar mr-2"></i>Utwórz Fakturę Sprzedaży
-                        </a>
+                        </x-button-link-green>
                         @endif
                         @endif
-                    </div>
-                    <div class="mt-8 flex md:hidden justify-start items-center space-x-4">
+                        <!-- Utwórz Fakturę Sprzedaży -->
+
+                        <!-- Wyślij Fakturę do Klienta -->
                         @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
-                        <!-- Wyślij Fakturę do Klienta -->
-                        <a href="{{route('invoice.send', $invoice_obj)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
+                        <x-button-link-orange href="{{route('invoice.send', $invoice_obj)}}">
                             <i class="fa-solid fa-paper-plane mr-2"></i>Wyślij Fakturę
-                        </a>
+                        </x-button-link-orange>
                         @else
-                        <!-- Wyświetl informację o braku adresu e-mail -->
-                        <button type="button" class="text-gray-600 bg-gray-400 cursor-not-allowed font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none" disabled>
+                        <x-button-link-disabled type="button" disabled>
                             <i class="fa-solid fa-paper-plane mr-2"></i>Brak adresu e-mail
-                        </button>
+                        </x-button-link-disabled>
                         @endif
                         @endif
+                        <!-- Wyślij Fakturę do Klienta -->
+
+                        <!-- Pobierz PDF -->
+                        <x-button-link-blue href="{{route('invoice.download', $invoice_obj)}}">
+                            <i class="fa-solid fa-file-pdf mr-2"></i>Pobierz PDF
+                        </x-button-link-blue>
+                        <!-- Pobierz PDF -->
                     </div>
-                    <div class="mt-8 flex md:hidden justify-start items-center space-x-4 w-full">
+                    <!--PRZYCISKI POD A4-->
+
+                    <!--ALERT-->
+                    <div class="my-8 hidden md:flex justify-end items-center space-x-4 w-full">
                         @if($invoice_obj->client)
                         @if($invoice_obj->client->email != null || $invoice_obj->client->email2 != null)
                         @else
@@ -377,6 +414,50 @@
                         @endif
                         @endif
                     </div>
+                    <script>
+                        $(document).ready(function() {
+                            $('#close-alert').click(function() {
+                                $(this).closest('div[role="alert"]').fadeOut();
+                            });
+                        });
+                    </script>
+                    <!--ALERT-->
+                    <!--INFO-->
+                    <div class="mt-8 grid grid-cols-2 md:gap-4">
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                Utworzone przez
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-400 text-sm md:text-xl font-semibold">
+                                {{ $invoice_obj->user->name ?? '' }}
+                            </p>
+                        </div>
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                Dane należące do
+                            </p>
+                            <p class="text-gray-900 dark:text-gray-400 text-sm md:text-xl font-semibold">
+                                {{ $invoice_obj->company->name ?? '' }}
+                            </p>
+                        </div>
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                Data utworzenia
+                            </p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 font-semibold">
+                                {{ $invoice_obj->created_at->format('d-m-Y H:i') }}
+                            </p>
+                        </div>
+                        <div class="col-span-2 md:grid  md:gap-4 p-4 border-b dark:border-gray-700">
+                            <p class="text-gray-600 dark:text-gray-400">
+                                Data aktualizacji
+                            </p>
+                            <p class="text-sm md:text-xl text-gray-900 dark:text-gray-400 font-semibold">
+                                {{ $invoice_obj->updated_at->format('d-m-Y H:i') }}
+                            </p>
+                        </div>
+                    </div>
+                    <!--INFO-->
                 </div>
             </div>
             <!--END WIDGET TASK-->

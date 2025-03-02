@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Mail\OfferMail;
 use App\Models\Client;
+use App\Models\Invoice;
 use App\Models\Offer;
 use App\Models\OfferItem;
 use App\Models\Product;
+use App\Models\Project;
 use App\Models\Service;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
 
 class OfferController extends Controller
@@ -59,15 +62,20 @@ class OfferController extends Controller
     /**
      * Pokazuje formularz tworzenia nowej oferty.
      */
-    public function create()
+    public function create(Project $project)
     {
         $clients = Client::where('company_id', $this->get_company_id())->get();
         $services = Service::where('company_id', $this->get_company_id())->get();
         $products = Product::where('company_id', $this->get_company_id())->get();
         $offerNumber = $this->get_offer_number();
         $company = $this->get_company();
-        return view('admin.offer.create', compact('clients', 'offerNumber', 'company', 'services', 'products'));
+        $user = User::where('id', auth()->id())->first();
+        $set_client = $user->setting_client;
+        $invoice = Invoice::where('id', 61)->first();
+        $create_client = Client::where('id', $project->client_id)->first();
+        return view('admin.offer.create', compact('create_client','project','user','invoice','clients', 'offerNumber', 'company', 'services', 'products', 'set_client'));
     }
+
     /**
      * Pokazuje formularz tworzenia nowej oferty.
      */
@@ -94,20 +102,26 @@ class OfferController extends Controller
         $vatAmount = 0;
         $total = 0;
 
-        // Obliczanie terminu płatności
-        $dueDate = $this->payment_term_to_due_date($request->input('payment_term'), $request->input('issue_date'));
-
         // Zapisuje pusty numer konta
-        if ($request->input('bank') == null) {
-            $bank = '';
+        $bank = $this->validate_bank_number($request);
+
+        if ($request->input('number') == null) {
+            // Konwersja daty za pomocą Carbon
+            $date = Carbon::createFromFormat('d/m/Y', $request->input('issue_date'));
+
+            // Wydobycie miesiąca i roku
+            $year = $date->format('Y');  // 2024
+            $numc = $this->get_offer_number_by_year($year);
+            $number = 'OFR/' . $numc . '/' . $year;
         } else {
-            $bank = $request->input('bank');
+            $number = 'OFR/' . $request->input('number');
         }
+
         $user = User::where('id', auth()->id())->first();
-        // Ustawiamy obliczoną datę jako termin płatności
-        $offer->due_date = $dueDate;
-        $offer->number = $request->input('number');
-        $offer->issue_date = $request->input('issue_date');
+        $offer->number = $number;
+        $offer->issue_date = Carbon::createFromFormat('d/m/Y', $request->input('issue_date'))->format('Y-m-d');
+        $offer->due_date = Carbon::createFromFormat('d/m/Y', $request->input('due_date'))->format('Y-m-d');
+        $offer->due_term = $request->input('due_term');
         $offer->company_id = $request->input('company_id');
         $offer->client_id = $request->input('client_id');
         $offer->seller_name = $request->input('seller_name');
@@ -117,13 +131,16 @@ class OfferController extends Controller
         $offer->buyer_name = $request->input('buyer_name');
         $offer->buyer_adress = $request->input('buyer_adress');
         $offer->buyer_tax_id = $request->input('buyer_vat_number');
-        $offer->buyer_person_name = $request->input('buyer_person_name');
-        $offer->buyer_person_email = $request->input('buyer_person_email');
+        $offer->buyer_person_name = $request->input('order_person_name');
+        $offer->buyer_person_email = $request->input('order_person_email');
+        $offer->project_scope = $request->input('project_scope');
+        $offer->project_id = $request->input('project_id');
         $offer->notes = $request->input('notes');
         $offer->subtotal = $subtotal;
         $offer->vat = $vatAmount;
         $offer->total = $total;
         $offer->user_id = $user->id;
+        $offer->status = 'Przygotowana';
         $offer->save();
 
         // Zapis pozycji faktury do tabeli 'offer_items'
@@ -169,6 +186,9 @@ class OfferController extends Controller
     public function show(Offer $offer)
     {
         $offer_obj = $offer;
+        if($offer_obj->project_id == null){
+            return redirect()->route('offer')->with('fail', 'Oferta nie posiada już wsparcia.');
+        }
         $offerItems = $this->get_offer_items_by_offer_id($offer_obj->id);
         return view('admin.offer.show', compact('offer', 'offer_obj', 'offerItems'));
     }
@@ -256,5 +276,9 @@ class OfferController extends Controller
         }
 
         return redirect()->back()->with('success', 'Oferta została wysłana pomyślnie!');
+    }
+    public function value($year)
+    {
+        return $this->get_offer_number_by_year($year);
     }
 }

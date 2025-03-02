@@ -1,13 +1,7 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Oferty') }}
-        </h2>
-    </x-slot>
-
-    @include('admin.elements.alerts')
-
-    <div class="py-12">
+    <div class="py-12 pt-48">
+        @include('admin.elements.alerts')
+        <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="px-6 lg:px-8 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -59,13 +53,6 @@
                             <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
                                 Oferty
                             </h1>
-                            @if ($company)
-                            <!-- Nowa Faktura -->
-                            <a href="{{ route('offer.create') }}" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                                <i class="fa-solid fa-plus mr-2"></i>Nowa Oferta
-                            </a>
-                            @else
-                            @endif
                         </div>
                     </div>
 
@@ -410,6 +397,9 @@
                                         Numer oferty
                                     </th>
                                     <th scope="col" class="px-6 py-3">
+                                        Projekt
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
                                         Klient
                                     </th>
                                     <th scope="col" class="px-6 py-3">
@@ -419,13 +409,10 @@
                                         Kwota brutto
                                     </th>
                                     <th scope="col" class="px-6 py-3">
+                                        Status
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
                                         Podgląd
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Wyślij mailem
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Pobierz PDF
                                     </th>
                                 </tr>
                             </thead>
@@ -433,10 +420,7 @@
                                 @if ($offers->isEmpty())
                                 <tr class="bg-white dark:bg-gray-800">
                                     <td colspan="7" class="px-6 py-4">
-                                        <div class="text-center py-8">
-                                            <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
-                                            <p class="text-gray-500 dark:text-gray-400">Brak ofert do wyświetlenia.</p>
-                                        </div>
+                                        <x-empty-place />
                                     </td>
                                 </tr>
                                 @else
@@ -481,38 +465,44 @@
                                 @endphp
 
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                                    <td class="px-6 py-4 min-w-48">
-                                        <div class="flex justify-start items-center w-full">
-                                            <span class="inline-flex items-center gap-x-1 py-1 px-2 rounded-full text-xs font-bold bg-gray-800 text-white dark:bg-sky-500 dark:text-white  mr-2">OFR</span>
-                                            {{ $offer->number }}
-                                        </div>
+                                    <td class="px-3 py-2 min-w-48">
+                                        <x-offer-label :offer="$offer"/>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    @if($offer->project != null)
+                                    <td class="px-3 py-2">
+                                        <p class="text-gray-900 dark:text-gray-50 font-semibold text-nowrap">
+                                            <x-label-link-project href="{{route('project.show', $offer->project)}}">
+                                                {{ $offer->project->shortcut }}
+                                            </x-label-link-project>
+                                        </p>
+                                    </td>
+                                    @else
+                                    <td class="px-3 py-2">
+                                    </td>
+                                    @endif
+                                    <td class="px-3 py-2">
                                         @if($offer->client)
-                                        <a href="{{ route('client.show', $offer->client->id) }}" class="text-blue-600 dark:text-blue-400 hover:underline">{{$offer->client->name}}</a>
+                                        <p class="text-gray-900 dark:text-gray-50 font-semibold">
+                                            <x-label-link-company href="{{ route('client.show', $offer->client->id) }}">
+                                                {{$offer->client->name}}
+                                            </x-label-link-company>
+                                        </p>
                                         @else
                                         {{$offer->buyer_name}}
                                         @endif
                                     </td>
-                                    <td class="px-6 py-4 text-sm min-w-32">
+                                    <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
                                         {{ $offer->subtotal }} zł
                                     </td>
-                                    <td class="px-6 py-4 font-semibold text-lg min-w-32 text-gray-50">
+                                    <td class="px-3 py-2 text-sm min-w-32 text-gray-700 dark:text-gray-50">
                                         {{ $offer->total }} zł
                                     </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{ route('offer.show', $offer) }}" class="py-2.5 px-5 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-4 focus:ring-gray-200">
+                                    <td class="px-3 py-2 text-sm min-w-32">
+                                        <x-offer-status :offer="$offer" />
+                                    </td>
+                                    <td class="px-3 py-2">
+                                        <a href="{{ route('offer.show', $offer) }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-lg font-semibold text-sm text-white dark:text-gray-900 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                             <i class="fa-solid fa-eye"></i>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{route('offer.send',$offer)}}" class="text-white bg-orange-500 hover:bg-orange-600 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                                            <i class="fa-solid fa-paper-plane"></i>
-                                        </a>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <a href="{{route('offer.download', $offer)}}" class="text-white bg-blue-500 hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none">
-                                            <i class="fa-solid fa-file-pdf"></i>
                                         </a>
                                     </td>
                                 </tr>

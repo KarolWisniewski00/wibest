@@ -1,25 +1,37 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 dark:border-gray-700 shadow fixed w-full">
     <!-- Primary Navigation Menu -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="w-full">
         <div class="flex justify-between h-16">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center">
+                <div class="shrink-0 flex items-center w-64 justify-center">
                     <a href="{{ route('dashboard') }}">
-                        <span class="sm:order-1 text-indigo-600 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-indigo-500" style='font-family: "Raleway", sans-serif;'>WIBEST</span>
+                        <span class="sm:order-1 text-lime-600 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-lime-500" style='font-family: "Raleway", sans-serif;'>WIBEST</span>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 md:-my-px md:ms-10 md:flex">
+                <div class="hidden space-x-8 xl:-my-px xl:ms-4 xl:flex">
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Panel główny') }}
+                        <i class="fa-solid fa-house"></i>
                     </x-nav-link>
-                    <x-nav-link href="{{ route('work.session') }}" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
-                        {{ __('Mierzenie Czasu Pracy') }}
+                    <x-nav-link href="{{ route('team') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
+                        <i class="fa-solid fa-users mr-2"></i>Zespół
+                    </x-nav-link>
+                    <x-nav-link href="" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
+                        <i class="fa-solid fa-calendar-days mr-2"></i>Kalendarz
+                    </x-nav-link>
+                    <x-nav-link href="" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
+                        <i class="fa-solid fa-inbox mr-2"></i>Wnioski
+                    </x-nav-link>
+                    <x-nav-link href="" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
+                        <i class="fa-solid fa-clock mr-2"></i>RCP
+                    </x-nav-link>
+                    <x-nav-link href="" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
+                        <i class="fa-solid fa-chart-line mr-2"></i>Raporty
                     </x-nav-link>
                     <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
-                        {{ __('Ustawienia') }}
+                        <i class="fa-solid fa-gear"></i>
                     </x-nav-link>
                 </div>
             </div>
@@ -78,7 +90,7 @@
                 @endif
 
                 <!-- Settings Dropdown -->
-                <div class="ms-3 relative">
+                <div class="me-2 relative">
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
                             @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
@@ -131,7 +143,7 @@
             </div>
 
             <!-- Hamburger -->
-            <div class="-me-2 flex items-center md:hidden">
+            <div class="me-2 flex items-center xl:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
