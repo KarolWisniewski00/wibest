@@ -1,4 +1,4 @@
-<div class="max-w">
+<div class="max-w w-full">
     <!-- SearchBox -->
     <div class="relative">
         <div id="search-container" class="relative flex flex-row justify-center items-center">

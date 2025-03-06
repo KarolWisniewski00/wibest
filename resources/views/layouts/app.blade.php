@@ -41,7 +41,151 @@
             {{ $slot }}
         </main>
     </div>
+    <input type="hidden" id="work_start" value="{{ route('api.work.start', '') }}">
+    <input type="hidden" id="work_stop" value="{{ route('api.work.stop', '') }}">
+    <input type="hidden" id="work_sessions" value="{{ route('api.work.session', ['','']) }}">
+    <input type="hidden" id="user_id" value="{{ $user_id }}">
+    <input type="hidden" id="company_id" value="{{ $company_id }}">
+    <input type="hidden" id="work_sessions_logged_user" value="{{ $work_sessions_logged_user }}">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            class WorkSessions {
+                constructor() {
+                    const self = this;
+                    self.timerInterval = null; // Zmienna do przechowywania interwału
+                    self.elapsedSeconds = 0; // Licznik sekund
+                    self.workStart = $('#work_start').val(); // Adres do rozpoczęcia pracy
+                    self.workStop = $('#work_stop').val(); // Adres do zakończenia pracy
+                    self.workSessions = $('#work_sessions').val(); // Adres do sesji pracy
+                    self.userId = $('#user_id').val(); // Id użytkownika
+                    self.companyId = $('#company_id').val(); // Id firmy
+                    self.session_id = null; // Id sesji
+                    self.session_status = false; // Status sesji
+                }
+                // Funkcja do liczenia czasu
+                counting() {
+                    const self = this;
+                    self.timerInterval = setInterval(() => {
+                        self.elapsedSeconds++;
+                        $('#timer').text(self.formatTime(self.elapsedSeconds));
+                    }, 1000);
+                    $('#startButton').addClass('hidden');
+                    $('#stopButton').removeClass('hidden');
+                }
 
+                // Funkcja do pobierania sesji pracy
+                updateWidgetWorkSession() {
+                    const self = this;
+                    $.ajax({
+                        url: self.workSessions + '/' + self.userId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            if (response.message === 'W trakcie pracy') {
+                                self.session_id = response.work_session_id;
+                                self.session_status = response.work_session_status;
+                                const dateString = response.work_session_start_time;
+                                const date = new Date(dateString.replace(" ", "T")); // Konwersja na format ISO 8601
+                                const now = new Date(); // Aktualny czas
+                                const diffInSeconds = Math.floor((now - date) / 1000);
+                                self.elapsedSeconds = diffInSeconds;
+                                self.counting();
+                            }
+                        },
+                        error: function(xhr, status, error) {}
+                    });
+                }
+
+                // Funkcja do rozpoczęcia pracy
+                ajaxStart() {
+                    const self = this;
+                    $.ajax({
+                        url: self.workStart + '/' + self.userId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log(self.workStart + '/' + self.userId)
+                            self.session_id = response.work_session_id;
+                            console.log(response)
+                        },
+                        error: function(xhr, status, error) {}
+                    });
+                }
+
+                // Funkcja do zakończenia pracy
+                ajaxStop() {
+                    const self = this;
+                    $.ajax({
+                        url: self.workStop + '/' + self.session_id,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function(response) {
+                            console.log(self.workStop + '/' + self.session_id)
+                            console.log(response)
+                        },
+                        error: function(xhr, status, error) {}
+                    });
+                }
+
+                // Funkcja do aktualizacji daty
+                updateTodayDate() {
+                    const self = this;
+                    const days = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+                    const months = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
+                    const today = new Date();
+                    const formattedDate = `${days[today.getDay()]} ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+                    $('#date').text(formattedDate);
+                }
+
+                // Funkcja do formatowania czasu
+                formatTime(seconds) {
+                    const self = this;
+                    const hrs = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                    const secs = String(seconds % 60).padStart(2, '0');
+                    return `${hrs}:${mins}:${secs}`;
+                }
+
+                // Funkcja do rozpoczęcia liczenia czasu
+                startTimer() {
+                    const self = this;
+                    self.ajaxStart();
+                    self.counting();
+                }
+
+                // Funka do zakończenia liczenia czasu
+                stopTimer() {
+                    const self = this;
+                    self.ajaxStop();
+                    clearInterval(self.timerInterval);
+                    self.elapsedSeconds = 0;
+                    $('#timer').text(self.formatTime(self.elapsedSeconds));
+                    $('#stopButton').addClass('hidden');
+                    $('#startButton').removeClass('hidden');
+                }
+
+                // Funkcja do uruchomienia
+                run() {
+                    const self = this;
+                    self.updateTodayDate();
+                    self.updateWidgetWorkSession();
+
+                    $('#startButton').click(function() {
+                        self.startTimer();
+                    });
+
+                    $('#stopButton').click(function() {
+                        self.stopTimer();
+                    });
+                }
+            }
+
+            // Main
+            var workSessions = new WorkSessions();
+            workSessions.run();
+        });
+    </script>
     @stack('modals')
 
     @livewireScripts

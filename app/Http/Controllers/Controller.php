@@ -214,7 +214,7 @@ class Controller extends BaseController
         return WorkSession::where('company_id', $this->get_company_id())
             ->orderBy('start_time', 'desc')  // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(20);
     }
     /**
      * Zwraca klientów domyślnie
@@ -433,7 +433,7 @@ class Controller extends BaseController
     public function get_invoice_number_by_month_year($month, $year, $type)
     {
         // Znajdź ostatnią fakturę, aby określić autoinkrementację
-        $invoices = Invoice::whereYear('created_at', $year)
+        $invoices = Invoice::whereYear('issue_date', $year)
             ->whereMonth('created_at', $month)
             ->where('invoice_type', $type)
             ->where('company_id', $this->get_company_id())

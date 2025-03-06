@@ -16,6 +16,7 @@
             </div>
         </div>
     </div>
+
     @else
     @include('admin.elements.end_config')
     @endif

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CostController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RaportController;
+use App\Http\Controllers\RCPController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
@@ -65,14 +67,18 @@ Route::middleware([
 ])->group(function () {
     Route::prefix('dashboard')->group(function () {
 
-        Route::post('/ocr', [OcrController::class, 'extractText'])->name('ocr'); //TEST
-
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::prefix('team')->group(function () {
             Route::get('/', [TeamController::class, 'index'])->name('team');
         });
-
+        Route::prefix('calendar')->group(function () {
+            Route::get('/', [CalendarController::class, 'index'])->name('calendar');
+        });
+        Route::prefix('rcp')->group(function () {
+            Route::get('/', [RCPController::class, 'index'])->name('rcp');
+            Route::get('show/{work_session}', [RCPController::class, 'show'])->name('rcp.show');
+        });
         Route::prefix('work')->group(function () {
             Route::prefix('session')->group(function () {
                 Route::get('/', [WorkSessionController::class, 'index'])->name('work.session');

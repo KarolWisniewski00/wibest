@@ -1,7 +1,7 @@
 <x-app-layout class="flex">
     @include('admin.elements.alerts')
     @if ($company)
-    <aside id="sidebar-multi-level-sidebar" class="fixed mt-16 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+    <aside id="sidebar-multi-level-sidebar" class="fixed mt-20 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 border-t-2 dark:border-gray-600">
             <ul class="space-y-2 font-medium">
                 <li>
