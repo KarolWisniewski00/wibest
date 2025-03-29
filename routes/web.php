@@ -76,8 +76,17 @@ Route::middleware([
             Route::get('/', [CalendarController::class, 'index'])->name('calendar');
         });
         Route::prefix('rcp')->group(function () {
-            Route::get('/', [RCPController::class, 'index'])->name('rcp');
-            Route::get('show/{work_session}', [RCPController::class, 'show'])->name('rcp.show');
+            Route::prefix('work_session')->group(function () {
+                Route::get('/', [RCPController::class, 'index'])->name('rcp');
+                Route::get('show/{work_session}', [RCPController::class, 'show'])->name('rcp.show');
+                Route::delete('delete/{work_session}', [RCPController::class, 'delete'])->name('rcp.delete');
+            });
+            Route::prefix('events')->group(function () {
+                Route::get('/', [EventController::class, 'index'])->name('event');
+                Route::get('show/{event}', [EventController::class, 'show'])->name('event.show');
+                Route::delete('delete/{event}', [EventController::class, 'delete'])->name('event.delete');
+            });
+
         });
         Route::prefix('work')->group(function () {
             Route::prefix('session')->group(function () {

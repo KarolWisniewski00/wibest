@@ -5,7 +5,7 @@
     <aside id="sidebar-multi-level-sidebar" class="fixed mt-20 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
         <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 border-t-2 dark:border-gray-600">
             <ul class="space-y-2 font-medium">
-                <li>
+            <li>
                     <input placeholder="Szukaj" type="text" class="datepicker h-12 w-full appearance-none rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-100 pr-4 outline-none  dark:bg-gray-700 dark:text-gray-50 dark:focus:border-2 dark:focus:border-lime-500" />
                 </li>
                 <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
@@ -88,7 +88,7 @@
                     <!--CONTENT-->
                     <div class="px-4 py-5 sm:px-6 lg:px-8">
                         <!--POWRÓT-->
-                        <x-button-link-back href="{{ route('rcp') }}" class="text-lg mb-4">
+                        <x-button-link-back href="{{ route('event') }}" class="text-lg mb-4">
                             <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
                         </x-button-link-back>
                         <!--POWRÓT-->
@@ -96,17 +96,17 @@
                             <!--status-->
                             <x-text-cell class="mx-4">
                                 <p class="text-gray-700 dark:text-gray-300 test-sm">
-                                    Status
+                                    Zdarzenie
                                 </p>
                                 <div class="flex justify-start items-center w-full justify-start">
-                                    @if($work_session->status == 'W trakcie pracy')
-                                    <span class="inline-flex items-center text-yellow-500 dark:text-yellow-300 font-semibold text-xl uppercase tracking-widest hover:text-yellow-700 dark:hover:text-yellow-300 transition ease-in-out duration-150">
-                                        {{ $work_session->status }}
+                                    @if($event->event_type == 'stop')
+                                    <span class="inline-flex items-center text-red-500 dark:text-red-300 font-semibold text-xl uppercase tracking-widest hover:text-red-700 dark:hover:text-red-300 transition ease-in-out duration-150">
+                                        Stop
                                     </span>
                                     @endif
-                                    @if($work_session->status == 'Praca zakończona')
+                                    @if($event->event_type == 'start')
                                     <span class="inline-flex items-center text-green-300 dark:text-green-300 font-semibold text-xl uppercase tracking-widest hover:text-green-700 dark:hover:text-green-300 transition ease-in-out duration-150">
-                                        {{ $work_session->status }}
+                                        Start
                                     </span>
                                     @endif
                                 </div>
@@ -115,91 +115,20 @@
                             <!--Czas w pracy-->
                             <x-text-cell class="mx-4">
                                 <p class="text-gray-700 dark:text-gray-300 test-sm">
-                                    Czas w pracy
+                                    Czas
                                 </p>
                                 <div class="flex justify-start items-center w-full justify-start">
                                     <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        {{ $work_session->time_in_work }}
+                                        {{ $event->time }}
                                     </span>
                                 </div>
                             </x-text-cell>
                             <!--Czas w pracy-->
                         </x-container-gray>
-                        <div class="grid grid-cols-2 mt-4 gap-4">
-                            @if($work_session->eventStart != null)
-                            <x-container-gray class="px-0">
-                                <!--status-->
-                                <x-text-cell class="mx-4">
-                                    <p class="text-gray-700 dark:text-gray-300 test-sm">
-                                        Zdarzenie
-                                    </p>
-                                    <div class="flex justify-start items-center w-full justify-start">
-                                        @if($work_session->eventStart->event_type == 'stop')
-                                        <span class="inline-flex items-center text-red-500 dark:text-red-300 font-semibold text-xl uppercase tracking-widest hover:text-red-700 dark:hover:text-red-300 transition ease-in-out duration-150">
-                                            Stop
-                                        </span>
-                                        @endif
-                                        @if($work_session->eventStart->event_type == 'start')
-                                        <span class="inline-flex items-center text-green-300 dark:text-green-300 font-semibold text-xl uppercase tracking-widest hover:text-green-700 dark:hover:text-green-300 transition ease-in-out duration-150">
-                                            Start
-                                        </span>
-                                        @endif
-                                    </div>
-                                </x-text-cell>
-                                <!--status-->
-                                <!--Czas w pracy-->
-                                <x-text-cell class="mx-4">
-                                    <p class="text-gray-700 dark:text-gray-300 test-sm">
-                                        Czas
-                                    </p>
-                                    <div class="flex justify-start items-center w-full justify-start">
-                                        <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                            {{ $work_session->eventStart->time }}
-                                        </span>
-                                    </div>
-                                </x-text-cell>
-                                <!--Czas w pracy-->
-                            </x-container-gray>
-                            @endif
-                            @if($work_session->eventStop != null)
-                            <x-container-gray class="px-0">
-                                <!--status-->
-                                <x-text-cell class="mx-4">
-                                    <p class="text-gray-700 dark:text-gray-300 test-sm">
-                                        Zdarzenie
-                                    </p>
-                                    <div class="flex justify-start items-center w-full justify-start">
-                                        @if($work_session->eventStop->event_type == 'stop')
-                                        <span class="inline-flex items-center text-red-500 dark:text-red-300 font-semibold text-xl uppercase tracking-widest hover:text-red-700 dark:hover:text-red-300 transition ease-in-out duration-150">
-                                            Stop
-                                        </span>
-                                        @endif
-                                        @if($work_session->eventStop->event_type == 'start')
-                                        <span class="inline-flex items-center text-green-300 dark:text-green-300 font-semibold text-xl uppercase tracking-widest hover:text-green-700 dark:hover:text-green-300 transition ease-in-out duration-150">
-                                            Start
-                                        </span>
-                                        @endif
-                                    </div>
-                                </x-text-cell>
-                                <!--status-->
-                                <!--Czas w pracy-->
-                                <x-text-cell class="mx-4">
-                                    <p class="text-gray-700 dark:text-gray-300 test-sm">
-                                        Czas
-                                    </p>
-                                    <div class="flex justify-start items-center w-full justify-start">
-                                        <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                            {{ $work_session->eventStop->time }}
-                                        </span>
-                                    </div>
-                                </x-text-cell>
-                                <!--Czas w pracy-->
-                            </x-container-gray>
-                            @endif
-                        </div>
+
                         <div class="flex justify-end mt-4">
                             @if($role == 'admin')
-                            <form action="{{route('rcp.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                            <form action="{{route('event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">

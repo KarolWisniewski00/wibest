@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\Company;
 use App\Models\Cost;
+use App\Models\Event;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Models\Offer;
@@ -25,6 +26,13 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
+    public function getCurrentMonthString()
+    {
+        $startOfMonth = now()->startOfMonth()->format('j M');
+        $endOfMonth = now()->endOfMonth()->format('j M Y');
+        return "$startOfMonth - $endOfMonth";
+    }
+    
     public function is_website_work($url)
     {
         try {
@@ -117,6 +125,13 @@ class Controller extends BaseController
         }
         return false;
     }
+    public function get_events_logged_user()
+    {
+        return Event::where('company_id', $this->get_company_id())
+            ->where('user_id', auth()->id())
+            ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
+            ->paginate(10);
+    }
     public function get_work_sessions_logged_user()
     {
         return WorkSession::where('company_id', $this->get_company_id())
@@ -187,6 +202,12 @@ class Controller extends BaseController
             ->orderBy('created_at', 'desc')  // Sortowanie malejąco
             ->paginate(10);
     }
+    public function get_all_events()
+    {
+        return Event::where('company_id', $this->get_company_id())
+            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
+            ->paginate(10);
+    }
     /**
      * Zwraca wszystkich klientów
      */
@@ -212,8 +233,15 @@ class Controller extends BaseController
     public function get_work_sessions()
     {
         return WorkSession::where('company_id', $this->get_company_id())
-            ->orderBy('start_time', 'desc')  // Sortowanie malejąco
-            ->orderBy('created_at', 'desc')
+            ->with(['eventStart', 'eventStop'])
+            ->orderByDesc(Event::select('time')->whereColumn('events.id', 'work_sessions.event_start_id'))
+            ->orderByDesc('created_at')
+            ->paginate(20);
+    }
+    public function get_events()
+    {
+        return Event::where('company_id', $this->get_company_id())
+            ->orderByDesc('created_at')
             ->paginate(20);
     }
     /**

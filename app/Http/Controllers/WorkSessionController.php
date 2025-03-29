@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\WorkSessionRequest;
+use App\Models\Event;
 use App\Models\User;
 use App\Models\WorkSession;
 use Illuminate\Http\Request;
@@ -14,22 +15,34 @@ class WorkSessionController extends Controller
     // Funkcja do rozpoczęcia pracy
     public function startWork($user_id)
     {
+        $now = Carbon::now();
         Carbon::setLocale('pl');
+        // Tworzenie eventu startowego
+        $event = Event::create([
+            'time' => $now,
+            'location' => '',
+            'device' => '',
+            'event_type' => 'start',
+            'user_id' => $user_id,
+            'company_id' => $this->get_company_id_by_user_id($user_id),
+            'created_user_id' => $user_id,
+        ]);
+
+        // Tworzenie sesji pracy
         $workSession = WorkSession::create([
             'company_id' => $this->get_company_id_by_user_id($user_id),
             'user_id' => $user_id,
             'created_user_id' => $user_id,
-            'start_time' => Carbon::now(),
-            'end_time' => null,
+            'event_start_id' => $event->id,
             'status' => 'W trakcie pracy',
-            'start_day_of_week' => Carbon::now()->translatedFormat('l'), // Zapisuje dzień tygodnia jako pełną nazwę (np. Monday)
+            'time_in_work' => 0,
         ]);
 
         return response()->json([
             'message' => 'Praca rozpoczęta',
             'work_session_id' => intval($workSession->id),
             'work_session_status' => 'W trakcie pracy',
-            'work_session_start_time' => $workSession->start_time,
+            'work_session_start_time' => $now,
         ], 200);
     }
 
@@ -40,20 +53,39 @@ class WorkSessionController extends Controller
         $workSession = WorkSession::find($id);
         if ($workSession) {
             $endTime = Carbon::now();
-            $startTime = Carbon::parse($workSession->start_time);
-            $timeInWork = $startTime->diff($endTime)->format('%H:%I:%S');
 
+            // Pobranie eventu startowego
+            $startEvent = Event::find($workSession->event_start_id);
+            if (!$startEvent) {
+                return response()->json(['message' => 'Brak rozpoczęcia pracy'], 400);
+            }
+
+            // Obliczenie przepracowanego czasu
+            $timeInWork = Carbon::parse($startEvent->time)->diff($endTime)->format('%H:%I:%S');
+
+
+            // Tworzenie eventu stop
+            $stopEvent = Event::create([
+                'time' => $endTime,
+                'location' => '',
+                'device' => '',
+                'event_type' => 'stop',
+                'user_id' => $workSession->user_id,
+                'company_id' => $workSession->company_id,
+                'created_user_id' => $workSession->created_user_id,
+            ]);
+
+            // Aktualizacja sesji pracy
             $workSession->update([
-                'end_time' => $endTime,
+                'event_stop_id' => $stopEvent->id,
                 'status' => 'Praca zakończona',
-                'end_day_of_week' => $endTime->translatedFormat('l'),
                 'time_in_work' => $timeInWork,
             ]);
             return response()->json([
                 'message' => 'Praca zakończona',
                 'work_session_id' => intval($id),
                 'work_session_status' => $workSession->status,
-                'work_session_start_time' => $workSession->start_time,
+                'work_session_start_time' => $timeInWork,
             ], 200);
         }
 
@@ -66,14 +98,15 @@ class WorkSessionController extends Controller
     public function getWorkSession($user_id)
     {
         $latestWorkSession = WorkSession::where('user_id', $user_id)
-            ->orderBy('start_time', 'desc')
+            ->with('eventStart')
+            ->orderByDesc(Event::select('time')->whereColumn('events.id', 'work_sessions.event_start_id'))
             ->first();
-        if ($latestWorkSession->end_time == null) {
+        if ($latestWorkSession->event_stop_id == null) {
             return response()->json([
                 'message' => 'W trakcie pracy',
                 'work_session_id' => intval($latestWorkSession->id),
                 'work_session_status' => $latestWorkSession->status,
-                'work_session_start_time' => $latestWorkSession->start_time,
+                'work_session_start_time' => optional($latestWorkSession->eventStart)->time,
             ], 200);
         } else {
             return response()->json([
@@ -83,9 +116,9 @@ class WorkSessionController extends Controller
     }
     public function index()
     {
-        if($this->isAdmin()){
+        if ($this->isAdmin()) {
             $work_sessions = $this->get_work_sessions();
-        }else{
+        } else {
             $work_sessions = $this->get_work_sessions_logged_user();
         }
         $work_sessions_sugestion = $this->get_sugestion_work_sessions();

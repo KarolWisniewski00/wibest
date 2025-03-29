@@ -117,7 +117,7 @@
                             @if ($company)
                             <ul id="list" class="grid w-full gap-y-4 block md:hidden">
                                 <!-- EMPTY PLACE -->
-                                @if ($work_sessions->isEmpty())
+                                @if ($events->isEmpty())
                                 <x-empty-place />
                                 @else
                                 <!-- EMPTY PLACE -->
@@ -141,15 +141,15 @@
                                 ];
                                 @endphp
 
-                                @foreach ($work_sessions as $key => $work_session)
+                                @foreach ($events as $key => $event)
                                 @php
                                 // Pobieramy miesiąc z daty faktury (załóżmy, że jest polem issue_date)
-                                $work_sessionMonth = \Carbon\Carbon::parse($work_session->issue_date)->month;
+                                $eventMonth = \Carbon\Carbon::parse($event->issue_date)->month;
 
                                 // Jeśli miesiąc zmienił się w stosunku do poprzedniego, wyświetlamy nazwę nowego miesiąca
-                                if ($work_sessionMonth !== $currentMonth) {
-                                $currentMonth = $work_sessionMonth;
-                                $monthName = $months[$work_sessionMonth];
+                                if ($eventMonth !== $currentMonth) {
+                                $currentMonth = $eventMonth;
+                                $monthName = $months[$eventMonth];
                                 @endphp
                                 <div id="s-{{$key}}"></div>
                                 <li id="e-{{$key}}" class="my-4">
@@ -171,19 +171,19 @@
                                         <div class="block w-full">
                                             <div class="flex justify-between w-full">
                                                 <div class="flex justify-start items-center w-full justify-start">
-                                                    @if($work_session->status == 'W trakcie pracy')
+                                                    @if($event->status == 'W trakcie pracy')
                                                     <x-status-yellow class="text-xl">
-                                                        {{ $work_session->status }}
+                                                        {{ $event->status }}
                                                     </x-status-yellow>
                                                     @endif
-                                                    @if($work_session->status == 'Praca zakończona')
+                                                    @if($event->status == 'Praca zakończona')
                                                     <x-status-green class="text-xl">
-                                                        {{ $work_session->status }}
+                                                        {{ $event->status }}
                                                     </x-status-green>
                                                     @endif
                                                 </div>
                                                 @if($role == 'admin')
-                                                <form action="{{route('work.session.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                                                <form action="{{route('work.session.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <x-button-red type="submit" class="min-h-[38px]">
@@ -193,26 +193,26 @@
                                                 @endif
                                             </div>
                                             <x-paragraf-display class="text-xl">
-                                                @if($work_session->status == 'Praca zakończona')
-                                                {{ $work_session->time_in_work }}
+                                                @if($event->status == 'Praca zakończona')
+                                                {{ $event->time_in_work }}
                                                 @endif
                                             </x-paragraf-display>
                                             <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
                                                 <div class="flex flex-col">
-                                                    {{$work_session->user->name}}
+                                                    {{$event->user->name}}
                                                 </div>
                                             </div>
                                             <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
                                                 <div class="flex flex-col">
-                                                    {{$work_session->company->name}}
+                                                    {{$event->company->name}}
                                                 </div>
                                             </div>
                                             <div class="flex space-x-4 mt-4">
-                                                <x-button-link-neutral href="{{route('rcp.show', $work_session)}}" class="min-h-[38px]">
+                                                <x-button-link-neutral href="{{route('rcp.show', $event)}}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </x-button-link-neutral>
                                                 @if($role == 'admin')
-                                                <x-button-link-blue href="{{route('work.session.edit', $work_session)}}" class="min-h-[38px]">
+                                                <x-button-link-blue href="{{route('work.session.edit', $event)}}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-pen-to-square"></i>
                                                 </x-button-link-blue>
                                                 @endif
@@ -242,10 +242,10 @@
                                             Imię i Nazwisko, Rola
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-center">
-                                            Status
+                                            Zdarzenie
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-center">
-                                            Czas w pracy
+                                            Czas
                                         </th>
                                         <th scope="col" class="px-6 py-3 text-center">
                                             Podgląd
@@ -253,14 +253,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($work_sessions->isEmpty())
+                                    @if ($events->isEmpty())
                                     <tr class="bg-white dark:bg-gray-800">
                                         <td colspan="8" class="px-3 py-2">
                                             <x-empty-place />
                                         </td>
                                     </tr>
                                     @else
-                                    @foreach ($work_sessions as $work_session)
+                                    @foreach ($events as $event)
                                     <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
                                         <td class="px-3 py-2">
                                             <x-flex-center>
@@ -268,39 +268,35 @@
                                             </x-flex-center>
                                         </td>
                                         <td class="px-3 py-2 flex items-center justify-center">
-                                            @if($work_session->user->profile_photo_path)
-                                            <img src="{{ $work_session->user->profile_photo_url }}" alt="{{ $work_session->user->name }}" class="w-10 h-10 rounded-full">
+                                            @if($event->user->profile_photo_path)
+                                            <img src="{{ $event->user->profile_photo_url }}" alt="{{ $event->user->name }}" class="w-10 h-10 rounded-full">
                                             @else
                                             <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                                {{ strtoupper(substr($work_session->user->name, 0, 1)) }}
+                                                {{ strtoupper(substr($event->user->name, 0, 1)) }}
                                             </div>
                                             @endif
                                         </td>
                                         <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
                                             <x-paragraf-display class="text-xs">
-                                                {{$work_session->user->name}}
+                                                {{$event->user->name}}
                                             </x-paragraf-display>
                                         </td>
                                         <td class="px-3 py-2 text-sm min-w-32">
-                                            @if($work_session->status == 'W trakcie pracy')
-                                            <x-status-yellow class="text-xs">
-                                                {{ $work_session->status }}
-                                            </x-status-yellow>
+                                            @if($event->event_type == 'stop')
+                                            <span class="inline-flex items-center text-red-500 dark:text-red-300 font-semibold text-xs uppercase tracking-widest hover:text-red-700 dark:hover:text-red-300 transition ease-in-out duration-150">
+                                                Stop
+                                            </span>
                                             @endif
-                                            @if($work_session->status == 'Praca zakończona')
-                                            <x-status-green class="text-xs">
-                                                {{ $work_session->status }}
-                                            </x-status-green>
+                                            @if($event->event_type == 'start')
+                                            <span class="inline-flex items-center text-green-300 dark:text-green-300 font-semibold text-xs uppercase tracking-widest hover:text-green-700 dark:hover:text-green-300 transition ease-in-out duration-150">
+                                                Start
+                                            </span>
                                             @endif
                                         </td>
-                                        <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                            <x-paragraf-display class="text-xl">
-                                                @if($work_session->status == 'Praca zakończona')
-                                                {{ $work_session->time_in_work }}
-                                                @endif
-                                            </x-paragraf-display>
+                                        <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
+                                            {{ $event->time }}
                                         </td>
-                                        <x-show-cell href="{{ route('rcp.show', $work_session) }}" />
+                                        <x-show-cell href="{{ route('event.show', $event) }}" />
                                     </tr>
                                     @endforeach
                                     @endif
@@ -310,7 +306,7 @@
 
                             <!--Links-->
                             <div id="links" class="md:px-2 py-4">
-                                {{ $work_sessions->links() }}
+                                {{ $events->links() }}
                             </div>
                             <!--Links-->
                             @else

@@ -14,20 +14,23 @@ return new class extends Migration
         Schema::create('work_sessions', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable();
-            $table->unsignedBigInteger('company_id');
-            $table->unsignedBigInteger('created_user_id');
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->unsignedBigInteger('created_user_id')->nullable();
             $table->string('status');
-            $table->timestamp('start_time')->nullable();
-            $table->timestamp('end_time')->nullable();
+            $table->unsignedBigInteger('event_start_id')->nullable();
+            $table->unsignedBigInteger('event_stop_id')->nullable();
+           
             $table->string('time_in_work')->nullable();
-            $table->string('start_day_of_week')->nullable();
-            $table->string('end_day_of_week')->nullable();
+
             $table->timestamps();
 
             $table->foreign('user_id')->nullable()->references('id')->on('users')->onDelete('set null');
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('created_user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('company_id')->nullable()->references('id')->on('companies')->onDelete('set null');
+            $table->foreign('created_user_id')->nullable()->references('id')->on('users')->onDelete('set null');
+            $table->foreign('event_start_id')->nullable()->references('id')->on('events')->onDelete('set null');
+            $table->foreign('event_stop_id')->nullable()->references('id')->on('events')->onDelete('set null');
         });
+        
     }
 
     /**
