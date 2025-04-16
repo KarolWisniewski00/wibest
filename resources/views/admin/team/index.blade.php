@@ -16,13 +16,7 @@
                         <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                             <label class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700 peer">
                                 <input type="radio" name="workers" class="hidden peer" checked />
-                                <span class="flex whitespace-nowrap peer-checked:bg-lime-700 peer-checked:rounded-lg w-full h-full px-3">Wszyscy</span>
-                            </label>
-                        </li>
-                        <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                            <label class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700 peer">
-                                <input type="radio" name="workers" class="hidden peer" />
-                                <span class="flex whitespace-nowrap peer-checked:bg-lime-700 peer-checked:rounded-lg w-full h-full px-3">Zaproszenia</span>
+                                <span class="flex whitespace-nowrap peer-checked:bg-green-300 peer-checked:text-gray-900 peer-checked:rounded-lg w-full h-full px-3">Wszyscy</span>
                             </label>
                         </li>
                     </ul>
@@ -36,43 +30,27 @@
                         <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                             <label class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700 peer">
                                 <input type="checkbox" class="hidden peer" />
-                                <span class="flex whitespace-nowrap peer-checked:bg-lime-700 peer-checked:rounded-lg w-full h-full px-3">Administrator</span>
+                                <span class="flex whitespace-nowrap peer-checked:bg-green-300 peer-checked:text-gray-900 peer-checked:rounded-lg w-full h-full px-3">Administrator</span>
                             </label>
                         </li>
                         <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                             <label class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700 peer">
                                 <input type="checkbox" class="hidden peer" />
-                                <span class="flex whitespace-nowrap peer-checked:bg-lime-700 peer-checked:rounded-lg w-full h-full px-3">Kierownik</span>
+                                <span class="flex whitespace-nowrap peer-checked:bg-green-300 peer-checked:text-gray-900 peer-checked:rounded-lg w-full h-full px-3">Kierownik</span>
                             </label>
                         </li>
                         <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                             <label class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700 peer">
                                 <input type="checkbox" class="hidden peer" />
-                                <span class="flex whitespace-nowrap peer-checked:bg-lime-700 peer-checked:rounded-lg w-full h-full px-3">Pracownik</span>
+                                <span class="flex whitespace-nowrap peer-checked:bg-green-300 peer-checked:text-gray-900 peer-checked:rounded-lg w-full h-full px-3">Pracownik</span>
                             </label>
                         </li>
                         <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
                             <label class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700 peer">
                                 <input type="checkbox" class="hidden peer" />
-                                <span class="flex whitespace-nowrap peer-checked:bg-lime-700 peer-checked:rounded-lg w-full h-full px-3">Menadżer</span>
+                                <span class="flex whitespace-nowrap peer-checked:bg-green-300 peer-checked:text-gray-900 peer-checked:rounded-lg w-full h-full px-3">Menadżer</span>
                             </label>
                         </li>
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="tags-dropdown" data-collapse-toggle="tags-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Tagi</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
-                    <ul id="tags-dropdown" class="hidden">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="positions-dropdown" data-collapse-toggle="positions-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Stanowiska</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="positions-dropdown">
                     </ul>
                 </li>
             </ul>
@@ -91,13 +69,39 @@
         <div class="py-12">
             <div class=" mx-auto sm:px-6 lg:px-8 mt-16">
                 <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-
+                    <!--NAV-->
+                    <div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                        <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+                            <x-nav-link class="h-full text-center"
+                                href="{{ route('team') }}"
+                                :active="Str::startsWith(request()->path(), 'dashboard/team')">
+                                Zespół
+                            </x-nav-link>
+                            @if($role == 'admin')
+                            <x-nav-link class="h-full text-center"
+                                href="{{ route('invitation') }}"
+                                :active="Str::startsWith(request()->path(), 'dashboard/invitation')">
+                                Zaproszenia
+                                @if($invitations->count() > 0)
+                                <span class="ml-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                                    {{ $invitations->count() }}
+                                </span>
+                                @endif
+                            </x-nav-link>
+                            @endif
+                        </nav>
+                    </div>
+                    <!--NAV-->
                     <!--HEADER-->
                     <x-container-header>
                         <x-h1-display>
                             Twój zespół ({{$user_count}})
+                            <x-label-green>
+                                Wszyscy
+                            </x-label-green>
                         </x-h1-display>
                         <x-flex-center>
+                            @if($role == 'admin')
                             <x-button-link-green class="text-xs mx-2">
                                 <i class="fa-solid fa-plus mr-2"></i>Dodaj
                             </x-button-link-green>
@@ -110,18 +114,27 @@
                             <x-button-link-cello class="text-xs ml-2">
                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                             </x-button-link-cello>
+                            @endif
                         </x-flex-center>
                     </x-container-header>
+                    @if($role == 'admin')
+                    <x-label class="px-4">
+                        0 zaznaczonych
+                    </x-label>
+                    @endif
                     <!--HEADER-->
-                    <x-flex-center class="px-4">
+
+                    <x-flex-center class="px-4 mt-8">
                         <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400  hidden md:table">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                                 <tr>
+                                    @if($role == 'admin')
                                     <th scope="col" class="px-6 py-3">
                                         <x-flex-center>
                                             <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         </x-flex-center>
                                     </th>
+                                    @endif
                                     <th scope="col" class="px-6 py-3">
 
                                     </th>
@@ -131,12 +144,14 @@
                                     <th scope="col" class="px-6 py-3">
                                         Role
                                     </th>
+                                    @if($role == 'admin')
                                     <th scope="col" class="px-6 py-3">
                                         Stanowisko
                                     </th>
                                     <th scope="col" class="px-6 py-3">
 
                                     </th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -152,18 +167,20 @@
                                 @else
                                 @foreach ($users as $user)
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                                    @if($role == 'admin')
                                     <td class="px-3 py-2">
                                         <x-flex-center>
                                             <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                         </x-flex-center>
                                     </td>
+                                    @endif
                                     <td class="px-3 py-2">
                                         @if($user->profile_photo_path)
-                                            <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
+                                        <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
                                         @else
-                                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                                {{ strtoupper(substr($user->name, 0, 1)) }}
-                                            </div>
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        </div>
                                         @endif
                                     </td>
                                     <td class="px-3 py-2">
@@ -194,6 +211,7 @@
                                         </span>
                                     </td>
                                     @endif
+                                    @if($role == 'admin')
                                     <td class="px-3 py-2">
 
                                     </td>
@@ -202,9 +220,10 @@
                                             <i class="fa-solid fa-ellipsis-vertical"></i>
                                         </x-button-link-cello>
                                     </td>
+                                    @endif
                                 </tr>
                                 @endforeach
-                                
+
                                 @endif
                             </tbody>
                         </table>

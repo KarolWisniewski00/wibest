@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             $user_id = Auth::id();
-            if($user_id === null) {
+            if ($user_id === null) {
                 return;
             }
             $company_id = User::find($user_id)->company_id;
@@ -33,7 +33,10 @@ class AppServiceProvider extends ServiceProvider
                 ->where('user_id', auth()->id())
                 ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
                 ->get();
-            $view->with('user_id', $user_id)->with('company_id', $company_id)->with('work_sessions_logged_user', $work_sessions_logged_user);
+                
+            $view->with('user_id', $user_id)
+                ->with('company_id', $company_id)
+                ->with('work_sessions_logged_user', $work_sessions_logged_user);
         });
     }
 }

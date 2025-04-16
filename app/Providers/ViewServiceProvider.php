@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Invitation;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
@@ -29,6 +30,7 @@ class ViewServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             if (Auth::check()) {
             $view->with('company', Auth::user()->company);
+            $view->with('invitation', Invitation::where('user_id', Auth::user()->id));
             $view->with('role', Auth::user()->role);
             }
         });

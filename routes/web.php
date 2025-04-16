@@ -7,6 +7,7 @@ use App\Http\Controllers\CostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\OcrController;
 use App\Http\Controllers\OfferController;
@@ -71,6 +72,9 @@ Route::middleware([
 
         Route::prefix('team')->group(function () {
             Route::get('/', [TeamController::class, 'index'])->name('team');
+        });
+        Route::prefix('invitation')->group(function () {
+            Route::get('/', [InvitationController::class, 'index'])->name('invitation');
         });
         Route::prefix('calendar')->group(function () {
             Route::get('/', [CalendarController::class, 'index'])->name('calendar');

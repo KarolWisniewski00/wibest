@@ -1,4 +1,6 @@
 <x-app-layout>
+    @include('admin.elements.alerts')
+    @if ($company)
     <div class="py-12 pt-48">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- WIDGET TASK -->
@@ -86,38 +88,6 @@
                             <p class="text-gray-500 dark:text-gray-400">Brak danych do wyświetlenia.</p>
                         </div>
                         @else
-                        @foreach ($invitations as $key => $invitation)
-                        <!-- Kod -->
-                        <li>
-                            <div class="h-full flex flex-col inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                <div class="block w-full">
-                                    <div class="flex justify-between w-full">
-                                        <div class="flex justify-start items-center w-full justify-start">
-                                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                                {{ $invitation->user->name }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <a href="mailto:{{ $invitation->user->email }}" class="my-4 inline-flex items-center text-blue-300 dark:text-blue-300 font-semibold text-xs uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition ease-in-out duration-150">
-                                        {{ $invitation->user->email }}
-                                    </a>
-                                </div>
-                                <div class="flex flex-col w-full">
-                                    <span class="my-2 inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xs uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        Prośba o dołączenie
-                                    </span>
-                                    <div class="flex gap-2">
-                                        <a href="{{route('setting.user.invitations.accept',$invitation->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-green-500 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                            <i class="fa-solid fa-check"></i>
-                                        </a>
-                                        <a href="{{route('setting.user.invitations.reject',$invitation->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                            <i class="fa-solid fa-ban"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-                        @endforeach
                         @foreach ($users as $key => $user)
                         <!-- Kod -->
                         <li>
@@ -195,31 +165,6 @@
                             </tr>
                             @else
                             @if($role == 'admin')
-                            @foreach ($invitations as $invitation)
-                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                    <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xs uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        {{ $invitation->user->name }}
-                                    </span>
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                    <a href="mailto:{{ $invitation->user->email }}" class="inline-flex items-center text-blue-300 dark:text-blue-300 font-semibold text-xs uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition ease-in-out duration-150">
-                                        {{ $invitation->user->email }}
-                                    </a>
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                    <a href="{{route('setting.user.invitations.accept',$invitation->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-green-500 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        <i class="fa-solid fa-check"></i>
-                                    </a>
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                    <a href="{{route('setting.user.invitations.reject',$invitation->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        <i class="fa-solid fa-ban"></i>
-                                    </a>
-                                </td>
-                            </tr>
-
-                            @endforeach
                             @endif
                             @foreach ($users as $user)
                             <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
@@ -337,4 +282,7 @@
             <!-- END WIDGET TASK -->
         </div>
     </div>
+    @else
+    @include('admin.elements.end_config')
+    @endif
 </x-app-layout>

@@ -17,9 +17,9 @@ class SettingController extends Controller
     public function index()
     {
         $users = User::where('company_id', $this->get_company_id())->get();
-        $invitations = Invitation::where('company_id', $this->get_company_id())->get();
+
         $user_id = auth()->id();
-        return view('admin.setting.index', compact('users', 'user_id', 'invitations'));
+        return view('admin.setting.index', compact('users', 'user_id'));
     }
 
     /**

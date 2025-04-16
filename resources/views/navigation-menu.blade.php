@@ -35,7 +35,7 @@
                     </x-nav-link>
                 </div>
             </div>
-
+            @if ($company)
             <x-widget-display-nav class="grid-cols-3 grid-rows-1 h-fit">
                 <div class="col-span-2">
                     <!-- Data -->
@@ -71,7 +71,7 @@
                     </div>
                 </div>
             </x-widget-display-nav>
-
+            @endif
             <div class="hidden xl:flex xl:items-center xl:ms-6">
                 <!-- Teams Dropdown -->
                 @if (Laravel\Jetstream\Jetstream::hasTeamFeatures())

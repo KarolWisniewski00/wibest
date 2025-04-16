@@ -94,15 +94,19 @@
                             </x-label-green>
                         </x-h1-display>
                         <x-flex-center>
+                            @if($role == 'admin')
                             <x-button-link-green class="text-xs mx-2">
                                 <i class="fa-solid fa-plus mr-2"></i>Dodaj
                             </x-button-link-green>
+                            @endif
                             <x-button-link-neutral class="text-xs mx-2">
                                 <i class="fa-solid fa-download mr-2"></i>Pobierz
                             </x-button-link-neutral>
+                            @if($role == 'admin')
                             <x-button-link-cello class="text-xs ml-2">
                                 <i class="fa-solid fa-ellipsis-vertical"></i>
                             </x-button-link-cello>
+                            @endif
                         </x-flex-center>
                     </x-container-header>
                     <x-label class="px-4">
@@ -293,12 +297,10 @@
                                             </x-status-green>
                                             @endif
                                         </td>
-                                        <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                            <x-paragraf-display class="text-xl">
-                                                @if($work_session->status == 'Praca zakończona')
-                                                {{ $work_session->time_in_work }}
-                                                @endif
-                                            </x-paragraf-display>
+                                        <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
+                                            @if($work_session->status == 'Praca zakończona')
+                                            {{ $work_session->time_in_work }}
+                                            @endif
                                         </td>
                                         <x-show-cell href="{{ route('rcp.show', $work_session) }}" />
                                     </tr>
