@@ -2,329 +2,308 @@
     @include('admin.elements.alerts')
     @if ($company)
     <!--SIDE BAR-->
-    <aside id="sidebar-multi-level-sidebar" class="fixed mt-20 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 border-t-2 dark:border-gray-600">
-            <ul class="space-y-2 font-medium">
-                <li>
-                    <input placeholder="Szukaj" type="text" class="datepicker h-12 w-full appearance-none rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-100 pr-4 outline-none  dark:bg-gray-700 dark:text-gray-50 dark:focus:border-2 dark:focus:border-lime-500" />
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Zakres dat</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="pracownicy-dropdown" class="">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Grafik pracy</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="pracownicy-dropdown" class="">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Stanowisko pracy</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="pracownicy-dropdown" class="">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="tags-dropdown" data-collapse-toggle="tags-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Tagi</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
-                    <ul id="tags-dropdown" class="hidden">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="positions-dropdown" data-collapse-toggle="positions-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Stanowiska</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="positions-dropdown">
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </aside>
-    <script>
-        $(document).ready(function() {
-            $('[data-collapse-toggle]').on('click', function() {
-                var target = $(this).attr('aria-controls');
-                $('#' + target).toggleClass('hidden');
-                $(this).find('i').toggleClass('fa-chevron-up fa-chevron-down');
-            });
-        });
-    </script>
+    <x-sidebar-left>
+        <x-search-filter />
+        <x-date-filter />
+    </x-sidebar-left>
     <!--SIDE BAR-->
 
     <!--MAIN-->
-    <div class="p-4 sm:ml-64">
-        <div class="py-12">
-            <div class=" mx-auto sm:px-6 lg:px-8 mt-16">
-                <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+    <x-main>
+        <x-RCP.nav />
+        <x-RCP.header>Rejestracja czasu pracy</x-RCP.header>
 
-                    <!--NAV-->
-                    <div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                        <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                            <x-nav-link class="h-full text-center"
-                                href="{{ route('rcp') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/work_session')">
-                                Rejestacja czasu pracy
-                            </x-nav-link>
-                            <x-nav-link class="h-full text-center"
-                                href="{{ route('event') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/events')">
-                                Zdarzenia
-                            </x-nav-link>
-                        </nav>
-                    </div>
-                    <!--NAV-->
-
-                    <!--HEADER-->
-                    <x-container-header>
-                        <x-h1-display>
-                            Rejestracja czasu pracy
-                            <x-label-green>
-                                {{ $currentMonthString }}
-                            </x-label-green>
-                        </x-h1-display>
-                        <x-flex-center>
-                            @if($role == 'admin')
-                            <x-button-link-green class="text-xs mx-2">
-                                <i class="fa-solid fa-plus mr-2"></i>Dodaj
-                            </x-button-link-green>
-                            @endif
-                            <x-button-link-neutral class="text-xs mx-2">
-                                <i class="fa-solid fa-download mr-2"></i>Pobierz
-                            </x-button-link-neutral>
-                            @if($role == 'admin')
-                            <x-button-link-cello class="text-xs ml-2">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </x-button-link-cello>
-                            @endif
-                        </x-flex-center>
-                    </x-container-header>
-                    <x-label class="px-4">
-                        0 zaznaczonych
-                    </x-label>
-                    <!--HEADER-->
-
-                    <!--CONTENT-->
-                    <x-flex-center class="px-4 flex flex-col">
-                        <!--MOBILE VIEW-->
-                        <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
-                            @if ($company)
-                            <ul id="list" class="grid w-full gap-y-4 block md:hidden">
-                                <!-- EMPTY PLACE -->
-                                @if ($work_sessions->isEmpty())
-                                <x-empty-place />
-                                @else
-                                <!-- EMPTY PLACE -->
-
-                                <!-- MONTHS VIEW -->
-                                @php
-                                $currentMonth = null; // Zmienna do śledzenia aktualnego miesiąca
-                                $months = [
-                                1 => 'Styczeń',
-                                2 => 'Luty',
-                                3 => 'Marzec',
-                                4 => 'Kwiecień',
-                                5 => 'Maj',
-                                6 => 'Czerwiec',
-                                7 => 'Lipiec',
-                                8 => 'Sierpień',
-                                9 => 'Wrzesień',
-                                10 => 'Październik',
-                                11 => 'Listopad',
-                                12 => 'Grudzień'
-                                ];
-                                @endphp
-
-                                @foreach ($work_sessions as $key => $work_session)
-                                @php
-                                // Pobieramy miesiąc z daty faktury (załóżmy, że jest polem issue_date)
-                                $work_sessionMonth = \Carbon\Carbon::parse($work_session->issue_date)->month;
-
-                                // Jeśli miesiąc zmienił się w stosunku do poprzedniego, wyświetlamy nazwę nowego miesiąca
-                                if ($work_sessionMonth !== $currentMonth) {
-                                $currentMonth = $work_sessionMonth;
-                                $monthName = $months[$work_sessionMonth];
-                                @endphp
-                                <div id="s-{{$key}}"></div>
-                                <li id="e-{{$key}}" class="my-4">
-                                    <div class="flex items-center justify-start">
-                                        <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-300">
-                                            {{ $monthName }}
-                                        </h2>
-                                        <i class="fa-solid fa-chevron-down ml-2 text-gray-500 dark:text-gray-400"></i>
+        <!--CONTENT-->
+        <x-flex-center class="px-4 pb-4 flex flex-col">
+            <!--MOBILE VIEW-->
+            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
+                @if ($company)
+                <ul id="list" class="grid w-full gap-y-4 block lg:hidden">
+                    <!-- EMPTY PLACE -->
+                    @if ($work_sessions->isEmpty())
+                    <x-empty-place />
+                    @else
+                    <!-- EMPTY PLACE -->
+                    @foreach ($work_sessions as $key => $work_session)
+                    <!-- WORK SESSIONS ELEMENT VIEW -->
+                    <li>
+                        <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            <div class="block w-full">
+                                <div class="flex justify-between w-full">
+                                    <div class="flex justify-start items-center w-full justify-start">
+                                        <x-RCP.work-session-status :work_session="$work_session" class="text-xl" />
                                     </div>
-                                </li>
-                                @php
-                                }
-                                @endphp
-                                <!-- MONTHS VIEW -->
-
-                                <!-- WORK SESSIONS ELEMENT VIEW -->
-                                <li>
-                                    <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                        <div class="block w-full">
-                                            <div class="flex justify-between w-full">
-                                                <div class="flex justify-start items-center w-full justify-start">
-                                                    @if($work_session->status == 'W trakcie pracy')
-                                                    <x-status-yellow class="text-xl">
-                                                        {{ $work_session->status }}
-                                                    </x-status-yellow>
-                                                    @endif
-                                                    @if($work_session->status == 'Praca zakończona')
-                                                    <x-status-green class="text-xl">
-                                                        {{ $work_session->status }}
-                                                    </x-status-green>
-                                                    @endif
-                                                </div>
-                                                @if($role == 'admin')
-                                                <form action="{{route('work.session.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <x-button-red type="submit" class="min-h-[38px]">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </x-button-red>
-                                                </form>
-                                                @endif
-                                            </div>
-                                            <x-paragraf-display class="text-xl">
-                                                @if($work_session->status == 'Praca zakończona')
-                                                {{ $work_session->time_in_work }}
-                                                @endif
-                                            </x-paragraf-display>
-                                            <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                                <div class="flex flex-col">
-                                                    {{$work_session->user->name}}
-                                                </div>
-                                            </div>
-                                            <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                                <div class="flex flex-col">
-                                                    {{$work_session->company->name}}
-                                                </div>
-                                            </div>
-                                            <div class="flex space-x-4 mt-4">
-                                                <x-button-link-neutral href="{{route('rcp.show', $work_session)}}" class="min-h-[38px]">
-                                                    <i class="fa-solid fa-eye"></i>
-                                                </x-button-link-neutral>
-                                                @if($role == 'admin')
-                                                <x-button-link-blue href="{{route('work.session.edit', $work_session)}}" class="min-h-[38px]">
-                                                    <i class="fa-solid fa-pen-to-square"></i>
-                                                </x-button-link-blue>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
-                                <!-- WORK SESSIONS ELEMENT VIEW -->
-                                @endforeach
-                                @endif
-                            </ul>
-                            <!-- WORK SESSIONS VIEW -->
-
-                            <!-- PC VIEW -->
-                            <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400  hidden md:table">
-                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
-                                    <tr>
-                                        <th scope="col" class="px-6 py-3">
-                                            <x-flex-center>
-                                                <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                            </x-flex-center>
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-center">
-                                            Zdjęcie
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-center">
-                                            Imię i Nazwisko, Rola
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-center">
-                                            Status
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-center">
-                                            Czas w pracy
-                                        </th>
-                                        <th scope="col" class="px-6 py-3 text-center">
-                                            Podgląd
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($work_sessions->isEmpty())
-                                    <tr class="bg-white dark:bg-gray-800">
-                                        <td colspan="8" class="px-3 py-2">
-                                            <x-empty-place />
-                                        </td>
-                                    </tr>
-                                    @else
-                                    @foreach ($work_sessions as $work_session)
-                                    <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                        <td class="px-3 py-2">
-                                            <x-flex-center>
-                                                <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                            </x-flex-center>
-                                        </td>
-                                        <td class="px-3 py-2 flex items-center justify-center">
-                                            @if($work_session->user->profile_photo_path)
-                                            <img src="{{ $work_session->user->profile_photo_url }}" alt="{{ $work_session->user->name }}" class="w-10 h-10 rounded-full">
-                                            @else
-                                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                                {{ strtoupper(substr($work_session->user->name, 0, 1)) }}
-                                            </div>
-                                            @endif
-                                        </td>
-                                        <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                            <x-paragraf-display class="text-xs">
-                                                {{$work_session->user->name}}
-                                            </x-paragraf-display>
-                                        </td>
-                                        <td class="px-3 py-2 text-sm min-w-32">
-                                            @if($work_session->status == 'W trakcie pracy')
-                                            <x-status-yellow class="text-xs">
-                                                {{ $work_session->status }}
-                                            </x-status-yellow>
-                                            @endif
-                                            @if($work_session->status == 'Praca zakończona')
-                                            <x-status-green class="text-xs">
-                                                {{ $work_session->status }}
-                                            </x-status-green>
-                                            @endif
-                                        </td>
-                                        <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
-                                            @if($work_session->status == 'Praca zakończona')
-                                            {{ $work_session->time_in_work }}
-                                            @endif
-                                        </td>
-                                        <x-show-cell href="{{ route('rcp.show', $work_session) }}" />
-                                    </tr>
-                                    @endforeach
+                                </div>
+                                <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                    @if($work_session->status == 'Praca zakończona')
+                                    {{ $work_session->time_in_work }}
                                     @endif
-                                </tbody>
-                            </table>
-                            <!-- PC VIEW -->
-
-                            <!--Links-->
-                            <div id="links" class="md:px-2 py-4">
-                                {{ $work_sessions->links() }}
+                                </div>
+                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
+                                    <div class="flex flex-col">
+                                        {{$work_session->user->name}}
+                                    </div>
+                                </div>
+                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
+                                    <div class="flex flex-col">
+                                        {{$work_session->company->name}}
+                                    </div>
+                                </div>
+                                <div class="flex space-x-4 mt-4">
+                                    <x-button-link-neutral href="{{route('rcp.work-session.show', $work_session)}}" class="min-h-[38px]">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </x-button-link-neutral>
+                                    @if($role == 'admin')
+                                    @if($work_session->status == 'Praca zakończona')
+                                    <x-button-link-blue href="{{route('rcp.work-session.edit', $work_session)}}" class="min-h-[38px]">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </x-button-link-blue>
+                                    @endif
+                                    @endif
+                                </div>
                             </div>
-                            <!--Links-->
-                            @else
-                            @include('admin.elements.end_config')
-                            @endif
                         </div>
-                    </x-flex-center>
-                    <!--CONTENT-->
-                </div>
+                    </li>
+                    <!-- WORK SESSIONS ELEMENT VIEW -->
+                    @endforeach
+                    @endif
+                </ul>
+                <!-- WORK SESSIONS VIEW -->
+
+                <!-- PC VIEW -->
+                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden lg:table">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                <x-flex-center>
+                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                </x-flex-center>
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
+                                Zdjęcie
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
+                                Imię i Nazwisko, Rola
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
+                                Status
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
+                                Czas w pracy
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
+                                Podgląd
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="work-sessions-body">
+                        @if ($work_sessions->isEmpty())
+                        <tr class="bg-white dark:bg-gray-800">
+                            <td colspan="8" class="px-3 py-2">
+                                <x-empty-place />
+                            </td>
+                        </tr>
+                        @else
+                        @foreach ($work_sessions as $work_session)
+                        <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                            <td class="px-3 py-2">
+                                <x-flex-center>
+                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="{{ $work_session->id }}">
+                                </x-flex-center>
+                            </td>
+                            <td class="px-3 py-2 flex items-center justify-center">
+                                @if($work_session->user->profile_photo_url)
+                                <img src="{{ $work_session->user->profile_photo_url }}" alt="{{ $work_session->user->name }}" class="w-10 h-10 rounded-full">
+                                @else
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                    {{ strtoupper(substr($work_session->user->name, 0, 1)) }}
+                                </div>
+                                @endif
+                            </td>
+                            <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
+                                <x-paragraf-display class="text-xs">
+                                    {{$work_session->user->name}}
+                                </x-paragraf-display>
+                            </td>
+                            <td class="px-3 py-2 text-sm min-w-32">
+                                <x-RCP.work-session-status :work_session="$work_session" class="text-xs" />
+                            </td>
+                            <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
+                                @if($work_session->status == 'Praca zakończona')
+                                {{ $work_session->time_in_work }}
+                                @endif
+                            </td>
+                            <x-show-cell href="{{ route('rcp.work-session.show', $work_session) }}" />
+                        </tr>
+                        @endforeach
+                        @endif
+                    </tbody>
+                    <div id="loader" class="text-center py-4 hidden">Ładowanie...</div>
+                </table>
+                <!-- PC VIEW -->
+                @else
+                @include('admin.elements.end_config')
+                @endif
             </div>
-        </div>
-    </div>
+        </x-flex-center>
+        <!--CONTENT-->
+        <script>
+            $(document).ready(function() {
+                const $table = $('#table');
+                const $masterCheckbox = $table.find('thead input[type="checkbox"]');
+                const $label = $('#selected-count');
+
+                function getCheckboxes() {
+                    return $table.find('tbody input[type="checkbox"]');
+                }
+
+                function updateSelectedCount() {
+                    const $checkboxes = getCheckboxes();
+                    const count = $checkboxes.filter(':checked').length;
+
+                    // Dopasowanie końcówki do liczby
+                    let suffix = 'ych';
+                    if (count === 1) suffix = 'y';
+                    else if (count >= 2 && count <= 4) suffix = 'e';
+
+                    $label.html(`${count} zaznaczon${suffix}`);
+                }
+
+                // Delegacja zdarzeń – działa też na przyszłe checkboxy
+                $table.on('change', 'tbody input[type="checkbox"]', function() {
+                    updateSelectedCount();
+
+                    const $checkboxes = getCheckboxes();
+                    if (!$(this).prop('checked')) {
+                        $masterCheckbox.prop('checked', false);
+                    } else if ($checkboxes.length === $checkboxes.filter(':checked').length) {
+                        $masterCheckbox.prop('checked', true);
+                    }
+                });
+
+                // Master checkbox – zaznacz/odznacz wszystkie
+                $masterCheckbox.on('change', function() {
+                    const isChecked = $(this).prop('checked');
+                    const $checkboxes = getCheckboxes();
+                    $checkboxes.prop('checked', isChecked);
+                    updateSelectedCount();
+                });
+
+                updateSelectedCount(); // W razie odświeżenia
+            });
+
+            // Pobieranie sesji pracy w formacie XLSX
+            $('#download-xlsx').on('click', function() {
+                const ids = [];
+
+                $('#table tbody input[type="checkbox"]:checked').each(function() {
+                    const id = $(this).data('id');
+                    if (id) {
+                        ids.push(id);
+                    }
+                });
+
+                if (ids.length === 0) {
+                    alert('Zaznacz przynajmniej jedną sesję.');
+                    return;
+                }
+
+                // Wysyłamy do API
+                $.ajax({
+                    url: "{{ route('api.v1.rcp.work-session.export.xlsx') }}",
+                    method: 'POST',
+                    data: JSON.stringify({
+                        _token: '{{ csrf_token() }}',
+                        ids: ids
+                    }),
+                    contentType: 'application/json',
+                    xhrFields: {
+                        responseType: 'blob' // ważne: bo XLSX to plik
+                    },
+                    success: function(data, status, xhr) {
+                        const blob = new Blob([data], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const link = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = 'work_sessions.xlsx';
+                        link.click();
+                    },
+                    error: function() {
+                        alert('Błąd przy generowaniu pliku.');
+                    }
+                });
+            });
+        </script>
+        <script>
+            $(document).ready(function() {
+                let page = 2;
+                let loading = false;
+                const $body = $('#work-sessions-body');
+                const $loader = $('#loader');
+
+                function loadMoreSessions() {
+                    if (loading) return;
+                    loading = true;
+                    $loader.removeClass('hidden');
+
+                    $.get(`{{ route('api.v1.rcp.work-session.get') }}?page=${page}`, function(data) {
+                        data.data.forEach(function(session) {
+                            const row = `
+                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                                <td class="px-3 py-2">
+                                    <x-flex-center>
+                                        <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${session.id}">
+                                    </x-flex-center>
+                                </td>
+                                <td class="px-3 py-2  flex items-center justify-center">
+                                    ${session.user.profile_photo_url
+                                        ? `<img src="${session.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
+                                    }
+                                </td>
+                                <td class="px-3 py-2">
+                                    <x-paragraf-display class="text-xs">
+                                        ${session.user.name}
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 text-sm">
+                                    ${session.status === 'W trakcie pracy' 
+                                        ? `<x-status-yellow>${session.status}</x-status-yellow>` 
+                                        : session.status === 'Praca zakończona' 
+                                            ? `<x-status-green>${session.status}</x-status-green>` 
+                                            : ''}
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
+                                    ${session.time_in_work ?? '-'}
+                                </td>
+                                <x-show-cell href="{{ route('rcp.work-session.show', '') }}/${session.id}" />
+                            </tr>`;
+                            $body.append(row);
+                        });
+
+                        if (data.next_page_url) {
+                            page++;
+                            loading = false;
+                        } else {
+                            $(window).off('scroll'); // koniec danych
+                        }
+
+                        $loader.addClass('hidden');
+                    });
+                }
+
+                // Event scroll
+                $(window).on('scroll', function() {
+                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                        loadMoreSessions();
+                    }
+                });
+
+                loadMoreSessions(); // wczytaj pierwszą stronę
+            });
+        </script>
+    </x-main>
     <!--MAIN-->
     @else
     @include('admin.elements.end_config')

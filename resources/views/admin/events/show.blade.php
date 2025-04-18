@@ -72,13 +72,13 @@
                     <div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                         <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                             <x-nav-link class="h-full text-center"
-                                href="{{ route('rcp') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/work_session')">
+                                href="{{ route('rcp.work-session.index') }}"
+                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/work-session')">
                                 Rejestacja czasu pracy
                             </x-nav-link>
                             <x-nav-link class="h-full text-center"
-                                href="{{ route('event') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/events')">
+                                href="{{ route('rcp.event.index') }}"
+                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/event')">
                                 Zdarzenia
                             </x-nav-link>
                         </nav>
@@ -88,7 +88,7 @@
                     <!--CONTENT-->
                     <div class="px-4 py-5 sm:px-6 lg:px-8">
                         <!--POWRÓT-->
-                        <x-button-link-back href="{{ route('event') }}" class="text-lg mb-4">
+                        <x-button-link-back href="{{ route('rcp.event.index') }}" class="text-lg mb-4">
                             <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
                         </x-button-link-back>
                         <!--POWRÓT-->
@@ -124,11 +124,25 @@
                                 </div>
                             </x-text-cell>
                             <!--Czas w pracy-->
+                            @if($role == 'admin')
+                            <!--Użytkownik-->
+                            <x-text-cell class="mx-4">
+                                <p class="text-gray-700 dark:text-gray-300 test-sm">
+                                    Użytkownik
+                                </p>
+                                <div class="flex justify-start items-center w-full justify-start">
+                                    <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                        {{ $event->user->name }}
+                                    </span>
+                                </div>
+                            </x-text-cell>
+                            <!--Użytkownik-->
+                            @endif
                         </x-container-gray>
 
                         <div class="flex justify-end mt-4">
                             @if($role == 'admin')
-                            <form action="{{route('event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                            <form action="{{route('rcp.event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
@@ -137,6 +151,15 @@
                             </form>
                             @endif
                         </div>
+                        <x-label class="my-2">
+                            Utworzono {{ $event->created_at }}
+                        </x-label>
+                        <x-label class="my-2">
+                            Utoworzono przez {{ $event->created_user->name }}
+                        </x-label>
+                        <x-label class="my-2">
+                            Ostatnia aktualizacja {{ $event->updated_at }}
+                        </x-label>
                     </div>
                     <!--CONTENT-->
                 </div>

@@ -67,53 +67,8 @@
         <div class="py-12">
             <div class=" mx-auto sm:px-6 lg:px-8 mt-16">
                 <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-
-                    <!--NAV-->
-                    <div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                        <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                            <x-nav-link class="h-full text-center"
-                                href="{{ route('rcp') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/work_session')">
-                                Rejestacja czasu pracy
-                            </x-nav-link>
-                            <x-nav-link class="h-full text-center"
-                                href="{{ route('event') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/rcp/events')">
-                                Zdarzenia
-                            </x-nav-link>
-                        </nav>
-                    </div>
-                    <!--NAV-->
-
-                    <!--HEADER-->
-                    <x-container-header>
-                        <x-h1-display>
-                            Rejestracja czasu pracy
-                            <x-label-green>
-                                {{ $currentMonthString }}
-                            </x-label-green>
-                        </x-h1-display>
-                        <x-flex-center>
-                            @if($role == 'admin')
-                            <x-button-link-green class="text-xs mx-2">
-                                <i class="fa-solid fa-plus mr-2"></i>Dodaj
-                            </x-button-link-green>
-                            @endif
-                            <x-button-link-neutral class="text-xs mx-2">
-                                <i class="fa-solid fa-download mr-2"></i>Pobierz
-                            </x-button-link-neutral>
-                            @if($role == 'admin')
-                            <x-button-link-cello class="text-xs ml-2">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </x-button-link-cello>
-                            @endif
-                        </x-flex-center>
-                    </x-container-header>
-                    <x-label class="px-4">
-                        0 zaznaczonych
-                    </x-label>
-                    <!--HEADER-->
-
+                    <x-RCP.nav />
+                    <x-RCP.header>Zdarzenia</x-RCP.header>
                     <!--CONTENT-->
                     <x-flex-center class="px-4 flex flex-col">
                         <!--MOBILE VIEW-->
@@ -187,7 +142,7 @@
                                                     @endif
                                                 </div>
                                                 @if($role == 'admin')
-                                                <form action="{{route('work.session.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                                                <form action="{{route('rcp.event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                                                     @csrf
                                                     @method('DELETE')
                                                     <x-button-red type="submit" class="min-h-[38px]">
@@ -212,11 +167,11 @@
                                                 </div>
                                             </div>
                                             <div class="flex space-x-4 mt-4">
-                                                <x-button-link-neutral href="{{route('rcp.show', $event)}}" class="min-h-[38px]">
+                                                <x-button-link-neutral href="{{route('rcp.event.show', $event)}}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </x-button-link-neutral>
                                                 @if($role == 'admin')
-                                                <x-button-link-blue href="{{route('work.session.edit', $event)}}" class="min-h-[38px]">
+                                                <x-button-link-blue href="" class="min-h-[38px]">
                                                     <i class="fa-solid fa-pen-to-square"></i>
                                                 </x-button-link-blue>
                                                 @endif
@@ -300,7 +255,7 @@
                                         <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
                                             {{ $event->time }}
                                         </td>
-                                        <x-show-cell href="{{ route('event.show', $event) }}" />
+                                        <x-show-cell href="{{ route('rcp.event.show', $event) }}" />
                                     </tr>
                                     @endforeach
                                     @endif
@@ -319,6 +274,47 @@
                         </div>
                     </x-flex-center>
                     <!--CONTENT-->
+                    <script>
+                        $(document).ready(function() {
+                            const $table = $('#table');
+                            const $masterCheckbox = $table.find('thead input[type="checkbox"]');
+                            const $checkboxes = $table.find('tbody input[type="checkbox"]');
+                            const $label = $('#selected-count');
+
+                            function updateSelectedCount() {
+                                const count = $checkboxes.filter(':checked').length;
+
+                                // Dopasowanie końcówki do liczby
+                                let suffix = 'ych';
+                                if (count === 1) suffix = 'y';
+                                else if (count >= 2 && count <= 4) suffix = 'e';
+
+                                $label.html(`${count} zaznaczon${suffix}`);
+                            }
+
+                            // Zaznaczenie pojedynczego checkboxa
+                            $checkboxes.on('change', function() {
+                                updateSelectedCount();
+
+                                // Jeśli odznaczymy jakiś checkbox, master też się odznacza
+                                if (!$(this).prop('checked')) {
+                                    $masterCheckbox.prop('checked', false);
+                                } else if ($checkboxes.length === $checkboxes.filter(':checked').length) {
+                                    $masterCheckbox.prop('checked', true);
+                                }
+                            });
+
+                            // Master checkbox (zaznacz wszystkie / odznacz wszystkie)
+                            $masterCheckbox.on('change', function() {
+                                const isChecked = $(this).prop('checked');
+                                $checkboxes.prop('checked', isChecked);
+                                updateSelectedCount();
+                            });
+
+                            updateSelectedCount(); // W razie odświeżenia
+                        });
+                    </script>
+
                 </div>
             </div>
         </div>

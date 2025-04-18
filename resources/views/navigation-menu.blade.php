@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 dark:border-gray-700 shadow fixed w-full">
+<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 dark:border-gray-700 shadow fixed w-full z-10">
     <!-- Primary Navigation Menu -->
     <div class="w-full">
         <div class="flex justify-between h-20">
@@ -15,19 +15,19 @@
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                         <i class="fa-solid fa-house"></i>
                     </x-nav-link>
-                    <x-nav-link href="{{ route('team') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
+                    <x-nav-link href="{{ route('team.user.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
                         <i class="fa-solid fa-users mr-2"></i>Zespół
                     </x-nav-link>
-                    <x-nav-link href="{{ route('calendar') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
+                    <x-nav-link href="{{ route('calendar.all.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
                         <i class="fa-solid fa-calendar-days mr-2"></i>Kalendarz
                     </x-nav-link>
-                    <x-nav-link href="" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
+                    <x-nav-link href="{{ route('leave.group.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
                         <i class="fa-solid fa-inbox mr-2"></i>Wnioski
                     </x-nav-link>
-                    <x-nav-link href="{{ route('rcp') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
+                    <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
                         <i class="fa-solid fa-clock mr-2"></i>RCP
                     </x-nav-link>
-                    <x-nav-link href="" :active="Str::startsWith(request()->path(), 'dashboard/work/session')">
+                    <x-nav-link href="{{ route('raport.time-sheet.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/raport')">
                         <i class="fa-solid fa-chart-line mr-2"></i>Raporty
                     </x-nav-link>
                     <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
@@ -36,41 +36,43 @@
                 </div>
             </div>
             @if ($company)
-            <x-widget-display-nav class="grid-cols-3 grid-rows-1 h-fit">
-                <div class="col-span-2">
-                    <!-- Data -->
-                    <div>
-                        <x-flex-center>
-                            <x-paragraf-display id="date" class="text-xs">
-                            </x-paragraf-display>
-                        </x-flex-center>
+            <div class="items-center hidden sm:flex">
+                <x-widget-display-nav class="grid-cols-3 grid-rows-1 h-fit">
+                    <div class="col-span-2">
+                        <!-- Data -->
+                        <div class="">
+                            <x-flex-center>
+                                <x-paragraf-display id="date" class="text-xs">
+                                </x-paragraf-display>
+                            </x-flex-center>
+                        </div>
+                        <!-- Timer -->
+                        <div>
+                            <x-flex-center>
+                                <x-paragraf-display id="timer" class="text-xl">
+                                    00:00:00
+                                </x-paragraf-display>
+                            </x-flex-center>
+                        </div>
                     </div>
-                    <!-- Timer -->
-                    <div>
-                        <x-flex-center>
-                            <x-paragraf-display id="timer" class="text-xl">
-                                00:00:00
-                            </x-paragraf-display>
-                        </x-flex-center>
+                    <div class="col-start-3 h-full">
+                        <!-- Przycisk Start -->
+                        <div class="text-center flex justify-center items-center h-full">
+                            <button
+                                id="startButton"
+                                class="whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                Start
+                            </button>
+                            <!-- Przycisk Stop -->
+                            <button
+                                id="stopButton"
+                                class="hidden whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                Stop
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="col-start-3 h-full">
-                    <!-- Przycisk Start -->
-                    <div class="text-center flex justify-center items-center h-full">
-                        <button
-                            id="startButton"
-                            class="whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                            Start
-                        </button>
-                        <!-- Przycisk Stop -->
-                        <button
-                            id="stopButton"
-                            class="hidden whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                            Stop
-                        </button>
-                    </div>
-                </div>
-            </x-widget-display-nav>
+                </x-widget-display-nav>
+            </div>
             @endif
             <div class="hidden xl:flex xl:items-center xl:ms-6">
                 <!-- Teams Dropdown -->
@@ -196,7 +198,7 @@
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Panel główny') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('work.session') }}" :active="Str::startsWith(request()->path(), 'dashboard/work')">
+            <x-responsive-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/work')">
                 {{ __('Mierzenie Czasu Pracy') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">

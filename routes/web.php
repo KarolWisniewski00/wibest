@@ -1,23 +1,32 @@
 <?php
 
-use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\Calendar\CalendarController;
+use App\Http\Controllers\Calendar\LeaveCalendarController;
+use App\Http\Controllers\Calendar\WorkScheduleController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CostController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EventController;
 use App\Http\Controllers\GoogleController;
-use App\Http\Controllers\InvitationController;
 use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\OcrController;
+use App\Http\Controllers\Leave\LeaveGroupController;
+use App\Http\Controllers\Leave\LeaveLimitController;
+use App\Http\Controllers\Leave\LeavePendingReviewController;
+use App\Http\Controllers\Leave\LeaveSingleController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\Raport\AttendanceSheetController;
+use App\Http\Controllers\Raport\TimeSheetController;
 use App\Http\Controllers\RaportController;
-use App\Http\Controllers\RCPController;
+use App\Http\Controllers\RCP\EventController;
+use App\Http\Controllers\RCP\WorkSessionController as RCPWorkSessionController;
+use App\Http\Controllers\RCP\RCPController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\Team\InvitationController;
+use App\Http\Controllers\Team\UserController as TeamUserController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WorkSessionController;
@@ -43,9 +52,9 @@ Route::get('/login/google', [GoogleController::class, 'redirect'])->name('login.
 Route::get('/login/google/callback', [GoogleController::class, 'callback']);
 Route::prefix('api')->group(function () {
     Route::prefix('work')->group(function () {
-        Route::get('/start/{user_id}', [WorkSessionController::class, 'startWork'])->name('api.work.start');
-        Route::get('/stop/{id}', [WorkSessionController::class, 'stopWork'])->name('api.work.stop');
-        Route::get('/session/{user_id}', [WorkSessionController::class, 'getWorkSession'])->name('api.work.session');
+        Route::get('/start/{user_id}', [RCPWorkSessionController::class, 'startWork'])->name('api.work.start');
+        Route::get('/stop/{id}', [RCPWorkSessionController::class, 'stopWork'])->name('api.work.stop');
+        Route::get('/session/{user_id}', [RCPWorkSessionController::class, 'getWorkSession'])->name('api.work.session');
     });
     Route::prefix('invoice')->group(function () {
         Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
@@ -59,7 +68,18 @@ Route::prefix('api')->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('update/role/{id}/{role}', [UserController::class, 'updateRole'])->name('api.user.update.role');
     });
+    //API -----------------------------------------------------------------
+    Route::prefix('v1')->group(function () {
+        Route::prefix('rcp')->group(function () {
+            Route::prefix('work-session')->group(function () {
+                Route::get('/', [RCPController::class, 'get'])->name('api.v1.rcp.work-session.get');
+                Route::post('/export-xlsx', [RCPController::class, 'export_xlsx'])->name('api.v1.rcp.work-session.export.xlsx');
+            });
+        });
+    });
+    //API -----------------------------------------------------------------
 });
+
 //LOGGED IN
 Route::middleware([
     'auth:sanctum',
@@ -67,47 +87,87 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::prefix('dashboard')->group(function () {
+        //Mierzenie Czasu Pracy -----------------------------------------------------------------
+        //Nazwy na podstawie zakładek
 
+        // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
+        // TEAM ---------------------------------------------------------------------------------
         Route::prefix('team')->group(function () {
-            Route::get('/', [TeamController::class, 'index'])->name('team');
+            Route::prefix('user')->group(function () {
+                Route::get('/', [TeamUserController::class, 'index'])->name('team.user.index');
+            });
+            Route::prefix('invitation')->group(function () {
+                Route::get('/', [InvitationController::class, 'index'])->name('team.invitation.index');
+            });
         });
-        Route::prefix('invitation')->group(function () {
-            Route::get('/', [InvitationController::class, 'index'])->name('invitation');
-        });
+
+        // CALENDAR ------------------------------------------------------------------------------
         Route::prefix('calendar')->group(function () {
-            Route::get('/', [CalendarController::class, 'index'])->name('calendar');
+            Route::prefix('all')->group(function () {
+                Route::get('/', [CalendarController::class, 'index'])->name('calendar.all.index');
+            });
+
+            Route::prefix('work-schedule')->group(function () {
+                Route::get('/', [WorkScheduleController::class, 'index'])->name('calendar.work-schedule.index');
+            });
+
+            Route::prefix('leave-application')->group(function () {
+                Route::get('/', [LeaveCalendarController::class, 'index'])->name('calendar.leave-application.index');
+            });
         });
+
+        // LEAVE APPLICATIONS --------------------------------------------------------------------
+        Route::prefix('leave')->group(function () {
+            Route::prefix('group')->group(function () {
+                Route::get('/', [LeaveGroupController::class, 'index'])->name('leave.group.index');
+            });
+
+            Route::prefix('single')->group(function () {
+                Route::get('/', [LeaveSingleController::class, 'index'])->name('leave.single.index');
+            });
+
+            Route::prefix('pending-review')->group(function () {
+                Route::get('/', [LeavePendingReviewController::class, 'index'])->name('leave.pending.index');
+            });
+
+            Route::prefix('limit')->group(function () {
+                Route::get('/', [LeaveLimitController::class, 'index'])->name('leave.limit.index');
+            });
+        });
+
+        // RCP -----------------------------------------------------------------------------------
         Route::prefix('rcp')->group(function () {
-            Route::prefix('work_session')->group(function () {
-                Route::get('/', [RCPController::class, 'index'])->name('rcp');
-                Route::get('show/{work_session}', [RCPController::class, 'show'])->name('rcp.show');
-                Route::delete('delete/{work_session}', [RCPController::class, 'delete'])->name('rcp.delete');
-            });
-            Route::prefix('events')->group(function () {
-                Route::get('/', [EventController::class, 'index'])->name('event');
-                Route::get('show/{event}', [EventController::class, 'show'])->name('event.show');
-                Route::delete('delete/{event}', [EventController::class, 'delete'])->name('event.delete');
+            Route::prefix('work-session')->group(function () {
+                Route::get('/', [RCPController::class, 'index'])->name('rcp.work-session.index');
+                Route::get('/create', [RCPController::class, 'create'])->name('rcp.work-session.create');
+                Route::post('/store', [RCPController::class, 'store'])->name('rcp.work-session.store');
+                Route::get('/edit/{work_session}', [RCPController::class, 'edit'])->name('rcp.work-session.edit');
+                Route::put('/update/{work_session}', [RCPController::class, 'update'])->name('rcp.work-session.update');
+                Route::get('/show/{work_session}', [RCPController::class, 'show'])->name('rcp.work-session.show');
+                Route::delete('/delete/{work_session}', [RCPController::class, 'delete'])->name('rcp.work-session.delete');
             });
 
-        });
-        Route::prefix('work')->group(function () {
-            Route::prefix('session')->group(function () {
-                Route::get('/', [WorkSessionController::class, 'index'])->name('work.session');
-                Route::get('create', [WorkSessionController::class, 'create'])->name('work.session.create');
-                Route::post('store', [WorkSessionController::class, 'store'])->name('work.session.store');
-                Route::get('search', [WorkSessionController::class, 'search'])->name('work.session.search');
-                Route::get('show/{work_session}', [WorkSessionController::class, 'show'])->name('work.session.show');
-                Route::get('edit/{work_session}', [WorkSessionController::class, 'edit'])->name('work.session.edit');
-                Route::put('update/{work_session}', [WorkSessionController::class, 'update'])->name('work.session.update');
-                Route::delete('delete/{work_session}', [WorkSessionController::class, 'delete'])->name('work.session.delete');
-
-                Route::get('now', [WorkSessionController::class, 'index_now'])->name('work.session.now');
-                Route::get('last', [WorkSessionController::class, 'index_last'])->name('work.session.last');
+            Route::prefix('event')->group(function () {
+                Route::get('/', [EventController::class, 'index'])->name('rcp.event.index');
+                Route::get('/show/{event}', [EventController::class, 'show'])->name('rcp.event.show');
+                Route::delete('/delete/{event}', [EventController::class, 'delete'])->name('rcp.event.delete');
             });
         });
 
+        // RAPORTS -------------------------------------------------------------------------------
+        Route::prefix('raport')->group(function () {
+            Route::prefix('time-sheet')->group(function () {
+                Route::get('/', [TimeSheetController::class, 'index'])->name('raport.time-sheet.index');
+            });
+
+            Route::prefix('attendance-sheet')->group(function () {
+                Route::get('/', [AttendanceSheetController::class, 'index'])->name('raport.attendance-sheet.index');
+            });
+        });
+
+        //Mierzenie Czasu Pracy ------------------------------------------------------------------
 
         Route::prefix('client')->group(function () {
             Route::get('/', [ClientController::class, 'index'])->name('client');
@@ -157,9 +217,7 @@ Route::middleware([
         Route::prefix('order')->group(function () {
             Route::get('/', [ContractController::class, 'index'])->name('order');
         });
-        Route::prefix('raport')->group(function () {
-            Route::get('/', [ContractController::class, 'index'])->name('raport');
-        });
+
         Route::prefix('cost')->group(function () {
             Route::get('/', [CostController::class, 'index'])->name('cost');
             Route::get('create', [CostController::class, 'create'])->name('cost.create');

@@ -26,7 +26,7 @@ class Event extends Model
 
     public function created_user()
     {
-        return $this->belongsTo(Company::class, 'created_user_id');
+        return $this->belongsTo(User::class, 'created_user_id');
     }
 
     public function company()

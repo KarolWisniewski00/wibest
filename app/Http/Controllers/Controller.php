@@ -113,18 +113,7 @@ class Controller extends BaseController
     {
         return User::find($id)->company_id;
     }
-    public function isAdmin()
-    {
-        $user = User::where('id', auth()->id())->first();
-        if ($user) {
-            if ($user->role == 'admin') {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
+
     public function get_events_logged_user()
     {
         return Event::where('company_id', $this->get_company_id())

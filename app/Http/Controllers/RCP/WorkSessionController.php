@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\RCP;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkSessionRequest;
 use App\Models\Event;
 use App\Models\User;
