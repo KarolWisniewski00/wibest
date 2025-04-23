@@ -10,13 +10,13 @@ use Illuminate\Support\Carbon;
 
 class WorkSessionRepository
 {
-    public function getPaginatedForCurrentUser(int $perPage = 10)
+    public function getPaginatedForCurrentUser(int $perPage = 10, ?string $startDate = null, ?string $endDate = null)
     {
         if ($this->isAdmin()) {
-            return $this->getAllForCompanyPaginated($perPage);
+            return $this->getAllForCompanyPaginated($perPage, $startDate, $endDate);
         }
 
-        return $this->getForLoggedUserPaginated($perPage);
+        return $this->getForLoggedUserPaginated($perPage, $startDate, $endDate);
     }
 
     public function getAll(): \Illuminate\Database\Eloquent\Collection
@@ -24,23 +24,34 @@ class WorkSessionRepository
         return WorkSession::all();
     }
 
-    public function getCurrentMonthString(): string
+    private function getForLoggedUserPaginated(int $perPage, ?string $startDate = null, ?string $endDate = null)
     {
-        return Carbon::now()->translatedFormat('F Y');
+        $query = WorkSession::where('user_id', Auth::id());
+
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
-    private function getForLoggedUserPaginated(int $perPage)
+    private function getAllForCompanyPaginated(int $perPage, ?string $startDate = null, ?string $endDate = null)
     {
-        return WorkSession::where('user_id', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
-    }
+        $query = WorkSession::where('company_id', Auth::user()->company_id);
 
-    private function getAllForCompanyPaginated(int $perPage)
-    {
-        return WorkSession::where('company_id', Auth::user()->company_id)
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+        if ($startDate) {
+            $query->whereDate('created_at', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
+
+        return $query->orderBy('created_at', 'desc')->paginate($perPage);
     }
 
     private function isAdmin(): bool

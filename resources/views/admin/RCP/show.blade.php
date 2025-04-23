@@ -3,8 +3,51 @@
     @if ($company)
     <!--SIDE BAR-->
     <x-sidebar-left>
-        <x-search-filter />
-        <x-date-filter />
+        <li>
+            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                Podgląd elementu RCP w którego skład wchodzą dwa mniejsze zdarzenia START i STOP.
+            </div>
+            @php
+            $czasString = $work_session->time_in_work;
+            $czasSekundy=\Illuminate\Support\Carbon::parse($czasString)->secondsSinceMidnight();
+
+            $klasa = '';
+            $komunikat = '';
+
+            if ($czasSekundy >= 8 * 3600) {
+            $klasa = 'green';
+            $komunikat = 'Czas pracy zgodny z normą.';
+            } elseif ($czasSekundy >= 7 * 3600) {
+            $klasa = 'yellow';
+            $komunikat = 'Czas pracy nieco poniżej normy.';
+            } else {
+            $klasa = 'red';
+            $komunikat = 'Uwaga! Czas pracy poniżej oczekiwań.';
+            }
+            @endphp
+            @if($work_session->status == 'Praca zakończona')
+            @if ($klasa === 'green')
+            <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                <span class="font-medium">Sukces!</span> {{ $komunikat }}
+            </div>
+            @elseif ($klasa === 'yellow')
+            <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+                <span class="font-medium">Ostrzeżenie!</span> {{ $komunikat }}
+            </div>
+            @else
+            <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <span class="font-medium">Błąd!</span> {{ $komunikat }}
+            </div>
+            @endif
+            @endif
+            @if($role == 'admin')
+            @if($work_session->status != 'Praca zakończona')
+            <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+                <span class="font-medium">Ostrzeżenie!</span> Edycja nie jest możliwa, ponieważ sesja pracy jeszcze nie została zakończona.
+            </div>
+            @endif
+            @endif
+        </li>
     </x-sidebar-left>
     <!--SIDE BAR-->
 
@@ -130,12 +173,12 @@
                 @endif
             </div>
             <div class="flex justify-end mt-4">
+                @if($role == 'admin')
                 @if($work_session->status == 'Praca zakończona')
                 <x-button-link-cello href="{{route('rcp.work-session.edit', $work_session)}}" class="text-lg mr-2">
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
                 </x-button-link-cello>
                 @endif
-                @if($role == 'admin')
                 <form action="{{route('rcp.work-session.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                     @csrf
                     @method('DELETE')

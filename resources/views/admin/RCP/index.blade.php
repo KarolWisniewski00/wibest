@@ -12,7 +12,9 @@
     <x-main>
         <x-RCP.nav />
         <x-RCP.header>Rejestracja czasu pracy</x-RCP.header>
-
+        <x-status-cello id="show-filter" class="mx-2 mt-8 ">
+            {{ $startDate }} - {{ $endDate }}
+        </x-status-cello>
         <!--CONTENT-->
         <x-flex-center class="px-4 pb-4 flex flex-col">
             <!--MOBILE VIEW-->
@@ -42,11 +44,6 @@
                                 <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
                                     <div class="flex flex-col">
                                         {{$work_session->user->name}}
-                                    </div>
-                                </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                    <div class="flex flex-col">
-                                        {{$work_session->company->name}}
                                     </div>
                                 </div>
                                 <div class="flex space-x-4 mt-4">
@@ -83,7 +80,7 @@
                                 Zdjęcie
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
-                                Imię i Nazwisko, Rola
+                                Imię i Nazwisko
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
                                 Status
@@ -138,7 +135,7 @@
                         @endforeach
                         @endif
                     </tbody>
-                    <div id="loader" class="text-center py-4 hidden">Ładowanie...</div>
+                    <div id="loader" class="text-center py-4 hidden text-gray-700 dark:text-gray-50">Ładowanie...</div>
                 </table>
                 <!-- PC VIEW -->
                 @else
@@ -235,19 +232,24 @@
                 });
             });
         </script>
+        <input type="hidden" id="start_date" value="{{ $startDate }}">
+        <input type="hidden" id="end_date" value="{{ $endDate }}">
         <script>
             $(document).ready(function() {
                 let page = 2;
                 let loading = false;
                 const $body = $('#work-sessions-body');
+                const $list = $('#list');
                 const $loader = $('#loader');
+                const startDate = $('#start_date').val();
+                const endDate = $('#end_date').val();
 
                 function loadMoreSessions() {
                     if (loading) return;
                     loading = true;
                     $loader.removeClass('hidden');
 
-                    $.get(`{{ route('api.v1.rcp.work-session.get') }}?page=${page}`, function(data) {
+                    $.get(`{{ route('api.v1.rcp.work-session.get') }}?page=${page}&start_date=${startDate}&end_date=${endDate}`, function(data) {
                         data.data.forEach(function(session) {
                             const row = `
                             <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
@@ -267,7 +269,7 @@
                                         ${session.user.name}
                                     </x-paragraf-display>
                                 </td>
-                                <td class="px-3 py-2 text-sm">
+                                <td class="px-3 py-2 text-xs">
                                     ${session.status === 'W trakcie pracy' 
                                         ? `<x-status-yellow>${session.status}</x-status-yellow>` 
                                         : session.status === 'Praca zakończona' 
@@ -279,6 +281,46 @@
                                 </td>
                                 <x-show-cell href="{{ route('rcp.work-session.show', '') }}/${session.id}" />
                             </tr>`;
+                            const rowMobile = `
+                            <li>
+                                <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                                    <div class="block w-full">
+                                        <div class="flex justify-between w-full">
+                                            <div class="flex justify-start items-center w-full justify-start">
+                                                ${session.status === 'W trakcie pracy' 
+                                                ? `<x-status-yellow class="text-xl">${session.status}</x-status-yellow>` 
+                                                : session.status === 'Praca zakończona' 
+                                                    ? `<x-status-green class="text-xl">${session.status}</x-status-green>` 
+                                                    : ''}
+                                            </div>
+                                        </div>
+                                        <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                            ${session.time_in_work ?? '-'}
+                                        </div>
+                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
+                                            <div class="flex flex-col">
+                                                ${session.user.name}
+                                            </div>
+                                        </div>
+                                        <div class="flex space-x-4 mt-4">
+                                            <x-button-link-neutral href="{{ route('rcp.work-session.show', '') }}/${session.id}" class="min-h-[38px]">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </x-button-link-neutral>
+                                            @if($role == 'admin')
+                                            ${session.status === 'W trakcie pracy' 
+                                                ? `` 
+                                                : session.status === 'Praca zakończona' 
+                                                    ? `<x-button-link-blue href="{{ route('rcp.work-session.edit', '') }}/${session.id}" class="min-h-[38px]">
+                                                            <i class="fa-solid fa-pen-to-square"></i>
+                                                        </x-button-link-blue>` 
+                                                    : ''}
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            `;
+                            $list.append(rowMobile);
                             $body.append(row);
                         });
 

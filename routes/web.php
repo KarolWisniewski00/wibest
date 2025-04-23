@@ -73,7 +73,13 @@ Route::prefix('api')->group(function () {
         Route::prefix('rcp')->group(function () {
             Route::prefix('work-session')->group(function () {
                 Route::get('/', [RCPController::class, 'get'])->name('api.v1.rcp.work-session.get');
+                Route::get('set-date/', [RCPController::class, 'setDate'])->name('api.v1.rcp.work-session.set.date');
                 Route::post('/export-xlsx', [RCPController::class, 'export_xlsx'])->name('api.v1.rcp.work-session.export.xlsx');
+            });
+            Route::prefix('event')->group(function () {
+                Route::get('/', [EventController::class, 'get'])->name('api.v1.rcp.event.get');
+                Route::get('set-date/', [EventController::class, 'setDate'])->name('api.v1.rcp.event.set.date');
+                Route::post('/export-xlsx', [EventController::class, 'export_xlsx'])->name('api.v1.rcp.event.export.xlsx');
             });
         });
     });

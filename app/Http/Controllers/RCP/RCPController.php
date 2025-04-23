@@ -30,13 +30,23 @@ class RCPController extends Controller
         $this->userRepository = $userRepository;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $work_sessions = $this->workSessionRepository->getPaginatedForCurrentUser(10);
-        $work_sessions_all = $this->workSessionRepository->getAll();
-        $currentMonthString = $this->workSessionRepository->getCurrentMonthString();
+        // Check if session variables for date range exist, otherwise set default to current month
+        if (!$request->session()->has('start_date') || !$request->session()->has('end_date')) {
+            $startOfMonth = now()->startOfMonth()->toDateString();
+            $endOfMonth = now()->endOfMonth()->toDateString();
 
-        return view('admin.rcp.index', compact('work_sessions', 'work_sessions_all', 'currentMonthString'));
+            $request->session()->put('start_date', $startOfMonth);
+            $request->session()->put('end_date', $endOfMonth);
+        }
+
+        $startDate = $request->session()->get('start_date');
+        $endDate = $request->session()->get('end_date');
+
+        $work_sessions = $this->workSessionRepository->getPaginatedForCurrentUser(10, $startDate, $endDate);
+
+        return view('admin.rcp.index', compact('work_sessions', 'startDate', 'endDate'));
     }
     public function create()
     {
@@ -91,9 +101,42 @@ class RCPController extends Controller
     public function get(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $sessions = WorkSession::with('user')
-            ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+    
+        $query = WorkSession::with('user')->orderBy('created_at', 'desc');
+    
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->input('start_date'));
+        }
+    
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->input('end_date'));
+        }
+    
+        $sessions = $query->paginate($perPage);
+    
+        return response()->json($sessions);
+    }
+    public function setDate(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $request->session()->put('start_date', $request->input('start_date'));
+        $request->session()->put('end_date', $request->input('end_date'));
+
+        $query = WorkSession::with('user')->orderBy('created_at', 'desc');
+    
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->input('start_date'));
+        }
+    
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->input('end_date'));
+        }
+    
+        $sessions = $query->get();
 
         return response()->json($sessions);
     }

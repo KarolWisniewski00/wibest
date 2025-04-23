@@ -9,3 +9,4 @@
     {{ $work_session->status }}
 </x-status-green>
 @endif
+<!--PRZY ZMIANACH PAMIĘTAJ ŻE W JQUERY TEŻ TRZEBA ZMIENIĆ-->

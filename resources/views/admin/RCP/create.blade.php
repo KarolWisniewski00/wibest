@@ -3,8 +3,17 @@
     @if ($company)
     <!--SIDE BAR-->
     <x-sidebar-left>
-        <x-search-filter />
-        <x-date-filter />
+        <li>
+            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                Tworzysz element RCP w którego skład wchodzą dwa mniejsze zdarzenia START i STOP. Nie można utworzyć zdarzenia START lub STOP bez tworzenia RCP.
+            </div>
+            <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+                <span class="font-medium">Ostrzeżenie!</span> Domyślnie użytkownik jest nie ustawiony. Należy wybrać użytkownika z listy rozwijanej. Jeżeli nie ma użytkownika na liście, należy dodać go w zakładce <a href="{{ route('team.user.index') }}" class="text-blue-600 hover:underline dark:text-blue-500">Zespół</a>.
+            </div>
+            <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+                <span class="font-medium">Ostrzeżenie!</span> Data rozpoczęcia musi być wcześniejsza niż data zakończenia.
+            </div>
+        </li>
     </x-sidebar-left>
     <!--SIDE BAR-->
 
