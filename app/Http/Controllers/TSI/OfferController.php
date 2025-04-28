@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\TSI;
 
+use App\Http\Controllers\Controller;
 use App\Mail\OfferMail;
 use App\Models\Client;
 use App\Models\Invoice;
@@ -213,15 +214,15 @@ class OfferController extends Controller
         $offer_str = $offer;
         $items = OfferItem::where('offer_id', $offer_str)->get();
         $offer_obj = Offer::where('id', $offer_str)->first();
-        $offer = $this->get_offer_data_from_obj($offer_obj, $items);
+        //$offer = $this->get_offer_data_from_obj($offer_obj, $items);
 
         // Generowanie PDF
-        $offerNumber = str_replace([' ', '/'], '-', $offer_obj->number);
-        $user = User::where('id', $offer_obj->user_id)->first();
-        $pdf = PDF::loadView('admin.template.offer', compact('offer', 'user'));
+        //$offerNumber = str_replace([' ', '/'], '-', $offer_obj->number);
+        //$user = User::where('id', $offer_obj->user_id)->first();
+        $pdf = PDF::loadView('admin.template.offer2');
 
         // Pobranie pliku PDF
-        return $pdf->download('oferta-' . $offer_obj->seller_name . '-' . $offerNumber . '.pdf');
+        return $pdf->download('oferta.pdf');
     }
     /**
      * Pokazuje formularz edycji faktury.

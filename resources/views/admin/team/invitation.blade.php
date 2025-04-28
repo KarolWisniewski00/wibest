@@ -1,45 +1,27 @@
 <x-app-layout class="flex">
     @include('admin.elements.alerts')
     @if ($company)
-    <aside id="sidebar-multi-level-sidebar" class="fixed mt-20 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 border-t-2 dark:border-gray-600">
-            <ul class="space-y-2 font-medium">
-                <li>
-                    <input placeholder="Szukaj" type="text" class="datepicker h-12 w-full appearance-none rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-100 pr-4 outline-none  dark:bg-gray-700 dark:text-gray-50 dark:focus:border-2 dark:focus:border-lime-500" />
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Zaproszenia</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="pracownicy-dropdown" class="">
-                        <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                            <label class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700 peer">
-                                <input type="radio" name="workers" class="hidden peer" checked />
-                                <span class="flex whitespace-nowrap peer-checked:bg-green-300 peer-checked:text-gray-900 peer-checked:rounded-lg w-full h-full px-3">Wszystkie</span>
-                            </label>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </aside>
-    <script>
-        $(document).ready(function() {
-            $('[data-collapse-toggle]').on('click', function() {
-                var target = $(this).attr('aria-controls');
-                $('#' + target).toggleClass('hidden');
-                $(this).find('i').toggleClass('fa-chevron-up fa-chevron-down');
-            });
-        });
-    </script>
+    <!--SIDE BAR-->
+    <x-sidebar-left>
+        <li>
+            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+                Podgląd zaproszeń do zespołu.
+            </div>
+            @if($role == 'admin')
+            <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
+                <span class="font-medium">Ostrzeżenie!</span> Możesz zaakceptować lub odrzucić zaproszenie.
+            </div>
+            @endif
+        </li>
+    </x-sidebar-left>
+    <!--SIDE BAR-->
     <div class="p-4 sm:ml-64">
         <div class="py-12">
             <div class=" mx-auto sm:px-6 lg:px-8 mt-16">
                 <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                     <!--NAV-->
                     <div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+                        <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                             <x-nav-link class="h-full text-center"
                                 href="{{ route('team.user.index') }}"
                                 :active="Str::startsWith(request()->path(), 'dashboard/team/user')">
@@ -64,9 +46,6 @@
                     <x-container-header>
                         <x-h1-display>
                             Zaproszenia ({{$invitationCount}})
-                            <x-label-green>
-                                Wszystkie
-                            </x-label-green>
                         </x-h1-display>
                     </x-container-header>
                     <x-label class="px-4">
@@ -82,12 +61,36 @@
                                 <div class="block w-full">
                                     <div class="flex justify-between w-full">
                                         <div class="flex justify-start items-center w-full justify-start">
-                                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                            <span class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                                @if($i->user->profile_photo_url)
+                                                <img src="{{ $i->user->profile_photo_url }}" alt="{{ $i->user->name }}" class="w-10 h-10 rounded-full">
+                                                @else
+                                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                                    {{ strtoupper(substr($i->user->name, 0, 1)) }}
+                                                </div>
+                                                @endif
                                                 {{ $i->user->name }}
+                                                @if($i->user->role == 'admin')
+                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>
+                                                @elseif($i->user->role == 'menedżer')
+                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-600 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>
+                                                @elseif($i->user->role == 'kierownik')
+                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-600 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>
+                                                @elseif($i->user->role == 'użytkownik')
+                                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-600 text-gray-100 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>
+                                                @endif
                                             </span>
                                         </div>
                                     </div>
-                                    <a href="mailto:{{ $i->user->email }}" class="my-4 inline-flex items-center text-blue-300 dark:text-blue-300 font-semibold text-xs uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition ease-in-out duration-150">
+                                    <a href="mailto:{{$i->user->email}}" class="mt-2 inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
                                         {{ $i->user->email }}
                                     </a>
                                 </div>
@@ -96,10 +99,10 @@
                                         Prośba o dołączenie
                                     </span>
                                     <div class="flex gap-2">
-                                        <a href="{{route('setting.user.invitations.accept',$i->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-green-500 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        <a href="{{route('team.invitation.accept',$i->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-green-500 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                             <i class="fa-solid fa-check"></i>
                                         </a>
-                                        <a href="{{route('setting.user.invitations.reject',$i->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        <a href="{{route('team.invitation.reject',$i->user->id)}}" class="min-h-[38px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                             <i class="fa-solid fa-ban"></i>
                                         </a>
                                     </div>

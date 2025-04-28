@@ -62,7 +62,13 @@ class WorkSessionController extends Controller
             }
 
             // Obliczenie przepracowanego czasu
-            $timeInWork = Carbon::parse($startEvent->time)->diff($endTime)->format('%H:%I:%S');
+            $timeDifference = Carbon::parse($startEvent->time)->diffInSeconds($endTime);
+            if ($timeDifference > 86400) { // 86400 seconds = 24 hours
+                $endTime = Carbon::parse($startEvent->time)->addHours(24);
+                $timeInWork = '24:00:00';
+            } else {
+                $timeInWork = Carbon::parse($startEvent->time)->diff($endTime)->format('%H:%I:%S');
+            }
 
 
             // Tworzenie eventu stop
@@ -102,6 +108,35 @@ class WorkSessionController extends Controller
             ->with('eventStart')
             ->orderByDesc(Event::select('time')->whereColumn('events.id', 'work_sessions.event_start_id'))
             ->first();
+
+        // Obliczenie przepracowanego czasu
+        $endTime = Carbon::now();
+        $timeDifference = Carbon::parse($latestWorkSession->eventStart->time)->diffInSeconds($endTime);
+        if ($timeDifference > 86400) { // 86400 seconds = 24 hours
+            $endTime = Carbon::parse($latestWorkSession->eventStart->time)->addHours(24);
+            $timeInWork = '24:00:00';
+            // Tworzenie eventu stop
+            $stopEvent = Event::create([
+                'time' => $endTime,
+                'location' => '',
+                'device' => '',
+                'event_type' => 'stop',
+                'user_id' => $latestWorkSession->user_id,
+                'company_id' => $latestWorkSession->company_id,
+                'created_user_id' => $latestWorkSession->created_user_id,
+            ]);
+            
+            // Aktualizacja sesji pracy
+            $latestWorkSession->update([
+                'event_stop_id' => $stopEvent->id,
+                'status' => 'Praca zakończona',
+                'time_in_work' => $timeInWork,
+            ]);
+            return response()->json([
+                'message' => 'Praca zakończona 24:00:00'
+            ], 200);
+        }
+
         if ($latestWorkSession->event_stop_id == null) {
             return response()->json([
                 'message' => 'W trakcie pracy',

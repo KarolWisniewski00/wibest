@@ -132,4 +132,47 @@ class WorkSessionRepository
 
         return $workSession;
     }
+    public function hasEventForUserOnDate(int $userId, string $date): bool
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        return WorkSession::where('user_id', $userId)
+            ->whereHas('eventStart', function ($query) use ($formattedDate) {
+                $query->whereDate('time', $formattedDate);
+            })
+            ->whereHas('eventStop', function ($query) use ($formattedDate) {
+                $query->whereDate('time', $formattedDate);
+            })
+            ->exists();
+    }
+    public function hasStartEventForUserOnDate(int $userId, string $date): bool
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        return Event::where('user_id', $userId)
+            ->where('event_type', 'start')
+            ->whereDate('time', $formattedDate)
+            ->exists();
+    }
+    public function hasStopEventForUserOnDate(int $userId, string $date): bool
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        return Event::where('user_id', $userId)
+            ->where('event_type', 'stop')
+            ->whereDate('time', $formattedDate)
+            ->exists();
+    }
+
+    public function hasInProgressEventForUserOnDate(int $userId, string $date): bool
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        return WorkSession::where('user_id', $userId)
+            ->where('status', 'W trakcie pracy')
+            ->whereHas('eventStart', function ($query) use ($formattedDate) {
+                $query->whereDate('time', $formattedDate);
+            })
+            ->exists();
+    }
 }

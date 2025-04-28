@@ -51,7 +51,7 @@
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
-                        <input type="hidden" id="api-link-gus" value="{{route('api.search.gus',[''])}}">
+                        <input type="hidden" id="api-link-gus" value="{{route('api.v1.search.gus',[''])}}">
                         <script>
                             $(document).ready(function() {
                                 $('#fetch_vat_data').click(function() {

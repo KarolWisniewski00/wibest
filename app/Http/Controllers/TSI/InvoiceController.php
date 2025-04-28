@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\TSI;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\InvoiceRequest;
 use App\Mail\InvoiceMail;
 use App\Models\Client;

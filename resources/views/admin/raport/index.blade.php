@@ -1,162 +1,207 @@
 <x-app-layout class="flex">
     @include('admin.elements.alerts')
     @if ($company)
-    <aside id="sidebar-multi-level-sidebar" class="fixed mt-20 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 border-t-2 dark:border-gray-600">
-            <ul class="space-y-2 font-medium">
-                <li>
-                    <input placeholder="Szukaj" type="text" class="datepicker h-12 w-full appearance-none rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-100 pr-4 outline-none  dark:bg-gray-700 dark:text-gray-50 dark:focus:border-2 dark:focus:border-lime-500" />
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Zakres dat</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="pracownicy-dropdown" class="">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Grafik pracy</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="pracownicy-dropdown" class="">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Stanowisko pracy</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="pracownicy-dropdown" class="">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="tags-dropdown" data-collapse-toggle="tags-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Tagi</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </button>
-                    <ul id="tags-dropdown" class="hidden">
-                    </ul>
-                </li>
-                <li class="group hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
-                    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="positions-dropdown" data-collapse-toggle="positions-dropdown">
-                        <span class="flex-1 text-left rtl:text-right whitespace-nowrap">Stanowiska</span>
-                        <i class="fa-solid fa-chevron-up"></i>
-                    </button>
-                    <ul id="positions-dropdown">
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </aside>
-    <script>
-        $(document).ready(function() {
-            $('[data-collapse-toggle]').on('click', function() {
-                var target = $(this).attr('aria-controls');
-                $('#' + target).toggleClass('hidden');
-                $(this).find('i').toggleClass('fa-chevron-up fa-chevron-down');
-            });
-        });
-    </script>
-    <div class="p-4 sm:ml-64">
-        <div class="py-12">
-            <div class=" mx-auto sm:px-6 lg:px-8 mt-16">
-                <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
-                    <!--NAV-->
-                    <div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                        <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-                            <x-nav-link class="h-full text-center"
-                                href="{{ route('raport.time-sheet.index') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/raport/time-sheet')">
-                                Lista obecności
-                            </x-nav-link>
-                            <x-nav-link class="h-full text-center"
-                                href="{{ route('raport.attendance-sheet.index') }}"
-                                :active="Str::startsWith(request()->path(), 'dashboard/raport/attendance-sheet')">
-                                Ewidencja Czasu Pracy
-                            </x-nav-link>
-                        </nav>
-                    </div>
-                    <!--NAV-->
-                    <!--HEADER-->
-                    <x-container-header>
-                        <x-h1-display>
-                            Raporty
-                        </x-h1-display>
-                        <x-flex-center>
-                            <x-button-link-green class="text-xs mx-2">
-                                <i class="fa-solid fa-plus mr-2"></i>Dodaj
-                            </x-button-link-green>
-                            <x-button-link-neutral class="text-xs mx-2">
-                                <i class="fa-solid fa-download mr-2"></i>Akcje
-                            </x-button-link-neutral>
-                            <x-button-link-cello class="text-xs ml-2">
-                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                            </x-button-link-cello>
-                        </x-flex-center>
-                    </x-container-header>
-                    <!--HEADER-->
+    <!--SIDE BAR-->
+    <x-sidebar-left>
+        <x-search-filter />
+        <x-date-filter />
+    </x-sidebar-left>
+    <!--SIDE BAR-->
+    <x-main>
+        <x-raport.nav />
+        <!--HEADER-->
+        <x-raport.header>
+            Raporty
+        </x-raport.header>
+        <!--HEADER-->
+        <x-status-cello id="show-filter" class="mx-2 mt-8 ">
+            {{ $startDate }} - {{ $endDate }}
+        </x-status-cello>
 
-                    <x-flex-center class="px-4">
-                        <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400  hidden md:table">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">
-                                        <x-flex-center>
-                                            <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                        </x-flex-center>
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
+        <x-flex-center class="px-4 pb-4 flex flex-col">
+            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
 
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        Imię i Nazwisko, Rola
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        1
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        2
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        3
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        4
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        5
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        6
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        7
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        8
-                                    </th>
-                                    <th scope="col" class="px-6 py-3">
-                                        9
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                                    <td class="px-3 py-2">
-                                        <x-flex-center>
-                                            <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                        </x-flex-center>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </x-flex-center>
-                </div>
+                <table id="table" class="w-full text-sm text-center text-gray-500 dark:text-gray-400 table">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+                        <tr id="table-head">
+                            <th scope="col" class="px-2 py-3 hidden lg:table-cell">
+                                <x-flex-center>
+                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                </x-flex-center>
+                            </th>
+                            <th scope="col" class="px-2 py-3">
+                                Zdjęcie
+                            </th>
+                            <th scope="col" class="px-2 py-3 text-left">
+                                Imię i Nazwisko
+                            </th>
+                            @foreach ($dates as $date)
+                            <th scope="col" class="px-2 py-3 date-column">
+                                {{ $date }}
+                            </th>
+                            @endforeach
+                        </tr>
+                    </thead>
+                    <tbody id="work-sessions-body">
+                        @foreach ($users as $user)
+                        <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                            <td class="px-2 py-2 hidden lg:table-cell">
+                                <x-flex-center>
+                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                </x-flex-center>
+                            </td>
+                            <td class="px-2 py-2 flex items-center justify-center gap-2">
+                                @if($user->profile_photo_url)
+                                <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
+                                @else
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                    {{ strtoupper(substr($user->name, 0, 1)) }}
+                                </div>
+                                @endif
+                            </td>
+                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 text-left">
+                                <x-paragraf-display class="text-xs">
+                                    {{$user->name}}
+                                </x-paragraf-display>
+                            </td>
+                            @foreach ($user->dates as $date)
+                            @if ($date == 1)
+                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
+                                <i class="fa-solid fa-sun"></i>
+                            </td>
+                            @elseif($date == 0.5)
+                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-200 dark:bg-green-200 border-x border-gray-200 dark:border-gray-700">
+                                <i class="fa-solid fa-moon"></i>
+                            </td>
+                            @elseif($date == 1.5)
+                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
+                            </td>
+                            @elseif($date == 'in_progress')
+                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </td>
+                            @else
+                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
+                            </td>
+                            @endif
+                            @endforeach
+                        </tr>
+                        @endforeach
+                    </tbody>
+                    <div id="loader" class="text-center py-4 hidden text-gray-700 dark:text-gray-50">Ładowanie...</div>
+                </table>
             </div>
-        </div>
-    </div>
+        </x-flex-center>
+        @php
+        $file = 'raport_' . $company->name . '_' . date('d.m.Y', strtotime($startDate)) . '_' . date('d.m.Y', strtotime($endDate)) . '.xlsx';
+        @endphp
+        <x-download :file="$file">
+            {{ route('api.v1.rcp.work-session.export.xlsx') }}
+        </x-download>
+        <input type="hidden" id="start_date" value="{{ $startDate }}">
+        <input type="hidden" id="end_date" value="{{ $endDate }}">
+        <script>
+            $(document).ready(function() {
+                let page = 2;
+                let loading = false;
+                const $body = $('#work-sessions-body');
+                const $list = $('#list');
+                const $loader = $('#loader');
+                const startDate = $('#start_date').val();
+                const endDate = $('#end_date').val();
+
+                function loadMoreSessions() {
+                    if (loading) return;
+                    loading = true;
+                    $loader.removeClass('hidden');
+
+                    $.get(`{{ route('api.v1.raport.time-sheet.get') }}?page=${page}&start_date=${startDate}&end_date=${endDate}`, function(data) {
+                        data.data.forEach(function(user) {
+                            let cells = '';
+                            const start = new Date(startDate);
+                            const end = new Date(endDate);
+                            const dates = [];
+
+                            // Generate list of dates from start to end
+                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                                const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear().toString().slice(-2)}`; // Format date as DD.MM.YY
+                                dates.push(formattedDate);
+                            }
+
+                            // Iterate through the generated dates and check user.dates
+                            dates.forEach(date => {
+                                console.log(date, user.dates[date]);
+                                if (user.dates[date] == 1) {
+                                    cells += `
+                                    <td class="px-2 py-2 font-semibold text-lg text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
+                                        <i class="fa-solid fa-sun"></i>
+                                    </td>`;
+                                }else if(user.dates[date] == 0.5) {
+                                    cells += `
+                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-200 dark:bg-green-200 border-x border-gray-200 dark:border-gray-700">
+                                        <i class="fa-solid fa-moon"></i>
+                                    </td>`;
+                                }else if(user.dates[date] == 1.5) {
+                                    cells += `
+                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
+                                    </td>`;
+                                }else if(user.dates[date] == 'in_progress') {
+                                    cells += `
+                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
+                                        <i class="fa-solid fa-briefcase"></i>
+                                    </td>`;
+                                }else{
+                                    cells += `
+                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
+                                    </td>`;
+                                }
+                            });
+
+                            const row = `
+                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                                <td class="px-3 py-2">
+                                    <x-flex-center>
+                                        <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
+                                    </x-flex-center>
+                                </td>
+                                <td class="px-3 py-2  flex items-center justify-center">
+                                    ${user.profile_photo_url
+                                        ? `<img src="${user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${user.name[0].toUpperCase()}</div>`
+                                    }
+                                </td>
+                                <td class="px-3 py-2 text-left">
+                                    <x-paragraf-display class="text-xs">
+                                        ${user.name}
+                                    </x-paragraf-display>
+                                </td>
+                                ${cells}
+                            </tr>`;
+                            $body.append(row);
+                        });
+
+                        if (data.next_page_url) {
+                            page++;
+                            loading = false;
+                        } else {
+                            $(window).off('scroll'); // koniec danych
+                        }
+
+                        $loader.addClass('hidden');
+                    });
+                }
+
+                // Event scroll
+                $(window).on('scroll', function() {
+                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                        loadMoreSessions();
+                    }
+                });
+
+                loadMoreSessions(); // wczytaj pierwszą stronę
+            });
+        </script>
+    </x-main>
     @else
     @include('admin.elements.end_config')
     @endif

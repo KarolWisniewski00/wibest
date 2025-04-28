@@ -77,12 +77,8 @@
                         const current = new Date(year, month, d);
                         const isToday = d === today.getDate() && month === today.getMonth() && year === today.getFullYear();
 
-                        let classes = 'day-btn rounded-lg py-1 text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700';
+                        let classes = 'day-btn rounded-lg py-1';
                         let dateStr = `${year}-${month + 1}-${d}`;
-
-                        if (isToday) {
-                            classes += ' border border-red-500 text-red-600';
-                        }
 
                         const selectedDate = new Date(year, month, d);
                         console.log('Selected Date:', selectedDate, 'Range Start:', rangeStart, 'Range End:', rangeEnd);
@@ -90,9 +86,20 @@
                             (rangeStart && !rangeEnd && selectedDate.getTime() === rangeStart.getTime()) ||
                             (rangeStart && rangeEnd && selectedDate >= rangeStart && selectedDate <= rangeEnd)
                         ) {
-                            classes += ' bg-green-300 text-gray-900';
+                            classes += ' text-gray-900 dark:text-gray-900';
+                            if (isToday) {
+                                classes += ' text-red-400 bg-red-300 dark:hover:bg-red-400';
+                            }else {
+                                classes += '  bg-green-300 dark:hover:bg-green-400';
+                            }
+                        } else {
+                            classes += ' dark:hover:bg-gray-700';
+                            if (isToday) {
+                                classes += ' text-red-400';
+                            }else {
+                                classes += ' text-gray-900 dark:text-white hover:bg-gray-100';
+                            }
                         }
-
                         $('#calendar-days').append(`<button type="button" class="${classes}" data-date="${dateStr}">${d}</button>`);
                     }
 
@@ -122,6 +129,7 @@
                     }
                 }
                 @if(Str::startsWith(request()->path(), 'dashboard/rcp/work-session'))
+
                 function ajaxFilter() {
                     $.ajax({
                         url: `{{ route('api.v1.rcp.work-session.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -179,6 +187,7 @@
                     updateShowFilter();
                 }
                 @elseif(Str::startsWith(request()->path(), 'dashboard/rcp/event'))
+
                 function ajaxFilter() {
                     $.ajax({
                         url: `{{ route('api.v1.rcp.event.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -223,6 +232,110 @@
                             });
                         },
                         error: function(xhr) {
+                            // generujemy emptyplace
+                            const row = `
+                            <tr class="bg-white dark:bg-gray-800">
+                                <td colspan="8" class="px-3 py-2">
+                                    <x-empty-place />
+                                </td>
+                            </tr>`;
+                            $tbody.append(row);
+                        }
+                    });
+                    updateShowFilter();
+                }
+                @elseif(Str::startsWith(request()->path(), 'dashboard/raport/time-sheet'))
+
+                function ajaxFilter() {
+                    const $tbody = $('#work-sessions-body');
+                    const $thead = $('#table-head');
+                    $.ajax({
+                        url: `{{ route('api.v1.raport.time-sheet.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
+                        method: 'get',
+                        success: function(response) {
+                            $tbody.empty();
+                            $('.date-column').remove();
+                            const start = new Date(rangeStart);
+                            const end = new Date(rangeEnd);
+                            const dates = [];
+                            
+                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                                const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+                                dates.push(formattedDate);
+                            }
+
+                            let headHtml = '';
+                            dates.forEach(date => {
+                                headHtml += `<th scope="col" class="px-2 py-3 date-column">${date}</th>`;
+                            });
+                            $thead.append(headHtml);
+
+                            response.forEach(user => {
+                                console.log(user);
+                                let cells = '';
+
+                                const dates = [];
+
+                                // Generate list of dates from start to end
+                                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                                    const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear().toString().slice(-2)}`; // Format date as DD.MM.YY
+                                    dates.push(formattedDate);
+                                }
+
+                                // Iterate through the generated dates and check user.dates
+                                dates.forEach(date => {
+                                    console.log(date, user.dates[date]);
+                                    if (user.dates[date] == 1) {
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
+                                            <i class="fa-solid fa-sun"></i>
+                                        </td>`;
+                                    }else if(user.dates[date] == 0.5) {
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-200 dark:bg-green-200 border-x border-gray-200 dark:border-gray-700">
+                                            <i class="fa-solid fa-moon"></i>
+                                        </td>`;
+                                    }else if(user.dates[date] == 1.5) {
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
+                                        </td>`;
+                                    }else if(user.dates[date] == 'in_progress') {
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
+                                            <i class="fa-solid fa-briefcase"></i>
+                                        </td>`;
+                                    }else{
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
+                                        </td>`;
+                                    }
+                                });
+
+                                const row = `
+                                <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                                    <td class="px-3 py-2">
+                                        <x-flex-center>
+                                            <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
+                                        </x-flex-center>
+                                    </td>
+                                    <td class="px-3 py-2  flex items-center justify-center">
+                                        ${user.profile_photo_url
+                                            ? `<img src="${user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                            : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${user.name[0].toUpperCase()}</div>`
+                                        }
+                                    </td>
+                                    <td class="px-3 py-2 text-left">
+                                        <x-paragraf-display class="text-xs">
+                                            ${user.name}
+                                        </x-paragraf-display>
+                                    </td>
+                                    ${cells}
+                                </tr>`;
+                                $tbody.append(row);
+                            });
+                        },
+                        error: function(xhr) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
                             // generujemy emptyplace
                             const row = `
                             <tr class="bg-white dark:bg-gray-800">

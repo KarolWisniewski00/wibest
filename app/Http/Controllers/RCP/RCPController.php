@@ -103,6 +103,12 @@ class RCPController extends Controller
         $perPage = $request->input('per_page', 10);
     
         $query = WorkSession::with('user')->orderBy('created_at', 'desc');
+
+        if(Auth::user()->role == 'admin') {
+            $query->where('company_id', Auth::user()->company_id);
+        } else {
+            $query->where('user_id', Auth::id());
+        }
     
         if ($request->filled('start_date')) {
             $query->whereDate('created_at', '>=', $request->input('start_date'));
@@ -135,7 +141,11 @@ class RCPController extends Controller
         if ($request->filled('end_date')) {
             $query->whereDate('created_at', '<=', $request->input('end_date'));
         }
-    
+        if(Auth::user()->role == 'admin') {
+            $query->where('company_id', Auth::user()->company_id);
+        } else {
+            $query->where('user_id', Auth::id());
+        }
         $sessions = $query->get();
 
         return response()->json($sessions);

@@ -30,6 +30,7 @@ class User extends Authenticatable
         'company_id',
         'setting_format',
         'setting_client',
+        'position',
     ];
 
     /**

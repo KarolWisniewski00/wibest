@@ -8,12 +8,12 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoogleController;
-use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\TSI\InvoiceController;
 use App\Http\Controllers\Leave\LeaveGroupController;
 use App\Http\Controllers\Leave\LeaveLimitController;
 use App\Http\Controllers\Leave\LeavePendingReviewController;
 use App\Http\Controllers\Leave\LeaveSingleController;
-use App\Http\Controllers\OfferController;
+use App\Http\Controllers\TSI\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\Raport\AttendanceSheetController;
@@ -62,14 +62,14 @@ Route::prefix('api')->group(function () {
     Route::prefix('offer')->group(function () {
         Route::get('/{year}', [OfferController::class, 'value'])->name('api.offer.value');
     });
-    Route::prefix('search')->group(function () {
-        Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.search.gus');
-    });
     Route::prefix('user')->group(function () {
         Route::get('update/role/{id}/{role}', [UserController::class, 'updateRole'])->name('api.user.update.role');
     });
     //API -----------------------------------------------------------------
     Route::prefix('v1')->group(function () {
+        Route::prefix('search')->group(function () {
+            Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.v1.search.gus');//TSI
+        });
         Route::prefix('rcp')->group(function () {
             Route::prefix('work-session')->group(function () {
                 Route::get('/', [RCPController::class, 'get'])->name('api.v1.rcp.work-session.get');
@@ -80,6 +80,20 @@ Route::prefix('api')->group(function () {
                 Route::get('/', [EventController::class, 'get'])->name('api.v1.rcp.event.get');
                 Route::get('set-date/', [EventController::class, 'setDate'])->name('api.v1.rcp.event.set.date');
                 Route::post('/export-xlsx', [EventController::class, 'export_xlsx'])->name('api.v1.rcp.event.export.xlsx');
+            });
+        });
+        Route::prefix('team')->group(function () {
+            Route::prefix('user')->group(function () {
+                Route::get('/', [TeamUserController::class, 'get'])->name('api.v1.team.user.get');
+                Route::post('set-role/', [TeamUserController::class, 'setRole'])->name('api.v1.team.user.set.role');
+                Route::post('/export-xlsx', [TeamUserController::class, 'export_xlsx'])->name('api.v1.team.user.export.xlsx');
+            });
+        });
+        Route::prefix('raport')->group(function () {
+            Route::prefix('time-sheet')->group(function () {
+                Route::get('/', [TimeSheetController::class, 'get'])->name('api.v1.raport.time-sheet.get');
+                Route::get('set-role/', [TimeSheetController::class, 'setDate'])->name('api.v1.raport.time-sheet.set.date');
+                Route::post('/export-xlsx', [TimeSheetController::class, 'export_xlsx'])->name('api.v1.raport.time-sheet.export.xlsx');
             });
         });
     });
@@ -103,9 +117,15 @@ Route::middleware([
         Route::prefix('team')->group(function () {
             Route::prefix('user')->group(function () {
                 Route::get('/', [TeamUserController::class, 'index'])->name('team.user.index');
+                Route::get('show/{user}', [TeamUserController::class, 'show'])->name('team.user.show');
+                Route::get('edit/{user}', [TeamUserController::class, 'edit'])->name('team.user.edit');
+                Route::put('update/{user}', [TeamUserController::class, 'update'])->name('team.user.update');
+                Route::post('disconnect/{user}', [TeamUserController::class, 'disconnect'])->name('team.user.disconnect');
             });
             Route::prefix('invitation')->group(function () {
                 Route::get('/', [InvitationController::class, 'index'])->name('team.invitation.index');
+                Route::get('accept/{id}', [InvitationController::class, 'accept'])->name('team.invitation.accept');
+                Route::get('reject/{id}', [InvitationController::class, 'reject'])->name('team.invitation.reject');
             });
         });
 

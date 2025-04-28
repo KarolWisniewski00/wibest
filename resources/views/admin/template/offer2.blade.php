@@ -123,10 +123,10 @@
 <body>
     <div class="offer-header">
         <p><span>Oferta handlowa numer</span>
-        <h2 class="h2">6/2025</h2>
+        <h2 class="h2">7/2025</h2>
         </p>
-        <p><span>Data wystawienia: </span>10.02.2025</p>
-        <p><span>Termin ważności: </span>10.02.2025</p>
+        <p><span>Data wystawienia: </span>26.04.2025</p>
+        <p><span>Termin ważności: </span>03.05.2025</p>
     </div>
     <div class="divider"></div>
 
@@ -134,19 +134,14 @@
         <tr>
             <td class="seller">
                 <h2 class="h2">Sprzedawca</h2>
-                <p>{{ $offer['seller']['name'] }}</p>
-                <p>{{ $offer['seller']['address'] }}</p>
-                <p><span>NIP:</span> {{ $offer['seller']['tax_id'] }}</p>
-                @if($offer['seller']['bank'] == '')
-                @else
-                <p><span>Numer konta:</span> {{ $offer['seller']['bank'] }}</p>
-                @endif
+                <p>Karol Wiśniewski WIBEST</p>
+                <p>Wrocław, ul. Partynicka 5</p>
+                <p><span>NIP:</span> 8992998536</p>
             </td>
             <td class="buyer">
                 <h2 class="h2">Nabywca</h2>
-                <p>ALBERGI JUSTYNA DRAGAN-KULPA</p>
-                <p>Opolska 48, 46-050, Walidrogi</p>
-                <p><span>NIP:</span> 6191590210</p>
+                <p>Karol Bystrzański</p>
+                <p>+48 730 554 321</p>
             </td>
         </tr>
     </table>
@@ -160,13 +155,12 @@
             </td>
             <td class="seller">
                 <p>Deweloper projektu</p>
-                <p><span>Karol Wiśniewski</span>,</p>
-                <p>biuro@wibest.pl</p>
+                <p><span>Piotr Zarówny</span>,</p>
             </td>
             <td class="buyer">
                 <p>Zamówione przez</p>
-                <p><span>Hotel Kołodziej</span>,</p>
-                <p>570 970 372</p>
+                <p><span>Karol Bystrzański</span>,</p>
+                <p>karol.bystrzanski@gmail.com</p>
             </td>
         </tr>
     </table>
@@ -175,12 +169,12 @@
         <tr>
             <td class="seller">
                 <p>Projekt</p>
-                <p><span>Podstawowa strona internetowa Hotel Kołodziej</span>,</p>
-                <p>https://hotel-kolodziej.pl/</p>
+                <p><span>Zaawansowany sklep internetowy BHPKB</span>,</p>
+                <p>https://e-bhpomoc.pl/</p>
             </td>
             <td class="buyer">
                 <p>Zakres prac</p>
-                <p><span>Przywrócenie danych automatycznych kopii zapasowych</span></p>
+                <p><span>Trzorzenie projektu</span></p>
             </td>
         </tr>
     </table>
@@ -204,33 +198,59 @@
         <tbody>
             <tr>
                 <td>1.</td>
-                <td>Przywrócenie wiadomości mailowych do 3 dni wstecz
+                <td>Sklep online Technologia WordPress</td>
                 </td>
                 <td>1 szt</td>
-                <td>150 PLN</td>
-                <td>150 PLN</td>
+                <td>9450 PLN</td>
+                <td>9450 PLN</td>
                 <td>zw</td>
                 <td>zw</td>
-                <td>150 PLN</td>
+                <td>9450 PLN</td>
                 <td>0%</td>
-                <td>150 PLN</td>
+                <td>9450 PLN</td>
+            </tr>
+            <tr>
+                <td>2.</td>
+                <td>Moduł szkoleń online wraz z testami
+                    wiedzy</td>
+                </td>
+                <td>1 szt</td>
+                <td>2835 PLN</td>
+                <td>2835 PLN</td>
+                <td>zw</td>
+                <td>zw</td>
+                <td>2835 PLN</td>
+                <td>0%</td>
+                <td>2835 PLN</td>
             </tr>
         </tbody>
     </table>
 
     <div class="summary">
         <h2 class="h2">Podsumowanie</h2>
-        <p>Razem netto: 150 PLN</p>
+        <p>Razem netto: 12 285 PLN</p>
         <p>VAT: zw</p>
-        <p>Razem brutto: 150 PLN</p>
+        <p>Razem brutto: 12 285 PLN</p>
     </div>
     <div class="summary">
         <h2 class="h2">Słownie</h2>
-        <p>sto pięćdziesiąt złotych 00/100</p>
+        <p>dwanaście tysięcy dwieście osiemdziesiąt pięć złotych 00/100</p>
     </div>
     <div class="divider"></div>
     <h2 class="h2">Uwagi</h2>
-    <p>Usługa wykonana przez dostawce serwera hostingu Home.pl</p>
+    <p>
+        -Sklep internetowy dostosowany do
+        potrzeb Twojej marki<br>
+        -Nowoczesny design inspirowany
+        minimalistyczną estetyką<br>
+        -Użycie technologii Wordpress +
+        WooCommerce<br>
+        -Optymalizacja struktury pod kątem SEO<br>
+        -Pełna responsywność – strona
+        dostosowana do urządzeń mobilnych<br>
+        -Funkcjonalność Chatu online<br>
+        -Integracja płatności (Przelewy24)<br>
+    </p>
 
     <!-- Napis w lewym dolnym rogu -->
     <div class="footer-left">

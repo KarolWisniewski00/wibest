@@ -16,11 +16,18 @@ class UserRepository
     {
         return Auth::id();
     }
-    public function getByCompanyId($companyId)
+    public function getByCompanyId($companyId, $page = 1)
     {
-        return User::where('company_id', $companyId)->get();
+        return User::where('company_id', $companyId)
+            ->where('role', '!=', null)
+            ->paginate(10, ['*'], 'page', $page);
     }
-
+    public function getByCompanyIdAll($companyId)
+    {
+        return User::where('company_id', $companyId)
+            ->where('role', '!=', null)
+            ->get();
+    }
     public function countByCompanyId($companyId)
     {
         return User::where('company_id', $companyId)->count();
