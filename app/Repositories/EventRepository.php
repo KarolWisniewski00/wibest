@@ -23,14 +23,14 @@ class EventRepository
         $query = Event::where('user_id', Auth::id());
 
         if ($startDate) {
-            $query->whereDate('created_at', '>=', Carbon::parse($startDate));
+            $query->whereDate('time', '>=', Carbon::parse($startDate));
         }
 
         if ($endDate) {
-            $query->whereDate('created_at', '<=', Carbon::parse($endDate));
+            $query->whereDate('time', '<=', Carbon::parse($endDate));
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        return $query->orderBy('time', 'desc')->paginate($perPage);
     }
 
     private function getAllCompanyEventsWithDateRange(int $perPage, ?string $startDate, ?string $endDate)
@@ -39,14 +39,14 @@ class EventRepository
         $query = Event::where('company_id', $companyId);
 
         if ($startDate) {
-            $query->whereDate('created_at', '>=', Carbon::parse($startDate));
+            $query->whereDate('time', '>=', Carbon::parse($startDate));
         }
 
         if ($endDate) {
-            $query->whereDate('created_at', '<=', Carbon::parse($endDate));
+            $query->whereDate('time', '<=', Carbon::parse($endDate));
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        return $query->orderBy('time', 'desc')->paginate($perPage);
     }
 
     private function isAdmin(): bool
@@ -54,6 +54,8 @@ class EventRepository
         $user = User::where('id', auth()->id())->first();
         if ($user) {
             if ($user->role == 'admin') {
+                return true;
+            }elseif($user->role == 'menedżer'){
                 return true;
             } else {
                 return false;

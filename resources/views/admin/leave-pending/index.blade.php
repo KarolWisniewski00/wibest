@@ -14,7 +14,7 @@
         <x-leave.nav :role="$role" :leavePending="$leavePending" />
         <!--HEADER-->
         <x-leave.header>
-            Moje wnioski
+            Do rozpatrzenia
         </x-leave.header>
         <!--HEADER-->
         <x-status-cello id="show-filter" class="mx-2 mt-8 ">
@@ -45,6 +45,9 @@
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
                                 Typ
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
+                                Akceptuj
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
                                 Anuluj
@@ -102,13 +105,18 @@
                                     @endif
                                 </x-paragraf-display>
                             </td>
-                            <td class="px-3 py-2 font-semibold text-lg text-gray-700 dark:text-gray-50">
+                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                 <x-paragraf-display class="text-xs">
                                     {{$leave->type}}
                                 </x-paragraf-display>
                             </td>
                             <td class="px-3 py-2">
-                            <x-button-link-red href="{{ route('leave.pending.reject', $leave)}}" class="min-h-[38px]">
+                                <x-button-link-green href="{{ route('leave.pending.accept', $leave)}}" class="min-h-[38px]">
+                                    <i class="fa-solid fa-check"></i>
+                                </x-button-link-green>
+                            </td>
+                            <td class="px-3 py-2">
+                                <x-button-link-red href="{{ route('leave.pending.reject', $leave)}}" class="min-h-[38px]">
                                     <i class="fa-solid fa-xmark"></i>
                                 </x-button-link-red>
                             </td>

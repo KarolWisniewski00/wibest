@@ -152,10 +152,14 @@ Route::middleware([
 
             Route::prefix('single')->group(function () {
                 Route::get('/', [LeaveSingleController::class, 'index'])->name('leave.single.index');
+                Route::get('/create', [LeaveSingleController::class, 'create'])->name('leave.single.create');
+                Route::post('/store', [LeaveSingleController::class, 'store'])->name('leave.single.store');
             });
 
             Route::prefix('pending-review')->group(function () {
                 Route::get('/', [LeavePendingReviewController::class, 'index'])->name('leave.pending.index');
+                Route::get('accept/{leave}', [LeavePendingReviewController::class, 'accept'])->name('leave.pending.accept');
+                Route::get('reject/{leave}', [LeavePendingReviewController::class, 'reject'])->name('leave.pending.reject');
             });
 
             Route::prefix('limit')->group(function () {

@@ -14,7 +14,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         //$schedule->job(new \App\Jobs\SendDailyEmails)->dailyAt('12:45');
-        $schedule->job(new \App\Jobs\SendDailyEmails)->fridays()->at('23:00');
+        //$schedule->job(new \App\Jobs\SendDailyEmails)->fridays()->at('23:00');
         //$schedule->job(new \App\Jobs\SendDailyEmails)->everyMinute();
     }
 

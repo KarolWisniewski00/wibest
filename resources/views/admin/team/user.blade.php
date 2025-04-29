@@ -43,15 +43,15 @@
                                 Admin
                             </span>
                             @elseif($user->role == 'menedżer')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-600 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Menedżer
                             </span>
                             @elseif($user->role == 'kierownik')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-600 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Kierownik
                             </span>
                             @elseif($user->role == 'użytkownik')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-600 text-gray-100 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Użytkownik
                             </span>
                             @endif
@@ -131,7 +131,7 @@
                 @endif
             </div>
             <div class="flex justify-end mt-4">
-                @if($role == 'admin')
+                @if($role == 'admin' || $role == 'menedżer')
                 <x-button-link-cello href="{{route('team.user.edit', $user)}}" class="text-lg mr-2">
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
                 </x-button-link-cello>
@@ -139,7 +139,7 @@
                 <form action="{{route('team.user.disconnect', $user)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz rozłączyć?');">
                     @csrf
                     <button type="submit" class="min-h-[34px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                        <i class="fa-solid fa-user-minus"></i> Rozłącz
+                        <i class="fa-solid fa-user-minus mr-2"></i>Rozłącz
                     </button>
                 </form>
                 @endif

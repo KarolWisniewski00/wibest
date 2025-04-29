@@ -22,10 +22,22 @@ class UserRepository
             ->where('role', '!=', null)
             ->paginate(10, ['*'], 'page', $page);
     }
+    public function getByLoggedUserCompanyId($companyId, $page = 1)
+    {
+        return User::where('company_id', $companyId)
+            ->where('id', Auth::id())
+            ->paginate(10, ['*'], 'page', $page);
+    }
     public function getByCompanyIdAll($companyId)
     {
         return User::where('company_id', $companyId)
             ->where('role', '!=', null)
+            ->get();
+    }
+    public function getByLoggedUserCompanyIdAll($companyId)
+    {
+        return User::where('company_id', $companyId)
+            ->where('id', Auth::id())
             ->get();
     }
     public function countByCompanyId($companyId)

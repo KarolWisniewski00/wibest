@@ -24,7 +24,7 @@ class LeaveGroupController extends Controller
     {
         // Używamy repozytorium, aby uzyskać ID użytkownika
         $userId = $this->userRepository->getAuthUserId();
-        
+       
         return view('admin.leave.index', compact('userId'));
     }
 }

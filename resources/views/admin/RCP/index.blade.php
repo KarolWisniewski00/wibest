@@ -19,7 +19,6 @@
         <x-flex-center class="px-4 pb-4 flex flex-col">
             <!--MOBILE VIEW-->
             <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
-                @if ($company)
                 <ul id="list" class="grid w-full gap-y-4 block lg:hidden">
                     <!-- EMPTY PLACE -->
                     @if ($work_sessions->isEmpty())
@@ -117,15 +116,15 @@
                                 </div>
                                 @endif
                             </td>
-                            <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
+                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                 <x-paragraf-display class="text-xs">
                                     {{$work_session->user->name}}
                                 </x-paragraf-display>
                             </td>
-                            <td class="px-3 py-2 text-sm min-w-32">
+                            <td class="px-3 py-2 text-sm ">
                                 <x-RCP.work-session-status :work_session="$work_session" class="text-xs" />
                             </td>
-                            <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
+                            <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
                                 @if($work_session->status == 'Praca zakończona')
                                 {{ $work_session->time_in_work }}
                                 @endif
@@ -138,14 +137,11 @@
                     <div id="loader" class="text-center py-4 hidden text-gray-700 dark:text-gray-50">Ładowanie...</div>
                 </table>
                 <!-- PC VIEW -->
-                @else
-                @include('admin.elements.end_config')
-                @endif
             </div>
         </x-flex-center>
         <!--CONTENT-->
         @php
-            $file = 'RCP_' . $company->name . '_' . date('d.m.Y', strtotime($startDate)) . '_' . date('d.m.Y', strtotime($endDate)) . '.xlsx';
+        $file = 'RCP_' . $company->name . '_' . date('d.m.Y', strtotime($startDate)) . '_' . date('d.m.Y', strtotime($endDate)) . '.xlsx';
         @endphp
         <x-download :file="$file">
             {{ route('api.v1.rcp.work-session.export.xlsx') }}

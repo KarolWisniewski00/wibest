@@ -21,7 +21,7 @@
                     <x-nav-link href="{{ route('calendar.all.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
                         <i class="fa-solid fa-calendar-days mr-2"></i>Kalendarz
                     </x-nav-link>
-                    <x-nav-link href="{{ route('leave.group.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
+                    <x-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
                         <i class="fa-solid fa-inbox mr-2"></i>Wnioski
                     </x-nav-link>
                     <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
@@ -60,14 +60,14 @@
                         <div class="text-center flex justify-center items-center h-full">
                             <button
                                 id="startButton"
-                                class="whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Start
+                                class="whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-gray-900 dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                <i class="fa-solid fa-play mr-2"></i>Start
                             </button>
                             <!-- Przycisk Stop -->
                             <button
                                 id="stopButton"
                                 class="hidden whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Stop
+                                <i class="fa-solid fa-stop mr-2"></i>Stop
                             </button>
                         </div>
                     </div>

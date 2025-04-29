@@ -18,13 +18,8 @@
                                     <p class="inline-flex items-center text-gray-600 dark:text-gray-400 font-semibold text-xs uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
                                         Nazwa
                                     </p>
-                                    <p class="text-sm md:text-xl text-gray-900 dark:text-gray-50 font-semibold">
-                                        <a href="{{route('setting')}}" class="inline-flex items-center text-blue-300 dark:text-blue-300 font-semibold text-xl uppercase tracking-widest hover:text-blue-700 dark:hover:text-blue-300 transition ease-in-out duration-150">
-                                            <span class="mr-2 inline-flex p-2 items-center bg-blue-300 dark:bg-blue-300 border border-transparent rounded-full font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-blue-700 dark:hover:bg-blue-300 focus:bg-blue-700 dark:focus:bg-blue-300 active:bg-blue-900 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-blue-800 transition ease-in-out duration-150">
-                                                ORG
-                                            </span>
-                                            {{$company->name}}
-                                        </a>
+                                    <p class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                        {{$company->name}}
                                         <input type="hidden" value="{{$company->id}}" name="company_id">
                                         <input type="hidden" value="{{$company->name}}" name="seller_name">
                                     </p>

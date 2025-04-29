@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Event;
+use App\Models\Leave;
 use App\Models\User;
 use App\Models\WorkSession;
 use Illuminate\Support\Facades\Auth;
@@ -26,39 +27,47 @@ class WorkSessionRepository
 
     private function getForLoggedUserPaginated(int $perPage, ?string $startDate = null, ?string $endDate = null)
     {
-        $query = WorkSession::where('user_id', Auth::id());
+        $query = WorkSession::where('work_sessions.user_id', Auth::id())
+            ->whereHas('eventStart', function ($query) use ($startDate, $endDate) {
+                if ($startDate) {
+                    $query->whereDate('time', '>=', $startDate);
+                }
 
-        if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
-        }
+                if ($endDate) {
+                    $query->whereDate('time', '<=', $endDate);
+                }
+            });
 
-        if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
-        }
-
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        return $query->select('work_sessions.*')
+            ->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
+            ->orderBy('event_start.time', 'desc')
+            ->paginate($perPage);
     }
 
     private function getAllForCompanyPaginated(int $perPage, ?string $startDate = null, ?string $endDate = null)
     {
-        $query = WorkSession::where('company_id', Auth::user()->company_id);
+        $query = WorkSession::where('work_sessions.company_id', Auth::user()->company_id)
+            ->whereHas('eventStart', function ($query) use ($startDate, $endDate) {
+                if ($startDate) {
+                    $query->whereDate('time', '>=', $startDate);
+                }
 
-        if ($startDate) {
-            $query->whereDate('created_at', '>=', $startDate);
-        }
+                if ($endDate) {
+                    $query->whereDate('time', '<=', $endDate);
+                }
+            });
 
-        if ($endDate) {
-            $query->whereDate('created_at', '<=', $endDate);
-        }
-
-        return $query->orderBy('created_at', 'desc')->paginate($perPage);
+        return $query->select('work_sessions.*')
+            ->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
+            ->orderBy('event_start.time', 'desc')
+            ->paginate($perPage);
     }
 
     private function isAdmin(): bool
     {
         $user = User::where('id', auth()->id())->first();
         if ($user) {
-            if ($user->role == 'admin') {
+            if ($user->role == 'admin'  || $user->role == 'menedżer') {
                 return true;
             } else {
                 return false;
@@ -173,6 +182,15 @@ class WorkSessionRepository
             ->whereHas('eventStart', function ($query) use ($formattedDate) {
                 $query->whereDate('time', $formattedDate);
             })
+            ->exists();
+    }
+    public function hasLeave(int $userId, string $date): bool
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        return Leave::where('user_id', $userId)
+            ->where('status', 'zaakceptowane')
+            ->whereDate('start_date', '<=', $formattedDate)
+            ->whereDate('end_date', '>=', $formattedDate)
             ->exists();
     }
 }

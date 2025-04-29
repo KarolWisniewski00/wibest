@@ -88,15 +88,15 @@
                         ) {
                             classes += ' text-gray-900 dark:text-gray-900';
                             if (isToday) {
-                                classes += ' text-red-400 bg-red-300 dark:hover:bg-red-400';
-                            }else {
+                                classes += '  bg-red-300 dark:hover:bg-red-400';
+                            } else {
                                 classes += '  bg-green-300 dark:hover:bg-green-400';
                             }
                         } else {
                             classes += ' dark:hover:bg-gray-700';
                             if (isToday) {
                                 classes += ' text-red-400';
-                            }else {
+                            } else {
                                 classes += ' text-gray-900 dark:text-white hover:bg-gray-100';
                             }
                         }
@@ -223,7 +223,7 @@
                                             ? `<x-status-green>${event.event_type}</x-status-green>` 
                                             : ''}
                                 </td>
-                                <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
+                                <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
                                     ${event.time ?? '-'}
                                 </td>
                                 <x-show-cell href="{{ route('rcp.event.show', '') }}/${event.id}" />
@@ -258,7 +258,7 @@
                             const start = new Date(rangeStart);
                             const end = new Date(rangeEnd);
                             const dates = [];
-                            
+
                             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                                 const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
                                 dates.push(formattedDate);
@@ -290,21 +290,26 @@
                                         <td class="px-2 py-2 font-semibold text-lg text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
                                             <i class="fa-solid fa-sun"></i>
                                         </td>`;
-                                    }else if(user.dates[date] == 0.5) {
+                                    } else if (user.dates[date] == 0.5) {
                                         cells += `
                                         <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-200 dark:bg-green-200 border-x border-gray-200 dark:border-gray-700">
                                             <i class="fa-solid fa-moon"></i>
                                         </td>`;
-                                    }else if(user.dates[date] == 1.5) {
+                                    } else if (user.dates[date] == 1.5) {
                                         cells += `
                                         <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
                                         </td>`;
-                                    }else if(user.dates[date] == 'in_progress') {
+                                    } else if (user.dates[date] == 'in_progress') {
                                         cells += `
                                         <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
                                             <i class="fa-solid fa-briefcase"></i>
                                         </td>`;
-                                    }else{
+                                    } else if (user.dates[date] == 'leave') {
+                                        cells += `
+                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
+                                        <i class="fa-solid fa-calendar"></i>
+                                    </td>`;
+                                    } else {
                                         cells += `
                                         <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
                                         </td>`;

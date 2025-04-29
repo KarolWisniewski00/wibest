@@ -101,25 +101,33 @@ class RCPController extends Controller
     public function get(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-    
-        $query = WorkSession::with('user')->orderBy('created_at', 'desc');
 
-        if(Auth::user()->role == 'admin') {
-            $query->where('company_id', Auth::user()->company_id);
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
+            $query = WorkSession::with('user')->where('work_sessions.company_id', Auth::user()->company_id);
         } else {
-            $query->where('user_id', Auth::id());
+            $query = WorkSession::with('user')->where('work_sessions.user_id', Auth::id());
         }
-    
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->input('start_date'));
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+            $query->whereHas('eventStart', function ($query) use ($startDate, $endDate) {
+                if ($startDate) {
+                    $query->whereDate('time', '>=', $startDate);
+                }
+
+                if ($endDate) {
+                    $query->whereDate('time', '<=', $endDate);
+                }
+            });
         }
-    
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->input('end_date'));
-        }
-    
+
+        $query->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
+            ->orderBy('event_start.time', 'desc')
+            ->paginate($perPage);
+
         $sessions = $query->paginate($perPage);
-    
+
         return response()->json($sessions);
     }
     public function setDate(Request $request)
@@ -132,20 +140,28 @@ class RCPController extends Controller
         $request->session()->put('start_date', $request->input('start_date'));
         $request->session()->put('end_date', $request->input('end_date'));
 
-        $query = WorkSession::with('user')->orderBy('created_at', 'desc');
-    
-        if ($request->filled('start_date')) {
-            $query->whereDate('created_at', '>=', $request->input('start_date'));
-        }
-    
-        if ($request->filled('end_date')) {
-            $query->whereDate('created_at', '<=', $request->input('end_date'));
-        }
-        if(Auth::user()->role == 'admin') {
-            $query->where('company_id', Auth::user()->company_id);
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
+            $query = WorkSession::with('user')->where('work_sessions.company_id', Auth::user()->company_id);
         } else {
-            $query->where('user_id', Auth::id());
+            $query = WorkSession::with('user')->where('work_sessions.user_id', Auth::id());
         }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+            $query->whereHas('eventStart', function ($query) use ($startDate, $endDate) {
+                if ($startDate) {
+                    $query->whereDate('time', '>=', $startDate);
+                }
+
+                if ($endDate) {
+                    $query->whereDate('time', '<=', $endDate);
+                }
+            });
+        }
+        $query->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
+            ->orderBy('event_start.time', 'desc');
+
         $sessions = $query->get();
 
         return response()->json($sessions);
@@ -156,21 +172,21 @@ class RCPController extends Controller
 
         $data = collect([
             [
-            'Nazwa użytkownika' => 'Nazwa użytkownika',
-            'Czas rozpoczęcia zdarzenia' => 'Czas rozpoczęcia zdarzenia',
-            'Czas zakończenia zdarzenia' => 'Czas zakończenia zdarzenia',
-            'Czas rozpoczęcia zdarzenia (duplikat)' => 'Czas rozpoczęcia zdarzenia (duplikat)',
-            'Czas w pracy' => 'Czas w pracy',
+                'Nazwa użytkownika' => 'Nazwa użytkownika',
+                'Czas rozpoczęcia zdarzenia' => 'Czas rozpoczęcia zdarzenia',
+                'Czas zakończenia zdarzenia' => 'Czas zakończenia zdarzenia',
+                'Czas rozpoczęcia zdarzenia (duplikat)' => 'Czas rozpoczęcia zdarzenia (duplikat)',
+                'Czas w pracy' => 'Czas w pracy',
             ]
         ])->concat(
             $sessions->map(function ($session) {
-            return [
-                'Nazwa użytkownika' => (string) ($session->user->name ?? 'Brak danych'),
-                'Czas rozpoczęcia zdarzenia' => $session->eventStart->time ?? 'Brak danych',
-                'Czas zakończenia zdarzenia' => $session->eventStop->time ?? 'Brak danych',
-                'Czas rozpoczęcia zdarzenia (duplikat)' => $session->eventStart->time ?? 'Brak danych',
-                'Czas w pracy' => $session->time_in_work ?? 'Brak danych',
-            ];
+                return [
+                    'Nazwa użytkownika' => (string) ($session->user->name ?? 'Brak danych'),
+                    'Czas rozpoczęcia zdarzenia' => $session->eventStart->time ?? 'Brak danych',
+                    'Czas zakończenia zdarzenia' => $session->eventStop->time ?? 'Brak danych',
+                    'Czas rozpoczęcia zdarzenia (duplikat)' => $session->eventStart->time ?? 'Brak danych',
+                    'Czas w pracy' => $session->time_in_work ?? 'Brak danych',
+                ];
             })
         );
 
