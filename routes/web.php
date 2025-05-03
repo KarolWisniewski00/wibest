@@ -74,26 +74,36 @@ Route::prefix('api')->group(function () {
             Route::prefix('work-session')->group(function () {
                 Route::get('/', [RCPController::class, 'get'])->name('api.v1.rcp.work-session.get');
                 Route::get('set-date/', [RCPController::class, 'setDate'])->name('api.v1.rcp.work-session.set.date');
-                Route::post('/export-xlsx', [RCPController::class, 'export_xlsx'])->name('api.v1.rcp.work-session.export.xlsx');
+                Route::post('/export-xlsx', [RCPController::class, 'exportXlsx'])->name('api.v1.rcp.work-session.export.xlsx');
             });
             Route::prefix('event')->group(function () {
                 Route::get('/', [EventController::class, 'get'])->name('api.v1.rcp.event.get');
                 Route::get('set-date/', [EventController::class, 'setDate'])->name('api.v1.rcp.event.set.date');
-                Route::post('/export-xlsx', [EventController::class, 'export_xlsx'])->name('api.v1.rcp.event.export.xlsx');
+                Route::post('/export-xlsx', [EventController::class, 'exportXlsx'])->name('api.v1.rcp.event.export.xlsx');
             });
         });
         Route::prefix('team')->group(function () {
             Route::prefix('user')->group(function () {
                 Route::get('/', [TeamUserController::class, 'get'])->name('api.v1.team.user.get');
                 Route::post('set-role/', [TeamUserController::class, 'setRole'])->name('api.v1.team.user.set.role');
-                Route::post('/export-xlsx', [TeamUserController::class, 'export_xlsx'])->name('api.v1.team.user.export.xlsx');
+                Route::post('/export-xlsx', [TeamUserController::class, 'exportXlsx'])->name('api.v1.team.user.export.xlsx');
             });
         });
         Route::prefix('raport')->group(function () {
             Route::prefix('time-sheet')->group(function () {
                 Route::get('/', [TimeSheetController::class, 'get'])->name('api.v1.raport.time-sheet.get');
-                Route::get('set-role/', [TimeSheetController::class, 'setDate'])->name('api.v1.raport.time-sheet.set.date');
-                Route::post('/export-xlsx', [TimeSheetController::class, 'export_xlsx'])->name('api.v1.raport.time-sheet.export.xlsx');
+                Route::get('set-date/', [TimeSheetController::class, 'setDate'])->name('api.v1.raport.time-sheet.set.date');
+                Route::post('/export-xlsx', [TimeSheetController::class, 'exportXlsx'])->name('api.v1.raport.time-sheet.export.xlsx');
+            });
+        });
+        Route::prefix('leave')->group(function () {
+            Route::prefix('single')->group(function () {
+                Route::get('/', [LeaveSingleController::class, 'get'])->name('api.v1.leave.single.get');
+                Route::get('set-date/', [LeaveSingleController::class, 'setDate'])->name('api.v1.leave.single.set.date');
+            });
+            Route::prefix('pending-review')->group(function () {
+                Route::get('/', [LeavePendingReviewController::class, 'get'])->name('api.v1.leave.pending.get');
+                Route::get('set-date/', [LeavePendingReviewController::class, 'setDate'])->name('api.v1.leave.pending.set.date');
             });
         });
     });
@@ -327,3 +337,14 @@ Route::middleware([
         });
     });
 });
+//TO DO LIST:
+//Manager nie ma edycji RCP
+//Dodać dzień tygodnia, dzień miesiąca, miesiąc w zakładce RCP
+//responsywność zakładki Zespół
+//blokowanie dat na święto przy tworzeniu RCP i Wniosków
+//Zakładka ewidencja czasu pracy
+//zakładka kalendarz
+//rozbuduj użytkownika podgląd
+//dodaj więcej filtrów
+//konfiguracja pobierania na serwerze
+//powielanie się stopa zdarzenia

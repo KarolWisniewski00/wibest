@@ -3,57 +3,100 @@
 namespace App\Http\Controllers\Leave;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DateRequest;
+use App\Mail\LeaveMail;
+use App\Mail\LeaveMailAccept;
 use App\Models\Leave;
 use App\Repositories\LeaveRepository;
 use App\Repositories\UserRepository;
+use App\Services\FilterDateService;
+use App\Services\LeaveService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class LeavePendingReviewController extends Controller
 {
-    protected LeaveRepository $leaveRepository;
+    protected FilterDateService $filterDateService;
+    protected LeaveService $leaveService;
 
-    public function __construct(LeaveRepository $leaveRepository)
-    {
-        $this->leaveRepository = $leaveRepository;
+    public function __construct(
+        FilterDateService $filterDateService,
+        LeaveService $leaveService,
+    ) {
+        $this->filterDateService = $filterDateService;
+        $this->leaveService = $leaveService;
     }
 
     /**
-     * Wyświetla stronę kalendarza
+     * Wyświetla stronę z wnioskami do akceptacji.
      *
+     * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\View\View
     {
-        // Check if session variables for date range exist, otherwise set default to current month
-        if (!$request->session()->has('start_date') || !$request->session()->has('end_date')) {
-            $startOfMonth = now()->startOfMonth()->toDateString();
-            $endOfMonth = now()->endOfMonth()->toDateString();
-
-            $request->session()->put('start_date', $startOfMonth);
-            $request->session()->put('end_date', $endOfMonth);
-        }
-
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-
-        //$leaves = $this->leaveRepository->getPaginatedForCurrentUser(10, $startDate, $endDate);
-        //$leavePending = $this->leaveRepository->getAllForCompanyPaginatedCount($startDate, $endDate);
-        $leaves = Leave::where('manager_id', Auth::id())->orderBy('start_date', 'desc')->get();
-        $leavePending = Leave::where('manager_id', Auth::id())->orderBy('start_date', 'desc')->count();
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $leaves = $this->leaveService->paginateByManagerId($request);
+        $leavePending = $this->leaveService->countByUserId($request);
         return view('admin.leave-pending.index', compact('leaves', 'startDate', 'endDate', 'leavePending'));
     }
-    public function accept(Leave $leave)
+    /**
+     *  Zwraca wnioski do rozpatrzenia dla menadżera w zakresie dat.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function get(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $leaves = $this->leaveService->paginateByManagerId($request);
+        return response()->json($leaves);
+    }
+    /**
+     * Ustawia nową datę w filtrze zwraca wnioski do rozpatrzenia.
+     *
+     * @param DateRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setDate(DateRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $leaves = $this->leaveService->getByManagerId($request);
+        return response()->json($leaves);
+    }
+    /**
+     * Akceptuje wniosek.
+     *
+     * @param Leave $leave
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function accept(Leave $leave): \Illuminate\Http\RedirectResponse
     {
         $leave->status = 'zaakceptowane';
         $leave->save();
+
+        $leaveMail = new LeaveMailAccept($leave);
+        try {
+            Mail::to($leave->user->email)->send($leaveMail);
+        } catch (Exception) {
+        }
         if (auth()->user()->is_admin) {
             return redirect()->route('leave.pending.index')->with('success', 'Zaakceptowane.');
         } else {
             return redirect()->route('leave.single.index')->with('success', 'Zaakceptowane.');
         }
     }
-    public function reject(Leave $leave)
+    /**
+     * Odrzuca wniosek.
+     *
+     * @param Leave $leave
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function reject(Leave $leave): \Illuminate\Http\RedirectResponse
     {
         $leave->status = 'odrzucone';
         $leave->save();

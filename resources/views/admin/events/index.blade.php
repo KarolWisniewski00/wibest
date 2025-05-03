@@ -11,7 +11,7 @@
     <!--MAIN-->
     <x-main>
         <x-RCP.nav />
-        <x-RCP.header>Zdarzenia</x-RCP.header>
+        <x-RCP.header>Zdarzenia 📆</x-RCP.header>
         <x-status-cello id="show-filter" class="mx-2 mt-8 ">
             {{ $startDate }} - {{ $endDate }}
         </x-status-cello>
@@ -102,7 +102,7 @@
                             <th scope="col" class="px-6 py-3 text-center">
                                 Zdjęcie
                             </th>
-                            <th scope="col" class="px-6 py-3 text-center">
+                            <th scope="col" class="px-6 py-3 text-start">
                                 Imię i Nazwisko
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
@@ -140,10 +140,29 @@
                                 </div>
                                 @endif
                             </td>
-                            <td class="px-3 py-2 font-semibold text-lg min-w-32 text-gray-700 dark:text-gray-50">
-                                <x-paragraf-display class="text-xs">
-                                    {{$event->user->name}}
-                                </x-paragraf-display>
+                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                <div class="flex flex-col justify-center w-fit">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                        {{$event->user->name}}
+                                    </x-paragraf-display>
+                                    @if($event->user->role == 'admin')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Admin
+                                    </span>
+                                    @elseif($event->user->role == 'menedżer')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Menedżer
+                                    </span>
+                                    @elseif($event->user->role == 'kierownik')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Kierownik
+                                    </span>
+                                    @elseif($event->user->role == 'użytkownik')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Użytkownik
+                                    </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-3 py-2 text-sm min-w-32">
                                 @if($event->event_type == 'stop')
@@ -209,13 +228,39 @@
                                 <td class="px-3 py-2  flex items-center justify-center">
                                     ${event.user.profile_photo_url
                                         ? `<img src="${event.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
-                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
+                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${event.user.name[0].toUpperCase()}</div>`
                                     }
                                 </td>
-                                <td class="px-3 py-2">
-                                    <x-paragraf-display class="text-xs">
-                                        ${event.user.name}
-                                    </x-paragraf-display>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            ${event.user.name}
+                                        </x-paragraf-display>
+                                        ${event.user.role == 'admin'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Admin
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'menedżer'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Menedżer
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'kierownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Kierownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'użytkownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                    </div>
                                 </td>
                                 <td class="px-3 py-2 text-xs">
                                     ${event.event_type === 'stop' 

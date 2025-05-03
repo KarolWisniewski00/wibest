@@ -1,6 +1,6 @@
 <!--HEADER-->
 <x-container-header>
-    <x-h1-display class="mx-2 lg:mx-0">
+    <x-h1-display>
         {{ $slot }}
     </x-h1-display>
     <x-flex-center>

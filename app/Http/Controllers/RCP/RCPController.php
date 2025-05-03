@@ -7,77 +7,93 @@ use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWorkSessionRequest;
-use App\Models\Event;
-use App\Repositories\CompanyRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\WorkSessionRepository;
+use App\Services\FilterDateService;
+use App\Services\UserService;
+use App\Services\WorkSessionService;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 class RCPController extends Controller
 {
-    protected WorkSessionRepository $workSessionRepository;
-    protected CompanyRepository $companyRepository;
-    protected UserRepository $userRepository;
+    protected FilterDateService $filterDateService;
+    protected WorkSessionService $workSessionService;
+    protected UserService $userService;
 
     public function __construct(
-        WorkSessionRepository $workSessionRepository,
-        CompanyRepository $companyRepository,
-        UserRepository $userRepository,
+        FilterDateService $filterDateService,
+        WorkSessionService $workSessionService,
+        UserService $userService,
     ) {
-        $this->workSessionRepository = $workSessionRepository;
-        $this->companyRepository = $companyRepository;
-        $this->userRepository = $userRepository;
+        $this->filterDateService = $filterDateService;
+        $this->workSessionService = $workSessionService;
+        $this->userService = $userService;
     }
 
-    public function index(Request $request)
+    /**
+     * Wyświetla stronę z sesjami pracy.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function index(Request $request): \Illuminate\View\View
     {
-        // Check if session variables for date range exist, otherwise set default to current month
-        if (!$request->session()->has('start_date') || !$request->session()->has('end_date')) {
-            $startOfMonth = now()->startOfMonth()->toDateString();
-            $endOfMonth = now()->endOfMonth()->toDateString();
-
-            $request->session()->put('start_date', $startOfMonth);
-            $request->session()->put('end_date', $endOfMonth);
-        }
-
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-
-        $work_sessions = $this->workSessionRepository->getPaginatedForCurrentUser(10, $startDate, $endDate);
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $work_sessions = $this->workSessionService->paginatedByRoleWithFilterDate($request);
 
         return view('admin.rcp.index', compact('work_sessions', 'startDate', 'endDate'));
     }
-    public function create()
+
+    /**
+     * Wyświetla formularz do dodawania sesji pracy.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function create(): \Illuminate\View\View
     {
         $userId = Auth::id();
-        $companyId = $this->companyRepository->getCompanyId();
-        $users = $this->userRepository->getByCompanyId($companyId);
+        $users = $this->userService->getUsersFromCompany();
         return view('admin.rcp.create', compact('users', 'userId'));
     }
-
-    public function store(StoreWorkSessionRequest $request)
+    /**
+     * Zapisuje nową sesję pracy.
+     *
+     * @param StoreWorkSessionRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function store(StoreWorkSessionRequest $request): \Illuminate\Http\RedirectResponse
     {
-        $this->workSessionRepository->storeWithEvents(
+        $this->workSessionService->storeWithEvents(
             userId: $request->user_id,
             startTime: $request->start_time,
             endTime: $request->end_time,
-            createdUserId: Auth::id()
         );
         return redirect()->route('rcp.work-session.index')->with('success', 'Sesja pracy została dodana.');
     }
-
+    /**
+     * Wyświetla formularz do edytowania sesji pracy.
+     *
+     * @param WorkSession $work_session
+     * @return \Illuminate\View\View
+     */
     public function edit(WorkSession $work_session)
     {
         $userId = Auth::id();
-        $companyId = $this->companyRepository->getCompanyId();
-        $users = $this->userRepository->getByCompanyId($companyId);
+        $users = $this->userService->getUsersFromCompany();
         return view('admin.rcp.edit', compact('work_session', 'users', 'userId'));
     }
 
-    public function update(StoreWorkSessionRequest $request, WorkSession $work_session)
+    /**
+     * Aktualizuje sesję pracy.
+     *
+     * @param StoreWorkSessionRequest $request
+     * @param WorkSession $work_session
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(StoreWorkSessionRequest $request, WorkSession $work_session): \Illuminate\Http\RedirectResponse
     {
-        $this->workSessionRepository->updateWithEvents(
+        $this->workSessionService->updateWithEvents(
             workSession: $work_session,
             userId: $request->user_id,
             startTime: $request->start_time,
@@ -85,17 +101,27 @@ class RCPController extends Controller
         );
         return redirect()->route('rcp.work-session.index')->with('success', 'Sesja pracy została zaktualizowana.');
     }
-    public function show(WorkSession $work_session)
+    /**
+     * Wyświetla szczegóły sesji pracy.
+     *
+     * @param WorkSession $work_session
+     * @return \Illuminate\View\View
+     */
+    public function show(WorkSession $work_session): \Illuminate\View\View
     {
         return view('admin.rcp.show', compact('work_session'));
     }
-
-    public function delete(WorkSession $work_session)
+    /**
+     * Usuwa sesję pracy.
+     *
+     * @param WorkSession $work_session
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function delete(WorkSession $work_session): \Illuminate\Http\RedirectResponse
     {
         if ($work_session->delete()) {
             return redirect()->route('rcp.work-session.index')->with('success', 'Operacja się powiodła.');
         }
-
         return redirect()->back()->with('fail', 'Wystąpił błąd.');
     }
     public function get(Request $request)
@@ -103,9 +129,9 @@ class RCPController extends Controller
         $perPage = $request->input('per_page', 10);
 
         if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
-            $query = WorkSession::with('user')->where('work_sessions.company_id', Auth::user()->company_id);
+            $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.company_id', Auth::user()->company_id);
         } else {
-            $query = WorkSession::with('user')->where('work_sessions.user_id', Auth::id());
+            $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.user_id', Auth::id());
         }
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -121,8 +147,8 @@ class RCPController extends Controller
                 }
             });
         }
-
-        $query->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
+        return $query->select('work_sessions.*')
+            ->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
             ->orderBy('event_start.time', 'desc')
             ->paginate($perPage);
 
@@ -141,9 +167,9 @@ class RCPController extends Controller
         $request->session()->put('end_date', $request->input('end_date'));
 
         if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
-            $query = WorkSession::with('user')->where('work_sessions.company_id', Auth::user()->company_id);
+            $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.company_id', Auth::user()->company_id);
         } else {
-            $query = WorkSession::with('user')->where('work_sessions.user_id', Auth::id());
+            $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.user_id', Auth::id());
         }
 
         if ($request->filled('start_date') && $request->filled('end_date')) {
@@ -159,7 +185,8 @@ class RCPController extends Controller
                 }
             });
         }
-        $query->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
+        $query->select('work_sessions.*')
+            ->join('events as event_start', 'work_sessions.event_start_id', '=', 'event_start.id')
             ->orderBy('event_start.time', 'desc');
 
         $sessions = $query->get();

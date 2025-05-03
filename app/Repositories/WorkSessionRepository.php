@@ -11,21 +11,15 @@ use Illuminate\Support\Carbon;
 
 class WorkSessionRepository
 {
-    public function getPaginatedForCurrentUser(int $perPage = 10, ?string $startDate = null, ?string $endDate = null)
-    {
-        if ($this->isAdmin()) {
-            return $this->getAllForCompanyPaginated($perPage, $startDate, $endDate);
-        }
-
-        return $this->getForLoggedUserPaginated($perPage, $startDate, $endDate);
-    }
-
-    public function getAll(): \Illuminate\Database\Eloquent\Collection
-    {
-        return WorkSession::all();
-    }
-
-    private function getForLoggedUserPaginated(int $perPage, ?string $startDate = null, ?string $endDate = null)
+    /**
+     * Zwraca sesje pracy dla użytkownika w zakresie dat.
+     *
+     * @param int $perPage
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginateByUserWithFilterDate(int $perPage, ?string $startDate = null, ?string $endDate = null): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = WorkSession::where('work_sessions.user_id', Auth::id())
             ->whereHas('eventStart', function ($query) use ($startDate, $endDate) {
@@ -43,8 +37,15 @@ class WorkSessionRepository
             ->orderBy('event_start.time', 'desc')
             ->paginate($perPage);
     }
-
-    private function getAllForCompanyPaginated(int $perPage, ?string $startDate = null, ?string $endDate = null)
+    /**
+     * Zwraca sesje pracy dla admina w zakresie dat.
+     *
+     * @param int $perPage
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginateByAdminWithFilterDate(int $perPage, ?string $startDate = null, ?string $endDate = null): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = WorkSession::where('work_sessions.company_id', Auth::user()->company_id)
             ->whereHas('eventStart', function ($query) use ($startDate, $endDate) {
@@ -62,32 +63,24 @@ class WorkSessionRepository
             ->orderBy('event_start.time', 'desc')
             ->paginate($perPage);
     }
-
-    private function isAdmin(): bool
+    /**
+     * Tworzy nową sesję pracy i zdarzenia start i stop.
+     *
+     * @param int $perPage
+     * @param string|null $startDate
+     * @param string|null $endDate
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function storeWithEvents(int $userId, string $startTime, string $endTime): WorkSession
     {
-        $user = User::where('id', auth()->id())->first();
-        if ($user) {
-            if ($user->role == 'admin'  || $user->role == 'menedżer') {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
-    }
-    public function storeWithEvents(int $userId, string $startTime, string $endTime, int $createdUserId): WorkSession
-    {
-        $companyId = app(CompanyRepository::class)->getCompanyId();
-
-        // Utwórz zdarzenia start i stop
         $eventStart = Event::create([
             'time' => $startTime,
             'location' => '',
             'device' => '',
             'event_type' => 'start',
             'user_id' => $userId,
-            'company_id' => $companyId,
-            'created_user_id' => $createdUserId,
+            'company_id' => Auth::user()->company_id,
+            'created_user_id' => Auth::id(),
         ]);
 
         $eventStop = Event::create([
@@ -96,18 +89,18 @@ class WorkSessionRepository
             'device' => '',
             'event_type' => 'stop',
             'user_id' => $userId,
-            'company_id' => $companyId,
-            'created_user_id' => $createdUserId,
+            'company_id' => Auth::user()->company_id,
+            'created_user_id' => Auth::id(),
         ]);
 
-        // Oblicz czas pracy
-        $timeInWork = Carbon::parse($startTime)->diff(Carbon::parse($endTime))->format('%H:%I:%S');
+        $timeInWork = Carbon::parse($startTime)
+            ->diff(Carbon::parse($endTime))
+            ->format('%H:%I:%S');
 
-        // Utwórz sesję
         return WorkSession::create([
-            'company_id' => $companyId,
+            'company_id' => Auth::user()->company_id,
             'user_id' => $userId,
-            'created_user_id' => $createdUserId,
+            'created_user_id' => Auth::id(),
             'event_start_id' => $eventStart->id,
             'event_stop_id' => $eventStop->id,
             'status' => 'Praca zakończona',
@@ -115,25 +108,26 @@ class WorkSessionRepository
         ]);
     }
 
+    /**
+     * Zwraca zaktualizowaną sesję pracy.
+     *
+     * @param int $perPage
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
     public function updateWithEvents(WorkSession $workSession, int $userId, string $startTime, string $endTime): WorkSession
     {
-        // Aktualizuj zdarzenia start i stop
         $eventStart = Event::findOrFail($workSession->event_start_id);
+        $eventStop = Event::findOrFail($workSession->event_stop_id);
+        $timeInWork = Carbon::parse($startTime)->diff(Carbon::parse($endTime))->format('%H:%I:%S');
+
         $eventStart->update([
             'time' => $startTime,
             'user_id' => $userId,
         ]);
-
-        $eventStop = Event::findOrFail($workSession->event_stop_id);
         $eventStop->update([
             'time' => $endTime,
             'user_id' => $userId,
         ]);
-
-        // Oblicz czas pracy
-        $timeInWork = Carbon::parse($startTime)->diff(Carbon::parse($endTime))->format('%H:%I:%S');
-
-        // Aktualizuj sesję
         $workSession->update([
             'user_id' => $userId,
             'time_in_work' => $timeInWork,
@@ -192,5 +186,21 @@ class WorkSessionRepository
             ->whereDate('start_date', '<=', $formattedDate)
             ->whereDate('end_date', '>=', $formattedDate)
             ->exists();
+    }
+    /**
+     * Zwraca wniosek urlopowy dla użytkownika na dany dzień.
+     *
+     * @param int $userId
+     * @param string $date
+     * @return Leave|null
+     */
+    public function getFirstLeave(int $userId, string $date): ?Leave
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        return Leave::where('user_id', $userId)
+            ->where('status', 'zaakceptowane')
+            ->whereDate('start_date', '<=', $formattedDate)
+            ->whereDate('end_date', '>=', $formattedDate)
+            ->first();
     }
 }

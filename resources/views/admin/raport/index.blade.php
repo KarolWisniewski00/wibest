@@ -11,7 +11,7 @@
         <x-raport.nav />
         <!--HEADER-->
         <x-raport.header>
-            Lista obecności
+            Lista obecności🧍🧍‍♀️
         </x-raport.header>
         <!--HEADER-->
         <x-status-cello id="show-filter" class="mx-2 mt-8 ">
@@ -50,7 +50,7 @@
                                     <input data-id="{{$user->id}}" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 </x-flex-center>
                             </td>
-                            <td class="px-2 py-2 flex items-center justify-center gap-2">
+                            <td class="px-3 py-2 flex items-center justify-center">
                                 @if($user->profile_photo_url)
                                 <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
                                 @else
@@ -59,11 +59,54 @@
                                 </div>
                                 @endif
                             </td>
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 text-left">
-                                <x-paragraf-display class="text-xs">
-                                    {{$user->name}}
-                                </x-paragraf-display>
+                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                <div class="flex flex-col justify-center w-fit">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                        {{$user->name}}
+                                    </x-paragraf-display>
+                                    @if($user->role == 'admin')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Admin
+                                    </span>
+                                    @elseif($user->role == 'menedżer')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Menedżer
+                                    </span>
+                                    @elseif($user->role == 'kierownik')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Kierownik
+                                    </span>
+                                    @elseif($user->role == 'użytkownik')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Użytkownik
+                                    </span>
+                                    @endif
+                                </div>
                             </td>
+                            @php
+                            $shortType = ['wolne za pracę w święto' => 'WPS',
+                            'zwolnienie lekarskie' => 'ZL',
+                            'urlop wypoczynkowy' => 'UW',
+                            'urlop rodzicielski' => 'UR',
+                            'wolne za nadgodziny' => 'WN',
+                            'wolne za święto w sobotę' => 'WSS',
+                            'urlop bezpłatny' => 'UB',
+                            'wolne z tytułu 5-dniowego tygodnia pracy' => 'WT5',
+                            'zwolnienie lekarsie - opieka' => 'ZLO',
+                            'urlop okolicznościowy' => 'UO',
+                            'urlop wypoczynkowy "na żądanie"' => 'UWZ',
+                            'oddanie krwi' => 'OK',
+                            'urlop ojcowski' => 'UOJC',
+                            'urlop macieżyński' => 'UM',
+                            'świadczenie rehabilitacyjne' => 'SR',
+                            'opieka' => 'OP',
+                            'świadek w sądzie' => 'SWS',
+                            'praca zdalna' => 'PZ',
+                            'kwarantanna' => 'KW',
+                            'kwarantanna z pracą zdalną' => 'KWZPZ',
+                            'delegacja' => 'DEL'
+                            ]
+                            @endphp
                             @foreach ($user->dates as $date)
                             @if ($date == 1)
                             <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
@@ -80,9 +123,9 @@
                             <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
                                 <i class="fa-solid fa-briefcase"></i>
                             </td>
-                            @elseif($date == 'leave')
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
-                                <i class="fa-solid fa-calendar"></i>
+                            @elseif($date != null)
+                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700">
+                                {{ $shortType[$date] }}
                             </td>
                             @else
                             <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
@@ -125,6 +168,29 @@
                             const start = new Date(startDate);
                             const end = new Date(endDate);
                             const dates = [];
+                            const shortType = {
+                                'wolne za pracę w święto': 'WPS',
+                                'zwolnienie lekarskie': 'ZL',
+                                'urlop wypoczynkowy': 'UW',
+                                'urlop rodzicielski': 'UR',
+                                'wolne za nadgodziny': 'WN',
+                                'wolne za święto w sobotę': 'WSS',
+                                'urlop bezpłatny': 'UB',
+                                'wolne z tytułu 5-dniowego tygodnia pracy': 'WT5',
+                                'zwolnienie lekarsie - opieka': 'ZLO',
+                                'urlop okolicznościowy': 'UO',
+                                'urlop wypoczynkowy "na żądanie"': 'UWZ',
+                                'oddanie krwi': 'OK',
+                                'urlop ojcowski': 'UOJC',
+                                'urlop macieżyński': 'UM',
+                                'świadczenie rehabilitacyjne': 'SR',
+                                'opieka': 'OP',
+                                'świadek w sądzie': 'SWS',
+                                'praca zdalna': 'PZ',
+                                'kwarantanna': 'KW',
+                                'kwarantanna z pracą zdalną': 'KWZPZ',
+                                'delegacja': 'DEL'
+                            };
 
                             // Generate list of dates from start to end
                             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
@@ -140,27 +206,26 @@
                                     <td class="px-2 py-2 font-semibold text-lg text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
                                         <i class="fa-solid fa-sun"></i>
                                     </td>`;
-                                }else if(user.dates[date] == 0.5) {
+                                } else if (user.dates[date] == 0.5) {
                                     cells += `
                                     <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-200 dark:bg-green-200 border-x border-gray-200 dark:border-gray-700">
                                         <i class="fa-solid fa-moon"></i>
                                     </td>`;
-                                }else if(user.dates[date] == 1.5) {
+                                } else if (user.dates[date] == 1.5) {
                                     cells += `
                                     <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
                                     </td>`;
-                                }else if(user.dates[date] == 'in_progress') {
+                                } else if (user.dates[date] == 'in_progress') {
                                     cells += `
                                     <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
                                         <i class="fa-solid fa-briefcase"></i>
                                     </td>`;
-                                }
-                                else if(user.dates[date] == 'leave') {
+                                } else if (user.dates[date] != null && user.dates[date] != 0) {
                                     cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
-                                        <i class="fa-solid fa-calendar"></i>
+                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700">
+                                        ${shortType[user.dates[date]]}
                                     </td>`;
-                                }else{
+                                } else {
                                     cells += `
                                     <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
                                     </td>`;
@@ -180,10 +245,36 @@
                                         : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${user.name[0].toUpperCase()}</div>`
                                     }
                                 </td>
-                                <td class="px-3 py-2 text-left">
-                                    <x-paragraf-display class="text-xs">
-                                        ${user.name}
-                                    </x-paragraf-display>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            ${user.name}
+                                        </x-paragraf-display>
+                                        ${user.role == 'admin'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Admin
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${user.role == 'menedżer'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Menedżer
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${user.role == 'kierownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Kierownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${user.role == 'użytkownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                    </div>
                                 </td>
                                 ${cells}
                             </tr>`;

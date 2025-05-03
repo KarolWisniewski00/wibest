@@ -41,4 +41,15 @@ class Event extends Model
     {
         return $this->hasOne(WorkSession::class, 'event_stop_id');
     }
+    public function isSameDay($event)
+    {
+        $thisTime = \Carbon\Carbon::parse($this->time);
+        $eventTime = \Carbon\Carbon::parse($event);
+        return $thisTime->isSameDay($eventTime);
+    }
+    public function format()
+    {
+        \Carbon\Carbon::setLocale('pl');
+        return \Carbon\Carbon::parse($this->time)->translatedFormat('d.m, l');
+    }
 }

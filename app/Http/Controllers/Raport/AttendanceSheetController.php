@@ -23,9 +23,8 @@ class AttendanceSheetController extends Controller
      */
     public function index()
     {
-        // Używamy repozytorium, aby uzyskać ID użytkownika
-        $userId = $this->userRepository->getAuthUserId();
+
         
-        return view('admin.attendance.index', compact('userId'));
+        return view('admin.attendance.index');
     }
 }

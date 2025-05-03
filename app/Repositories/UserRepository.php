@@ -8,38 +8,61 @@ use Illuminate\Support\Facades\Auth;
 class UserRepository
 {
     /**
-     * Pobiera ID zalogowanego użytkownika
+     * Zwraca użytkowników dla admina.
      *
-     * @return int|null
+     * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function getAuthUserId(): ?int
+    public function paginateByAdmin(): \Illuminate\Pagination\LengthAwarePaginator
     {
-        return Auth::id();
-    }
-    public function getByCompanyId($companyId, $page = 1)
-    {
-        return User::where('company_id', $companyId)
+        return User::where('company_id', Auth::user()->company_id)
             ->where('role', '!=', null)
-            ->paginate(10, ['*'], 'page', $page);
+            ->paginate(10);
     }
-    public function getByLoggedUserCompanyId($companyId, $page = 1)
+
+    /**
+     * Zwraca użytkowników dla użytkownika.
+     *
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginateByUser(): \Illuminate\Pagination\LengthAwarePaginator
     {
-        return User::where('company_id', $companyId)
+        return User::where('company_id', Auth::user()->company_id)
             ->where('id', Auth::id())
-            ->paginate(10, ['*'], 'page', $page);
+            ->paginate(10);
     }
-    public function getByCompanyIdAll($companyId)
+    /**
+     * Zwraca użytkowników dla admina.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getByAdmin(): \Illuminate\Support\Collection
     {
-        return User::where('company_id', $companyId)
+        return User::where('company_id', Auth::user()->company_id)
             ->where('role', '!=', null)
             ->get();
     }
-    public function getByLoggedUserCompanyIdAll($companyId)
+    /**
+     * Zwraca użytkowników dla użytkownika.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getByUser(): \Illuminate\Support\Collection
     {
-        return User::where('company_id', $companyId)
+        return User::where('company_id', Auth::user()->company_id)
             ->where('id', Auth::id())
             ->get();
     }
+    /**
+     * Zwraca użytkowników dla admina.
+     *
+     * @param array|null $ids
+     * @return \Illuminate\Support\Collection
+     */
+    public function getByRequestIds(?array $ids = []): \Illuminate\Support\Collection
+    {
+        return User::where('company_id', Auth::user()->company_id)->whereIn('id', $ids)->get();
+    }
+
     public function countByCompanyId($companyId)
     {
         return User::where('company_id', $companyId)->count();

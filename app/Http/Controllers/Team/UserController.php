@@ -32,7 +32,7 @@ class UserController extends Controller
     {
         $userId = Auth::id();
         $companyId = $this->companyRepository->getCompanyId();
-        $users = $this->userRepository->getByCompanyId($companyId);
+        $users = $this->userRepository->getByAdmin();
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         $userCount =  $this->userRepository->countByCompanyId($companyId);
 

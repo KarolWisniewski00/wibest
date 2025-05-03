@@ -11,8 +11,8 @@
     <!--MAIN-->
     <x-main>
         <x-RCP.nav />
-        <x-RCP.header>Rejestracja czasu pracy</x-RCP.header>
-        <x-status-cello id="show-filter" class="mx-2 mt-8 ">
+        <x-RCP.header>Rejestracja czasu pracy⏱️</x-RCP.header>
+        <x-status-cello id="show-filter" class="mx-2 mt-8">
             {{ $startDate }} - {{ $endDate }}
         </x-status-cello>
         <!--CONTENT-->
@@ -37,15 +37,52 @@
                                 </div>
                                 <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
                                     @if($work_session->status == 'Praca zakończona')
-                                    {{ $work_session->time_in_work }}
+                                    {{ $work_session->time_in_work }},
+                                    <span class="text-xs text-gray-400">
+                                        @if ($work_session->eventStart->isSameDay($work_session->eventStop->time))
+                                        {{ $work_session->eventStart->format() }}
+                                        @else
+                                        z {{ $work_session->eventStart->format() }} na {{ $work_session->eventStop->format() }}
+                                        @endif
+                                    </span>
                                     @endif
                                 </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                    <div class="flex flex-col">
-                                        {{$work_session->user->name}}
+                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full p-2 justify-start">
+                                    <div class="flex items-center gap-4">
+                                        @if($work_session->user->profile_photo_url)
+                                        <img src="{{ $work_session->user->profile_photo_url }}" alt="{{ $work_session->user->name }}" class="w-10 h-10 rounded-full">
+                                        @else
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                            {{ strtoupper(substr($work_session->user->name, 0, 1)) }}
+                                        </div>
+                                        @endif
+                                        <div>
+                                            <div class="flex flex-col justify-center w-fit">
+                                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                    {{$work_session->user->name}}
+                                                </x-paragraf-display>
+                                                @if($work_session->user->role == 'admin')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>
+                                                @elseif($work_session->user->role == 'menedżer')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>
+                                                @elseif($work_session->user->role == 'kierownik')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>
+                                                @elseif($work_session->user->role == 'użytkownik')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="flex space-x-4 mt-4">
+                                <div class="flex space-x-4 p-2 mt-4">
                                     <x-button-link-neutral href="{{route('rcp.work-session.show', $work_session)}}" class="min-h-[38px]">
                                         <i class="fa-solid fa-eye"></i>
                                     </x-button-link-neutral>
@@ -78,7 +115,7 @@
                             <th scope="col" class="px-6 py-3 text-center">
                                 Zdjęcie
                             </th>
-                            <th scope="col" class="px-6 py-3 text-center">
+                            <th scope="col" class="px-6 py-3 text-start">
                                 Imię i Nazwisko
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
@@ -86,6 +123,9 @@
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
                                 Czas w pracy
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
+                                Kiedy
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
                                 Podgląd
@@ -117,17 +157,51 @@
                                 @endif
                             </td>
                             <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-                                <x-paragraf-display class="text-xs">
-                                    {{$work_session->user->name}}
-                                </x-paragraf-display>
+                                <div class="flex flex-col justify-center w-fit">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                        {{$work_session->user->name}}
+                                    </x-paragraf-display>
+                                    @if($work_session->user->role == 'admin')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Admin
+                                    </span>
+                                    @elseif($work_session->user->role == 'menedżer')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Menedżer
+                                    </span>
+                                    @elseif($work_session->user->role == 'kierownik')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Kierownik
+                                    </span>
+                                    @elseif($work_session->user->role == 'użytkownik')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        Użytkownik
+                                    </span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-3 py-2 text-sm ">
                                 <x-RCP.work-session-status :work_session="$work_session" class="text-xs" />
                             </td>
                             <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
-                                @if($work_session->status == 'Praca zakończona')
-                                {{ $work_session->time_in_work }}
-                                @endif
+                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                    @if($work_session->status == 'Praca zakończona')
+                                    {{ $work_session->time_in_work }}
+                                    @endif
+                                </x-paragraf-display>
+                            </td>
+                            <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
+                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                    <span class="text-gray-400">
+                                        @if($work_session->status == 'Praca zakończona')
+                                        @if ($work_session->eventStart->isSameDay($work_session->eventStop->time))
+                                        {{ $work_session->eventStart->format() }}
+                                        @else
+                                        z {{ $work_session->eventStart->format() }} - na {{ $work_session->eventStop->format() }}
+                                        @endif
+                                        @endif
+                                    </span>
+                                </x-paragraf-display>
                             </td>
                             <x-show-cell href="{{ route('rcp.work-session.show', $work_session) }}" />
                         </tr>
@@ -149,6 +223,17 @@
         <input type="hidden" id="start_date" value="{{ $startDate }}">
         <input type="hidden" id="end_date" value="{{ $endDate }}">
         <script>
+            function formatDateWhen(dateStr) {
+                const date = new Date(dateStr);
+                const options = {
+                    day: '2-digit',
+                    month: '2-digit',
+                    weekday: 'long'
+                };
+                const formattedDate = date.toLocaleDateString('pl-PL', options);
+                const [weekday, rest] = formattedDate.split(', ');
+                return `${rest}, ${weekday}`;
+            }
             $(document).ready(function() {
                 let page = 2;
                 let loading = false;
@@ -157,6 +242,7 @@
                 const $loader = $('#loader');
                 const startDate = $('#start_date').val();
                 const endDate = $('#end_date').val();
+                let resultText = "";
 
                 function loadMoreSessions() {
                     if (loading) return;
@@ -165,6 +251,27 @@
 
                     $.get(`{{ route('api.v1.rcp.work-session.get') }}?page=${page}&start_date=${startDate}&end_date=${endDate}`, function(data) {
                         data.data.forEach(function(session) {
+                            console.log(session);
+                            if (session.status == 'Praca zakończona') {
+
+                                const start = new Date(session.event_start.time);
+                                const end = new Date(session.event_stop.time);
+
+                                const sameDay = start.toDateString() === end.toDateString();
+
+                                if (sameDay) {
+                                    resultText = formatDateWhen(session.event_start.time);
+                                } else {
+                                    resultText = "z " + formatDateWhen(session.event_start.time) + " - na " + formatDateWhen(session.event_stop.time);
+                                }
+
+                                // wyświetl wynik np. w divie o ID #session-info
+                                $('#session-info').text(resultText);
+
+                            } else {
+                                // jeśli praca nie zakończona, możesz np. wyświetlić "w trakcie"
+                                $('#session-info').text('W trakcie...');
+                            }
                             const row = `
                             <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
                                 <td class="px-3 py-2">
@@ -178,10 +285,36 @@
                                         : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
                                     }
                                 </td>
-                                <td class="px-3 py-2">
-                                    <x-paragraf-display class="text-xs">
-                                        ${session.user.name}
-                                    </x-paragraf-display>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            ${session.user.name}
+                                        </x-paragraf-display>
+                                        ${session.user.role == 'admin'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Admin
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${session.user.role == 'menedżer'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Menedżer
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${session.user.role == 'kierownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Kierownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${session.user.role == 'użytkownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                    </div>
                                 </td>
                                 <td class="px-3 py-2 text-xs">
                                     ${session.status === 'W trakcie pracy' 
@@ -191,7 +324,16 @@
                                             : ''}
                                 </td>
                                 <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
-                                    ${session.time_in_work ?? '-'}
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                        ${session.time_in_work ?? '-'}
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                        <span class="text-gray-400">
+                                        ${resultText ?? '-'}
+                                        </span>
+                                    </x-paragraf-display>
                                 </td>
                                 <x-show-cell href="{{ route('rcp.work-session.show', '') }}/${session.id}" />
                             </tr>`;
@@ -209,11 +351,48 @@
                                             </div>
                                         </div>
                                         <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
-                                            ${session.time_in_work ?? '-'}
+                                            ${session.time_in_work ?? '-'},
+                                            <span class="text-xs text-gray-400">
+                                                ${resultText ?? '-'}
+                                            </span>
                                         </div>
-                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                            <div class="flex flex-col">
-                                                ${session.user.name}
+                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full p-2 justify-start">
+                                            <div class="flex items-center gap-4">
+                                                ${session.user.profile_photo_url
+                                                    ? `<img src="${session.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                                    : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
+                                                }
+                                                <div>
+                                                    <div class="flex flex-col justify-center w-fit">
+                                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                            ${session.user.name}
+                                                        </x-paragraf-display>
+                                                        ${session.user.role == 'admin'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Admin
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                        ${session.user.role == 'menedżer'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Menedżer
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                        ${session.user.role == 'kierownik'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Kierownik
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                        ${session.user.role == 'użytkownik'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Użytkownik
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <div class="flex space-x-4 mt-4">

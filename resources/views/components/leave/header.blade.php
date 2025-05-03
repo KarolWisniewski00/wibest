@@ -9,9 +9,4 @@
         </x-button-link-green>
     </x-flex-center>
 </x-container-header>
-<x-label class="px-4 hidden lg:flex">
-    <span id="selected-count">
-        0 zaznaczonych
-    </span>
-</x-label>
 <!--HEADER-->

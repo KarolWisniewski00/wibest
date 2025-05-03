@@ -131,14 +131,47 @@
                 @if(Str::startsWith(request()->path(), 'dashboard/rcp/work-session'))
 
                 function ajaxFilter() {
+                    const $tbody = $('#work-sessions-body');
+                    var resultText = "";
+
+                    function formatDateWhen(dateStr) {
+                        const date = new Date(dateStr);
+                        const options = {
+                            day: '2-digit',
+                            month: '2-digit',
+                            weekday: 'long'
+                        };
+                        const formattedDate = date.toLocaleDateString('pl-PL', options);
+                        const [weekday, rest] = formattedDate.split(', ');
+                        return `${rest}, ${weekday}`;
+                    }
                     $.ajax({
                         url: `{{ route('api.v1.rcp.work-session.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
                         method: 'get',
                         success: function(response) {
-                            const $tbody = $('#work-sessions-body');
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
 
                             response.forEach(session => {
+                                if (session.status == 'Praca zakończona') {
+
+                                    const start = new Date(session.event_start.time);
+                                    const end = new Date(session.event_stop.time);
+
+                                    const sameDay = start.toDateString() === end.toDateString();
+
+                                    if (sameDay) {
+                                        resultText = formatDateWhen(session.event_start.time);
+                                    } else {
+                                        resultText = "z " + formatDateWhen(session.event_start.time) + " - na " + formatDateWhen(session.event_stop.time);
+                                    }
+
+                                    // wyświetl wynik np. w divie o ID #session-info
+                                    $('#session-info').text(resultText);
+
+                                } else {
+                                    // jeśli praca nie zakończona, możesz np. wyświetlić "w trakcie"
+                                    $('#session-info').text('W trakcie...');
+                                }
                                 // generujemy każdy wiersz
                                 const row = `
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
@@ -153,10 +186,36 @@
                                             : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
                                         }
                                     </td>
-                                    <td class="px-3 py-2">
-                                        <x-paragraf-display class="text-xs">
-                                            ${session.user.name}
-                                        </x-paragraf-display>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <div class="flex flex-col justify-center w-fit">
+                                            <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                ${session.user.name}
+                                            </x-paragraf-display>
+                                            ${session.user.role == 'admin'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${session.user.role == 'menedżer'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${session.user.role == 'kierownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${session.user.role == 'użytkownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>`
+                                            : ``
+                                            }
+                                        </div>
                                     </td>
                                     <td class="px-3 py-2 text-xs">
                                         ${session.status === 'W trakcie pracy' 
@@ -166,7 +225,16 @@
                                                 : ''}
                                     </td>
                                     <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
-                                        ${session.time_in_work ?? '-'}
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            ${session.time_in_work ?? '-'}
+                                        </x-paragraf-display>
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            <span class="text-gray-400">
+                                            ${resultText ?? '-'}
+                                            </span>
+                                        </x-paragraf-display>
                                     </td>
                                     <x-show-cell href="{{ route('rcp.work-session.show', '') }}/${session.id}" />
                                 </tr>`;
@@ -174,6 +242,7 @@
                             });
                         },
                         error: function(xhr) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
                             // generujemy emptyplace
                             const row = `
                             <tr class="bg-white dark:bg-gray-800">
@@ -189,11 +258,11 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/rcp/event'))
 
                 function ajaxFilter() {
+                    const $tbody = $('#work-sessions-body');
                     $.ajax({
                         url: `{{ route('api.v1.rcp.event.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
                         method: 'get',
                         success: function(response) {
-                            const $tbody = $('#work-sessions-body');
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
 
                             response.forEach(event => {
@@ -208,13 +277,39 @@
                                 <td class="px-3 py-2  flex items-center justify-center">
                                     ${event.user.profile_photo_url
                                         ? `<img src="${event.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
-                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
+                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${event.user.name[0].toUpperCase()}</div>`
                                     }
                                 </td>
-                                <td class="px-3 py-2">
-                                    <x-paragraf-display class="text-xs">
-                                        ${event.user.name}
-                                    </x-paragraf-display>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            ${event.user.name}
+                                        </x-paragraf-display>
+                                        ${event.user.role == 'admin'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Admin
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'menedżer'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Menedżer
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'kierownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Kierownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'użytkownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                    </div>
                                 </td>
                                 <td class="px-3 py-2 text-xs">
                                     ${event.event_type === 'stop' 
@@ -232,6 +327,302 @@
                             });
                         },
                         error: function(xhr) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
+                            // generujemy emptyplace
+                            const row = `
+                            <tr class="bg-white dark:bg-gray-800">
+                                <td colspan="8" class="px-3 py-2">
+                                    <x-empty-place />
+                                </td>
+                            </tr>`;
+                            $tbody.append(row);
+                        }
+                    });
+                    updateShowFilter();
+                }
+                @elseif(Str::startsWith(request()->path(), 'dashboard/leave/single'))
+
+                function ajaxFilter() {
+                    const $tbody = $('#work-sessions-body');
+                    $.ajax({
+                        url: `{{ route('api.v1.leave.single.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
+                        method: 'get',
+                        success: function(response) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
+
+                            response.forEach(leave => {
+                                // generujemy każdy wiersz
+                                const shortType = {
+                                    'wolne za pracę w święto': 'WPS',
+                                    'zwolnienie lekarskie': 'ZL',
+                                    'urlop wypoczynkowy': 'UW',
+                                    'urlop rodzicielski': 'UR',
+                                    'wolne za nadgodziny': 'WN',
+                                    'wolne za święto w sobotę': 'WSS',
+                                    'urlop bezpłatny': 'UB',
+                                    'wolne z tytułu 5-dniowego tygodnia pracy': 'WT5',
+                                    'zwolnienie lekarsie - opieka': 'ZLO',
+                                    'urlop okolicznościowy': 'UO',
+                                    'urlop wypoczynkowy "na żądanie"': 'UWZ',
+                                    'oddanie krwi': 'OK',
+                                    'urlop ojcowski': 'UOJC',
+                                    'urlop macieżyński': 'UM',
+                                    'świadczenie rehabilitacyjne': 'SR',
+                                    'opieka': 'OP',
+                                    'świadek w sądzie': 'SWS',
+                                    'praca zdalna': 'PZ',
+                                    'kwarantanna': 'KW',
+                                    'kwarantanna z pracą zdalną': 'KWZPZ',
+                                    'delegacja': 'DEL'
+                                };
+                                const row = `
+                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                                <td class="px-3 py-2  flex items-center justify-center">
+                                    ${leave.manager.profile_photo_url
+                                        ? `<img src="${leave.manager.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${leave.manager.name[0].toUpperCase()}</div>`
+                                    }
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            ${leave.manager.name}
+                                        </x-paragraf-display>
+                                        ${leave.manager.role == 'admin'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Admin
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.manager.role == 'menedżer'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Menedżer
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.manager.role == 'kierownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Kierownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.manager.role == 'użytkownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                    </div>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="text-xs">
+                                        ${leave.start_date}
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="text-xs">
+                                        ${leave.end_date}
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="text-xs">
+                                        ${leave.status == 'oczekujące'
+                                        ? ` <x-status-yellow>
+                                                ${leave.status}
+                                            </x-status-yellow>`
+                                        : ``
+                                        }
+                                        ${leave.status == 'zaakceptowane'
+                                        ? ` <x-status-green>
+                                                ${leave.status}
+                                            </x-status-green>`
+                                        : ``
+                                        }
+                                        ${leave.status == 'odrzucone'
+                                        ? ` <x-status-red>
+                                                ${leave.status}
+                                            </x-status-red>`
+                                        : ``
+                                        }
+                                        ${leave.status == 'anulowane'
+                                        ? ` <x-status-red>
+                                                ${leave.status}
+                                            </x-status-red>`
+                                        : ``
+                                        }
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-gray-700 dark:text-gray-50 text-start">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit">
+                                            ${leave.type}
+                                        </x-paragraf-display>
+                                        <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                            ${shortType[leave.type] ?? '' }
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <x-button-link-red href="{{ route('leave.pending.reject', '')}}/${leave.id}" class="min-h-[38px]">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </x-button-link-red>
+                                </td>
+                            </tr>`;
+                                $tbody.append(row);
+                            });
+                        },
+                        error: function(xhr) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
+                            // generujemy emptyplace
+                            const row = `
+                            <tr class="bg-white dark:bg-gray-800">
+                                <td colspan="8" class="px-3 py-2">
+                                    <x-empty-place />
+                                </td>
+                            </tr>`;
+                            $tbody.append(row);
+                        }
+                    });
+                    updateShowFilter();
+                }
+                @elseif(Str::startsWith(request()->path(), 'dashboard/leave/pending-review'))
+
+                function ajaxFilter() {
+                    const $tbody = $('#work-sessions-body');
+                    $.ajax({
+                        url: `{{ route('api.v1.leave.pending.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
+                        method: 'get',
+                        success: function(response) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
+
+                            response.forEach(leave => {
+                                // generujemy każdy wiersz
+                                const shortType = {
+                                    'wolne za pracę w święto': 'WPS',
+                                    'zwolnienie lekarskie': 'ZL',
+                                    'urlop wypoczynkowy': 'UW',
+                                    'urlop rodzicielski': 'UR',
+                                    'wolne za nadgodziny': 'WN',
+                                    'wolne za święto w sobotę': 'WSS',
+                                    'urlop bezpłatny': 'UB',
+                                    'wolne z tytułu 5-dniowego tygodnia pracy': 'WT5',
+                                    'zwolnienie lekarsie - opieka': 'ZLO',
+                                    'urlop okolicznościowy': 'UO',
+                                    'urlop wypoczynkowy "na żądanie"': 'UWZ',
+                                    'oddanie krwi': 'OK',
+                                    'urlop ojcowski': 'UOJC',
+                                    'urlop macieżyński': 'UM',
+                                    'świadczenie rehabilitacyjne': 'SR',
+                                    'opieka': 'OP',
+                                    'świadek w sądzie': 'SWS',
+                                    'praca zdalna': 'PZ',
+                                    'kwarantanna': 'KW',
+                                    'kwarantanna z pracą zdalną': 'KWZPZ',
+                                    'delegacja': 'DEL'
+                                };
+                                const row = `
+                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                                <td class="px-3 py-2  flex items-center justify-center">
+                                    ${leave.user.profile_photo_url
+                                        ? `<img src="${leave.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${leave.user.name[0].toUpperCase()}</div>`
+                                    }
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            ${leave.user.name}
+                                        </x-paragraf-display>
+                                        ${leave.user.role == 'admin'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Admin
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.user.role == 'menedżer'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Menedżer
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.user.role == 'kierownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Kierownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.user.role == 'użytkownik'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                    </div>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="text-xs">
+                                        ${leave.start_date}
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="text-xs">
+                                        ${leave.end_date}
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="text-xs">
+                                        ${leave.status == 'oczekujące'
+                                        ? ` <x-status-yellow>
+                                                ${leave.status}
+                                            </x-status-yellow>`
+                                        : ``
+                                        }
+                                        ${leave.status == 'zaakceptowane'
+                                        ? ` <x-status-green>
+                                                ${leave.status}
+                                            </x-status-green>`
+                                        : ``
+                                        }
+                                        ${leave.status == 'odrzucone'
+                                        ? ` <x-status-red>
+                                                ${leave.status}
+                                            </x-status-red>`
+                                        : ``
+                                        }
+                                        ${leave.status == 'anulowane'
+                                        ? ` <x-status-red>
+                                                ${leave.status}
+                                            </x-status-red>`
+                                        : ``
+                                        }
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-gray-700 dark:text-gray-50 text-start">
+                                    <div class="flex flex-col justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit">
+                                            ${leave.type}
+                                        </x-paragraf-display>
+                                        <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                            ${shortType[leave.type] ?? '' }
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <x-button-link-green href="{{ route('leave.pending.accept', '')}}/${leave.id}" class="min-h-[38px]">
+                                        <i class="fa-solid fa-check"></i>
+                                    </x-button-link-green>
+                                </td>
+                                <td class="px-3 py-2">
+                                    <x-button-link-red href="{{ route('leave.pending.reject', '')}}/${leave.id}" class="min-h-[38px]">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </x-button-link-red>
+                                </td>
+                            </tr>`;
+                                $tbody.append(row);
+                            });
+                        },
+                        error: function(xhr) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
                             // generujemy emptyplace
                             const row = `
                             <tr class="bg-white dark:bg-gray-800">
@@ -258,6 +649,29 @@
                             const start = new Date(rangeStart);
                             const end = new Date(rangeEnd);
                             const dates = [];
+                            const shortType = {
+                                'wolne za pracę w święto': 'WPS',
+                                'zwolnienie lekarskie': 'ZL',
+                                'urlop wypoczynkowy': 'UW',
+                                'urlop rodzicielski': 'UR',
+                                'wolne za nadgodziny': 'WN',
+                                'wolne za święto w sobotę': 'WSS',
+                                'urlop bezpłatny': 'UB',
+                                'wolne z tytułu 5-dniowego tygodnia pracy': 'WT5',
+                                'zwolnienie lekarsie - opieka': 'ZLO',
+                                'urlop okolicznościowy': 'UO',
+                                'urlop wypoczynkowy "na żądanie"': 'UWZ',
+                                'oddanie krwi': 'OK',
+                                'urlop ojcowski': 'UOJC',
+                                'urlop macieżyński': 'UM',
+                                'świadczenie rehabilitacyjne': 'SR',
+                                'opieka': 'OP',
+                                'świadek w sądzie': 'SWS',
+                                'praca zdalna': 'PZ',
+                                'kwarantanna': 'KW',
+                                'kwarantanna z pracą zdalną': 'KWZPZ',
+                                'delegacja': 'DEL'
+                            };
 
                             for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
                                 const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -304,11 +718,11 @@
                                         <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
                                             <i class="fa-solid fa-briefcase"></i>
                                         </td>`;
-                                    } else if (user.dates[date] == 'leave') {
+                                    } else if (user.dates[date] != null && user.dates[date] != 0) {
                                         cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
-                                        <i class="fa-solid fa-calendar"></i>
-                                    </td>`;
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700">
+                                            ${shortType[user.dates[date]]}
+                                        </td>`;
                                     } else {
                                         cells += `
                                         <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
@@ -329,10 +743,36 @@
                                             : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${user.name[0].toUpperCase()}</div>`
                                         }
                                     </td>
-                                    <td class="px-3 py-2 text-left">
-                                        <x-paragraf-display class="text-xs">
-                                            ${user.name}
-                                        </x-paragraf-display>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <div class="flex flex-col justify-center w-fit">
+                                            <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                ${user.name}
+                                            </x-paragraf-display>
+                                            ${user.role == 'admin'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'menedżer'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'kierownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'użytkownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>`
+                                            : ``
+                                            }
+                                        </div>
                                     </td>
                                     ${cells}
                                 </tr>`;

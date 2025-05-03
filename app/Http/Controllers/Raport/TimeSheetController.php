@@ -4,287 +4,79 @@ namespace App\Http\Controllers\Raport;
 
 use App\Exports\TimeSheetExport;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Repositories\CompanyRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\WorkSessionRepository;
+use App\Http\Requests\DateRequest;
+use App\Services\FilterDateService;
+use App\Services\UserService;
+use App\Services\WorkSessionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TimeSheetController extends Controller
 {
-    protected UserRepository $userRepository;
-    protected WorkSessionRepository $workSessionRepository;
-    protected CompanyRepository $companyRepository;
+    protected FilterDateService $filterDateService;
+    protected WorkSessionService $workSessionService;
+    protected UserService $userService;
 
     public function __construct(
-        UserRepository $userRepository,
-        WorkSessionRepository $workSessionRepository,
-        CompanyRepository $companyRepository,
+        FilterDateService $filterDateService,
+        WorkSessionService $workSessionService,
+        UserService $userService,
     ) {
-        $this->userRepository = $userRepository;
-        $this->workSessionRepository = $workSessionRepository;
-        $this->companyRepository = $companyRepository;
+        $this->filterDateService = $filterDateService;
+        $this->workSessionService = $workSessionService;
+        $this->userService = $userService;
     }
 
 
     /**
-     * Wyświetla stronę kalendarza
+     * Wyświetla stronę kalendarza z obecnościami.
      *
+     * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\View\View
     {
-        // Używamy repozytorium, aby uzyskać ID użytkownika
-        $userId = $this->userRepository->getAuthUserId();
-        // Check if session variables for date range exist, otherwise set default to current month
-        if (!$request->session()->has('start_date') || !$request->session()->has('end_date')) {
-            $startOfMonth = now()->startOfMonth()->toDateString();
-            $endOfMonth = now()->endOfMonth()->toDateString();
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $dates = $this->filterDateService->getRangeDateFilter($request, 'd.m');
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
 
-            $request->session()->put('start_date', $startOfMonth);
-            $request->session()->put('end_date', $endOfMonth);
-        }
-
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-
-        // Generate a list of dates from start to end in Y-m-d format
-        $dates = [];
-        $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
-        $endDateCarbon = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
-
-        while ($currentDate->lte($endDateCarbon)) {
-            $dates[] = $currentDate->format('d.m.y');
-            $currentDate->addDay();
-        }
-
-        $work_sessions = $this->workSessionRepository->getPaginatedForCurrentUser(10, $startDate, $endDate);
-
-        $companyId = $this->companyRepository->getCompanyId();
-        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
-            $users = $this->userRepository->getByCompanyId($companyId);
-        } else {
-            $users = $this->userRepository->getByLoggedUserCompanyId($companyId);
-        }
-        // Add dates with 0 or 1 for each user
-        foreach ($users as &$user) {
-            $userDates = [];
-            foreach ($dates as $date) {
-                $hasEvent = $this->workSessionRepository->hasEventForUserOnDate($user->id, $date);
-                $hasStartEvent = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, $date);
-                $hasStopEvent = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->addDay()->format('d.m.y'));
-                $hasStartEvent2 = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->subDays(1)->format('d.m.y'));
-                $hasStopEvent2 = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, $date);
-                $status = $this->workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
-                $leave = $this->workSessionRepository->hasLeave($user->id, $date);
-
-                if ($status) {
-                    $userDates[$date] = "in_progress";
-                } else if ($leave) {
-                    $userDates[$date] = "leave";
-                } else if ($hasEvent) {
-                    $userDates[$date] = 1;
-                } else if ($hasStartEvent && $hasStopEvent) {
-                    $userDates[$date] = 0.5;
-                } else if ($hasStartEvent2 && $hasStopEvent2) {
-                    $userDates[$date] = 0.5;
-                } else if (!$hasEvent) {
-                    $userDates[$date] = 0;
-                }
-            }
-            $user->dates = $userDates;
-        }
-
-        // Generate a list of dates from start to end in Y-m-d format
-        $dates = [];
-        $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
-        $endDateCarbon = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
-
-        while ($currentDate->lte($endDateCarbon)) {
-            $dates[] = $currentDate->format('d.m');
-            $currentDate->addDay();
-        }
-
-        return view('admin.raport.index', compact('work_sessions', 'dates', 'startDate', 'endDate', 'users'));
+        return view('admin.raport.index', compact('dates', 'startDate', 'endDate', 'users'));
     }
-    public function get(Request $request)
+    /**
+     * Zwraca użytkowników dla paginated infinite scroll.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function get(Request $request): \Illuminate\Http\JsonResponse
     {
-        $perPage = $request->input('per_page', 10);
-
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-
-        // Generate a list of dates from start to end in Y-m-d format
-        $dates = [];
-        $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
-        $endDateCarbon = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
-
-        while ($currentDate->lte($endDateCarbon)) {
-            $dates[] = $currentDate->format('d.m.y');
-            $currentDate->addDay();
-        }
-
-        $companyId = $this->companyRepository->getCompanyId();
-        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
-            $users = $this->userRepository->getByCompanyId($companyId, $request->input('page'));
-        } else {
-            $users = $this->userRepository->getByLoggedUserCompanyId($companyId, $request->input('page'));
-        }
-        // Add dates with 0 or 1 for each user
-        foreach ($users as &$user) {
-            $userDates = [];
-            foreach ($dates as $date) {
-                $hasEvent = $this->workSessionRepository->hasEventForUserOnDate($user->id, $date);
-                $hasStartEvent = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, $date);
-                $hasStopEvent = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->addDay()->format('d.m.y'));
-                $hasStartEvent2 = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->subDays(1)->format('d.m.y'));
-                $hasStopEvent2 = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, $date);
-                $status = $this->workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
-                $leave = $this->workSessionRepository->hasLeave($user->id, $date);
-
-                if ($status) {
-                    $userDates[$date] = "in_progress";
-                } else if ($leave) {
-                    $userDates[$date] = "leave";
-                } else if ($hasEvent) {
-                    $userDates[$date] = 1;
-                } else if ($hasStartEvent && $hasStopEvent) {
-                    $userDates[$date] = 0.5;
-                } else if ($hasStartEvent2 && $hasStopEvent2) {
-                    $userDates[$date] = 0.5;
-                } else if (!$hasEvent) {
-                    $userDates[$date] = 0;
-                }
-            }
-            $user->dates = $userDates;
-        }
-
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
         return response()->json($users);
     }
-    public function setDate(Request $request)
+    /**
+     * Ustawia nową datę w filtrze zwraca użytkowników.
+     *
+     * @param DateRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setDate(DateRequest $request): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after_or_equal:start_date',
-        ]);
-
-        $request->session()->put('start_date', $request->input('start_date'));
-        $request->session()->put('end_date', $request->input('end_date'));
-
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-
-        // Generate a list of dates from start to end in Y-m-d format
-        $dates = [];
-        $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
-        $endDateCarbon = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
-
-        while ($currentDate->lte($endDateCarbon)) {
-            $dates[] = $currentDate->format('d.m.y');
-            $currentDate->addDay();
-        }
-
-        $companyId = $this->companyRepository->getCompanyId();
-        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
-            $users = $this->userRepository->getByCompanyIdAll($companyId);
-        } else {
-            $users = $this->userRepository->getByLoggedUserCompanyIdAll($companyId);
-        }
-
-        // Add dates with 0 or 1 for each user
-        foreach ($users as &$user) {
-            $userDates = [];
-            foreach ($dates as $date) {
-                $hasEvent = $this->workSessionRepository->hasEventForUserOnDate($user->id, $date);
-                $hasStartEvent = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, $date);
-                $hasStopEvent = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->addDay()->format('d.m.y'));
-                $hasStartEvent2 = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->subDays(1)->format('d.m.y'));
-                $hasStopEvent2 = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, $date);
-                $status = $this->workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
-                $leave = $this->workSessionRepository->hasLeave($user->id, $date);
-
-                if ($status) {
-                    $userDates[$date] = "in_progress";
-                } else if ($leave) {
-                    $userDates[$date] = "leave";
-                } else if ($hasEvent) {
-                    $userDates[$date] = 1;
-                } else if ($hasStartEvent && $hasStopEvent) {
-                    $userDates[$date] = 0.5;
-                } else if ($hasStartEvent2 && $hasStopEvent2) {
-                    $userDates[$date] = 0.5;
-                } else if (!$hasEvent) {
-                    $userDates[$date] = 0;
-                }
-            }
-            $user->dates = $userDates;
-        }
-
+        $this->filterDateService->initFilterDate($request);
+        $users = $this->userService->getByRoleAddDatesByFilterDate($request);
         return response()->json($users);
     }
-    public function export_xlsx(Request $request)
+    /**
+     * Zwraca export do Excela.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function exportXlsx(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-
-        // Generate a list of dates from start to end in Y-m-d format
-        $dates = [];
-        $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
-        $endDateCarbon = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
-
-        while ($currentDate->lte($endDateCarbon)) {
-            $dates[] = $currentDate->format('d.m.y');
-            $currentDate->addDay();
-        }
-
-        $companyId = $this->companyRepository->getCompanyId();
-        $users = User::where('company_id', $companyId)->whereIn('id', $request->ids)->get();
-
-        // Add dates with 0 or 1 for each user
-        foreach ($users as &$user) {
-            $userDates = [];
-            foreach ($dates as $date) {
-                $hasEvent = $this->workSessionRepository->hasEventForUserOnDate($user->id, $date);
-                $hasStartEvent = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, $date);
-                $hasStopEvent = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->addDay()->format('d.m.y'));
-                $hasStartEvent2 = $this->workSessionRepository->hasStartEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->subDays(1)->format('d.m.y'));
-                $hasStopEvent2 = $this->workSessionRepository->hasStopEventForUserOnDate($user->id, $date);
-                $status = $this->workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
-                $leave = $this->workSessionRepository->hasLeave($user->id, $date);
-
-                if ($status) {
-                    $userDates[$date] = "W trakcie pracy";
-                } else if ($leave) {
-                    $userDates[$date] = "Wniosek";
-                } else if ($hasEvent) {
-                    $userDates[$date] = "Obecny";
-                } else if ($hasStartEvent && $hasStopEvent) {
-                    $userDates[$date] = "Obecny";
-                } else if ($hasStartEvent2 && $hasStopEvent2) {
-                    $userDates[$date] = "Obecny";
-                } else if (!$hasEvent) {
-                    $userDates[$date] = "brak obecności";
-                }
-            }
-            $user->dates = $userDates;
-        }
-
-        $data = collect([
-            array_merge(
-                ['Nazwa użytkownika' => 'Nazwa użytkownika'],
-                array_combine($dates, $dates)
-            )
-        ])->concat(
-            $users->map(function ($user) use ($dates) {
-                return array_merge(
-                    ['Nazwa użytkownika' => (string) ($user->name ?? 'Brak danych')],
-                    $user->dates
-                );
-            })
-        );
-
+        $data = $this->userService->getDataToExcelByRoleAddDatesByFilterDate($request);
         return Excel::download(new TimeSheetExport($data), 'eksport_dziennika_obecności.xlsx');
     }
 }

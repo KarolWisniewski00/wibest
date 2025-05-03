@@ -129,7 +129,7 @@
 
                 <!-- Settings Dropdown -->
                 <div class="me-2 relative">
-                    <x-dropdown align="right" width="48">
+                    <x-dropdown-jets align="right" width="48">
                         <x-slot name="trigger">
                             @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
                             <button class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition">
@@ -176,7 +176,7 @@
                                 </x-dropdown-link>
                             </form>
                         </x-slot>
-                    </x-dropdown>
+                    </x-dropdown-jets>
                 </div>
             </div>
 
@@ -193,13 +193,25 @@
     </div>
 
     <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden md:hidden">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden xl:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
                 {{ __('Panel główny') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/work')">
-                {{ __('Mierzenie Czasu Pracy') }}
+            <x-responsive-nav-link href="{{ route('team.user.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
+                <i class="fa-solid fa-users mr-2"></i>Zespół
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('calendar.all.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
+                <i class="fa-solid fa-calendar-days mr-2"></i>Kalendarz
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
+                <i class="fa-solid fa-inbox mr-2"></i>Wnioski
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
+                <i class="fa-solid fa-clock mr-2"></i>RCP
+            </x-responsive-nav-link>
+            <x-responsive-nav-link href="{{ route('raport.time-sheet.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/raport')">
+                <i class="fa-solid fa-chart-line mr-2"></i>Raporty
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                 {{ __('Ustawienia') }}

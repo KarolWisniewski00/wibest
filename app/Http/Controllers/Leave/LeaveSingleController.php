@@ -3,87 +3,72 @@
 namespace App\Http\Controllers\Leave;
 
 use App\Http\Controllers\Controller;
-use App\Models\Leave;
-use App\Repositories\CompanyRepository;
-use App\Repositories\LeaveRepository;
-use App\Repositories\UserRepository;
+use App\Http\Requests\DateRequest;
+use App\Services\FilterDateService;
+use App\Services\LeaveService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-
 class LeaveSingleController extends Controller
 {
-    protected LeaveRepository $leaveRepository;
-    protected CompanyRepository $companyRepository;
-    protected UserRepository $userRepository;
+    protected FilterDateService $filterDateService;
+    protected LeaveService $leaveService;
 
     public function __construct(
-        LeaveRepository $leaveRepository,
-        CompanyRepository $companyRepository,
-        UserRepository $userRepository
+        FilterDateService $filterDateService,
+        LeaveService $leaveService,
     ) {
-        $this->leaveRepository = $leaveRepository;
-        $this->companyRepository = $companyRepository;
-        $this->userRepository = $userRepository;
+        $this->filterDateService = $filterDateService;
+        $this->leaveService = $leaveService;
     }
 
     /**
      * Wyświetla stronę kalendarza
      *
+     * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\View\View
     {
-        // Check if session variables for date range exist, otherwise set default to current month
-        if (!$request->session()->has('start_date') || !$request->session()->has('end_date')) {
-            $startOfMonth = now()->startOfMonth()->toDateString();
-            $endOfMonth = now()->endOfMonth()->toDateString();
-
-            $request->session()->put('start_date', $startOfMonth);
-            $request->session()->put('end_date', $endOfMonth);
-        }
-
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-
-        //$leaves = $this->leaveRepository->getForLoggedUserPaginated(10, $startDate, $endDate);
-        //$leavePending = $this->leaveRepository->getAllForCompanyPaginatedCount($startDate, $endDate);
-        $leaves = Leave::where('user_id', Auth::id())->orderBy('start_date', 'desc')->get();
-        $leavePending = Leave::where('manager_id', Auth::id())->orderBy('start_date', 'desc')->count();
-
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $leaves = $this->leaveService->paginateByUserId($request);
+        $leavePending = $this->leaveService->countByUserId($request);
         return view('admin.leave.index', compact('leaves', 'startDate', 'endDate', 'leavePending'));
     }
-    public function create(Request $request)
+    /**
+     * Zwraca widok do tworzenia nowego wniosku.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function create(Request $request): \Illuminate\View\View
     {
-        // Check if session variables for date range exist, otherwise set default to current month
-        if (!$request->session()->has('start_date') || !$request->session()->has('end_date')) {
-            $startOfMonth = now()->startOfMonth()->toDateString();
-            $endOfMonth = now()->endOfMonth()->toDateString();
-
-            $request->session()->put('start_date', $startOfMonth);
-            $request->session()->put('end_date', $endOfMonth);
-        }
-
-        $startDate = $request->session()->get('start_date');
-        $endDate = $request->session()->get('end_date');
-        
-        $userId = Auth::id();
-        $companyId = $this->companyRepository->getCompanyId();
-        $users = $this->userRepository->getByCompanyId($companyId);
-        $leavePending = $this->leaveRepository->getAllForCompanyPaginatedCount($startDate, $endDate);
-        return view('admin.leave.create', compact('users', 'userId', 'companyId' , 'leavePending'));
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $leavePending = $this->leaveService->countByUserId($request);
+        return view('admin.leave.create', compact('leavePending'));
     }
-    public function store(Request $request)
+    /**
+     *  Zwraca wnioski dla użytkownika w zakresie dat.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function get(Request $request): \Illuminate\Http\JsonResponse
     {
-        Leave::create([
-            'company_id' => $request->company_id,
-            'manager_id' => $request->manager_id,
-            'user_id' => $request->user_id,
-            'created_user_id' => $request->user_id,
-            'type' => $request->type,
-            'note' => $request->note,
-            'start_date' => $request->start_time,
-            'end_date' => $request->end_time,
-        ]);
-        return redirect()->route('leave.single.index')->with('success', 'Operacja zakończona powodzeniem.');
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $leaves = $this->leaveService->paginateByUserId($request);
+        return response()->json($leaves);
+    }
+    /**
+     * Ustawia nową datę w filtrze zwraca wnioski.
+     *
+     * @param DateRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setDate(DateRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $leaves = $this->leaveService->getByUserId($request);
+        return response()->json($leaves);
     }
 }
