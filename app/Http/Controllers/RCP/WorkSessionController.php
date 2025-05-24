@@ -5,6 +5,7 @@ namespace App\Http\Controllers\RCP;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WorkSessionRequest;
 use App\Models\Event;
+use App\Models\Location;
 use App\Models\User;
 use App\Models\WorkSession;
 use Illuminate\Http\Request;
@@ -14,14 +15,24 @@ use Carbon\Carbon;
 class WorkSessionController extends Controller
 {
     // Funkcja do rozpoczęcia pracy
-    public function startWork($user_id)
+    public function startWork($user_id, Request $request)
     {
         $now = Carbon::now();
         Carbon::setLocale('pl');
+
+        try {
+            $location = Location::create([
+                'name' => $request->input('name', ''),
+                'latitude' => $request->input('lat', null),
+                'longitude' => $request->input('lon', null),
+            ]);
+        } catch (\Exception $e) {
+        }
+
         // Tworzenie eventu startowego
         $event = Event::create([
             'time' => $now,
-            'location' => '',
+            'location_id' => isset($location) ? $location->id : null,
             'device' => '',
             'event_type' => 'start',
             'user_id' => $user_id,
@@ -48,7 +59,7 @@ class WorkSessionController extends Controller
     }
 
     // Funkcja do zakończenia pracy
-    public function stopWork($id)
+    public function stopWork($id, Request $request)
     {
         Carbon::setLocale('pl');
         $workSession = WorkSession::find($id);
@@ -69,12 +80,19 @@ class WorkSessionController extends Controller
             } else {
                 $timeInWork = Carbon::parse($startEvent->time)->diff($endTime)->format('%H:%I:%S');
             }
-
+            try {
+                $location = Location::create([
+                    'name' => $request->input('name', ''),
+                    'latitude' => $request->input('lat', null),
+                    'longitude' => $request->input('lon', null),
+                ]);
+            } catch (\Exception $e) {
+            }
 
             // Tworzenie eventu stop
             $stopEvent = Event::create([
                 'time' => $endTime,
-                'location' => '',
+                'location' => isset($location) ? $location->id : null,
                 'device' => '',
                 'event_type' => 'stop',
                 'user_id' => $workSession->user_id,
@@ -125,7 +143,7 @@ class WorkSessionController extends Controller
                 'company_id' => $latestWorkSession->company_id,
                 'created_user_id' => $latestWorkSession->created_user_id,
             ]);
-            
+
             // Aktualizacja sesji pracy
             $latestWorkSession->update([
                 'event_stop_id' => $stopEvent->id,

@@ -84,46 +84,7 @@
                                 </x-flex-center>
                             </div>
 
-                            <script>
-                                $(document).ready(function() {
-                                    function getLocation() {
-                                        if (navigator.geolocation) {
-                                            navigator.geolocation.getCurrentPosition(showPosition, showError);
-                                        } else {
-                                            $('#locationWidget').text("Geolokalizacja nie jest wspierana przez tę przeglądarkę.");
-                                        }
-                                    }
-
-                                    function showPosition(position) {
-                                        const lat = position.coords.latitude;
-                                        const lon = position.coords.longitude;
-                                        const acc = position.coords.accuracy;
-
-                                        $('#locationWidget').text(
-                                            "Szerokość: " + lat + "\nDługość: " + lon + "\nDokładność: " + Math.round(acc) + " metrów"
-                                        );
-                                    }
-
-                                    function showError(error) {
-                                        switch (error.code) {
-                                            case error.PERMISSION_DENIED:
-                                                $('#locationWidget').text("Użytkownik odmówił dostępu do lokalizacji.");
-                                                break;
-                                            case error.POSITION_UNAVAILABLE:
-                                                $('#locationWidget').text("Informacje o lokalizacji są niedostępne.");
-                                                break;
-                                            case error.TIMEOUT:
-                                                $('#locationWidget').text("Przekroczono czas oczekiwania na lokalizację.");
-                                                break;
-                                            case error.UNKNOWN_ERROR:
-                                                $('#locationWidget').text("Wystąpił nieznany błąd.");
-                                                break;
-                                        }
-                                    }
-
-                                    getLocation();
-                                });
-                            </script>
+                            
                             <!-- Prawa kolumna: Przyciski -->
                             <div class="flex flex-col justify-center items-center space-y-6">
                                 <button
@@ -363,8 +324,48 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(function() {
+    <input type="hidden" id="lat" value="">
+    <input type="hidden" id="lon" value="">
+        <script>
+            $(document).ready(function() {
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition, showError);
+                } else {
+                    $('#locationWidget').text("Geolokalizacja nie jest wspierana przez tę przeglądarkę.");
+                }
+            }
+
+            function showPosition(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const acc = position.coords.accuracy;
+
+                $('#locationWidget').text(
+                    "Szerokość: " + lat + "\nDługość: " + lon + "\nDokładność: " + Math.round(acc) + " metrów"
+                );
+                $('#lat').val(lat);
+                $('#lon').val(lon);
+            }
+
+            function showError(error) {
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        $('#locationWidget').text("Użytkownik odmówił dostępu do lokalizacji.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        $('#locationWidget').text("Informacje o lokalizacji są niedostępne.");
+                        break;
+                    case error.TIMEOUT:
+                        $('#locationWidget').text("Przekroczono czas oczekiwania na lokalizację.");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        $('#locationWidget').text("Wystąpił nieznany błąd.");
+                        break;
+                }
+            }
+
+            getLocation();
             class WorkSessions {
                 constructor() {
                     const self = this;
@@ -415,9 +416,16 @@
                 // Funkcja do rozpoczęcia pracy
                 ajaxStart() {
                     const self = this;
+                    const lat = $('#lat').val();
+                    const lon = $('#lon').val();
                     $.ajax({
                         url: self.workStart + '/' + self.userId,
                         type: 'GET',
+                        data: {
+                            name: 'Widget',
+                            lat: lat,
+                            lon: lon
+                        },
                         dataType: 'json',
                         success: function(response) {
                             console.log(self.workStart + '/' + self.userId)
@@ -431,9 +439,16 @@
                 // Funkcja do zakończenia pracy
                 ajaxStop() {
                     const self = this;
+                    const lat = $('#lat').val();
+                    const lon = $('#lon').val();
                     $.ajax({
                         url: self.workStop + '/' + self.session_id,
                         type: 'GET',
+                        data: {
+                            name: 'Widget',
+                            lat: lat,
+                            lon: lon
+                        },
                         dataType: 'json',
                         success: function(response) {
                             console.log(self.workStop + '/' + self.session_id)

@@ -11,7 +11,7 @@ class Event extends Model
 
     protected $fillable = [
         'time',
-        'location',
+        'location_id',
         'device',
         'event_type',
         'user_id',
@@ -51,5 +51,9 @@ class Event extends Model
     {
         \Carbon\Carbon::setLocale('pl');
         return \Carbon\Carbon::parse($this->time)->translatedFormat('d.m, l');
+    }
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 }
