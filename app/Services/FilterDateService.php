@@ -69,7 +69,7 @@ class FilterDateService
         return $request->session()->get('start_date');
     }
     /**
-     * Zwraca datę startową z sesji.
+     * Zwraca datę końcową z sesji.
      *
      * @param Request $request
      * @return string

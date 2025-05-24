@@ -11,7 +11,7 @@
     <!--MAIN-->
     <x-main>
         <x-RCP.nav />
-        <x-RCP.header>Rejestracja czasu pracy⏱️</x-RCP.header>
+        <x-RCP.header>Rejestracja czasu pracy ⏱️</x-RCP.header>
         <x-status-cello id="show-filter" class="mx-2 mt-8">
             {{ $startDate }} - {{ $endDate }}
         </x-status-cello>

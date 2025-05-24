@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\DateRequest;
 use App\Mail\LeaveMail;
 use App\Mail\LeaveMailAccept;
+use App\Mail\LeaveMailReject;
 use App\Models\Leave;
 use App\Repositories\LeaveRepository;
 use App\Repositories\UserRepository;
@@ -84,6 +85,7 @@ class LeavePendingReviewController extends Controller
             Mail::to($leave->user->email)->send($leaveMail);
         } catch (Exception) {
         }
+
         if (auth()->user()->is_admin) {
             return redirect()->route('leave.pending.index')->with('success', 'Zaakceptowane.');
         } else {
@@ -100,6 +102,12 @@ class LeavePendingReviewController extends Controller
     {
         $leave->status = 'odrzucone';
         $leave->save();
+
+        $leaveMail = new LeaveMailReject($leave);
+        try {
+            Mail::to($leave->user->email)->send($leaveMail);
+        } catch (Exception) {
+        }
 
         if (auth()->user()->is_admin) {
             return redirect()->route('leave.pending.index')->with('success', 'Odrzucone.');

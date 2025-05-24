@@ -49,6 +49,18 @@ class LeaveService
         return $leaveRepository->getMainByManagerId();
     }
     /**
+     * Zwraca wnioski dla użytkownika w stronie głównej
+     * 
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getMainByUserId(Request $request): \Illuminate\Database\Eloquent\Collection
+    {
+        $leaveRepository = new LeaveRepository();
+
+        return $leaveRepository->getMainByUserId();
+    }
+    /**
      * Zwraca liczbę wniosków dla użytkownika w zakresie dat.
      *
      * @param Request $request

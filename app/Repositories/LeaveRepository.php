@@ -117,6 +117,16 @@ class LeaveRepository
         $query = Leave::with('user')->where('manager_id', Auth::id())->where('status', 'oczekujące');
         return $query->orderBy('start_date', 'desc')->take(5)->get();
     }
+        /**
+     * Zwraca pierwsze kilka wniosków dla użytkownika.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getMainByUserId()
+    {
+        $query = Leave::with('user')->where('user_id', Auth::id())->where('status', 'oczekujące');
+        return $query->orderBy('start_date', 'desc')->take(5)->get();
+    }
     /**
      * Zwraca wnioski dla użytkownika w zakresie dat.
      *

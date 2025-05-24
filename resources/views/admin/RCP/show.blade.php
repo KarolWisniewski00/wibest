@@ -64,8 +64,8 @@
             <!--POWRÓT-->
             <x-container-gray class="px-0">
                 <!--status-->
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                <x-text-cell class="mx-2">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm mx-2">
                         Status
                     </p>
                     <div class="flex justify-start items-center w-full justify-start">
@@ -158,6 +158,50 @@
                         </div>
                     </x-text-cell>
                     <!--Czas w pracy-->
+                    <!--Typ-->
+                    <x-text-cell class="mx-4">
+                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                            Typ zdarzenia
+                        </p>
+                        <div class="flex justify-start items-center w-full justify-start">
+                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                Pasek nawigacyjny
+                            </span>
+                        </div>
+                    </x-text-cell>
+                    <!--Typ-->
+                    <!-- Dodaj Leaflet CSS i JS oraz jQuery -->
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+                    <!--Lokalizacja-->
+                    <x-text-cell class="mx-4">
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">
+                            Lokalizacja
+                        </p>
+                        <div class="flex justify-start items-center w-full">
+                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                Warszawa
+                            </span>
+                        </div>
+                        <div id="map" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
+                    </x-text-cell>
+                    <!--Lokalizacja-->
+
+                    <script>
+                        $(document).ready(function() {
+                            const map = L.map('map').setView([52.2297, 21.0122], 13); // Warszawa
+
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap contributors'
+                            }).addTo(map);
+
+                            L.marker([52.2297, 21.0122]).addTo(map)
+                                .bindPopup('Warszawa')
+                                .openPopup();
+                        });
+                    </script>
                 </x-container-gray>
                 @endif
                 @if($work_session->eventStop != null)
@@ -193,6 +237,45 @@
                         </div>
                     </x-text-cell>
                     <!--Czas w pracy-->
+                    <!--Typ-->
+                    <x-text-cell class="mx-4">
+                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                            Typ zdarzenia
+                        </p>
+                        <div class="flex justify-start items-center w-full justify-start">
+                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                Widget
+                            </span>
+                        </div>
+                    </x-text-cell>
+                    <!--Typ-->
+                    <!--Lokalizacja-->
+                    <x-text-cell class="mx-4">
+                        <p class="text-gray-700 dark:text-gray-300 text-sm">
+                            Lokalizacja
+                        </p>
+                        <div class="flex justify-start items-center w-full">
+                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                                Warszawa
+                            </span>
+                        </div>
+                        <div id="map2" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
+                    </x-text-cell>
+                    <!--Lokalizacja-->
+
+                    <script>
+                        $(document).ready(function() {
+                            const map2 = L.map('map2').setView([52.2297, 21.0122], 13); // Warszawa
+
+                            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                attribution: '© OpenStreetMap contributors'
+                            }).addTo(map2);
+
+                            L.marker([52.2297, 21.0122]).addTo(map2)
+                                .bindPopup('Warszawa')
+                                .openPopup();
+                        });
+                    </script>
                 </x-container-gray>
                 @endif
             </div>
