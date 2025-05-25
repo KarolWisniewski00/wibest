@@ -60,51 +60,7 @@
                     </div>
                 </x-text-cell>
                 <!--Czas w pracy-->
-                <!--Typ-->
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 test-sm">
-                        Typ zdarzenia
-                    </p>
-                    <div class="flex justify-start items-center w-full justify-start">
-                        <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                            Pasek nawigacyjny
-                        </span>
-                    </div>
-                </x-text-cell>
-                <!--Typ-->
-                <!-- Dodaj Leaflet CSS i JS oraz jQuery -->
-                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-                <!--Lokalizacja-->
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">
-                        Lokalizacja
-                    </p>
-                    <div class="flex justify-start items-center w-full">
-                        <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                            Warszawa
-                        </span>
-                    </div>
-                    <div id="map" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
-                </x-text-cell>
-                <!--Lokalizacja-->
-
-                <script>
-                    $(document).ready(function() {
-                        const map = L.map('map').setView([52.2297, 21.0122], 13); // Warszawa
-
-                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '© OpenStreetMap contributors'
-                        }).addTo(map);
-
-                        L.marker([52.2297, 21.0122]).addTo(map)
-                            .bindPopup('Warszawa')
-                            .openPopup();
-                    });
-                </script>
-                @if($role == 'admin')
+                                @if($role == 'admin')
                 <!--Użytkownik-->
                 <x-text-cell class="mx-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
@@ -141,6 +97,39 @@
                     </div>
                 </x-text-cell>
                 <!--Użytkownik-->
+                @endif
+                <!-- Dodaj Leaflet CSS i JS oraz jQuery -->
+                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+                <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                @if($event->location)
+                <!--Lokalizacja-->
+                <x-text-cell class="mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 text-sm">
+                        Lokalizacja
+                    </p>
+                    <div class="flex justify-start items-center w-full">
+                        <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            {{ $event->location->name }}
+                        </span>
+                    </div>
+                    <div id="map" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
+                </x-text-cell>
+                <!--Lokalizacja-->
+
+                <script>
+                    $(document).ready(function() {
+                        const map = L.map('map').setView([{{$event->location->latitude}}, {{$event->location->longitude}}], 13); // Warszawa
+
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '© OpenStreetMap contributors'
+                        }).addTo(map);
+
+                        L.marker([{{$event->location->latitude}}, {{$event->location->longitude}}]).addTo(map)
+                            .bindPopup('{{ $event->location->name }}')
+                            .openPopup();
+                    });
+                </script>
                 @endif
             </x-container-gray>
 

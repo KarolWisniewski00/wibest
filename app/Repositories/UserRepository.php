@@ -41,6 +41,16 @@ class UserRepository
             ->where('role', '!=', null)
             ->get();
     }
+        /**
+     * Zwraca użytkowników z firmy.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAllFromCompany(): \Illuminate\Support\Collection
+    {
+        return User::where('company_id', Auth::user()->company_id)
+            ->get();
+    }
     /**
      * Zwraca użytkowników dla użytkownika.
      *

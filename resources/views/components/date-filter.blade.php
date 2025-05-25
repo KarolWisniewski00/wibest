@@ -793,6 +793,94 @@
                     });
                     updateShowFilter();
                 }
+                @elseif(Str::startsWith(request()->path(), 'dashboard/raport/attendance-sheet'))
+
+                function ajaxFilter() {
+                    const $tbody = $('#work-sessions-body');
+                    const $thead = $('#table-head');
+                    $.ajax({
+                        url: `{{ route('api.v1.raport.attendance-sheet.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
+                        method: 'get',
+                        success: function(response) {
+                            $tbody.empty();
+                            $('.date-column').remove();
+                            const start = new Date(rangeStart);
+                            const end = new Date(rangeEnd);
+                            response.forEach(user => {
+                                console.log(user);
+                                // Iterate through the generated dates and check user.dates
+                                const row = `
+                                <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                                    <td class="px-3 py-2">
+                                        <x-flex-center>
+                                            <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
+                                        </x-flex-center>
+                                    </td>
+                                    <td class="px-3 py-2  flex items-center justify-center">
+                                        ${user.profile_photo_url
+                                            ? `<img src="${user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                            : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${user.name[0].toUpperCase()}</div>`
+                                        }
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <div class="flex flex-col justify-center w-fit">
+                                            <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                ${user.name}
+                                            </x-paragraf-display>
+                                            ${user.role == 'admin'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'menedżer'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'kierownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'użytkownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>`
+                                            : ``
+                                            }
+                                        </div>
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            <span class="text-gray-400">
+                                                ${user.time_in_work_hms}
+                                            </span>
+                                        </x-paragraf-display>
+                                    </td>
+                                </tr>`;
+                                $tbody.append(row);
+                            });
+                        },
+                        error: function(xhr) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
+                            // generujemy emptyplace
+                            const row = `
+                            <tr class="bg-white dark:bg-gray-800">
+                                <td colspan="8" class="px-3 py-2">
+                                    <x-empty-place />
+                                </td>
+                            </tr>`;
+                            $tbody.append(row);
+                        }
+                    });
+                    updateShowFilter();
+                }
                 @endif
 
                 function setRange(start, end) {

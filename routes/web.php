@@ -68,7 +68,7 @@ Route::prefix('api')->group(function () {
     //API -----------------------------------------------------------------
     Route::prefix('v1')->group(function () {
         Route::prefix('search')->group(function () {
-            Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.v1.search.gus');//TSI
+            Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.v1.search.gus'); //TSI
         });
         Route::prefix('rcp')->group(function () {
             Route::prefix('work-session')->group(function () {
@@ -94,6 +94,18 @@ Route::prefix('api')->group(function () {
                 Route::get('/', [TimeSheetController::class, 'get'])->name('api.v1.raport.time-sheet.get');
                 Route::get('set-date/', [TimeSheetController::class, 'setDate'])->name('api.v1.raport.time-sheet.set.date');
                 Route::post('/export-xlsx', [TimeSheetController::class, 'exportXlsx'])->name('api.v1.raport.time-sheet.export.xlsx');
+            });
+            Route::prefix('attendance-sheet')->group(function () {
+                Route::get('/', [AttendanceSheetController::class, 'get'])->name('api.v1.raport.attendance-sheet.get');
+                Route::get('set-date/', [AttendanceSheetController::class, 'setDate'])->name('api.v1.raport.attendance-sheet.set.date');
+                Route::post('/export-xlsx', [AttendanceSheetController::class, 'exportXlsx'])->name('api.v1.raport.attendance-sheet.export.xlsx');
+            });
+        });
+        Route::prefix('calendar')->group(function () {
+            Route::prefix('all')->group(function () {
+                Route::get('/', [CalendarController::class, 'get'])->name('api.v1.calendar.all.get');
+                Route::get('set-date/', [CalendarController::class, 'setDate'])->name('api.v1.calendar.all.set.date');
+                Route::post('/export-xlsx', [CalendarController::class, 'exportXlsx'])->name('api.v1.calendar.all.export.xlsx');
             });
         });
         Route::prefix('leave')->group(function () {
@@ -143,6 +155,10 @@ Route::middleware([
         Route::prefix('calendar')->group(function () {
             Route::prefix('all')->group(function () {
                 Route::get('/', [CalendarController::class, 'index'])->name('calendar.all.index');
+                Route::get('/create', [CalendarController::class, 'create'])->name('calendar.all.create');
+                Route::post('/store', [CalendarController::class, 'store'])->name('calendar.all.store');
+                Route::get('/edit/{user}/{date}', [CalendarController::class, 'edit'])->name('calendar.all.edit');
+                Route::post('/update/{plannedLeave}', [CalendarController::class, 'update'])->name('calendar.all.update');
             });
 
             Route::prefix('work-schedule')->group(function () {

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Repositories\LeaveRepository;
 use App\Repositories\WorkSessionRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\Request;
@@ -106,6 +107,92 @@ class UserService
                 }
             }
             $user->dates = $userDates;
+        }
+        return $users;
+    }
+    /**
+     * Zwraca użytkowników z datami w zależności od roli zalogowanego użytkownika.
+     *
+     * @param Request $request
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginatedByRoleAddDatesAndLeavesByFilterDate(Request $request): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        $filterDateService = new FilterDateService();
+        $workSessionRepository = new WorkSessionRepository();
+        $leaveRepository = new LeaveRepository();
+        $dates = $filterDateService->getRangeDateFilter($request);
+        $users = $this->paginatedByRole();
+
+        foreach ($users as &$user) {
+            $userDates = [];
+            foreach ($dates as $date) {
+                $status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
+                $leave = $leaveRepository->hasPlannedLeaveToday($user->id, $date);
+
+
+                if ($status) {
+                    $userDates[$date] = "in_progress";
+                }elseif ($leave) {
+                    $userDates[$date] = "planned_leave";
+                }else{
+                    $userDates[$date] = null;
+                }
+            }
+            $user->dates = $userDates;
+        }
+        return $users;
+    }
+    /**
+     * Zwraca użytkowników z ewidencją w zależności od roli zalogowanego użytkownika.
+     *
+     * @param Request $request
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginatedByRoleAddEwiByFilterDate(Request $request): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        $filterDateService = new FilterDateService();
+        $workSessionRepository = new WorkSessionRepository();
+        $dates = $filterDateService->getRangeDateFilter($request);
+        $users = $this->paginatedByRole();
+
+        foreach ($users as &$user) {
+            $user->time_in_work = 0;
+            $user->time_in_work_hms = '';
+            foreach ($dates as $date) {
+                $totalDay = $workSessionRepository->getTotalOfDay($user->id, $date);
+                $user->time_in_work += $totalDay;
+            }
+            $hours = floor($user->time_in_work / 3600);
+            $minutes = floor(($user->time_in_work % 3600) / 60);
+            $seconds = $user->time_in_work % 60;
+            $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
+        }
+        return $users;
+    }
+    /**
+     * Zwraca użytkowników z ewidencją w zależności od roli zalogowanego użytkownika.
+     *
+     * @param Request $request
+     */
+    public function getByRoleAddEwiByFilterDate(Request $request)
+    {
+        $filterDateService = new FilterDateService();
+        $workSessionRepository = new WorkSessionRepository();
+        $dates = $filterDateService->getRangeDateFilter($request);
+        $users = $this->getByRole();
+
+        foreach ($users as &$user) {
+            $user->time_in_work = 0;
+            $user->time_in_work_hms = '';
+            foreach ($dates as $date) {
+                $totalDay = $workSessionRepository->getTotalOfDay($user->id, $date);
+                $user->time_in_work += $totalDay;
+            }
+            $hours = floor($user->time_in_work / 3600);
+            $minutes = floor(($user->time_in_work % 3600) / 60);
+            $seconds = $user->time_in_work % 60;
+            $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
         }
         return $users;
     }

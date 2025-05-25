@@ -29,7 +29,7 @@
                 wire:click="setStep({{ $stepInstance->getOrder() }})"
                 icon="{{ $stepInstance->icon() }}"
                 @class([
-                    'rounded-full w-10 h-10',
+                    'bg-gray-300 rounded-full w-10 h-10',
                     'bg-green-300 dark:text-gray-900' => $stepIsGreaterOrEqualThan && !$isFailedStep,
                     'bg-red-300 dark:text-gray-900' => $isFailedStep,
                 ])

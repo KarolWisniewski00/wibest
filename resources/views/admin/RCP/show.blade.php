@@ -7,39 +7,6 @@
             <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
                 Podgląd elementu RCP w którego skład wchodzą dwa mniejsze zdarzenia START i STOP.
             </div>
-            @php
-            $czasString = $work_session->time_in_work;
-            $czasSekundy=\Illuminate\Support\Carbon::parse($czasString)->secondsSinceMidnight();
-
-            $klasa = '';
-            $komunikat = '';
-
-            if ($czasSekundy >= 8 * 3600) {
-            $klasa = 'green';
-            $komunikat = 'Czas pracy zgodny z normą.';
-            } elseif ($czasSekundy >= 7 * 3600) {
-            $klasa = 'yellow';
-            $komunikat = 'Czas pracy nieco poniżej normy.';
-            } else {
-            $klasa = 'red';
-            $komunikat = 'Uwaga! Czas pracy poniżej oczekiwań.';
-            }
-            @endphp
-            @if($work_session->status == 'Praca zakończona')
-            @if ($klasa === 'green')
-            <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-                <span class="font-medium">Sukces!</span> {{ $komunikat }}
-            </div>
-            @elseif ($klasa === 'yellow')
-            <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
-                <span class="font-medium">Ostrzeżenie!</span> {{ $komunikat }}
-            </div>
-            @else
-            <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
-                <span class="font-medium">Błąd!</span> {{ $komunikat }}
-            </div>
-            @endif
-            @endif
             @if($role == 'admin')
             @if($work_session->status != 'Praca zakończona')
             <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">

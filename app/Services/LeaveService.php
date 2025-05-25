@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Repositories\LeaveRepository;
 use App\Repositories\WorkSessionRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class LeaveService
@@ -99,5 +101,11 @@ class LeaveService
         $endDate = $request->session()->get('end_date');
 
         return $leaveRepository->getByManagerId($startDate, $endDate);
+    }
+    public function getPlannedByUserAndDate(User $user, $date)
+    {
+        $leaveRepository = new LeaveRepository();
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        return $leaveRepository->getPlannedByUserIdAndFormattedDate($user->id, $formattedDate);
     }
 }

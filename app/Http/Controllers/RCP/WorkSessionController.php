@@ -88,11 +88,10 @@ class WorkSessionController extends Controller
                 ]);
             } catch (\Exception $e) {
             }
-
             // Tworzenie eventu stop
             $stopEvent = Event::create([
                 'time' => $endTime,
-                'location' => isset($location) ? $location->id : null,
+                'location_id' => isset($location) ? $location->id : null,
                 'device' => '',
                 'event_type' => 'stop',
                 'user_id' => $workSession->user_id,

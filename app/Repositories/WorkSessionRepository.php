@@ -203,4 +203,24 @@ class WorkSessionRepository
             ->whereDate('end_date', '>=', $formattedDate)
             ->first();
     }
+    /**
+     * Zwraca sume czasu pracy z dnia
+     */
+    public function getTotalOfDay(int $userId, string $date): int
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        $workSessions = WorkSession::where('user_id', $userId)
+            ->where('status', 'Praca zakończona')
+            ->whereHas('eventStart', function ($query) use ($formattedDate) {
+                $query->whereDate('time', $formattedDate);
+            })->get();
+        $total = 0;
+        foreach ($workSessions as $key => $value) {
+            list($hours, $minutes, $seconds) = explode(':', $value->time_in_work);
+            $seconds = ((int)$hours * 3600) + ((int)$minutes * 60) + (int)$seconds;
+            $total += $seconds;
+        }
+        return $total;
+    }
 }

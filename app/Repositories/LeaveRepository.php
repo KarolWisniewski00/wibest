@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Leave;
+use App\Models\PlannedLeave;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
@@ -117,7 +118,7 @@ class LeaveRepository
         $query = Leave::with('user')->where('manager_id', Auth::id())->where('status', 'oczekujące');
         return $query->orderBy('start_date', 'desc')->take(5)->get();
     }
-        /**
+    /**
      * Zwraca pierwsze kilka wniosków dla użytkownika.
      *
      * @return \Illuminate\Database\Eloquent\Collection
@@ -178,5 +179,20 @@ class LeaveRepository
             }
         }
         return false;
+    }
+    public function hasPlannedLeaveToday(int $userId, string $date): bool
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        return PlannedLeave::where('user_id', $userId)
+            ->whereDate('start_date', '<=', $formattedDate)
+            ->whereDate('end_date', '>=', $formattedDate)
+            ->exists();
+    }
+    public function getPlannedByUserIdAndFormattedDate($userId, $formattedDate)
+    {
+        return PlannedLeave::where('user_id', $userId)
+            ->whereDate('start_date', '<=', $formattedDate)
+            ->whereDate('end_date', '>=', $formattedDate)
+            ->first();
     }
 }

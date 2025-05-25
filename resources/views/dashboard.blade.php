@@ -105,19 +105,21 @@
                         <x-h1-display class="text-center md:text-start mb-4">
                             📅 Kalendarz - wnioski zaakceptowane
                         </x-h1-display>
-                        <div class="grid grid-cols-7 gap-px w-full overflow-hidden text-xs text-white font-medium rounded-lg">
+                        <div class="grid grid-cols-7 gap-px w-full overflow-hidden text-xs font-medium rounded-lg">
                             {{-- Nagłówki dni tygodnia --}}
                             @foreach (['Nd', 'Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So'] as $day)
-                            <div class="bg-gray-700 py-2 text-center">{{ $day }}</div>
+                            <div class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white py-2 text-center">
+                                {{ $day }}
+                            </div>
                             @endforeach
                             @foreach($dates as $date)
-                            <div class="bg-gray-900 h-28 relative p-2 border border-gray-800 flex h-full">
-                                <div class="text-white text-[11px] font-semibold">{{$date['day']}}</div>
+                            <div class="bg-white dark:bg-gray-900 h-28 relative p-2 border border-gray-200 dark:border-gray-800 flex h-full">
+                                <div class="text-gray-700 dark:text-white text-[11px] font-semibold">{{$date['day']}}</div>
                                 @if($date['leave'] != null)
                                 <div class="flex flex-row justify-center items-center h-full py-6 w-full">
                                     <div class="ms-2 text-4xl">{{ $icons[$date['leave']] ?? '' }}</div>
                                     <div class="flex flex-row gap-2 items-center">
-                                        <span class="px-3 py-1 rounded-full text-xl w-fit font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        <span class="px-3 py-1 rounded-full text-xl w-fit font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-500 focus:bg-pink-200 dark:focus:bg-pink-500 active:bg-pink-200 dark:active:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                             {{ $shortType[$date['leave']] ?? '' }}
                                         </span>
                                     </div>
@@ -324,8 +326,8 @@
             </div>
         </div>
     </div>
-    <input type="hidden" id="lat" value="">
-    <input type="hidden" id="lon" value="">
+    <input type="hidden" id="lat" value="51.06195234194151">
+    <input type="hidden" id="lon" value="16.99088511627247">
         <script>
             $(document).ready(function() {
             function getLocation() {
@@ -344,8 +346,8 @@
                 $('#locationWidget').text(
                     "Szerokość: " + lat + "\nDługość: " + lon + "\nDokładność: " + Math.round(acc) + " metrów"
                 );
-                $('#lat').val(lat);
-                $('#lon').val(lon);
+                //$('#lat').val(lat);
+                //$('#lon').val(lon);
             }
 
             function showError(error) {
