@@ -78,7 +78,7 @@ class LeaveRepository
      */
     public function paginateByUserId(int $perPage, ?string $startDate = null, ?string $endDate = null)
     {
-        $query = Leave::with('manager')->where('user_id', Auth::id());
+        $query = Leave::with('manager')->where('user_id', Auth::id())->with('user');
         if ($startDate) {
             $query->whereDate('start_date', '>=', Carbon::parse($startDate));
         }
@@ -98,7 +98,9 @@ class LeaveRepository
      */
     public function paginateByManagerId(int $perPage, ?string $startDate = null, ?string $endDate = null)
     {
-        $query = Leave::with('user')->where('manager_id', Auth::id());
+        $query = Leave::with('user')
+            ->where('manager_id', Auth::id())
+            ->orderByRaw("FIELD(status, 'zaakceptowane', 'oczekujące') DESC");
         if ($startDate) {
             $query->whereDate('start_date', '>=', Carbon::parse($startDate));
         }
@@ -156,7 +158,7 @@ class LeaveRepository
      */
     public function getByManagerId(?string $startDate = null, ?string $endDate = null)
     {
-        $query = Leave::with('user')->where('manager_id', Auth::id());
+        $query = Leave::with('user')->where('manager_id', Auth::id())->orderByRaw("FIELD(status, 'zaakceptowane', 'oczekujące') DESC");
         if ($startDate) {
             $query->whereDate('start_date', '>=', Carbon::parse($startDate));
         }
@@ -193,6 +195,11 @@ class LeaveRepository
         return PlannedLeave::where('user_id', $userId)
             ->whereDate('start_date', '<=', $formattedDate)
             ->whereDate('end_date', '>=', $formattedDate)
+            ->first();
+    }
+    public function getLeaveById(Leave $leave)
+    {
+        return Leave::where('id', $leave->id)
             ->first();
     }
 }

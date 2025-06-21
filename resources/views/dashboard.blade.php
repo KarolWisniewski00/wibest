@@ -84,7 +84,7 @@
                                 </x-flex-center>
                             </div>
 
-                            
+
                             <!-- Prawa kolumna: Przyciski -->
                             <div class="flex flex-col justify-center items-center space-y-6">
                                 <button
@@ -113,13 +113,17 @@
                             </div>
                             @endforeach
                             @foreach($dates as $date)
-                            <div class="bg-white dark:bg-gray-900 h-28 relative p-2 border border-gray-200 dark:border-gray-800 flex h-full">
-                                <div class="text-gray-700 dark:text-white text-[11px] font-semibold">{{$date['day']}}</div>
+                            <div class="bg-white dark:bg-gray-900 h-28 relative p-2 border border-gray-200 dark:border-gray-800 flex flex-col md:flex-row h-full">
+                                @if($date['date'] == \Carbon\Carbon::now()->format('d.m.y'))
+                                    <div class="text-white bg-red-500 dark:bg-red-700 rounded-full w-6 h-6 flex items-center justify-center text-[11px] font-semibold mx-auto">{{$date['day']}}</div>
+                                @else
+                                    <div class="text-gray-700 dark:text-white text-[11px] font-semibold">{{$date['day']}}</div>
+                                @endif
                                 @if($date['leave'] != null)
-                                <div class="flex flex-row justify-center items-center h-full py-6 w-full">
-                                    <div class="ms-2 text-4xl">{{ $icons[$date['leave']] ?? '' }}</div>
+                                <div class="flex flex-col md:flex-row justify-center items-center h-full py-6 w-full">
+                                    <div class="md:ms-2 text-xl md:text-4xl">{{ $icons[$date['leave']] ?? '' }}</div>
                                     <div class="flex flex-row gap-2 items-center">
-                                        <span class="px-3 py-1 rounded-full text-xl w-fit font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-500 focus:bg-pink-200 dark:focus:bg-pink-500 active:bg-pink-200 dark:active:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        <span class="px-1 md:px-3 py-1 rounded-full text-xs md:text-xl w-fit font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-500 focus:bg-pink-200 dark:focus:bg-pink-500 active:bg-pink-200 dark:active:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                             {{ $shortType[$date['leave']] ?? '' }}
                                         </span>
                                     </div>
@@ -137,8 +141,115 @@
                         <x-flex-center class="px-4 pb-4 flex flex-col">
                             <!--MOBILE VIEW-->
                             <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
+                                <ul id="list" class="grid w-full gap-y-4 block lg:hidden">
+                                    <!-- EMPTY PLACE -->
+                                    @if ($leaves->isEmpty())
+                                    <x-empty-place />
+                                    @else
+                                    <!-- EMPTY PLACE -->
+                                    @foreach ($leaves as $key => $leave)
+                                    <!-- WORK SESSIONS ELEMENT VIEW -->
+                                    <li>
+                                        <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                                            <div class="block w-full">
+                                                <div class="flex justify-between w-full">
+                                                    <div class="flex justify-start items-center w-full justify-start">
+                                                        <x-paragraf-display class="text-xs">
+                                                            @if($leave->status == 'oczekujące')
+                                                            <x-status-yellow>
+                                                                {{ $leave->status }}
+                                                            </x-status-yellow>
+                                                            @elseif($leave->status == 'zaakceptowane')
+                                                            <x-status-green>
+                                                                {{ $leave->status }}
+                                                            </x-status-green>
+                                                            @elseif($leave->status == 'odrzucone')
+                                                            <x-status-red>
+                                                                {{ $leave->status }}
+                                                            </x-status-red>
+                                                            @elseif($leave->status == 'anulowane')
+                                                            <x-status-red>
+                                                                {{ $leave->status }}
+                                                            </x-status-red>
+                                                            @endif
+                                                        </x-paragraf-display>
+                                                    </div>
+                                                </div>
+                                                <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                                    <x-paragraf-display class="text-xs">
+                                                        {{$leave->start_date}}
+                                                    </x-paragraf-display>
+                                                    <x-paragraf-display class="text-xs">
+                                                        {{$leave->end_date}}
+                                                    </x-paragraf-display>
+                                                    <div class="flex flex-row justify-center w-fit">
+                                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-3xl">
+                                                            {{ $icons[$leave->type] ?? '' }}
+                                                        </x-paragraf-display>
+                                                        <div class="flex flex-col justify-center w-fit">
+                                                            <x-paragraf-display class="font-semibold mb-1 w-fit">
+                                                                {{$leave->type}}
+                                                            </x-paragraf-display>
+                                                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                {{ $shortType[$leave->type] ?? '' }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full p-2 justify-start">
+                                                    <div class="flex items-center gap-4">
+                                                        @if($leave->user->profile_photo_url)
+                                                        <img src="{{ $leave->user->profile_photo_url }}" alt="{{ $leave->user->name }}" class="w-10 h-10 rounded-full">
+                                                        @else
+                                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                                            {{ strtoupper(substr($leave->user->name, 0, 1)) }}
+                                                        </div>
+                                                        @endif
+                                                        <div>
+                                                            <div class="flex flex-col justify-center w-fit">
+                                                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                                    {{$leave->user->name}}
+                                                                </x-paragraf-display>
+                                                                @if($leave->user->role == 'admin')
+                                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                    Admin
+                                                                </span>
+                                                                @elseif($leave->user->role == 'menedżer')
+                                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                    Menedżer
+                                                                </span>
+                                                                @elseif($leave->user->role == 'kierownik')
+                                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                    Kierownik
+                                                                </span>
+                                                                @elseif($leave->user->role == 'użytkownik')
+                                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                    Użytkownik
+                                                                </span>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex space-x-4 p-2 mt-4">
+                                                    <x-button-link-blue href="{{route('leave.single.edit', $leave)}}" class="min-h-[38px]">
+                                                        <i class="fa-solid fa-pen-to-square"></i>
+                                                    </x-button-link-blue>
+                                                    @if($leave->status == 'oczekujące')
+                                                    <x-button-link-red href="{{ route('leave.pending.cancel', $leave)}}" class="min-h-[38px]">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </x-button-link-red>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <!-- WORK SESSIONS ELEMENT VIEW -->
+                                    @endforeach
+                                    @endif
+                                </ul>
                                 <!-- PC VIEW -->
-                                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table">
+                                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden lg:table">
                                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                                         <tr>
                                             <th scope="col" class="px-6 py-3 text-center">
@@ -160,10 +271,13 @@
                                                 Typ
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-center">
+                                                Edycja
+                                            </th>
+                                            <th scope="col" class="px-6 py-3 text-center">
                                                 Akceptuj
                                             </th>
                                             <th scope="col" class="px-6 py-3 text-center">
-                                                Anuluj
+                                                Odrzuć
                                             </th>
                                         </tr>
                                     </thead>
@@ -242,24 +356,38 @@
                                                 </x-paragraf-display>
                                             </td>
                                             <td class="px-3 py-2 font-semibold text-gray-700 dark:text-gray-50 text-start">
-                                                <div class="flex flex-col justify-center w-fit">
-                                                    <x-paragraf-display class="font-semibold mb-1 w-fit">
-                                                        {{$leave->type}}
+                                                <div class="flex flex-row justify-center w-fit">
+                                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-3xl">
+                                                        {{ $icons[$leave->type] ?? '' }}
                                                     </x-paragraf-display>
-                                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                        {{ $shortType[$leave->type] ?? '' }}
-                                                    </span>
+                                                    <div class="flex flex-col justify-center w-fit">
+                                                        <x-paragraf-display class="font-semibold mb-1 w-fit">
+                                                            {{$leave->type}}
+                                                        </x-paragraf-display>
+                                                        <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                            {{ $shortType[$leave->type] ?? '' }}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td class="px-3 py-2">
+                                                <x-button-link-blue href="{{route('leave.single.edit', $leave)}}" class="min-h-[38px]">
+                                                    <i class="fa-solid fa-pen-to-square"></i>
+                                                </x-button-link-blue>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                @if($leave->status == 'oczekujące' || $leave->status == 'odrzucone' || $leave->status == 'anulowane')
                                                 <x-button-link-green href="{{ route('leave.pending.accept', $leave)}}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-check"></i>
                                                 </x-button-link-green>
+                                                @endif
                                             </td>
                                             <td class="px-3 py-2">
+                                                @if($leave->status == 'oczekujące' || $leave->status == 'zaakceptowane')
                                                 <x-button-link-red href="{{ route('leave.pending.reject', $leave)}}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-xmark"></i>
                                                 </x-button-link-red>
+                                                @endif
                                             </td>
                                         </tr>
                                         @endforeach
@@ -326,10 +454,10 @@
             </div>
         </div>
     </div>
-    <input type="hidden" id="lat" value="51.06195234194151">
-    <input type="hidden" id="lon" value="16.99088511627247">
-        <script>
-            $(document).ready(function() {
+    <input type="hidden" id="lat" value="">
+    <input type="hidden" id="lon" value="">
+    <script>
+        $(document).ready(function() {
             function getLocation() {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -346,8 +474,8 @@
                 $('#locationWidget').text(
                     "Szerokość: " + lat + "\nDługość: " + lon + "\nDokładność: " + Math.round(acc) + " metrów"
                 );
-                //$('#lat').val(lat);
-                //$('#lon').val(lon);
+                $('#lat').val(lat);
+                $('#lon').val(lon);
             }
 
             function showError(error) {

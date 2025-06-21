@@ -89,13 +89,8 @@
                                 <i class="fa-solid fa-briefcase"></i>
                             </td>
                             @elseif($date == 'planned_leave')
-                            <!--
                             <td class="px-2 py-2 font-semibold text-lg text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700 cursor-pointer"
                                 onclick="window.location.href='{{ route('calendar.all.edit', ['user' => $user, 'date' => $key ]) }}'">
-                                UP
-                            </td>
-                            -->
-                            <td class="px-2 py-2 font-semibold text-lg text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700">
                                 UP
                             </td>
                             @else
@@ -150,7 +145,8 @@
                                     </td>`;
                                 } else if (user.dates[date] != null && user.dates[date] != 0) {
                                     cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700">
+                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700 cursor-pointer"
+                                        onclick="window.location.href='{{ route('calendar.all.edit', ['','']) }}'+'/${user.id}/${date}'">
                                         UP
                                     </td>`;
                                 } else {

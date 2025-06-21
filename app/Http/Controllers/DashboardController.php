@@ -44,9 +44,9 @@ class DashboardController extends Controller
             $leaveFirst = $workSessionRepository->getFirstLeave(Auth::user()->id, $date);
             $day = Carbon::createFromFormat('d.m.y', $date)->format('d');
             if ($leave) {
-                $dates[] = ['day' => $day, 'leave' => $leaveFirst->type];
+                $dates[] = ['day' => $day, 'leave' => $leaveFirst->type, 'date' => $date];
             } else {
-                $dates[] = ['day' => $day, 'leave' => null];
+                $dates[] = ['day' => $day, 'leave' => null, 'date' => $date];
             }
         }
         return view('dashboard', compact('leaves', 'leavesUser', 'dates'));

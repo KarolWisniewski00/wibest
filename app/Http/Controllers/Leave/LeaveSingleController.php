@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Leave;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DateRequest;
+use App\Models\Leave;
 use App\Services\FilterDateService;
 use App\Services\LeaveService;
 use Illuminate\Http\Request;
+
 class LeaveSingleController extends Controller
 {
     protected FilterDateService $filterDateService;
@@ -46,6 +48,32 @@ class LeaveSingleController extends Controller
         $this->filterDateService->initFilterDateIfNotExist($request);
         $leavePending = $this->leaveService->countByUserId($request);
         return view('admin.leave.create', compact('leavePending'));
+    }
+    /**
+     * Zwraca widok do edycji.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function edit(Leave $leave, Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $leave = $this->leaveService->getLeaveById($leave);
+        $leavePending = $this->leaveService->countByUserId($request);
+        return view('admin.leave.edit', compact('leave', 'leavePending'));
+    }
+        /**
+     * Usuwa wniosek.
+     *
+     * @param Leave $leave
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function delete(Leave $leave)
+    {
+        if ($leave->delete()) {
+            return redirect()->route('leave.single.index')->with('success', 'Operacja się powiodła.');
+        }
+        return redirect()->back()->with('fail', 'Wystąpił błąd.');
     }
     /**
      *  Zwraca wnioski dla użytkownika w zakresie dat.

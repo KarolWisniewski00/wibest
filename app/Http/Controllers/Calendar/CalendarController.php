@@ -83,4 +83,17 @@ class CalendarController extends Controller
         $plannedLeave = $this->leaveService->getPlannedByUserAndDate($user, $date);
         return view('admin.calendar.edit', compact('plannedLeave'));
     }
+    /**
+     * Usuwa urlop planowany.
+     *
+     * @param PlannedLeave $planned_leave
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function delete(PlannedLeave $plannedLeave)
+    {
+        if ($plannedLeave->delete()) {
+            return redirect()->route('calendar.all.index')->with('success', 'Operacja się powiodła.');
+        }
+        return redirect()->back()->with('fail', 'Wystąpił błąd.');
+    }
 }

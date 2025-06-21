@@ -104,7 +104,9 @@
                             <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                 <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                     <span class="text-gray-400">
+                                        @if($user->time_in_work_hms != '00h 00min 00s')
                                         {{$user->time_in_work_hms}}
+                                        @endif
                                     </span>
                                 </x-paragraf-display>
                             </td>
@@ -187,7 +189,10 @@
                                 <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                     <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                         <span class="text-gray-400">
-                                            ${user.time_in_work_hms}
+                                            ${user.time_in_work_hms != '00h 00min 00s'
+                                            ? user.time_in_work_hms
+                                            : ``
+                                            }
                                         </span>
                                     </x-paragraf-display>
                                 </td>

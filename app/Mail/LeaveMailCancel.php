@@ -10,7 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-class LeaveMailAccept extends Mailable
+class LeaveMailCancel extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -24,7 +24,7 @@ class LeaveMailAccept extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.leave-accept',
+            view: 'emails.leave-cancel',
         );
     }
     /**
@@ -41,6 +41,6 @@ class LeaveMailAccept extends Mailable
         $leave_obj = $this->leave;
         return $this->subject('Wniosek ' . $leave_obj->type . ' ' . $leave_obj->start_date . ' - ' . $leave_obj->end_date)
             ->from(env('MAIL_USERNAME'), env('MAIL_FROM_NAME'))
-            ->view('emails.leave-accept');
+            ->view('emails.leave-cancel');
     }
 }

@@ -2,7 +2,10 @@
 
 namespace App\Steps;
 
+use App\Mail\EditPlannedLeaveMail;
 use App\Mail\LeaveMail;
+use App\Mail\PlannedLeaveMail;
+use App\Models\PlannedLeave;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -21,19 +24,16 @@ class EditPlannedLeaveDateStep extends Step
     }
     public function save($state)
     {
-        $leave = $this->model;
+        $leave = PlannedLeave::findOrFail($state['planned_leave_id']);
         $leave->start_date = $state['start_time'];
         $leave->end_date = $state['end_time'];
-        $leave->company_id = Auth::user()->company_id;
-        $leave->created_user_id = Auth::id();
         $leave->save();
 
-        $leaveMail = new LeaveMail($leave);
+        $leaveMail = new EditPlannedLeaveMail($leave);
         try {
-            Mail::to('karol.wisniewski2901@gmail.com')->send($leaveMail);
+            Mail::to($leave->user->email)->send($leaveMail);
         } catch (Exception) {
         }
-
         return redirect()->route('calendar.all.index')->with('success', 'Operacja zakończona powodzeniem.');
     }
     public function icon(): string

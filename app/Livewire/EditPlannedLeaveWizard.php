@@ -24,6 +24,13 @@ class EditPlannedLeaveWizard extends WizardComponent
     public function mount($plannedLeaveId = null)
     {
         $this->plannedLeave = PlannedLeave::findOrFail($plannedLeaveId);
+
+        $this->mergeState([
+            'user_id' => $this->plannedLeave->user_id,
+            'start_time' => $this->plannedLeave->start_date,
+            'end_time'   => $this->plannedLeave->end_date,
+            'planned_leave_id'   => $plannedLeaveId,
+        ]);
     }
 
     // 👇 Zwróć już wczytany model

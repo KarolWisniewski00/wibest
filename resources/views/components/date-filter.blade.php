@@ -375,6 +375,29 @@
                                     'kwarantanna z pracą zdalną': 'KWZPZ',
                                     'delegacja': 'DEL'
                                 };
+                                const icons = {
+                                    'wolne za pracę w święto': '🕊️',
+                                    'zwolnienie lekarskie': '🤒',
+                                    'urlop wypoczynkowy': '🏖️',
+                                    'urlop rodzicielski': '👶',
+                                    'wolne za nadgodziny': '⏰',
+                                    'wolne za święto w sobotę': '🗓️',
+                                    'urlop bezpłatny': '💸',
+                                    'wolne z tytułu 5-dniowego tygodnia pracy': '📆',
+                                    'zwolnienie lekarsie - opieka': '🧑‍⚕️',
+                                    'urlop okolicznościowy': '🎉',
+                                    'urlop wypoczynkowy "na żądanie"': '📢',
+                                    'oddanie krwi': '🩸',
+                                    'urlop ojcowski': '👨‍👧',
+                                    'urlop macieżyński': '🤱',
+                                    'świadczenie rehabilitacyjne': '🦾',
+                                    'opieka': '🧑‍🍼',
+                                    'świadek w sądzie': '⚖️',
+                                    'praca zdalna': '💻',
+                                    'kwarantanna': '🦠',
+                                    'kwarantanna z pracą zdalną': '🏠💻',
+                                    'delegacja': '✈️',
+                                };
                                 const row = `
                             <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
                                 <td class="px-3 py-2  flex items-center justify-center">
@@ -453,20 +476,33 @@
                                     </x-paragraf-display>
                                 </td>
                                 <td class="px-3 py-2 font-semibold text-gray-700 dark:text-gray-50 text-start">
-                                    <div class="flex flex-col justify-center w-fit">
-                                        <x-paragraf-display class="font-semibold mb-1 w-fit">
-                                            ${leave.type}
+                                    <div class="flex flex-row justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-3xl">
+                                            ${icons[leave.type] ?? '' }
                                         </x-paragraf-display>
-                                        <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                            ${shortType[leave.type] ?? '' }
-                                        </span>
+                                        <div class="flex flex-col justify-center w-fit">
+                                            <x-paragraf-display class="font-semibold mb-1 w-fit">
+                                                ${leave.type}
+                                            </x-paragraf-display>
+                                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                ${shortType[leave.type] ?? '' }
+                                            </span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-3 py-2">
-                                    <x-button-link-red href="{{ route('leave.pending.reject', '')}}/${leave.id}" class="min-h-[38px]">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </x-button-link-red>
+                                    <x-button-link-blue href="{{route('leave.single.edit', '')}}/${leave.id}" class="min-h-[38px]">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </x-button-link-blue>
                                 </td>
+                                ${leave.status == 'oczekujące'
+                                ? ` <td class="px-3 py-2">
+                                        <x-button-link-red href="{{ route('leave.pending.cancel', '')}}/${leave.id}" class="min-h-[38px]">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </x-button-link-red>
+                                    </td>`
+                                : ``
+                                }
                             </tr>`;
                                 $tbody.append(row);
                             });
@@ -519,6 +555,29 @@
                                     'kwarantanna': 'KW',
                                     'kwarantanna z pracą zdalną': 'KWZPZ',
                                     'delegacja': 'DEL'
+                                };
+                                const icons = {
+                                    'wolne za pracę w święto': '🕊️',
+                                    'zwolnienie lekarskie': '🤒',
+                                    'urlop wypoczynkowy': '🏖️',
+                                    'urlop rodzicielski': '👶',
+                                    'wolne za nadgodziny': '⏰',
+                                    'wolne za święto w sobotę': '🗓️',
+                                    'urlop bezpłatny': '💸',
+                                    'wolne z tytułu 5-dniowego tygodnia pracy': '📆',
+                                    'zwolnienie lekarsie - opieka': '🧑‍⚕️',
+                                    'urlop okolicznościowy': '🎉',
+                                    'urlop wypoczynkowy "na żądanie"': '📢',
+                                    'oddanie krwi': '🩸',
+                                    'urlop ojcowski': '👨‍👧',
+                                    'urlop macieżyński': '🤱',
+                                    'świadczenie rehabilitacyjne': '🦾',
+                                    'opieka': '🧑‍🍼',
+                                    'świadek w sądzie': '⚖️',
+                                    'praca zdalna': '💻',
+                                    'kwarantanna': '🦠',
+                                    'kwarantanna z pracą zdalną': '🏠💻',
+                                    'delegacja': '✈️',
                                 };
                                 const row = `
                             <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
@@ -598,25 +657,43 @@
                                     </x-paragraf-display>
                                 </td>
                                 <td class="px-3 py-2 font-semibold text-gray-700 dark:text-gray-50 text-start">
-                                    <div class="flex flex-col justify-center w-fit">
-                                        <x-paragraf-display class="font-semibold mb-1 w-fit">
-                                            ${leave.type}
+                                    <div class="flex flex-row justify-center w-fit">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-3xl">
+                                            ${icons[leave.type] ?? '' }
                                         </x-paragraf-display>
-                                        <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                            ${shortType[leave.type] ?? '' }
-                                        </span>
+                                        <div class="flex flex-col justify-center w-fit">
+                                            <x-paragraf-display class="font-semibold mb-1 w-fit">
+                                                ${leave.type}
+                                            </x-paragraf-display>
+                                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                ${shortType[leave.type] ?? '' }
+                                            </span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-3 py-2">
+                                    <x-button-link-blue href="{{route('leave.single.edit', '')}}/${leave.id}" class="min-h-[38px]">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </x-button-link-blue>
+                                </td>
+                                <td class="px-3 py-2">
+                                ${leave.status == 'oczekujące' || leave.status == 'odrzucone' || leave.status == 'anulowane'
+                                ? ` 
                                     <x-button-link-green href="{{ route('leave.pending.accept', '')}}/${leave.id}" class="min-h-[38px]">
                                         <i class="fa-solid fa-check"></i>
                                     </x-button-link-green>
+                                    `
+                                : ``
+                                }
                                 </td>
-                                <td class="px-3 py-2">
-                                    <x-button-link-red href="{{ route('leave.pending.reject', '')}}/${leave.id}" class="min-h-[38px]">
-                                        <i class="fa-solid fa-xmark"></i>
-                                    </x-button-link-red>
-                                </td>
+                                ${leave.status == 'oczekujące' || leave.status == 'zaakceptowane'
+                                ? ` <td class="px-3 py-2">
+                                        <x-button-link-red href="{{ route('leave.pending.reject', '')}}/${leave.id}" class="min-h-[38px]">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </x-button-link-red>
+                                    </td>`
+                                : ``
+                                }
                             </tr>`;
                                 $tbody.append(row);
                             });
@@ -859,7 +936,10 @@
                                     <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                         <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                             <span class="text-gray-400">
-                                                ${user.time_in_work_hms}
+                                            ${user.time_in_work_hms != '00h 00min 00s'
+                                            ? user.time_in_work_hms
+                                            : ``
+                                            }
                                             </span>
                                         </x-paragraf-display>
                                     </td>

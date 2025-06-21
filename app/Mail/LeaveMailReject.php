@@ -41,6 +41,6 @@ class LeaveMailReject extends Mailable
         $leave_obj = $this->leave;
         return $this->subject('Wniosek ' . $leave_obj->type . ' ' . $leave_obj->start_date . ' - ' . $leave_obj->end_date)
             ->from(env('MAIL_USERNAME'), env('MAIL_FROM_NAME'))
-            ->view('emails.leave');
+            ->view('emails.leave-reject');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Leave;
 use App\Models\User;
 use App\Repositories\LeaveRepository;
 use App\Repositories\WorkSessionRepository;
@@ -107,5 +108,10 @@ class LeaveService
         $leaveRepository = new LeaveRepository();
         $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
         return $leaveRepository->getPlannedByUserIdAndFormattedDate($user->id, $formattedDate);
+    }
+    public function getLeaveById(Leave $leave)
+    {
+        $leaveRepository = new LeaveRepository();
+        return $leaveRepository->getLeaveById($leave);
     }
 }

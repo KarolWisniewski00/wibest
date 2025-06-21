@@ -7,6 +7,7 @@ use App\Http\Requests\DateRequest;
 use App\Mail\LeaveMail;
 use App\Mail\LeaveMailAccept;
 use App\Mail\LeaveMailReject;
+use App\Mail\LeaveMailCancel;
 use App\Models\Leave;
 use App\Repositories\LeaveRepository;
 use App\Repositories\UserRepository;
@@ -113,6 +114,29 @@ class LeavePendingReviewController extends Controller
             return redirect()->route('leave.pending.index')->with('success', 'Odrzucone.');
         } else {
             return redirect()->route('leave.single.index')->with('success', 'Odrzucone.');
+        }
+    }
+        /**
+     * Anuluje wniosek.
+     *
+     * @param Leave $leave
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function cancel(Leave $leave): \Illuminate\Http\RedirectResponse
+    {
+        $leave->status = 'anulowane';
+        $leave->save();
+
+        $leaveMail = new LeaveMailCancel($leave);
+        try {
+            Mail::to($leave->user->email)->send($leaveMail);
+        } catch (Exception) {
+        }
+
+        if (auth()->user()->is_admin) {
+            return redirect()->route('leave.pending.index')->with('success', 'Anulowane.');
+        } else {
+            return redirect()->route('leave.single.index')->with('success', 'Anulowane.');
         }
     }
 }

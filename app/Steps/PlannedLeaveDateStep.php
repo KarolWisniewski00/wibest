@@ -3,6 +3,7 @@
 namespace App\Steps;
 
 use App\Mail\LeaveMail;
+use App\Mail\PlannedLeaveMail;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -27,6 +28,12 @@ class PlannedLeaveDateStep extends Step
         $leave->company_id = Auth::user()->company_id;
         $leave->created_user_id = Auth::id();
         $leave->save();
+
+        $leaveMail = new PlannedLeaveMail($leave);
+        try {
+            Mail::to($leave->user->email)->send($leaveMail);
+        } catch (Exception) {
+        }
 
         return redirect()->route('calendar.all.index')->with('success', 'Operacja zakończona powodzeniem.');
     }

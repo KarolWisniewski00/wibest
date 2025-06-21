@@ -42,7 +42,8 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
+//TODO:
+// dodać mobilke w datefilter dla wniosków o urlop
 //NOT LOGGED IN
 Route::get('/', function () {
     return view('welcome');
@@ -159,6 +160,7 @@ Route::middleware([
                 Route::post('/store', [CalendarController::class, 'store'])->name('calendar.all.store');
                 Route::get('/edit/{user}/{date}', [CalendarController::class, 'edit'])->name('calendar.all.edit');
                 Route::post('/update/{plannedLeave}', [CalendarController::class, 'update'])->name('calendar.all.update');
+                Route::delete('/delete/{plannedLeave}', [CalendarController::class, 'delete'])->name('calendar.all.delete');
             });
 
             Route::prefix('work-schedule')->group(function () {
@@ -180,12 +182,16 @@ Route::middleware([
                 Route::get('/', [LeaveSingleController::class, 'index'])->name('leave.single.index');
                 Route::get('/create', [LeaveSingleController::class, 'create'])->name('leave.single.create');
                 Route::post('/store', [LeaveSingleController::class, 'store'])->name('leave.single.store');
+                Route::get('/edit/{leave}', [LeaveSingleController::class, 'edit'])->name('leave.single.edit');
+                Route::post('/update/{leave}', [LeaveSingleController::class, 'update'])->name('leave.single.update');
+                Route::delete('/delete/{leave}', [LeaveSingleController::class, 'delete'])->name('leave.single.delete');
             });
 
             Route::prefix('pending-review')->group(function () {
                 Route::get('/', [LeavePendingReviewController::class, 'index'])->name('leave.pending.index');
                 Route::get('accept/{leave}', [LeavePendingReviewController::class, 'accept'])->name('leave.pending.accept');
                 Route::get('reject/{leave}', [LeavePendingReviewController::class, 'reject'])->name('leave.pending.reject');
+                Route::get('cancel/{leave}', [LeavePendingReviewController::class, 'cancel'])->name('leave.pending.cancel');
             });
 
             Route::prefix('limit')->group(function () {

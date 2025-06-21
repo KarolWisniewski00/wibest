@@ -21,7 +21,7 @@
             <!--MOBILE VIEW-->
             <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
                 @if ($company)
-                <ul id="list" class="grid w-full gap-y-4 block md:hidden">
+                <ul id="list" class="grid w-full gap-y-4 hidden">
                     <!-- EMPTY PLACE -->
                     @if ($events->isEmpty())
                     <x-empty-place />
@@ -91,7 +91,7 @@
                 <!-- WORK SESSIONS VIEW -->
 
                 <!-- PC VIEW -->
-                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400  hidden md:table">
+                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                         <tr>
                             <th scope="col" class="px-6 py-3">

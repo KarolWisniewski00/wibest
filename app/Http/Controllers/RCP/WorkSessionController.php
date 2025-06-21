@@ -19,16 +19,17 @@ class WorkSessionController extends Controller
     {
         $now = Carbon::now();
         Carbon::setLocale('pl');
-
-        try {
-            $location = Location::create([
-                'name' => $request->input('name', ''),
-                'latitude' => $request->input('lat', null),
-                'longitude' => $request->input('lon', null),
-            ]);
-        } catch (\Exception $e) {
+        if ($request->input('lat') == '' || $request->input('lon') == '') {
+        } else {
+            try {
+                $location = Location::create([
+                    'name' => $request->input('name', ''),
+                    'latitude' => $request->input('lat', null),
+                    'longitude' => $request->input('lon', null),
+                ]);
+            } catch (\Exception $e) {
+            }
         }
-
         // Tworzenie eventu startowego
         $event = Event::create([
             'time' => $now,
@@ -80,13 +81,16 @@ class WorkSessionController extends Controller
             } else {
                 $timeInWork = Carbon::parse($startEvent->time)->diff($endTime)->format('%H:%I:%S');
             }
-            try {
-                $location = Location::create([
-                    'name' => $request->input('name', ''),
-                    'latitude' => $request->input('lat', null),
-                    'longitude' => $request->input('lon', null),
-                ]);
-            } catch (\Exception $e) {
+            if ($request->input('lat') == '' || $request->input('lon') == '') {
+            } else {
+                try {
+                    $location = Location::create([
+                        'name' => $request->input('name', ''),
+                        'latitude' => $request->input('lat', null),
+                        'longitude' => $request->input('lon', null),
+                    ]);
+                } catch (\Exception $e) {
+                }
             }
             // Tworzenie eventu stop
             $stopEvent = Event::create([

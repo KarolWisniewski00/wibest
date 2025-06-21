@@ -18,11 +18,13 @@
                     <x-nav-link href="{{ route('team.user.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
                         <i class="fa-solid fa-users mr-2"></i>Zespół
                     </x-nav-link>
+                    @if($role != 'użytkownik')
                     <x-nav-link href="{{ route('calendar.all.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
-                        <i class="fa-solid fa-calendar-days mr-2"></i>Kalendarz
+                        <i class="fa-solid fa-calendar-days mr-2"></i>Urlopy planowane
                     </x-nav-link>
+                    @endif
                     <x-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
-                        <i class="fa-solid fa-inbox mr-2"></i>Wnioski
+                        <i class="fa-solid fa-inbox mr-2"></i>Wnioski o urlop
                     </x-nav-link>
                     <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
                         <i class="fa-solid fa-clock mr-2"></i>RCP
@@ -196,16 +198,18 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden xl:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Panel główny') }}
+                <i class="fa-solid fa-house mr-2"></i>Panel Główny
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('team.user.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
                 <i class="fa-solid fa-users mr-2"></i>Zespół
             </x-responsive-nav-link>
+            @if($role != 'użytkownik')
             <x-responsive-nav-link href="{{ route('calendar.all.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
-                <i class="fa-solid fa-calendar-days mr-2"></i>Kalendarz
+                <i class="fa-solid fa-calendar-days mr-2"></i>Urlopy planowane
             </x-responsive-nav-link>
+            @endif
             <x-responsive-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
-                <i class="fa-solid fa-inbox mr-2"></i>Wnioski
+                <i class="fa-solid fa-inbox mr-2"></i>Wnioski o urlop
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
                 <i class="fa-solid fa-clock mr-2"></i>RCP
@@ -214,7 +218,7 @@
                 <i class="fa-solid fa-chart-line mr-2"></i>Raporty
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
-                {{ __('Ustawienia') }}
+                <i class="fa-solid fa-gear mr-2"></i>Ustawienia
             </x-responsive-nav-link>
         </div>
 

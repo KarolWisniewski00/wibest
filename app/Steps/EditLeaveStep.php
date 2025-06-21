@@ -2,23 +2,23 @@
 
 namespace App\Steps;
 
-use App\Models\PlannedLeave;
+use App\Models\Leave;
 use Vildanbina\LivewireWizard\Components\Step;
 
-class EditUserStep extends Step
+class EditLeaveStep extends Step
 {
-    protected string $view = 'livewire.steps.edit-user-step';
-    
+    protected string $view = 'livewire.steps.edit-leave-step';
+
     public function mount()
     {
         $this->mergeState([
-            'user_id' => $this->model->user_id,
+            'type' => $this->model->type,
         ]);
     }
     public function save($state)
     {
-        $leave = PlannedLeave::findOrFail($state['planned_leave_id']);
-        $leave->user_id = $state['user_id'];
+        $leave = Leave::findOrFail($state['leave_id']);
+        $leave->type = $state['type'];
         $leave->save();
     }
     public function icon(): string
@@ -29,17 +29,17 @@ class EditUserStep extends Step
     {
         return [
             [
-                'state.user_id'     => ['required'],
+                'state.type'     => ['required'],
             ],
             [],
             [
-                'state.user_id'     => __('user_id'),
+                'state.type'     => __('type'),
             ],
         ];
     }
     public function title(): string
     {
-        return __('Wybierz użytkownika');
+        return __('Wybierz rodzaj wniosku');
     }
 
 }

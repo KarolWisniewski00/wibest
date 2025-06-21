@@ -2,15 +2,17 @@
 
 namespace App\Steps;
 
+use App\Mail\EditLeaveMail;
 use App\Mail\LeaveMail;
+use App\Models\Leave;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Vildanbina\LivewireWizard\Components\Step;
 
-class LeaveDateStep extends Step
+class EditLeaveDateStep extends Step
 {
-    protected string $view = 'livewire.steps.leave-date-step';
+    protected string $view = 'livewire.steps.edit-leave-date-step';
 
     public function mount()
     {
@@ -19,20 +21,22 @@ class LeaveDateStep extends Step
             'end_time' => $this->model->end_date,
         ]);
     }
+
     public function save($state)
     {
-        $leave = $this->model;
+        $leave = Leave::findOrFail($state['leave_id']);
         $leave->start_date = $state['start_time'];
         $leave->end_date = $state['end_time'];
-        $leave->company_id = Auth::user()->company_id;
-        $leave->user_id = Auth::id();
-        $leave->created_user_id = Auth::id();
         $leave->status = 'oczekujące';
         $leave->save();
 
-        $leaveMail = new LeaveMail($leave);
+        $leaveMail = new EditLeaveMail($leave);
         try {
-            Mail::to($leave->manager->email)->send($leaveMail);
+            if (Auth::user()->id == $leave->user_id) {
+                Mail::to($leave->manager->email)->send($leaveMail);
+            }elseif (Auth::user()->id == $leave->manager_id) {
+                Mail::to($leave->user->email)->send($leaveMail);
+            }
         } catch (Exception) {
         }
 
