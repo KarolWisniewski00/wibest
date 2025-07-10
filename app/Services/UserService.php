@@ -144,6 +144,39 @@ class UserService
         return $users;
     }
     /**
+     * Zwraca użytkowników z datami w zależności od roli zalogowanego użytkownika.
+     *
+     * @param Request $request
+     * @return \Illuminate\Support\Collection
+     */
+    public function getByRoleAddDatesAndLeavesByFilterDate(Request $request): \Illuminate\Support\Collection
+    {
+        $filterDateService = new FilterDateService();
+        $workSessionRepository = new WorkSessionRepository();
+        $leaveRepository = new LeaveRepository();
+        $dates = $filterDateService->getRangeDateFilter($request);
+        $users = $this->getByRole();
+
+        foreach ($users as &$user) {
+            $userDates = [];
+            foreach ($dates as $date) {
+                $status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
+                $leave = $leaveRepository->hasPlannedLeaveToday($user->id, $date);
+
+
+                if ($status) {
+                    $userDates[$date] = "in_progress";
+                }elseif ($leave) {
+                    $userDates[$date] = "planned_leave";
+                }else{
+                    $userDates[$date] = null;
+                }
+            }
+            $user->dates = $userDates;
+        }
+        return $users;
+    }
+    /**
      * Zwraca użytkowników z ewidencją w zależności od roli zalogowanego użytkownika.
      *
      * @param Request $request

@@ -32,13 +32,13 @@
 
             <!-- Dni tygodnia -->
             <div class="grid grid-cols-7 text-center text-gray-500 dark:text-gray-400 mb-1">
-                <div>pon</div>
-                <div>wt</div>
-                <div>śr</div>
-                <div>czw</div>
-                <div>pt</div>
-                <div>sob</div>
-                <div>ndz</div>
+                <div>Pon</div>
+                <div>Wt</div>
+                <div>Śr</div>
+                <div>Czw</div>
+                <div>Pt</div>
+                <div>Sob</div>
+                <div>Ndz</div>
             </div>
 
             <!-- Miejsce na dni miesiąca generowane przez JS -->
@@ -695,6 +695,128 @@
                                 : ``
                                 }
                             </tr>`;
+                                $tbody.append(row);
+                            });
+                        },
+                        error: function(xhr) {
+                            $tbody.empty(); // najpierw czyścimy poprzednie wiersze
+                            // generujemy emptyplace
+                            const row = `
+                            <tr class="bg-white dark:bg-gray-800">
+                                <td colspan="8" class="px-3 py-2">
+                                    <x-empty-place />
+                                </td>
+                            </tr>`;
+                            $tbody.append(row);
+                        }
+                    });
+                    updateShowFilter();
+                }
+                @elseif(Str::startsWith(request()->path(), 'dashboard/calendar/all'))
+
+                function ajaxFilter() {
+                    const $tbody = $('#work-sessions-body');
+                    const $thead = $('#table-head');
+                    $.ajax({
+                        url: `{{ route('api.v1.calendar.all.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
+                        method: 'get',
+                        success: function(response) {
+                            $tbody.empty();
+                            $('.date-column').remove();
+                            const start = new Date(rangeStart);
+                            const end = new Date(rangeEnd);
+                            const dates = [];
+
+                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                                const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+                                dates.push(formattedDate);
+                            }
+
+                            let headHtml = '';
+                            dates.forEach(date => {
+                                headHtml += `<th scope="col" class="px-2 py-3 date-column">${date}</th>`;
+                            });
+                            $thead.append(headHtml);
+
+                            response.forEach(user => {
+                                console.log(user);
+                                let cells = '';
+
+                                const dates = [];
+
+                                // Generate list of dates from start to end
+                                for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                                    const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear().toString().slice(-2)}`; // Format date as DD.MM.YY
+                                    dates.push(formattedDate);
+                                }
+
+                                // Iterate through the generated dates and check user.dates
+                                dates.forEach(date => {
+                                    console.log(date, user.dates[date]);
+                                    if (user.dates[date] == 'in_progress') {
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
+                                            <i class="fa-solid fa-briefcase"></i>
+                                        </td>`;
+                                    } else if (user.dates[date] != null && user.dates[date] != 0) {
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700 cursor-pointer"
+                                            onclick="window.location.href='{{ route('calendar.all.edit', ['','']) }}'+'/${user.id}/${date}'">
+                                            UP
+                                        </td>`;
+                                    } else {
+                                        cells += `
+                                        <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
+                                        </td>`;
+                                    }
+                                });
+
+                                const row = `
+                                <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+                                    <td class="px-3 py-2">
+                                        <x-flex-center>
+                                            <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
+                                        </x-flex-center>
+                                    </td>
+                                    <td class="px-3 py-2  flex items-center justify-center">
+                                        ${user.profile_photo_url
+                                            ? `<img src="${user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                            : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${user.name[0].toUpperCase()}</div>`
+                                        }
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <div class="flex flex-col justify-center w-fit">
+                                            <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                ${user.name}
+                                            </x-paragraf-display>
+                                            ${user.role == 'admin'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'menedżer'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'kierownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>`
+                                            : ``
+                                            }
+                                            ${user.role == 'użytkownik'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>`
+                                            : ``
+                                            }
+                                        </div>
+                                    </td>
+                                    ${cells}
+                                </tr>`;
                                 $tbody.append(row);
                             });
                         },

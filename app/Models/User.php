@@ -26,11 +26,23 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
+
         'company_id',
         'setting_format',
         'setting_client',
         'position',
+
+        'supervisor_id',
+        'paid_until',
+        'assigned_at',
+        'contract_type',
+
+        'working_hours_regular',
+        'working_hours_custom',
+        'working_hours_from',
+        'working_hours_to',
     ];
 
     /**
@@ -52,6 +64,11 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'paid_until' => 'date',
+        'assigned_at' => 'date',
+        'working_hours_regular' => 'boolean',
+        'working_hours_from' => 'datetime:H:i',
+        'working_hours_to' => 'datetime:H:i',
     ];
 
     /**
@@ -114,5 +131,34 @@ class User extends Authenticatable
     public function events()
     {
         return $this->hasMany(Event::class);
+    }
+    
+    /**
+     * Hierarchia użytkowników
+     */
+    public function supervisor()
+    {
+        return $this->belongsTo(User::class, 'supervisor_id');
+    }
+
+    public function subordinates()
+    {
+        return $this->hasMany(User::class, 'supervisor_id');
+    }
+
+    /**
+     * Permissions przypisane bezpośrednio do użytkownika
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'permission_user')->withTimestamps();
+    }
+
+    /**
+     * Sprawdzenie czy użytkownik ma konkretną permission
+     */
+    public function hasPermission(string $permissionName): bool
+    {
+        return $this->permissions()->where('name', $permissionName)->exists();
     }
 }

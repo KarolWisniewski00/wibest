@@ -13,7 +13,7 @@ use Vildanbina\LivewireWizard\Components\Step;
 
 class EditPlannedLeaveDateStep extends Step
 {
-    protected string $view = 'livewire.steps.leave-date-step';
+    protected string $view = 'livewire.steps.edit-leave-date-step';
 
     public function mount()
     {

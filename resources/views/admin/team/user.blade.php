@@ -65,18 +65,20 @@
                     </p>
                     <div class="flex justify-start items-center w-full justify-start">
                         <a href="mailto:{{$user->email}}" class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <span class="text-2xl">📧</span>
                             {{ $user->email }}
                         </a>
                     </div>
                 </x-text-cell>
                 <x-text-cell class="mx-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
-                        Stanowisko
+                        Numer telefonu
                     </p>
                     <div class="flex justify-start items-center w-full justify-start">
-                        <span class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                            {{ $user->position }}
-                        </span>
+                        <a href="tel:{{$user->phone}}" class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <span class="text-2xl">📱</span>
+                            {{ $user->phone }}
+                        </a>
                     </div>
                 </x-text-cell>
                 @if($user->oauth_id != null)
@@ -92,44 +94,110 @@
                 </x-text-cell>
                 @endif
             </x-container-gray>
-            <div class="grid grid-cols-2 mt-4 gap-4">
-
-                @if($user->eventStop != null)
-                <x-container-gray class="px-0">
-                    <!--status-->
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
-                            Zdarzenie
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
-                            @if($user->eventStop->event_type == 'stop')
-                            <span class="inline-flex items-center text-red-500 dark:text-red-300 font-semibold text-xl uppercase tracking-widest hover:text-red-700 dark:hover:text-red-300 transition ease-in-out duration-150">
-                                Stop
+            @if($user->supervisor || $user->position || $user->assigned_at)
+            <x-container-gray class="px-0 mt-4">
+                <x-text-cell class="mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                        Bezpośredni przełożony
+                    </p>
+                    <div class="flex justify-start items-center w-full justify-start">
+                        @if($user->supervisor)
+                        <span class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            @if($user->supervisor->profile_photo_url)
+                            <img src="{{ $user->supervisor->profile_photo_url }}" alt="{{ $user->supervisor->name }}" class="w-10 h-10 rounded-full">
+                            @else
+                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                {{ strtoupper(substr($user->supervisor->name, 0, 1)) }}
+                            </div>
+                            @endif
+                            {{ $user->supervisor->name }}
+                            @if($user->supervisor->role == 'admin')
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                Admin
+                            </span>
+                            @elseif($user->supervisor->role == 'menedżer')
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                Menedżer
+                            </span>
+                            @elseif($user->supervisor->role == 'kierownik')
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                Kierownik
+                            </span>
+                            @elseif($user->supervisor->role == 'użytkownik')
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                Użytkownik
                             </span>
                             @endif
-                            @if($user->eventStop->event_type == 'start')
-                            <span class="inline-flex items-center text-green-300 dark:text-green-300 font-semibold text-xl uppercase tracking-widest hover:text-green-700 dark:hover:text-green-300 transition ease-in-out duration-150">
-                                Start
-                            </span>
-                            @endif
+                        </span>
+                        @else
+                        <span class="text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest">
+                            Brak przełożonego
+                        </span>
+                        @endif
+                    </div>
+                </x-text-cell>
+                <x-text-cell class="mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                        Stanowisko
+                    </p>
+                    <div class="flex justify-start items-center w-full justify-start">
+                        <span class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <span class="text-2xl">💼</span>
+                            {{ $user->position ? $user->position : 'Brak stanowiska' }}
+                        </span>
+                    </div>
+                </x-text-cell>
+                <x-text-cell class="mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                        Data dołączenia do zespołu
+                    </p>
+                    <div class="flex justify-start items-center w-full justify-start">
+                        <span class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <span class="text-2xl">📅</span>
+                            {{ $user->assigned_at ? $user->assigned_at : 'Brak daty' }}
+                        </span>
+                    </div>
+                </x-text-cell>
+            </x-container-gray>
+            @endif
+            @if($user->working_hours_from && $user->working_hours_to)
+            <x-container-gray class="px-0 mt-4">
+                <x-text-cell class="mx-4">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                        Godziny pracy
+                    </p>
+                    <div class="flex justify-start items-center w-full justify-start">
+                        @if($user->working_hours_regular)
+                        <div class="flex items-center gap-4">
+                            <div class="text-2xl">🕒</div>
+                            <div>
+                                <div class="text-lg font-semibold mb-1">Stałe godziny pracy regulowane przez ustawienia niżej</div>
+                            </div>
                         </div>
-                    </x-text-cell>
-                    <!--status-->
-                    <!--Czas w pracy-->
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
-                            Czas
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
-                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                {{ $user->eventStop->time }}
-                            </span>
+                        @else
+                        <div class="flex items-center gap-4">
+                            <div class="text-2xl">📅</div>
+                            <div>
+                                <div class="text-lg font-semibold mb-1">Zmienne godziny pracy regulowane przez harmonogram</div>
+                            </div>
                         </div>
-                    </x-text-cell>
-                    <!--Czas w pracy-->
-                </x-container-gray>
-                @endif
-            </div>
+                        @endif
+                    </div>
+                    <div class="flex justify-start items-center w-full justify-start mt-2">
+                        @if($user->working_hours_regular)
+                        <div class="flex items-center gap-4">
+                            <div class="text-2xl">🕒</div>
+                            <div>
+                                <div class="text-lg font-semibold mb-1">
+                                    Od {{ \Carbon\Carbon::parse($user->working_hours_from)->format('H:i') }} do {{ \Carbon\Carbon::parse($user->working_hours_to)->format('H:i') }}
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </x-text-cell>
+            </x-container-gray>
+            @endif
             <div class="flex justify-end mt-4">
                 @if($role == 'admin' || $role == 'menedżer')
                 <x-button-link-cello href="{{route('team.user.edit', $user)}}" class="text-lg mr-2">

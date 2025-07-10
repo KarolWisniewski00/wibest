@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Calendar;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DateRequest;
 use App\Models\PlannedLeave;
 use App\Models\User;
 use App\Repositories\UserRepository;
@@ -95,5 +96,17 @@ class CalendarController extends Controller
             return redirect()->route('calendar.all.index')->with('success', 'Operacja się powiodła.');
         }
         return redirect()->back()->with('fail', 'Wystąpił błąd.');
+    }
+    /**
+     * Ustawia nową datę w filtrze zwraca urlop planowany.
+     *
+     * @param DateRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setDate(DateRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $users = $this->userService->getByRoleAddDatesAndLeavesByFilterDate($request);
+        return response()->json($users);
     }
 }

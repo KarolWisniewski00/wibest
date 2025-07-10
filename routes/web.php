@@ -140,6 +140,8 @@ Route::middleware([
         Route::prefix('team')->group(function () {
             Route::prefix('user')->group(function () {
                 Route::get('/', [TeamUserController::class, 'index'])->name('team.user.index');
+                Route::get('create', [TeamUserController::class, 'create'])->name('team.user.create');
+                Route::post('store/{user}', [TeamUserController::class, 'store'])->name('team.user.store');
                 Route::get('show/{user}', [TeamUserController::class, 'show'])->name('team.user.show');
                 Route::get('edit/{user}', [TeamUserController::class, 'edit'])->name('team.user.edit');
                 Route::put('update/{user}', [TeamUserController::class, 'update'])->name('team.user.update');

@@ -7,10 +7,11 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Vildanbina\LivewireWizard\Components\Step;
-
+use Livewire\Attributes\On;
 class LeaveDateStep extends Step
 {
     protected string $view = 'livewire.steps.leave-date-step';
+
 
     public function mount()
     {

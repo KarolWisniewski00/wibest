@@ -30,14 +30,22 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
+        $perPage = $request->input('per_page', 10);
         $userId = Auth::id();
         $companyId = $this->companyRepository->getCompanyId();
-        $users = $this->userRepository->getByAdmin();
+        $query = User::where('company_id', $companyId)->where('role', '!=', null);
+        $users = $query->paginate($perPage);
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         $userCount =  $this->userRepository->countByCompanyId($companyId);
 
         return view('admin.team.index', compact('users', 'userId', 'invitations'));
 
+    }
+    public function create()
+    {
+        $companyId = $this->companyRepository->getCompanyId();
+        $invitations = $this->invitationRepository->getByCompanyId($companyId);
+        return view('admin.team.create', compact('invitations'));
     }
     public function show(User $user)
     {

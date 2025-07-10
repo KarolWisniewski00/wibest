@@ -8,7 +8,7 @@ use App\Repositories\UserRepository;
 use App\Steps\PlannedLeaveDateStep;
 use App\Steps\UserStep;
 use Vildanbina\LivewireWizard\WizardComponent;
-
+use Livewire\Attributes\On;
 class PlannedLeaveWizard extends WizardComponent
 {
     public PlannedLeave $plannedLeave;
@@ -17,7 +17,19 @@ class PlannedLeaveWizard extends WizardComponent
         UserStep::class,
         PlannedLeaveDateStep::class
     ];
-
+    #[On('selectDate')]
+    public function handleCalendarDateSelected($selectedDate, $typeTime = 'start_time')
+    {
+        if ($typeTime === 'start_time') {
+            $this->mergeState([
+                'start_time' => $selectedDate,
+            ]);
+        } else {
+            $this->mergeState([
+                'end_time' => $selectedDate,
+            ]);
+        }
+    }
     public function model(): PlannedLeave
     {
         return new PlannedLeave();

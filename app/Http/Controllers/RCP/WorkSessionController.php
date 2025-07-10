@@ -126,6 +126,7 @@ class WorkSessionController extends Controller
     public function getWorkSession($user_id)
     {
         $latestWorkSession = WorkSession::where('user_id', $user_id)
+            ->where('status', 'W trakcie pracy')
             ->with('eventStart')
             ->orderByDesc(Event::select('time')->whereColumn('events.id', 'work_sessions.event_start_id'))
             ->first();
