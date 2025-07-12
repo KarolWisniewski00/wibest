@@ -86,14 +86,32 @@
                 @foreach ($week as $day)
                     <button
                     type="button"
+                    
+                        @if ($day['leave'] || $day['isHoliday'])
+                        x-data="{ clicked: false }"
+                        @click="
+                            $dispatch('calendar-unselect');
+                            clicked = true
+                        "
+                        @calendar-unselect.window="clicked = false"
+                        :class="clicked ? 'border-red-500 dark:border-red-500' : (
+                            '{{ $selectedDate === $day['date']->format('Y-m-d') ? ($day['leave'] || $day['isHoliday'] ? 'border-red-400 dark:border-red-500' : 'border-green-500 dark:border-green-400') : 'border-gray-200 dark:border-gray-800' }}'
+                        )"    
+                        @else
                         wire:click="selectDate('{{ $day['date']->format('Y-m-d') }}', '{{ $typeTime }}')"
                         wire:key="day-{{ $day['date']->format('Y-m-d') }}"
+                        @endif
+                        @click="
+                            $dispatch('calendar-unselect');
+                            clicked = true
+                        "
+                        @calendar-unselect.window="clicked = false"
                         class="
                             bg-white dark:bg-gray-900 h-28 w-full relative p-2 border-2 rounded-lg
                             flex flex-row items-start justify-start
                             @if ($selectedDate === $day['date']->format('Y-m-d'))
-                                @if ($day['leave'])
-                                    border-yellow-400 dark:border-yellow-500
+                                @if ($day['leave'] || $day['isHoliday'])
+                                    border-red-400 dark:border-red-500
                                 @else
                                     border-green-500 dark:border-green-400
                                 @endif
