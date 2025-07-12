@@ -194,7 +194,7 @@
         </x-flex-center>
         <!--CONTENT-->
         @php
-        $file = 'Zdarzenia_' . $company->name . '_' . date('d.m.Y', strtotime($startDate)) . '_' . date('d.m.Y', strtotime($endDate)) . '.xlsx';
+        $file = 'Zdarzenia_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
         @endphp
         <x-download :file="$file">
             {{ route('api.v1.rcp.event.export.xlsx') }}

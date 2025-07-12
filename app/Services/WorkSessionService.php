@@ -27,7 +27,7 @@ class WorkSessionService
             case 'admin':
                 return $workSessionRepository->paginateByAdminWithFilterDate(10, $startDate, $endDate);
                 break;
-            case 'memedżer':
+            case 'menedżer':
                 return $workSessionRepository->paginateByAdminWithFilterDate(10, $startDate, $endDate);
                 break;
             case 'kierownik':

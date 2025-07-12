@@ -9,7 +9,7 @@
                     <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                         <!-- Napis z przyciskiem tworzenia -->
                         <x-h1-display>
-                            Ustawienia
+                            Moja firma
                         </x-h1-display>
                         @if ($company)
                         <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8">

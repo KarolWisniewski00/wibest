@@ -24,7 +24,7 @@
                     </x-nav-link>
                     @endif
                     <x-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
-                        <i class="fa-solid fa-inbox mr-2"></i>Wnioski o urlop
+                        <i class="fa-solid fa-inbox mr-2"></i>Wnioski
                     </x-nav-link>
                     <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
                         <i class="fa-solid fa-clock mr-2"></i>RCP
@@ -33,7 +33,7 @@
                         <i class="fa-solid fa-chart-line mr-2"></i>Raporty
                     </x-nav-link>
                     <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
-                        <i class="fa-solid fa-gear"></i>
+                        <i class="fa-solid fa-gear mr-2"></i>Moja firma
                     </x-nav-link>
                 </div>
             </div>
@@ -209,7 +209,7 @@
             </x-responsive-nav-link>
             @endif
             <x-responsive-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
-                <i class="fa-solid fa-inbox mr-2"></i>Wnioski o urlop
+                <i class="fa-solid fa-inbox mr-2"></i>Wnioski
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
                 <i class="fa-solid fa-clock mr-2"></i>RCP
@@ -218,7 +218,7 @@
                 <i class="fa-solid fa-chart-line mr-2"></i>Raporty
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
-                <i class="fa-solid fa-gear mr-2"></i>Ustawienia
+                <i class="fa-solid fa-gear mr-2"></i>Moja firma
             </x-responsive-nav-link>
         </div>
 

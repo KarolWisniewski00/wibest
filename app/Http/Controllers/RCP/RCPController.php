@@ -193,7 +193,7 @@ class RCPController extends Controller
 
         return response()->json($sessions);
     }
-    public function export_xlsx(Request $request)
+    public function exportXlsx(Request $request)
     {
         $sessions = WorkSession::with(['user', 'eventStart', 'eventStop'])->whereIn('id', $request->ids)->get();
 

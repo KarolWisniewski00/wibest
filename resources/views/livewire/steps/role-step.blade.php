@@ -293,7 +293,7 @@
                     </label>
                 </li>
                 <li>
-                    <input name="role" wire:model="state.role" type="radio" id="role-supervisor" value="supervisor" class="hidden peer">
+                    <input name="role" wire:model="state.role" type="radio" id="role-supervisor" value="kierownik" class="hidden peer">
                     <label for="role-supervisor" class="h-full justify-between flex flex-col w-full p-5 text-gray-700 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-yellow-400 dark:peer-checked:border-yellow-400 hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700">
 
                         <!-- Nazwa roli Kierownik -->
@@ -440,7 +440,7 @@
                     </label>
                 </li>
                 <li>
-                    <input name="role" wire:model="state.role" type="radio" id="role-user" value="user" class="hidden peer">
+                    <input name="role" wire:model="state.role" type="radio" id="role-user" value="użytkownik" class="hidden peer">
                     <label for="role-user" class="h-full justify-between flex flex-col w-full p-5 text-gray-700 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-gray-400 dark:peer-checked:border-gray-400 hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700">
 
                         <!-- Nazwa roli Użytkownik -->

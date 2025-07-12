@@ -140,7 +140,7 @@
             </div>
         </x-flex-center>
         @php
-        $file = 'raport_lista_obecnosci_' . $company->name . '_' . date('d.m.Y', strtotime($startDate)) . '_' . date('d.m.Y', strtotime($endDate)) . '.xlsx';
+        $file = 'raport_lista_obecnosci_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
         @endphp
         <x-download :file="$file">
             {{ route('api.v1.raport.time-sheet.export.xlsx') }}

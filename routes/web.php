@@ -144,6 +144,7 @@ Route::middleware([
                 Route::post('store/{user}', [TeamUserController::class, 'store'])->name('team.user.store');
                 Route::get('show/{user}', [TeamUserController::class, 'show'])->name('team.user.show');
                 Route::get('edit/{user}', [TeamUserController::class, 'edit'])->name('team.user.edit');
+                Route::get('restart/{user}', [TeamUserController::class, 'restart'])->name('team.user.restart');
                 Route::put('update/{user}', [TeamUserController::class, 'update'])->name('team.user.update');
                 Route::post('disconnect/{user}', [TeamUserController::class, 'disconnect'])->name('team.user.disconnect');
             });

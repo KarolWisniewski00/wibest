@@ -132,14 +132,6 @@
                     @if($work_session->eventStart->location)
                     <!--Lokalizacja-->
                     <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 text-sm">
-                            Nazwa lokalizacji
-                        </p>
-                        <div class="flex justify-start items-center w-full">
-                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                {{ $work_session->eventStart->location->name ? $work_session->eventStart->location->name : '' }}
-                            </span>
-                        </div>
                         <div id="map" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
                     </x-text-cell>
                     <!--Lokalizacja-->
@@ -153,8 +145,6 @@
                             }).addTo(map);
 
                             L.marker([{{$work_session->eventStart->location->latitude}}, {{$work_session->eventStart->location->longitude}}]).addTo(map)
-                                .bindPopup('{{$work_session->eventStart->location->name}}')
-                                .openPopup();
                         });
                     </script>
                     @endif
@@ -196,14 +186,6 @@
                     @if($work_session->eventStop->location)
                     <!--Lokalizacja-->
                     <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 text-sm">
-                            Nazwa lokalizacji
-                        </p>
-                        <div class="flex justify-start items-center w-full">
-                            <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                Warszawa
-                            </span>
-                        </div>
                         <div id="map2" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
                     </x-text-cell>
                     <!--Lokalizacja-->
@@ -217,8 +199,6 @@
                             }).addTo(map2);
 
                             L.marker([{{$work_session->eventStop->location->latitude}}, {{$work_session->eventStop->location->longitude}}]).addTo(map2)
-                                .bindPopup('{{$work_session->eventStop->location->name}}')
-                                .openPopup();
                         });
                     </script>
                     @endif

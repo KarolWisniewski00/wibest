@@ -225,7 +225,7 @@
             </div>
         </x-flex-center>
         @php
-        $file = 'Użytkownicy_' . $company->name . '.xlsx';
+        $file = 'Użytkownicy_' . str_replace(' ', '_', $company->name) . '.xlsx';
         @endphp
         <x-download :file="$file">
             {{ route('api.v1.team.user.export.xlsx') }}

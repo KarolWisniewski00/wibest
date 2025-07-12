@@ -18,6 +18,18 @@ class UserRepository
             ->where('role', '!=', null)
             ->paginate(10);
     }
+        /**
+     * Zwraca użytkowników dla menadżera.
+     *
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
+    public function paginateByManager(): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        return User::where('company_id', Auth::user()->company_id)
+            ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
+            ->where('supervisor_id', '=', Auth::user()->supervisor_id)
+            ->paginate(10);
+    }
 
     /**
      * Zwraca użytkowników dla użytkownika.
@@ -41,7 +53,19 @@ class UserRepository
             ->where('role', '!=', null)
             ->get();
     }
-        /**
+    /**
+     * Zwraca użytkowników dla menadżera.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getByManager(): \Illuminate\Support\Collection
+    {
+        return User::where('company_id', Auth::user()->company_id)
+            ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
+            ->where('supervisor_id', '=', Auth::user()->supervisor_id)
+            ->get();
+    }
+    /**
      * Zwraca użytkowników z firmy.
      *
      * @return \Illuminate\Support\Collection

@@ -24,8 +24,8 @@ class UserService
             case 'admin':
                 return $userRepository->paginateByAdmin();
                 break;
-            case 'memedżer':
-                return $userRepository->paginateByAdmin();
+            case 'menedżer':
+                return $userRepository->paginateByManager();
                 break;
             case 'kierownik':
                 return $userRepository->paginateByUser();
@@ -52,8 +52,8 @@ class UserService
             case 'admin':
                 return $userRepository->getByAdmin();
                 break;
-            case 'memedżer':
-                return $userRepository->getByAdmin();
+            case 'menedżer':
+                return $userRepository->getByManager();
                 break;
             case 'kierownik':
                 return $userRepository->getByUser();

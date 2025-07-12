@@ -103,7 +103,7 @@ class EventController extends Controller
 
         return response()->json($event);
     }
-    public function export_xlsx(Request $request)
+    public function exportXlsx(Request $request)
     {
         $events = Event::with(['user'])->whereIn('id', $request->ids)->get();
 

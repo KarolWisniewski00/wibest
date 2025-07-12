@@ -4,14 +4,18 @@ namespace App\Http\Controllers\Team;
 
 use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
+use App\Mail\UserMail;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Repositories\InvitationRepository;
 use App\Repositories\CompanyRepository;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
 class UserController extends Controller
 {
     protected UserRepository $userRepository;
@@ -32,14 +36,32 @@ class UserController extends Controller
     {
         $perPage = $request->input('per_page', 10);
         $userId = Auth::id();
+        $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
-        $query = User::where('company_id', $companyId)->where('role', '!=', null);
+        if ($user->role === 'admin') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
+        } else if ($user->role === 'menadżer') {
+            $query = User::where('company_id', $companyId)
+                ->whereIn('role', ['kierownik', 'użytkownik', 'menadżer'])
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'kierownik') {
+            $query = User::where('company_id', $companyId)
+                ->whereIn('role', ['kierownik', 'użytkownik'])
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'użytkownik') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '=', 'użytkownik')
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
+        }
         $users = $query->paginate($perPage);
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         $userCount =  $this->userRepository->countByCompanyId($companyId);
 
         return view('admin.team.index', compact('users', 'userId', 'invitations'));
-
     }
     public function create()
     {
@@ -53,15 +75,49 @@ class UserController extends Controller
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         return view('admin.team.user', compact('user', 'invitations'));
     }
+    public function restart(User $user)
+    {
+
+        $password = Str::random(10);
+        $user->password = Hash::make($password);
+        $user->save();
+        $userMail = new UserMail($user, $password);
+        try {
+            Mail::to($user->email)->send($userMail);
+        } catch (Exception) {
+        }
+        $companyId = $this->companyRepository->getCompanyId();
+        $invitations = $this->invitationRepository->getByCompanyId($companyId);
+        return view('admin.team.user', compact('user', 'invitations'));
+    }
 
     public function get(Request $request)
     {
         $perPage = $request->input('per_page', 10);
+        $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
-        $query = User::where('company_id', $companyId)->where('role', '!=', null);
+        if ($user->role === 'admin') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
+        } else if ($user->role === 'menedżer') {
+            $query = User::where('company_id', $companyId)
+                ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'kierownik') {
+            $query = User::where('company_id', $companyId)
+                ->whereIn('role', ['kierownik', 'użytkownik'])
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'użytkownik') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '=', 'użytkownik')
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
+        }
 
         $users = $query->paginate($perPage);
-    
+
         return response()->json($users);
     }
     public function setRole(Request $request)
@@ -72,9 +128,27 @@ class UserController extends Controller
         ]);
 
         $request->session()->put('role_filter', $request->input('role_filter'));
-
+        $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
-        $query = User::where('company_id', $companyId);
+        if ($user->role === 'admin') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
+        } else if ($user->role === 'menadżer') {
+            $query = User::where('company_id', $companyId)
+                ->whereIn('role', ['kierownik', 'użytkownik', 'menadżer'])
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'kierownik') {
+            $query = User::where('company_id', $companyId)
+                ->whereIn('role', ['kierownik', 'użytkownik'])
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'użytkownik') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '=', 'użytkownik')
+                ->where('supervisor_id', '=', $user->supervisor_id);
+        } else {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
+        }
 
         if ($request->filled('role_filter')) {
             $query->whereIn('role', $request->input('role_filter'));
@@ -84,27 +158,28 @@ class UserController extends Controller
 
         return response()->json($users);
     }
-    public function export_xlsx(Request $request)
+    public function exportXlsx(Request $request)
     {
         $users = User::whereIn('id', $request->ids)->get();
 
         $data = collect([
             [
-            'Nazwa użytkownika' => 'Nazwa użytkownika',
-            'Rola' => 'Rola',
+                'Nazwa użytkownika' => 'Nazwa użytkownika',
+                'Rola' => 'Rola',
             ]
         ])->concat(
             $users->map(function ($user) {
-            return [
-                'Nazwa użytkownika' => (string) ($user->name ?? 'Brak danych'),
-                'Rola' => $user->role ?? 'Brak danych',
-            ];
+                return [
+                    'Nazwa użytkownika' => (string) ($user->name ?? 'Brak danych'),
+                    'Rola' => $user->role ?? 'Brak danych',
+                ];
             })
         );
 
         return Excel::download(new UsersExport($data), 'eksport_użytkowników.xlsx');
     }
-    public function disconnect(User $user){
+    public function disconnect(User $user)
+    {
         $user->company_id = null;
         $user->role = null;
         $user->save();

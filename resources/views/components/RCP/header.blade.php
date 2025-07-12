@@ -4,7 +4,7 @@
         {{ $slot }}
     </x-h1-display>
     <x-flex-center>
-        @if($role == 'admin')
+        @if($role == 'admin' || $role == 'menedżer')
         <x-button-link-green href="{{ route('rcp.work-session.create') }}" class="text-xs mx-2">
             <i class="fa-solid fa-plus mr-2"></i>Dodaj RCP
         </x-button-link-green>
