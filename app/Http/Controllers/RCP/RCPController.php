@@ -10,6 +10,7 @@ use App\Http\Requests\StoreWorkSessionRequest;
 use App\Services\FilterDateService;
 use App\Services\UserService;
 use App\Services\WorkSessionService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -112,17 +113,71 @@ class RCPController extends Controller
         return view('admin.rcp.show', compact('work_session'));
     }
     /**
-     * Usuwa sesję pracy.
+     * przesuwa stop, do startu dodaje liczbe godzin.
+     *
+     * @param WorkSession $work_session
+     * @return \Illuminate\View\View
+     */
+    public function startPlus(WorkSession $work_session): \Illuminate\View\View
+    {
+        $workingHours = (int) $work_session->user->working_hours_custom;
+        $newStop = \Carbon\Carbon::parse($work_session->eventStart->time)->addHours($workingHours);
+        $work_session->eventStop->time = $newStop;
+        $work_session->eventStop->save();
+        $timeInWork = Carbon::parse($work_session->eventStart->time)->diff(Carbon::parse($newStop))->format('%H:%I:%S');
+        $work_session->time_in_work = $timeInWork;
+        $work_session->save();
+        return view('admin.rcp.show', compact('work_session'));
+    }
+    /**
+     * przesuwa start, do stopu odejmuje liczbe godzin.
+     *
+     * @param WorkSession $work_session
+     * @return \Illuminate\View\View
+     */
+    public function stopMinus(WorkSession $work_session): \Illuminate\View\View
+    {
+        $workingHours = (int) $work_session->user->working_hours_custom;
+        $newStart = \Carbon\Carbon::parse($work_session->eventStop->time)->subHours($workingHours);
+        $work_session->eventStart->time = $newStart;
+        $work_session->eventStart->save();
+        $timeInWork = Carbon::parse($newStart)->diff(Carbon::parse($work_session->eventStop->time))->format('%H:%I:%S');
+        $work_session->time_in_work = $timeInWork;
+        $work_session->save();
+        return view('admin.rcp.show', compact('work_session'));
+    }
+    /**
+     * Usuwa sesję pracy wraz z powiązanymi eventami i lokalizacjami eventów.
      *
      * @param WorkSession $work_session
      * @return \Illuminate\Http\RedirectResponse
      */
     public function delete(WorkSession $work_session): \Illuminate\Http\RedirectResponse
     {
-        if ($work_session->delete()) {
+        try {
+            // Usuń lokalizacje eventów powiązane z eventStart i eventStop
+            if ($work_session->eventStart && $work_session->eventStart->location) {
+                $work_session->eventStart->location->delete();
+            }
+            if ($work_session->eventStop && $work_session->eventStop->location) {
+                $work_session->eventStop->location->delete();
+            }
+
+            // Usuń eventStart i eventStop
+            if ($work_session->eventStart) {
+                $work_session->eventStart->delete();
+            }
+            if ($work_session->eventStop) {
+                $work_session->eventStop->delete();
+            }
+
+            // Usuń sesję pracy
+            $work_session->delete();
+
             return redirect()->route('rcp.work-session.index')->with('success', 'Operacja się powiodła.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('fail', 'Wystąpił błąd.');
         }
-        return redirect()->back()->with('fail', 'Wystąpił błąd.');
     }
     public function get(Request $request)
     {

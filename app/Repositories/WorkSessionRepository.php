@@ -223,4 +223,107 @@ class WorkSessionRepository
         }
         return $total;
     }
+    /**
+     * Zwraca sume czasu nadgodzin pracy z dnia
+     */
+    public function getTotalOfDayExtra(int $userId, string $date): int
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        $user = User::findOrFail($userId);
+        $workingSeconds = (int)$user->working_hours_custom * 3600;
+
+        $workSessions = WorkSession::where('user_id', $userId)
+            ->where('status', 'Praca zakończona')
+            ->whereHas('eventStart', function ($query) use ($formattedDate) {
+                $query->whereDate('time', $formattedDate);
+            })->get();
+
+        $total = 0;
+        foreach ($workSessions as $value) {
+            list($hours, $minutes, $seconds) = explode(':', $value->time_in_work);
+            $sessionSeconds = ((int)$hours * 3600) + ((int)$minutes * 60) + (int)$seconds;
+            $total += $sessionSeconds;
+        }
+
+        $extra = $total - $workingSeconds;
+        return $extra > 0 ? $extra : 0;
+    }
+    /**
+     * Zwraca sumę czasu niedogodzin pracy z dnia (brak normy).
+     */
+    public function getTotalOfDayUnder(int $userId, string $date): int
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        $user = User::findOrFail($userId);
+        $workingSeconds = (int)$user->working_hours_custom * 3600;
+
+        $workSessions = WorkSession::where('user_id', $userId)
+            ->where('status', 'Praca zakończona')
+            ->whereHas('eventStart', function ($query) use ($formattedDate) {
+                $query->whereDate('time', $formattedDate);
+            })->get();
+
+        $total = 0;
+        foreach ($workSessions as $value) {
+            list($hours, $minutes, $seconds) = explode(':', $value->time_in_work);
+            $sessionSeconds = ((int)$hours * 3600) + ((int)$minutes * 60) + (int)$seconds;
+            $total += $sessionSeconds;
+        }
+
+        if ($workingSeconds > $total) {
+            if ($workingSeconds - $total != $workingSeconds) {
+                return $workingSeconds - $total;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    }
+    /**
+     * Zwraca sumę czasu niedogodzin pracy z dnia (brak normy).
+     */
+    public function getTotalOfDayPlanned(int $userId, string $date): int
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        $user = User::findOrFail($userId);
+
+        // Mapowanie polskich dni na numery ISO (1 = pon, 7 = niedziela)
+        $daysMap = [
+            'poniedziałek' => 1,
+            'wtorek'       => 2,
+            'środa'        => 3,
+            'czwartek'     => 4,
+            'piątek'       => 5,
+            'sobota'       => 6,
+            'niedziela'    => 7,
+        ];
+
+        $startDay = $daysMap[$user->working_hours_start_day] ?? null;
+        $stopDay = $daysMap[$user->working_hours_stop_day] ?? null;
+
+        if (!$startDay || !$stopDay) {
+            // Niepoprawne dane w bazie
+            return 0;
+        }
+
+        $dateDay = Carbon::parse($formattedDate)->dayOfWeekIso;
+
+        // Sprawdzamy przedział (przechodzący lub nie przez koniec tygodnia)
+        if ($startDay <= $stopDay) {
+            // np. Poniedziałek - Piątek
+            $isInRange = ($dateDay >= $startDay && $dateDay <= $stopDay);
+        } else {
+            // przedział przechodzi przez koniec tygodnia, np. Piątek - Wtorek
+            $isInRange = ($dateDay >= $startDay || $dateDay <= $stopDay);
+        }
+
+        if ($isInRange) {
+            return (int)$user->working_hours_custom * 3600;
+        }
+
+        return 0;
+    }
 }

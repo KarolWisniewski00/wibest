@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Route;
 */
 //TODO:
 // dodać mobilke w datefilter dla wniosków o urlop
+// dokończyć raporty
 //NOT LOGGED IN
 Route::get('/', function () {
     return view('welcome');
@@ -208,6 +209,8 @@ Route::middleware([
                 Route::get('/', [RCPController::class, 'index'])->name('rcp.work-session.index');
                 Route::get('/create', [RCPController::class, 'create'])->name('rcp.work-session.create');
                 Route::post('/store', [RCPController::class, 'store'])->name('rcp.work-session.store');
+                Route::get('/start/plus/{work_session}', [RCPController::class, 'startPlus'])->name('rcp.work-session.start.plus');
+                Route::get('/stop/minus/{work_session}', [RCPController::class, 'stopMinus'])->name('rcp.work-session.stop.minus');
                 Route::get('/edit/{work_session}', [RCPController::class, 'edit'])->name('rcp.work-session.edit');
                 Route::put('/update/{work_session}', [RCPController::class, 'update'])->name('rcp.work-session.update');
                 Route::get('/show/{work_session}', [RCPController::class, 'show'])->name('rcp.work-session.show');

@@ -7,7 +7,7 @@
             <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
                 Podgląd elementu RCP w którego skład wchodzą dwa mniejsze zdarzenia START i STOP.
             </div>
-            @if($role == 'admin')
+            @if($role == 'admin' || $role == 'menedżer')
             @if($work_session->status != 'Praca zakończona')
             <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
                 <span class="font-medium">Ostrzeżenie!</span> Edycja nie jest możliwa, ponieważ sesja pracy jeszcze nie została zakończona.
@@ -29,9 +29,9 @@
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
             </x-button-link-back>
             <!--POWRÓT-->
-            <x-container-gray class="px-0">
+            <x-container-gray class="px-0 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                 <!--status-->
-                <x-text-cell class="mx-2">
+                <x-text-cell class="mx-4 gap-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm mx-2">
                         Status
                     </p>
@@ -40,21 +40,42 @@
                     </div>
                 </x-text-cell>
                 <!--status-->
+                @if($work_session->time_in_work == '24:00:00' && $work_session->user->working_hours_from && $work_session->user->working_hours_to && $work_session->user->working_hours_start_day && $work_session->user->working_hours_stop_day)
+                <x-text-cell class="mx-4 gap-4 row-span-3">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                        Przesuń czas
+                    </p>
+                    <div class="flex flex-col items-start w-full justify-start gap-2">
+                        <x-button-link-green href="{{ route('rcp.work-session.start.plus', $work_session) }}">
+                            <i class="fa-solid fa-clock mr-2"></i>start + {{$work_session->user->working_hours_custom}}h
+                        </x-button-link-green>
+                        <x-button-link-red href="{{ route('rcp.work-session.stop.minus', $work_session) }}">
+                            <i class="fa-solid fa-clock mr-2"></i>stop - {{$work_session->user->working_hours_custom}}h
+                        </x-button-link-red>
+                    </div>
+                </x-text-cell>
+                @else
+                <x-text-cell class="mx-4 gap-4 row-span-3 hidden md:flex">
+                </x-text-cell>
+                @endif
                 <!--Czas w pracy-->
-                <x-text-cell class="mx-4">
+                <x-text-cell class="mx-4 gap-4 hidden md:flex">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
                         Czas w pracy
                     </p>
                     <div class="flex justify-start items-center w-full justify-start">
                         <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            @if($work_session->time_in_work == '24:00:00')
+                            <span title="Automatyczne zakończenie" class="text-red-500">⚠️</span>
+                            @endif
                             {{ $work_session->time_in_work }}
                         </span>
                     </div>
                 </x-text-cell>
                 <!--Czas w pracy-->
-                @if($role == 'admin')
+                @if($role == 'admin' || $role == 'menedżer')
                 <!--Użytkownik-->
-                <x-text-cell class="mx-4">
+                <x-text-cell class="mx-4 gap-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
                         Użytkownik
                     </p>
@@ -95,7 +116,7 @@
                 @if($work_session->eventStart != null)
                 <x-container-gray class="px-0">
                     <!--status-->
-                    <x-text-cell class="mx-4">
+                    <x-text-cell class="mx-4 gap-4">
                         <p class="text-gray-700 dark:text-gray-300 test-sm">
                             Zdarzenie
                         </p>
@@ -114,7 +135,7 @@
                     </x-text-cell>
                     <!--status-->
                     <!--Czas w pracy-->
-                    <x-text-cell class="mx-4">
+                    <x-text-cell class="mx-4 gap-4">
                         <p class="text-gray-700 dark:text-gray-300 test-sm">
                             Czas
                         </p>
@@ -131,7 +152,7 @@
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                     @if($work_session->eventStart->location)
                     <!--Lokalizacja-->
-                    <x-text-cell class="mx-4">
+                    <x-text-cell class="mx-4 gap-4">
                         <div id="map" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
                     </x-text-cell>
                     <!--Lokalizacja-->
@@ -153,7 +174,7 @@
                 @if($work_session->eventStop != null)
                 <x-container-gray class="px-0">
                     <!--status-->
-                    <x-text-cell class="mx-4">
+                    <x-text-cell class="mx-4 gap-4">
                         <p class="text-gray-700 dark:text-gray-300 test-sm">
                             Zdarzenie
                         </p>
@@ -172,7 +193,7 @@
                     </x-text-cell>
                     <!--status-->
                     <!--Czas w pracy-->
-                    <x-text-cell class="mx-4">
+                    <x-text-cell class="mx-4 gap-4">
                         <p class="text-gray-700 dark:text-gray-300 test-sm">
                             Czas
                         </p>
@@ -185,7 +206,7 @@
                     <!--Czas w pracy-->
                     @if($work_session->eventStop->location)
                     <!--Lokalizacja-->
-                    <x-text-cell class="mx-4">
+                    <x-text-cell class="mx-4 gap-4">
                         <div id="map2" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
                     </x-text-cell>
                     <!--Lokalizacja-->
@@ -206,7 +227,7 @@
                 @endif
             </div>
             <div class="flex justify-end mt-4">
-                @if($role == 'admin')
+                @if($role == 'admin' || $role == 'menedżer')
                 @if($work_session->status == 'Praca zakończona')
                 <x-button-link-cello href="{{route('rcp.work-session.edit', $work_session)}}" class="text-lg mr-2">
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja

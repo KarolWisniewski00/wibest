@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nowe Konto</title>
+    <title>Nowe Hasło</title>
     <style>
         body {
             font-family: 'Lato', Tahoma, Verdana, Segoe, sans-serif;
@@ -146,11 +146,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Nowe konto</h1>
+            <h1>Nowe Hasło</h1>
         </div>
 
         <div class="invoice-details" style="text-align: center;">
-            <h2>{{ $user->name }}, stworzyliśmy dla Ciebie konto, niżej przesyłamy hasło do pierwszego logowania. Zmień je po pierwszym logowaniu aby zachować bezpieczeństwo</h2>
+            <h2>{{ $user->name }}, stworzyliśmy dla Ciebie nowe hasło. Zmień je po pierwszym logowaniu aby zachować bezpieczeństwo</h2>
             <p style="font-weight: bold;">{{ $password }}</p>
         </div>
 

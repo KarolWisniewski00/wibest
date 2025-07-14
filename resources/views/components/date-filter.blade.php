@@ -224,11 +224,30 @@
                                                 ? `<x-status-green>${session.status}</x-status-green>` 
                                                 : ''}
                                     </td>
-                                    <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
-                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                            ${session.time_in_work ?? '-'}
-                                        </x-paragraf-display>
-                                    </td>
+                                <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
+                                    ${session.event_start && session.event_start.location_id
+                                    ? `<x-status-green>
+                                        <i class="fa-solid fa-location-dot mx-1"></i>
+                                    </x-status-green>`
+                                    : ''}
+                                    ${session.event_stop && session.event_stop.location_id
+                                    ? `<x-status-red>
+                                        <i class="fa-solid fa-location-dot mx-1"></i>
+                                    </x-status-red>`
+                                    : ''}
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start relative">
+                                        ${session.status === 'Praca zakończona'
+                                        ?
+                                        `${session.time_in_work}
+                                        ${session.time_in_work == '24:00:00'
+                                        ?
+                                        `<span title="Automatyczne zakończenie" class="text-red-500 absolute left-0 -ml-8">⚠️</span>`
+                                        : ''}`
+                                        : ''}
+                                    </x-paragraf-display>
+                                </td>
                                     <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
                                         <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                             <span class="text-gray-400">
@@ -1053,15 +1072,42 @@
                                         </div>
                                     </td>
                                     <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            <span class="text-gray-400">
+                                                ${user.time_in_work_hms_planned != '00h 00min 00s'
+                                                ? user.time_in_work_hms_planned
+                                                : ``
+                                                }
+                                            </span>
+                                        </x-paragraf-display>
                                     </td>
                                     <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                         <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                             <span class="text-gray-400">
-                                            ${user.time_in_work_hms != '00h 00min 00s'
-                                            ? user.time_in_work_hms
-                                            : ``
-                                            }
+                                                ${user.time_in_work_hms != '00h 00min 00s'
+                                                ? user.time_in_work_hms
+                                                : ``
+                                                }
+                                            </span>
+                                        </x-paragraf-display>
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            <span class="text-gray-400">
+                                                ${user.time_in_work_hms_extra != '00h 00min 00s'
+                                                ? user.time_in_work_hms_extra
+                                                : ``
+                                                }
+                                            </span>
+                                        </x-paragraf-display>
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            <span class="text-gray-400">
+                                                ${user.time_in_work_hms_under != '00h 00min 00s'
+                                                ? user.time_in_work_hms_under
+                                                : ``
+                                                }
                                             </span>
                                         </x-paragraf-display>
                                     </td>

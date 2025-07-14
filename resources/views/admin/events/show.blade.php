@@ -7,7 +7,7 @@
             <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
                 Podgląd elementu zdarzenia START lub STOP który jest częścią elementu RCP
             </div>
-            @if($role == 'admin')
+            @if($role == 'admin' || $role == 'menedżer')
             <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
                 <span class="font-medium">Ostrzeżenie!</span> Usunięcie zdarzenia START lub STOP spowoduje usunięcie całego RCP.
             </div>
@@ -60,7 +60,7 @@
                     </div>
                 </x-text-cell>
                 <!--Czas w pracy-->
-                                @if($role == 'admin')
+                @if($role == 'admin' || $role == 'menedżer')
                 <!--Użytkownik-->
                 <x-text-cell class="mx-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
@@ -125,16 +125,14 @@
                             attribution: '© OpenStreetMap contributors'
                         }).addTo(map);
 
-                        L.marker([{{$event->location->latitude}}, {{$event->location->longitude}}]).addTo(map)
-                            .bindPopup('{{ $event->location->name }}')
-                            .openPopup();
+                        L.marker([{{$event->location->latitude}}, {{$event->location->longitude}}]).addTo(map);
                     });
                 </script>
                 @endif
             </x-container-gray>
 
             <div class="flex justify-end mt-4">
-                @if($role == 'admin')
+                @if($role == 'admin' || $role == 'menedżer')
                 <form action="{{route('rcp.event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                     @csrf
                     @method('DELETE')

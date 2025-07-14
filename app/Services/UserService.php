@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\LeaveRepository;
 use App\Repositories\WorkSessionRepository;
 use App\Repositories\UserRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -133,9 +134,9 @@ class UserService
 
                 if ($status) {
                     $userDates[$date] = "in_progress";
-                }elseif ($leave) {
+                } elseif ($leave) {
                     $userDates[$date] = "planned_leave";
-                }else{
+                } else {
                     $userDates[$date] = null;
                 }
             }
@@ -166,9 +167,9 @@ class UserService
 
                 if ($status) {
                     $userDates[$date] = "in_progress";
-                }elseif ($leave) {
+                } elseif ($leave) {
                     $userDates[$date] = "planned_leave";
-                }else{
+                } else {
                     $userDates[$date] = null;
                 }
             }
@@ -191,15 +192,42 @@ class UserService
 
         foreach ($users as &$user) {
             $user->time_in_work = 0;
+            $user->time_in_work_extra = 0;
+            $user->time_in_work_under = 0;
+            $user->time_in_work_planned = 0;
             $user->time_in_work_hms = '';
+            $user->time_in_work_hms_extra = '';
+            $user->time_in_work_hms_under = '';
+            $user->time_in_work_hms_planned = '';
             foreach ($dates as $date) {
                 $totalDay = $workSessionRepository->getTotalOfDay($user->id, $date);
+                $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
+                $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($user->id, $date);
+                $totalDayPlanned = $workSessionRepository->getTotalOfDayPlanned($user->id, $date);
                 $user->time_in_work += $totalDay;
+                $user->time_in_work_extra += $totalDayExtra;
+                $user->time_in_work_under += $totalDayUnder;
+                $user->time_in_work_planned += $totalDayPlanned;
             }
             $hours = floor($user->time_in_work / 3600);
             $minutes = floor(($user->time_in_work % 3600) / 60);
             $seconds = $user->time_in_work % 60;
             $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
+
+            $hoursExtra = floor($user->time_in_work_extra / 3600);
+            $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
+            $secondsExtra = $user->time_in_work_extra % 60;
+            $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+
+            $hoursUnder = floor($user->time_in_work_under / 3600);
+            $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
+            $secondsUnder = $user->time_in_work_under % 60;
+            $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+
+            $hoursPlanned = floor($user->time_in_work_planned / 3600);
+            $minutesPlanned = floor(($user->time_in_work_planned % 3600) / 60);
+            $secondsPlanned = $user->time_in_work_planned % 60;
+            $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
         }
         return $users;
     }
@@ -217,15 +245,42 @@ class UserService
 
         foreach ($users as &$user) {
             $user->time_in_work = 0;
+            $user->time_in_work_extra = 0;
+            $user->time_in_work_under = 0;
+            $user->time_in_work_planned = 0;
             $user->time_in_work_hms = '';
+            $user->time_in_work_hms_extra = '';
+            $user->time_in_work_hms_under = '';
+            $user->time_in_work_hms_planned = '';
             foreach ($dates as $date) {
                 $totalDay = $workSessionRepository->getTotalOfDay($user->id, $date);
+                $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
+                $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($user->id, $date);
+                $totalDayPlanned = $workSessionRepository->getTotalOfDayPlanned($user->id, $date);
                 $user->time_in_work += $totalDay;
+                $user->time_in_work_extra += $totalDayExtra;
+                $user->time_in_work_under += $totalDayUnder;
+                $user->time_in_work_planned += $totalDayPlanned;
             }
             $hours = floor($user->time_in_work / 3600);
             $minutes = floor(($user->time_in_work % 3600) / 60);
             $seconds = $user->time_in_work % 60;
             $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
+
+            $hoursExtra = floor($user->time_in_work_extra / 3600);
+            $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
+            $secondsExtra = $user->time_in_work_extra % 60;
+            $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+
+            $hoursUnder = floor($user->time_in_work_under / 3600);
+            $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
+            $secondsUnder = $user->time_in_work_under % 60;
+            $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+
+            $hoursPlanned = floor($user->time_in_work_planned / 3600);
+            $minutesPlanned = floor(($user->time_in_work_planned % 3600) / 60);
+            $secondsPlanned = $user->time_in_work_planned % 60;
+            $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
         }
         return $users;
     }

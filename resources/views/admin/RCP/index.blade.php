@@ -36,7 +36,24 @@
                                     </div>
                                 </div>
                                 <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                    @if(isset($work_session->eventStart))
+                                    @if($work_session->eventStart->location_id)
+                                    <x-status-green>
+                                        <i class="fa-solid fa-location-dot mx-1"></i>
+                                    </x-status-green>
+                                    @endif
+                                    @endif
+                                    @if(isset($work_session->eventStop))
+                                    @if($work_session->eventStop->location_id)
+                                    <x-status-red>
+                                        <i class="fa-solid fa-location-dot mx-1"></i>
+                                    </x-status-red>
+                                    @endif
+                                    @endif
                                     @if($work_session->status == 'Praca zakończona')
+                                    @if($work_session->time_in_work == '24:00:00')
+                                    <span title="Automatyczne zakończenie" class="text-red-500">⚠️</span>
+                                    @endif
                                     {{ $work_session->time_in_work }},
                                     <span class="text-xs text-gray-400">
                                         @if ($work_session->eventStart->isSameDay($work_session->eventStop->time))
@@ -122,6 +139,9 @@
                                 Status
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
+                                Lokalizacja
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
                                 Czas w pracy
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
@@ -184,8 +204,27 @@
                                 <x-RCP.work-session-status :work_session="$work_session" class="text-xs" />
                             </td>
                             <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
-                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                @if(isset($work_session->eventStart))
+                                @if($work_session->eventStart->location_id)
+                                <x-status-green>
+                                    <i class="fa-solid fa-location-dot mx-1"></i>
+                                </x-status-green>
+                                @endif
+                                @endif
+                                @if(isset($work_session->eventStop))
+                                @if($work_session->eventStop->location_id)
+                                <x-status-red>
+                                    <i class="fa-solid fa-location-dot mx-1"></i>
+                                </x-status-red>
+                                @endif
+                                @endif
+                            </td>
+                            <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
+                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start relative">
                                     @if($work_session->status == 'Praca zakończona')
+                                    @if($work_session->time_in_work == '24:00:00')
+                                    <span title="Automatyczne zakończenie" class="text-red-500 absolute left-0 -ml-8">⚠️</span>
+                                    @endif
                                     {{ $work_session->time_in_work }}
                                     @endif
                                 </x-paragraf-display>
@@ -323,9 +362,28 @@
                                             ? `<x-status-green>${session.status}</x-status-green>` 
                                             : ''}
                                 </td>
-                                <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
-                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                        ${session.time_in_work ?? '-'}
+                                <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
+                                    ${session.event_start && session.event_start.location_id
+                                    ? `<x-status-green>
+                                        <i class="fa-solid fa-location-dot mx-1"></i>
+                                    </x-status-green>`
+                                    : ''}
+                                    ${session.event_stop && session.event_stop.location_id
+                                    ? `<x-status-red>
+                                        <i class="fa-solid fa-location-dot mx-1"></i>
+                                    </x-status-red>`
+                                    : ''}
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start relative">
+                                        ${session.status === 'Praca zakończona'
+                                        ?
+                                        `${session.time_in_work}
+                                        ${session.time_in_work == '24:00:00'
+                                        ?
+                                        `<span title="Automatyczne zakończenie" class="text-red-500 absolute left-0 -ml-8">⚠️</span>`
+                                        : ''}`
+                                        : ''}
                                     </x-paragraf-display>
                                 </td>
                                 <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
@@ -350,8 +408,24 @@
                                                     : ''}
                                             </div>
                                         </div>
+                                        ${session.event_start && session.event_start.location_id
+                                        ? `<x-status-green>
+                                            <i class="fa-solid fa-location-dot mx-1"></i>
+                                        </x-status-green>`
+                                        : ''}
+                                        ${session.event_stop && session.event_stop.location_id
+                                        ? `<x-status-red>
+                                            <i class="fa-solid fa-location-dot mx-1"></i>
+                                        </x-status-red>`
+                                        : ''}
                                         <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
-                                            ${session.time_in_work ?? '-'},
+                                            ${session.status === 'Praca zakończona'
+                                            ?
+                                            `${session.time_in_work == '24:00:00'
+                                            ?
+                                            `<span title="Automatyczne zakończenie" class="text-red-500">⚠️</span>`
+                                            : ''}${session.time_in_work},`
+                                            : ''},
                                             <span class="text-xs text-gray-400">
                                                 ${resultText ?? '-'}
                                             </span>

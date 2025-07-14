@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Team;
 
 use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordMail;
 use App\Mail\UserMail;
 use App\Models\User;
 use App\Repositories\UserRepository;
@@ -81,7 +82,7 @@ class UserController extends Controller
         $password = Str::random(10);
         $user->password = Hash::make($password);
         $user->save();
-        $userMail = new UserMail($user, $password);
+        $userMail = new PasswordMail($user, $password);
         try {
             Mail::to($user->email)->send($userMail);
         } catch (Exception) {

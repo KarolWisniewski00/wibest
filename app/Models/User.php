@@ -43,6 +43,8 @@ class User extends Authenticatable
         'working_hours_custom',
         'working_hours_from',
         'working_hours_to',
+        'working_hours_start_day',
+        'working_hours_stop_day',
     ];
 
     /**
