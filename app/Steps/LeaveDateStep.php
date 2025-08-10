@@ -48,7 +48,7 @@ class LeaveDateStep extends Step
         return [
             [
                 'state.start_time'     => ['required', 'date'],
-                'state.end_time'     => ['required', 'date', 'after_or_equal:today', 'after_or_equal:start_date'],
+                'state.end_time'     => ['required', 'date', 'after_or_equal:start_date'],
             ],
             [],
             [

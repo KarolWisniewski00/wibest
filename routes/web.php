@@ -95,12 +95,12 @@ Route::prefix('api')->group(function () {
             Route::prefix('time-sheet')->group(function () {
                 Route::get('/', [TimeSheetController::class, 'get'])->name('api.v1.raport.time-sheet.get');
                 Route::get('set-date/', [TimeSheetController::class, 'setDate'])->name('api.v1.raport.time-sheet.set.date');
-                Route::post('/export-xlsx', [TimeSheetController::class, 'exportXlsx'])->name('api.v1.raport.time-sheet.export.xlsx');
+                Route::post('/export-xlsx', [TimeSheetController::class, 'exportPdf'])->name('api.v1.raport.time-sheet.export.xlsx');
             });
             Route::prefix('attendance-sheet')->group(function () {
                 Route::get('/', [AttendanceSheetController::class, 'get'])->name('api.v1.raport.attendance-sheet.get');
                 Route::get('set-date/', [AttendanceSheetController::class, 'setDate'])->name('api.v1.raport.attendance-sheet.set.date');
-                Route::post('/export-xlsx', [AttendanceSheetController::class, 'exportXlsx'])->name('api.v1.raport.attendance-sheet.export.xlsx');
+                Route::post('/export-xlsx', [AttendanceSheetController::class, 'exportPdf'])->name('api.v1.raport.attendance-sheet.export.xlsx');
             });
         });
         Route::prefix('calendar')->group(function () {

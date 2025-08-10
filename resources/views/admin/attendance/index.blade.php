@@ -24,9 +24,7 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                         <tr id="table-head">
                             <th scope="col" class="px-2 py-3 hidden lg:table-cell">
-                                <x-flex-center>
-                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
+
                             </th>
                             <th scope="col" class="px-2 py-3">
                                 Zdjęcie
@@ -62,7 +60,7 @@
                         <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                             <td class="px-2 py-2 hidden lg:table-cell">
                                 <x-flex-center>
-                                    <input data-id="{{$user->id}}" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <input data-id="{{$user->id}}" name="radio" type="radio" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 </x-flex-center>
                             </td>
                             <td class="px-3 py-2 flex items-center justify-center">
@@ -141,6 +139,12 @@
                 </table>
             </div>
         </x-flex-center>
+        @php
+        $file = 'ewidencja_czasu_pracy' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
+        @endphp
+        <x-download-pdf :file="$file">
+            {{ route('api.v1.raport.attendance-sheet.export.xlsx') }}
+        </x-download-pdf>
         <input type="hidden" id="start_date" value="{{ $startDate }}">
         <input type="hidden" id="end_date" value="{{ $endDate }}">
         <script>
@@ -165,9 +169,9 @@
                             const end = new Date(endDate);
                             const row = `
                             <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                <td class="px-3 py-2">
+                                <td class="px-2 py-2 hidden lg:table-cell">
                                     <x-flex-center>
-                                        <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
+                                        <input name="radio" type="radio" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
                                     </x-flex-center>
                                 </td>
                                 <td class="px-3 py-2  flex items-center justify-center">

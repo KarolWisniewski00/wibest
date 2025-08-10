@@ -142,9 +142,9 @@
         @php
         $file = 'raport_lista_obecnosci_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
         @endphp
-        <x-download :file="$file">
+        <x-download-pdf :file="$file">
             {{ route('api.v1.raport.time-sheet.export.xlsx') }}
-        </x-download>
+        </x-download-pdf>
         <input type="hidden" id="start_date" value="{{ $startDate }}">
         <input type="hidden" id="end_date" value="{{ $endDate }}">
         <script>

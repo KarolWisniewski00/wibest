@@ -131,6 +131,7 @@
                 @if(Str::startsWith(request()->path(), 'dashboard/rcp/work-session'))
 
                 function ajaxFilter() {
+                    
                     const $tbody = $('#work-sessions-body');
                     var resultText = "";
 
@@ -259,6 +260,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
+                            
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -277,6 +279,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/rcp/event'))
 
                 function ajaxFilter() {
+                    
                     const $tbody = $('#work-sessions-body');
                     $.ajax({
                         url: `{{ route('api.v1.rcp.event.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -344,6 +347,7 @@
                             </tr>`;
                                 $tbody.append(row);
                             });
+                            
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -362,6 +366,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/leave/single'))
 
                 function ajaxFilter() {
+                    
                     const $tbody = $('#work-sessions-body');
                     $.ajax({
                         url: `{{ route('api.v1.leave.single.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -525,6 +530,7 @@
                             </tr>`;
                                 $tbody.append(row);
                             });
+                            
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -543,6 +549,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/leave/pending-review'))
 
                 function ajaxFilter() {
+                    
                     const $tbody = $('#work-sessions-body');
                     $.ajax({
                         url: `{{ route('api.v1.leave.pending.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -716,6 +723,7 @@
                             </tr>`;
                                 $tbody.append(row);
                             });
+                            
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -734,6 +742,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/calendar/all'))
 
                 function ajaxFilter() {
+                    
                     const $tbody = $('#work-sessions-body');
                     const $thead = $('#table-head');
                     $.ajax({
@@ -838,6 +847,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
+                            
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -856,6 +866,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/raport/time-sheet'))
 
                 function ajaxFilter() {
+                    
                     const $tbody = $('#work-sessions-body');
                     const $thead = $('#table-head');
                     $.ajax({
@@ -996,6 +1007,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
+                            
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -1014,6 +1026,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/raport/attendance-sheet'))
 
                 function ajaxFilter() {
+                    
                     const $tbody = $('#work-sessions-body');
                     const $thead = $('#table-head');
                     $.ajax({
@@ -1114,6 +1127,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
+                            
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
