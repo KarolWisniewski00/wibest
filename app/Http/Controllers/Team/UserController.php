@@ -17,6 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+
 class UserController extends Controller
 {
     protected UserRepository $userRepository;
@@ -192,7 +193,31 @@ class UserController extends Controller
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         return view('admin.team.edit', compact('user', 'invitations'));
     }
+    public function planing(User $user)
+    {
+        $companyId = $this->companyRepository->getCompanyId();
+        $invitations = $this->invitationRepository->getByCompanyId($companyId);
+        return view('admin.team.planing', compact('user', 'invitations'));
+    }
+    public function update_planing(Request $request, User $user)
+    {
+        $request->validate([
+            'working_hours_custom' => 'nullable',
+            'working_hours_from' => 'nullable',
+            'working_hours_to' => 'nullable',
+            'working_hours_start_day' => 'nullable',
+            'working_hours_stop_day' => 'nullable',
+        ]);
 
+        $user->working_hours_custom = $request->input('working_hours_custom');
+        $user->working_hours_from = $request->input('working_hours_from');
+        $user->working_hours_to = $request->input('working_hours_to');
+        $user->working_hours_start_day = $request->input('working_hours_start_day');
+        $user->working_hours_stop_day = $request->input('working_hours_stop_day');
+        $user->save();
+
+        return redirect()->route('team.user.show', $user)->with('success', 'Planing zostały zaktualizowane.');
+    }
     public function update(Request $request, User $user)
     {
         $request->validate([

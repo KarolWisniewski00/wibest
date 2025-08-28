@@ -214,6 +214,9 @@
             </div>
             <div class="flex justify-end mt-4">
                 @if($role == 'admin' || $role == 'menedżer')
+                <x-button-link-orange href="{{route('team.user.planing', $user)}}" class="text-lg mr-2">
+                    Edytuj planning
+                </x-button-link-orange>
                 <x-button-link-orange href="{{route('team.user.restart', $user)}}" class="text-lg mr-2">
                     <i class="fa-solid fa-paper-plane mr-2"></i>Reset hasła
                 </x-button-link-orange>
