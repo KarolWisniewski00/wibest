@@ -210,8 +210,16 @@ class UserController extends Controller
         ]);
 
         $user->working_hours_custom = $request->input('working_hours_custom');
-        $user->working_hours_from = $request->input('working_hours_from');
-        $user->working_hours_to = $request->input('working_hours_to');
+        // konwersja z formatu HTML datetime-local (2025-08-29T08:00) na MySQL (2025-08-29 08:00:00)
+        if ($request->filled('working_hours_from')) {
+            $user->working_hours_from = \Carbon\Carbon::parse($request->input('working_hours_from'))
+                ->format('Y-m-d H:i:s');
+        }
+
+        if ($request->filled('working_hours_to')) {
+            $user->working_hours_to = \Carbon\Carbon::parse($request->input('working_hours_to'))
+                ->format('Y-m-d H:i:s');
+        }
         $user->working_hours_start_day = $request->input('working_hours_start_day');
         $user->working_hours_stop_day = $request->input('working_hours_stop_day');
         $user->save();

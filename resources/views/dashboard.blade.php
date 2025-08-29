@@ -115,7 +115,7 @@
                             @foreach($dates as $date)
                             <div class="bg-white dark:bg-gray-900 h-28 relative p-2 border border-gray-200 dark:border-gray-800 flex flex-col md:flex-row h-full">
                                 @if($date['date'] == \Carbon\Carbon::now()->format('d.m.y'))
-                                    <div class="text-white bg-red-500 dark:bg-red-700 rounded-full w-6 h-6 flex items-center justify-center text-[11px] font-semibold mx-auto">{{$date['day']}}</div>
+                                    <div class="text-white bg-red-500 dark:bg-red-700 rounded-full w-6 h-6 flex items-center justify-center text-[11px] font-semibold">{{$date['day']}}</div>
                                 @else
                                     <div class="text-gray-700 dark:text-white text-[11px] font-semibold">{{$date['day']}}</div>
                                 @endif
