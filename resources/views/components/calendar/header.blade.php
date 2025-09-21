@@ -1,5 +1,5 @@
 <!--HEADER-->
-<x-container-header>
+<x-container-header class="grid gap-2 md:flex md:gap-0 md:justify-between">
     <x-h1-display class="mx-2 lg:mx-0">
         {{ $slot }}
     </x-h1-display>

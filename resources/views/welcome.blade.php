@@ -211,7 +211,7 @@
                 <p class="text-lg text-gray-500 mb-12">NIP:8992998536</p>
                 <div class="flex flex-row text-5xl">
                     <i class="fa-solid fa-location-dot mr-5"></i>
-                    <adress class="text-lg">Partynicka 5,<br> <span class="text-gray-500">53-031, </span>Wrocław</adress>
+                    <adress class="text-lg">Sielecka 63,<br> <span class="text-gray-500">42-500, </span>Będzin</adress>
                 </div>
             </div>
         </div>

@@ -52,7 +52,7 @@
                         console.log('Zaznaczone role:', roles);
                         $('#show-filter').html(roles.length > 0 ? roles.join(', ') : 'WSZYSTKO');
                         if (roles.length > 0) {} else {
-                            roles = ['admin', 'menedżer', 'kierownik', 'użytkownik'];
+                            roles = ['admin', 'menedżer', 'kierownik', 'użytkownik', 'właściciel'];
                         }
 
                         $.ajax({
@@ -112,6 +112,20 @@
                                         </span>`
                                     : ``
                                     }
+                                    ${user.role == 'właściciel'
+                                    ? ` <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                            Właściciel
+                                        </span>`
+                                    : ``
+                                    }
+                                </td>
+                                <td>
+                                    ${(user.working_hours_custom != null && user.working_hours_from != null && user.working_hours_to != null && user.working_hours_start_day != null && user.working_hours_stop_day != null)
+                                        ? ''
+                                        : `<a href="{{ route('team.user.planing', '' )}}/${user.id}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                            ⚠️Ustaw godziny pracy
+                                        </a>`
+                                    }
                                 </td>
                                 <x-show-cell href="{{route('team.user.show', '' )}}/${user.id}" />
                                 </tr>`;
@@ -159,6 +173,9 @@
                                 Role
                             </th>
                             <th scope="col" class="px-6 py-3 text-center">
+                                Informacje
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-center">
                                 Podgląd
                             </th>
                         </tr>
@@ -169,7 +186,7 @@
                             <td colspan="8" class="px-3 py-2">
                                 <div class="text-center py-8">
                                     <img src="{{ asset('empty.svg') }}" alt="Brak danych" class="mx-auto mb-4" style="max-width: 300px;">
-                                    <p class="text-gray-500 dark:text-gray-400">Brak faktur do wyświetlenia.</p>
+                                    <p class="text-gray-500 dark:text-gray-400">Brak danych do wyświetlenia.</p>
                                 </div>
                             </td>
                         </tr>
@@ -212,6 +229,18 @@
                                 <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     Użytkownik
                                 </span>
+                                @elseif($user->role == 'właściciel')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                    Właściciel
+                                </span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($user->working_hours_custom != null && $user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
+                                @else
+                                <a href="{{ route('team.user.planing', $user->id) }}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                    ⚠️Ustaw godziny pracy
+                                </a>
                                 @endif
                             </td>
                             <x-show-cell href="{{route('team.user.show', $user )}}" />
@@ -287,6 +316,20 @@
                                             Użytkownik
                                         </span>`
                                     : ``
+                                    }
+                                    ${session.role == 'właściciel'
+                                    ? ` <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                            Właściciel
+                                        </span>`
+                                    : ``
+                                    }
+                                </td>
+                                <td>
+                                    ${(session.working_hours_custom != null && session.working_hours_from != null && session.working_hours_to != null && session.working_hours_start_day != null && session.working_hours_stop_day != null)
+                                        ? ''
+                                        : `<a href="{{ route('team.user.planing', '' )}}/${session.id}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                            ⚠️Ustaw godziny pracy
+                                        </a>`
                                     }
                                 </td>
                                 <x-show-cell href="{{route('team.user.show', '' )}}/${session.id}" />

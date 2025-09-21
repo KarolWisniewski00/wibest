@@ -2,20 +2,19 @@
     @php
     $users = $this->getUsers()
     @endphp
-    <div class="space-y-6 px-6 py-4">
+    <div class="space-y-6 md:px-6 py-4">
         <div class="mb-6" id="user">
             <h3 class="mb-5 text-lg font-medium text-gray-900 dark:text-white">Użytkownik</h3>
             <ul class="grid w-full gap-6 md:grid-cols-3">
                 @foreach ($users as $user)
                 <li>
-                    <input 
-                        name="user_id" 
-                        wire:model="state.user_id" 
-                        type="radio" 
-                        id="user-{{ $user->id }}" 
-                        value="{{ $user->id }}" 
-                        class="hidden peer"
-                    >
+                    <input
+                        name="user_id"
+                        wire:model="state.user_id"
+                        type="radio"
+                        id="user-{{ $user->id }}"
+                        value="{{ $user->id }}"
+                        class="hidden peer">
                     <label for="user-{{ $user->id }}" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-300 dark:peer-checked:border-green-300 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <div class="flex items-center gap-4">
                             @if($user->profile_photo_url)
@@ -44,6 +43,9 @@
                                     <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                         Użytkownik
                                     </span>
+                                    @break
+                                    @case('właściciel')
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Właściciel</span>
                                     @break
                                     @endswitch
                                 </div>

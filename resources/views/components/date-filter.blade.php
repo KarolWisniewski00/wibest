@@ -216,6 +216,12 @@
                                                 </span>`
                                             : ``
                                             }
+                                            ${session.user.role == 'właściciel'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                    Właściciel
+                                                </span>`
+                                            : ``
+                                            }
                                         </div>
                                     </td>
                                     <td class="px-3 py-2 text-xs">
@@ -328,6 +334,12 @@
                                         ${event.user.role == 'użytkownik'
                                         ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'właściciel'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                Właściciel
                                             </span>`
                                         : ``
                                         }
@@ -456,6 +468,12 @@
                                         ${leave.manager.role == 'użytkownik'
                                         ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.manager.role == 'właściciel'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                Właściciel
                                             </span>`
                                         : ``
                                         }
@@ -639,6 +657,12 @@
                                         ${leave.user.role == 'użytkownik'
                                         ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${leave.user.role == 'właściciel'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                Właściciel
                                             </span>`
                                         : ``
                                         }
@@ -841,6 +865,12 @@
                                                 </span>`
                                             : ``
                                             }
+                                            ${user.role == 'właściciel'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                    Właściciel
+                                                </span>`
+                                            : ``
+                                            }
                                         </div>
                                     </td>
                                     ${cells}
@@ -1001,6 +1031,12 @@
                                                 </span>`
                                             : ``
                                             }
+                                            ${user.role == 'właściciel'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                    Właściciel
+                                                </span>`
+                                            : ``
+                                            }
                                         </div>
                                     </td>
                                     ${cells}
@@ -1082,6 +1118,12 @@
                                                 </span>`
                                             : ``
                                             }
+                                            ${user.role == 'właściciel'
+                                            ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                    Właściciel
+                                                </span>`
+                                            : ``
+                                            }
                                         </div>
                                     </td>
                                     <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
@@ -1089,7 +1131,9 @@
                                             <span class="text-gray-400">
                                                 ${user.time_in_work_hms_planned != '00h 00min 00s'
                                                 ? user.time_in_work_hms_planned
-                                                : ``
+                                                :  `<a href="{{ route('team.user.planing', '') }}/${user.id}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                                        ⚠️Ustaw godziny pracy
+                                                    </a>`
                                                 }
                                             </span>
                                         </x-paragraf-display>

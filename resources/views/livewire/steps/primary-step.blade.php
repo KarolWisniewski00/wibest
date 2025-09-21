@@ -1,6 +1,6 @@
 <div>
 
-    <div class="space-y-6 px-6 py-4">
+    <div class="space-y-6 md:px-6 py-4">
         <div class="mb-6" id="manager">
             <h3 class="mb-5 text-lg font-medium text-gray-900 dark:text-white flex items-center gap-2">
                 <span>📋</span> Podstawowe dane

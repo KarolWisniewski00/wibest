@@ -6,7 +6,7 @@
             :active="Str::startsWith(request()->path(), 'dashboard/leave/single')">
             Moje Wnioski
         </x-nav-link>
-        @if($role == 'admin' || $role == 'menedżer')
+        @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
         <x-nav-link class="h-full text-center"
             href="{{ route('leave.pending.index') }}"
             :active="Str::startsWith(request()->path(), 'dashboard/leave/pending-review')">

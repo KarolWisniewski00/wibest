@@ -34,6 +34,9 @@ class UserService
             case 'użytkownik':
                 return $userRepository->paginateByUser();
                 break;
+            case 'właściciel':
+                return $userRepository->paginateByAdmin();
+                break;
             default:
                 return $userRepository->paginateByUser();
                 break;
@@ -61,6 +64,9 @@ class UserService
                 break;
             case 'użytkownik':
                 return $userRepository->getByUser();
+                break;
+            case 'właściciel':
+                return $userRepository->getByAdmin();
                 break;
             default:
                 return $userRepository->getByUser();

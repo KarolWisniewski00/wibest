@@ -55,6 +55,9 @@ class UserController extends Controller
             $query = User::where('company_id', $companyId)
                 ->where('role', '=', 'użytkownik')
                 ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'właściciel') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
         } else {
             $query = User::where('company_id', $companyId)
                 ->where('role', '!=', null);
@@ -113,6 +116,9 @@ class UserController extends Controller
             $query = User::where('company_id', $companyId)
                 ->where('role', '=', 'użytkownik')
                 ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'właściciel') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
         } else {
             $query = User::where('company_id', $companyId)
                 ->where('role', '!=', null);
@@ -147,6 +153,9 @@ class UserController extends Controller
             $query = User::where('company_id', $companyId)
                 ->where('role', '=', 'użytkownik')
                 ->where('supervisor_id', '=', $user->supervisor_id);
+        } else if ($user->role === 'właściciel') {
+            $query = User::where('company_id', $companyId)
+                ->where('role', '!=', null);
         } else {
             $query = User::where('company_id', $companyId)
                 ->where('role', '!=', null);

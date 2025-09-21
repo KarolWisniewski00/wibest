@@ -94,6 +94,10 @@
                                                 <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                     Użytkownik
                                                 </span>
+                                                @elseif($work_session->user->role == 'właściciel')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                    Właściciel
+                                                </span>
                                                 @endif
                                             </div>
                                         </div>
@@ -103,7 +107,7 @@
                                     <x-button-link-neutral href="{{route('rcp.work-session.show', $work_session)}}" class="min-h-[38px]">
                                         <i class="fa-solid fa-eye"></i>
                                     </x-button-link-neutral>
-                                    @if($role == 'admin')
+                                    @if($role == 'admin' || $role == 'właściciel')
                                     @if($work_session->status == 'Praca zakończona')
                                     <x-button-link-blue href="{{route('rcp.work-session.edit', $work_session)}}" class="min-h-[38px]">
                                         <i class="fa-solid fa-pen-to-square"></i>
@@ -196,6 +200,10 @@
                                     @elseif($work_session->user->role == 'użytkownik')
                                     <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                         Użytkownik
+                                    </span>
+                                    @elseif($work_session->user->role == 'właściciel')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                        Właściciel
                                     </span>
                                     @endif
                                 </div>
@@ -353,6 +361,12 @@
                                             </span>`
                                         : ``
                                         }
+                                        ${session.user.role == 'właściciel'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                Właściciel
+                                            </span>`
+                                        : ``
+                                        }
                                     </div>
                                 </td>
                                 <td class="px-3 py-2 text-xs">
@@ -465,6 +479,12 @@
                                                             </span>`
                                                         : ``
                                                         }
+                                                        ${session.user.role == 'właściciel'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                                Właściciel
+                                                            </span>`
+                                                        : ``
+                                                        }
                                                     </div>
                                                 </div>
                                             </div>
@@ -473,7 +493,7 @@
                                             <x-button-link-neutral href="{{ route('rcp.work-session.show', '') }}/${session.id}" class="min-h-[38px]">
                                                 <i class="fa-solid fa-eye"></i>
                                             </x-button-link-neutral>
-                                            @if($role == 'admin')
+                                            @if($role == 'admin' || $role == 'właściciel')
                                             ${session.status === 'W trakcie pracy' 
                                                 ? `` 
                                                 : session.status === 'Praca zakończona' 

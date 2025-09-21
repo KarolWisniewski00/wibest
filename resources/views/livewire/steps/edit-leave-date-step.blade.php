@@ -1,36 +1,30 @@
 <div>
     <!-- Start i Stop -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <!-- START -->
-        <x-container-gray class="px-0">
-            <x-text-cell class="mx-4">
-                <p class="text-gray-700 dark:text-gray-300 text-sm">Start</p>
-                <div class="flex justify-start items-center w-full">
-                    <input
-                        type="date"
-                        wire:model="state.start_time"
-                        name="start_time"
-                        id="start"
-                        class="w-full mt-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold"
-                        required>
-                </div>
-            </x-text-cell>
-        </x-container-gray>
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
+        <div>
+            <label for="datepicker" class="md:mx-4 my-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                📅 Wniosek od
+            </label>
+            <!-- START -->
+            <input
+                name="start_time"
+                wire:model="state.start_time"
+                type="hidden"
+                class="" />
+            <livewire:calendar selectedDate="{{$this->getState()['start_time']}}" typeTime="start_time" userId="{{ array_key_exists('user_id', $this->getState()) ? $this->getState()['user_id'] : auth()->user()->id }}" />
+        </div>
 
         <!-- STOP -->
-        <x-container-gray class="px-0">
-            <x-text-cell class="mx-4">
-                <p class="text-gray-700 dark:text-gray-300 text-sm">Stop</p>
-                <div class="flex justify-start items-center w-full">
-                    <input
-                        type="date"
-                        wire:model="state.end_time" 
-                        name="end_time"
-                        id="end"
-                        class="w-full mt-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold"
-                        required>
-                </div>
-            </x-text-cell>
-        </x-container-gray>
+        <div>
+            <label for="datepicker" class="md:mx-4 my-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                📅 Wniosek do
+            </label>
+            <input
+                type="hidden"
+                wire:model="state.end_time"
+                name="end_time"
+                class="">
+            <livewire:calendar selectedDate="{{$this->getState()['end_time']}}" typeTime="end_time" userId="{{ array_key_exists('user_id', $this->getState()) ? $this->getState()['user_id'] : auth()->user()->id }}" />
+        </div>
     </div>
 </div>

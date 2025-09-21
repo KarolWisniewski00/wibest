@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Event;
 use App\Models\Leave;
+use App\Models\PlannedLeave;
 use App\Models\User;
 use App\Models\WorkSession;
 use Illuminate\Support\Facades\Auth;
@@ -187,8 +188,31 @@ class WorkSessionRepository
             ->whereDate('end_date', '>=', $formattedDate)
             ->exists();
     }
+    public function hasPlannedLeave(int $userId, string $date): bool
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        return PlannedLeave::where('user_id', $userId)
+            ->whereDate('start_date', '<=', $formattedDate)
+            ->whereDate('end_date', '>=', $formattedDate)
+            ->exists();
+    }
     /**
      * Zwraca wniosek urlopowy dla użytkownika na dany dzień.
+     *
+     * @param int $userId
+     * @param string $date
+     * @return Leave|null
+     */
+    public function getFirstPlannedLeave(int $userId, string $date): ?PlannedLeave
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        return PlannedLeave::where('user_id', $userId)
+            ->whereDate('start_date', '<=', $formattedDate)
+            ->whereDate('end_date', '>=', $formattedDate)
+            ->first();
+    }
+    /**
+     * Zwraca urlop planowany dla użytkownika na dany dzień.
      *
      * @param int $userId
      * @param string $date
@@ -201,6 +225,27 @@ class WorkSessionRepository
             ->where('status', 'zaakceptowane')
             ->whereDate('start_date', '<=', $formattedDate)
             ->whereDate('end_date', '>=', $formattedDate)
+            ->first();
+    }
+    /**
+     * Zwraca rcp dla użytkownika na dany dzień.
+     *
+     * @param int $userId
+     * @param string $date
+     * @return WorkSession|null
+     */
+    public function getFirstRcp(int $userId, string $date): ?WorkSession
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+        return WorkSession::where('user_id', $userId)
+            ->where(function ($query) use ($formattedDate) {
+                $query->whereHas('eventStart', function ($q) use ($formattedDate) {
+                    $q->whereDate('time', $formattedDate);
+                })
+                    ->orWhereHas('eventStop', function ($q) use ($formattedDate) {
+                        $q->whereDate('time', $formattedDate);
+                    });
+            })
             ->first();
     }
     /**

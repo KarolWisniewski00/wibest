@@ -10,7 +10,7 @@ use App\Steps\EditUserStep;
 use App\Steps\PlannedLeaveDateStep;
 use App\Steps\UserStep;
 use Vildanbina\LivewireWizard\WizardComponent;
-
+use Livewire\Attributes\On;
 class EditPlannedLeaveWizard extends WizardComponent
 {
     public PlannedLeave $plannedLeave;
@@ -32,7 +32,19 @@ class EditPlannedLeaveWizard extends WizardComponent
             'planned_leave_id'   => $plannedLeaveId,
         ]);
     }
-
+    #[On('selectDate')]
+    public function handleCalendarDateSelected($selectedDate, $typeTime = 'start_time')
+    {
+        if ($typeTime === 'start_time') {
+            $this->mergeState([
+                'start_time' => $selectedDate,
+            ]);
+        } else {
+            $this->mergeState([
+                'end_time' => $selectedDate,
+            ]);
+        }
+    }
     // 👇 Zwróć już wczytany model
     public function model(): PlannedLeave
     {

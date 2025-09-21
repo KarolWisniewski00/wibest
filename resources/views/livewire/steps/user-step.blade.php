@@ -2,7 +2,7 @@
     @php
     $users = $this->getUsers()
     @endphp
-    <div class="space-y-6 px-6 py-4">
+    <div class="space-y-6 md:px-6 py-4">
         <div class="mb-6" id="user">
             <h3 class="mb-5 text-lg font-medium text-gray-900 dark:text-white">Użytkownik</h3>
             <ul class="grid w-full gap-6 md:grid-cols-3">
@@ -37,6 +37,9 @@
                                     <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                         Użytkownik
                                     </span>
+                                    @break
+                                    @case('właściciel')
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Właściciel</span>
                                     @break
                                     @endswitch
                                 </div>

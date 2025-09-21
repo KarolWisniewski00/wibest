@@ -23,70 +23,8 @@
             </x-button-link-back>
             <!--POWRÓT-->
             <h2 class="text-xl font-semibold dark:text-white mb-3">Edytuj planing Użytkownika</h2>
-            <form method="POST" action="{{route('team.user.update_planing', $user)}}" class="space-y-4">
-                @csrf
-                @method('PUT')
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">Liczba godzin</p>
-                    <div class="flex justify-start items-center w-full">
-                        <input
-                            type="number"
-                            name="working_hours_custom"
-                            id="working_hours_custom"
-                            value="{{ $user->working_hours_custom }}"
-                            class="w-full mt-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold">
-                    </div>
-                </x-text-cell>
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">Start pracy (hh:mm:ss)</p>
-                    <div class="flex justify-start items-center w-full">
-                        <input
-                            type="datetime-local"
-                            name="working_hours_from"
-                            id="working_hours_from"
-                            value="{{ $user->working_hours_from }}"
-                            class="w-full mt-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold">
-                    </div>
-                </x-text-cell>
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">Koniec pracy (hh:mm:ss)</p>
-                    <div class="flex justify-start items-center w-full">
-                        <input
-                            type="datetime-local" 
-                            name="working_hours_to"
-                            id="working_hours_to"
-                            value="{{ $user->working_hours_to }}"
-                            class="w-full mt-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold">
-                    </div>
-                </x-text-cell>
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">Dni tygodnia od</p>
-                    <div class="flex justify-start items-center w-full">
-                        <input
-                            type="text"
-                            name="working_hours_start_day"
-                            id="working_hours_start_day"
-                            value="{{ $user->working_hours_start_day }}"
-                            class="w-full mt-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold">
-                    </div>
-                </x-text-cell>
-                <x-text-cell class="mx-4">
-                    <p class="text-gray-700 dark:text-gray-300 text-sm">Dni tygodnia do</p>
-                    <div class="flex justify-start items-center w-full">
-                        <input
-                            type="text"
-                            name="working_hours_stop_day"
-                            id="working_hours_stop_day"
-                            value="{{ $user->working_hours_stop_day }}"
-                            class="w-full mt-1 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold">
-                    </div>
-                </x-text-cell>
-                <div class="pt-4">
-                    <x-button-green type="submit" class="mx-2">
-                        <i class="fa-solid fa-save mr-2"></i>Zapisz
-                    </x-button-green>
-                </div>
-            </form>
+            
+            <livewire:planing-wizard userId="{{$user->id}}" />
 
         </div>
         <!--CONTENT-->

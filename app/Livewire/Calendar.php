@@ -11,6 +11,7 @@ class Calendar extends Component
     public $selectedDate;
     public $typeTime;
     public $userId;
+    public bool $planned = false;
 
     public function getPublicHolidays($year)
     {
@@ -75,9 +76,20 @@ class Calendar extends Component
         while ($start <= $end) {
             $date = $start->copy();
             $dateStr = $date->format('Y-m-d');
+            $rcp = null;
 
             $leave = $workSessionRepository->hasLeave($userId, $date->format('d.m.y'));
             $leaveFirst = $workSessionRepository->getFirstLeave($userId, $date->format('d.m.y'));
+            $rcp = $workSessionRepository->getFirstRcp($userId, $date->format('d.m.y'));
+
+            if ($this->planned) {
+                $leavePlanned = $workSessionRepository->hasPlannedLeave($userId, $date->format('d.m.y'));
+                $leavePlannedFirst = $workSessionRepository->getFirstPlannedLeave($userId, $date->format('d.m.y'));
+                if ($leavePlannedFirst) {
+                    $leavePlannedFirst->type = 'urlop planowany';
+                }
+            }
+
             // Sprawdzenie czy to Nowy Rok lub Trzech Króli
             if ($date->month == 1 && $date->day == 1) {
                 $isHoliday = true; // Nowy Rok
@@ -92,12 +104,21 @@ class Calendar extends Component
                     'date' => $date,
                     'leave' => $leaveFirst->type,
                     'isHoliday' => $isHoliday,
+                    'rcp' => $rcp,
                 ];
-            } else {
+            } elseif ($this->planned && $leavePlanned) {
+                $dates[] = [
+                    'date' => $date,
+                    'leave' => $leavePlannedFirst->type,
+                    'isHoliday' => $isHoliday,
+                    'rcp' => $rcp,
+                ];
+            }else {
                 $dates[] = [
                     'date' => $date,
                     'leave' => null,
                     'isHoliday' => $isHoliday,
+                    'rcp' => $rcp,
                 ];
             }
             $start->addDay();

@@ -30,7 +30,7 @@
                             Użytkownik
                         </p>
                         <div class="flex justify-start items-center w-full justify-start">
-                            <span class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <span class="grid mt-2 md:mt-0 md:inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
                                 @if($user->profile_photo_url)
                                 <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
                                 @else
@@ -55,6 +55,10 @@
                                 <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     Użytkownik
                                 </span>
+                                @elseif($user->role == 'właściciel')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                    Właściciel
+                                </span>
                                 @endif
                             </span>
                         </div>
@@ -65,7 +69,7 @@
                             Email
                         </p>
                         <div class="flex justify-start items-center w-full justify-start">
-                            <a href="mailto:{{$user->email}}" class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <a href="mailto:{{$user->email}}" class="grid mt-2 md:mt-0 md:inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-xs md:text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
                                 <span class="text-2xl">📧</span>
                                 {{ $user->email }}
                             </a>
@@ -103,7 +107,7 @@
                         </p>
                         <div class="flex justify-start items-center w-full justify-start">
                             @if($user->supervisor)
-                            <span class="inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <span class="grid mt-2 md:mt-0 md:inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
                                 @if($user->supervisor->profile_photo_url)
                                 <img src="{{ $user->supervisor->profile_photo_url }}" alt="{{ $user->supervisor->name }}" class="w-10 h-10 rounded-full">
                                 @else
@@ -127,6 +131,10 @@
                                 @elseif($user->supervisor->role == 'użytkownik')
                                 <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                     Użytkownik
+                                </span>
+                                @elseif($user->role == 'właściciel')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                    Właściciel
                                 </span>
                                 @endif
                             </span>
@@ -210,17 +218,25 @@
                         </div>
                     </x-text-cell>
                 </x-container-gray>
-            @endif
+                @else
+                <x-container-gray class="px-0">
+                    <x-text-cell class="mx-4">
+                        <a href="{{ route('team.user.planing', $user->id) }}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                            ⚠️Ustaw godziny pracy
+                        </a>
+                    </x-text-cell>
+                </x-container-gray>
+                @endif
             </div>
-            <div class="flex justify-end mt-4">
-                @if($role == 'admin' || $role == 'menedżer')
-                <x-button-link-orange href="{{route('team.user.planing', $user)}}" class="text-lg mr-2">
-                    Edytuj planning
-                </x-button-link-orange>
-                <x-button-link-orange href="{{route('team.user.restart', $user)}}" class="text-lg mr-2">
+            <div class="grid gap-4 md:flex md:justify-end mt-4">
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
+                <x-button-link-violet href="{{route('team.user.planing', $user)}}" class="text-lg md:mr-2">
+                    <i class="fa-solid fa-calendar mr-2"></i>Edytuj planning
+                </x-button-link-violet>
+                <x-button-link-orange href="{{route('team.user.restart', $user)}}" class="text-lg md:mr-2">
                     <i class="fa-solid fa-paper-plane mr-2"></i>Reset hasła
                 </x-button-link-orange>
-                <x-button-link-cello href="{{route('team.user.edit', $user)}}" class="text-lg mr-2">
+                <x-button-link-cello href="{{route('team.user.edit', $user)}}" class="text-lg md:mr-2">
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
                 </x-button-link-cello>
                 @if($user->id != $user_id)

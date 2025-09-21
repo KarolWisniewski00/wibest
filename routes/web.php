@@ -42,9 +42,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-//TODO:
-// dodać mobilke w datefilter dla wniosków o urlop
-// dokończyć raporty
+
 //NOT LOGGED IN
 Route::get('/', function () {
     return view('welcome');
@@ -52,7 +50,9 @@ Route::get('/', function () {
 
 Route::get('/login/google', [GoogleController::class, 'redirect'])->name('login.google');
 Route::get('/login/google/callback', [GoogleController::class, 'callback']);
+
 Route::prefix('api')->group(function () {
+
     Route::prefix('work')->group(function () {
         Route::get('/start/{user_id}', [RCPWorkSessionController::class, 'startWork'])->name('api.work.start');
         Route::get('/stop/{id}', [RCPWorkSessionController::class, 'stopWork'])->name('api.work.stop');
@@ -67,6 +67,8 @@ Route::prefix('api')->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('update/role/{id}/{role}', [UserController::class, 'updateRole'])->name('api.user.update.role');
     });
+
+
     //API -----------------------------------------------------------------
     Route::prefix('v1')->group(function () {
         Route::prefix('search')->group(function () {
@@ -237,39 +239,131 @@ Route::middleware([
             });
         });
 
+        // SETTINGS -----------------------------------------------------------------------------
+        Route::prefix('setting')->group(function () {
+            Route::get('/', [SettingController::class, 'index'])->name('setting');
+            Route::get('create', [SettingController::class, 'create'])->name('setting.create');
+            Route::post('store', [SettingController::class, 'store'])->name('setting.store');
+            Route::get('edit/{company}', [SettingController::class, 'edit'])->name('setting.edit');
+            Route::put('update/{company}', [SettingController::class, 'update'])->name('setting.update');
+            Route::get('disconnect/{user}', [SettingController::class, 'disconnect'])->name('setting.user.disconnect');
+            Route::get('invitations/accept/{id}', [SettingController::class, 'acceptInvitation'])->name('setting.user.invitations.accept');
+            Route::get('invitations/reject/{id}', [SettingController::class, 'rejectInvitation'])->name('setting.user.invitations.reject');
+
+            Route::prefix('invoice')->group(function () {
+                Route::get('/', [InvoiceController::class, 'index'])->name('setting.invoice');
+                Route::get('create', [InvoiceController::class, 'create'])->name('setting.invoice.create');
+                Route::post('store', [InvoiceController::class, 'store'])->name('setting.invoice.store');
+                Route::get('show/{invoice}', [InvoiceController::class, 'show'])->name('setting.invoice.show');
+                Route::get('edit/{invoice}', [InvoiceController::class, 'edit'])->name('setting.invoice.edit');
+                Route::put('update/{invoice}', [InvoiceController::class, 'update'])->name('setting.invoice.update');
+                Route::delete('delete/{invoice}', [InvoiceController::class, 'delete'])->name('setting.invoice.delete');
+
+                Route::get('now', [InvoiceController::class, 'index_now'])->name('setting.invoice.now');
+                Route::get('last', [InvoiceController::class, 'index_last'])->name('setting.invoice.last');
+                Route::get('search', [InvoiceController::class, 'search'])->name('setting.invoice.search');
+                Route::get('create/{client}', [InvoiceController::class, 'create_client'])->name('setting.invoice.create.client');
+                Route::get('create/pro/{client}', [InvoiceController::class, 'create_client'])->name('setting.invoice.create.pro.client');
+                Route::get('send/{invoice}', [InvoiceController::class, 'send_invoice'])->name('setting.invoice.send');
+                Route::get('file/{invoice}', [InvoiceController::class, 'file'])->name('setting.invoice.show.file');
+                Route::get('download/{invoice}', [InvoiceController::class, 'download'])->name('setting.invoice.download');
+                Route::get('store/from/{invoice}', [InvoiceController::class, 'store_from'])->name('setting.invoice.store.from');
+                Route::get('store/from/ofr/{offer}', [InvoiceController::class, 'store_from_ofr'])->name('setting.invoice.store.from.ofr');
+            });
+
+            Route::prefix('offer')->group(function () {
+                Route::get('/', [OfferController::class, 'index'])->name('setting.offer');
+                Route::get('create/{project}', [OfferController::class, 'create'])->name('setting.offer.create.project');
+                Route::post('store', [OfferController::class, 'store'])->name('setting.offer.store');
+                Route::get('show/{offer}', [OfferController::class, 'show'])->name('setting.offer.show');
+                Route::get('edit/{offer}', [OfferController::class, 'edit'])->name('setting.offer.edit');
+                Route::put('update/{offer}', [OfferController::class, 'update'])->name('setting.offer.update');
+                Route::delete('delete/{offer}', [OfferController::class, 'delete'])->name('setting.offer.delete');
+
+                Route::get('now', [OfferController::class, 'index_now'])->name('setting.offer.now');
+                Route::get('last', [OfferController::class, 'index_last'])->name('setting.offer.last');
+                Route::get('/search', [OfferController::class, 'search'])->name('setting.offer.search');
+                Route::get('/send/{offer}', [OfferController::class, 'send_offer'])->name('setting.offer.send');
+                Route::get('file/{offer}', [OfferController::class, 'file'])->name('setting.offer.show.file');
+                Route::get('download/{offer}', [OfferController::class, 'download'])->name('setting.offer.download');
+                Route::get('store/from/{offer}', [OfferController::class, 'store_from'])->name('setting.offer.store.from');
+            });
+
+            Route::prefix('client')->group(function () {
+                Route::get('/', [ClientController::class, 'index'])->name('setting.client');
+                Route::get('create', [ClientController::class, 'create'])->name('setting.client.create');
+                Route::post('store', [ClientController::class, 'store'])->name('setting.client.store');
+                Route::get('/search', [ClientController::class, 'search'])->name('setting.client.search');
+                Route::get('show/{client}', [ClientController::class, 'show'])->name('setting.client.show');
+                Route::get('edit/{client}', [ClientController::class, 'edit'])->name('setting.client.edit');
+                Route::put('update/{client}', [ClientController::class, 'update'])->name('setting.client.update');
+                Route::delete('delete/{client}', [ClientController::class, 'delete'])->name('setting.client.delete');
+            });
+            Route::prefix('user')->group(function () {
+                Route::get('/', [UserController::class, 'index'])->name('setting.user');
+            });
+        });
+
         //Mierzenie Czasu Pracy ------------------------------------------------------------------
 
-        Route::prefix('client')->group(function () {
-            Route::get('/', [ClientController::class, 'index'])->name('client');
-            Route::get('create', [ClientController::class, 'create'])->name('client.create');
-            Route::post('store', [ClientController::class, 'store'])->name('client.store');
-            Route::get('/search', [ClientController::class, 'search'])->name('client.search');
-            Route::get('show/{client}', [ClientController::class, 'show'])->name('client.show');
-            Route::get('edit/{client}', [ClientController::class, 'edit'])->name('client.edit');
-            Route::put('update/{client}', [ClientController::class, 'update'])->name('client.update');
-            Route::delete('delete/{client}', [ClientController::class, 'delete'])->name('client.delete');
+        // REDIRECTS ---------------------------------------------------------------------------
+        Route::redirect('/raport', '/dashboard/raport/time-sheet')->name('raport');
+
+        Route::prefix('version')->group(function () {
+            Route::redirect('/', '/dashboard/setting')->name('version');
         });
 
         Route::prefix('invoice')->group(function () {
-            Route::get('/', [InvoiceController::class, 'index'])->name('invoice');
-            Route::get('create', [InvoiceController::class, 'create'])->name('invoice.create');
-            Route::post('store', [InvoiceController::class, 'store'])->name('invoice.store');
-            Route::get('show/{invoice}', [InvoiceController::class, 'show'])->name('invoice.show');
-            Route::get('edit/{invoice}', [InvoiceController::class, 'edit'])->name('invoice.edit');
-            Route::put('update/{invoice}', [InvoiceController::class, 'update'])->name('invoice.update');
-            Route::delete('delete/{invoice}', [InvoiceController::class, 'delete'])->name('invoice.delete');
+            Route::redirect('/', '/dashboard/setting/invoice')->name('invoice');
+            Route::redirect('/create', '/dashboard/setting/invoice/create')->name('invoice.create');
+            Route::redirect('store', '/dashboard/setting/invoice/store')->name('invoice.store');
+            Route::redirect('show/{invoice}', '/dashboard/setting/invoice/show/{invoice}')->name('invoice.show');
+            Route::redirect('edit/{invoice}', '/dashboard/setting/invoice/edit/{invoice}')->name('invoice.edit');
+            Route::redirect('update/{invoice}', '/dashboard/setting/invoice/update/{invoice}')->name('invoice.update');
+            Route::redirect('delete/{invoice}', '/dashboard/setting/invoice/delete/{invoice}')->name('invoice.delete');
 
-            Route::get('now', [InvoiceController::class, 'index_now'])->name('invoice.now');
-            Route::get('last', [InvoiceController::class, 'index_last'])->name('invoice.last');
-            Route::get('search', [InvoiceController::class, 'search'])->name('invoice.search');
-            Route::get('create/{client}', [InvoiceController::class, 'create_client'])->name('invoice.create.client');
-            Route::get('create/pro/{client}', [InvoiceController::class, 'create_client'])->name('invoice.create.pro.client');
-            Route::get('send/{invoice}', [InvoiceController::class, 'send_invoice'])->name('invoice.send');
-            Route::get('file/{invoice}', [InvoiceController::class, 'file'])->name('invoice.show.file');
-            Route::get('download/{invoice}', [InvoiceController::class, 'download'])->name('invoice.download');
-            Route::get('store/from/{invoice}', [InvoiceController::class, 'store_from'])->name('invoice.store.from');
-            Route::get('store/from/ofr/{offer}', [InvoiceController::class, 'store_from_ofr'])->name('invoice.store.from.ofr');
+            Route::redirect('now', '/dashboard/setting/invoice/now')->name('invoice.now');
+            Route::redirect('last', '/dashboard/setting/invoice/last')->name('invoice.last');
+            Route::redirect('search', '/dashboard/setting/invoice/search')->name('invoice.search');
+            Route::redirect('create/{client}', '/dashboard/setting/invoice/create/{client}')->name('invoice.create.client');
+            Route::redirect('create/pro/{client}', '/dashboard/setting/invoice/create/pro/{client}')->name('invoice.create.pro.client');
+            Route::redirect('send/{invoice}', '/dashboard/setting/invoice/send/{invoice}')->name('invoice.send');
+            Route::redirect('file/{invoice}', '/dashboard/setting/invoice/file/{invoice}')->name('invoice.show.file');
+            Route::redirect('download/{invoice}', '/dashboard/setting/invoice/download/{invoice}')->name('invoice.download');
+            Route::redirect('store/from/{invoice}', '/dashboard/setting/invoice/store/from/{invoice}')->name('invoice.store.from');
+            Route::redirect('store/from/ofr/{offer}', '/dashboard/setting/invoice/store/from/ofr/{offer}')->name('invoice.store.from.ofr');
         });
+        
+        Route::prefix('offer')->group(function () {
+            Route::redirect('/', '/dashboard/setting/offer')->name('offer');
+            Route::redirect('create/{project}', '/dashboard/setting/offer/create/{project}')->name('offer.create.project');
+            Route::redirect('store', '/dashboard/setting/offer/store')->name('offer.store');
+            Route::redirect('show/{offer}', '/dashboard/setting/offer/show/{offer}')->name('offer.show');
+            Route::redirect('edit/{offer}', '/dashboard/setting/offer/edit/{offer}')->name('offer.edit');
+            Route::redirect('update/{offer}', '/dashboard/setting/offer/update/{offer}')->name('offer.update');
+            Route::redirect('delete/{offer}', '/dashboard/setting/offer/delete/{offer}')->name('offer.delete');
+
+            Route::redirect('now', '/dashboard/setting/offer/now')->name('offer.now');
+            Route::redirect('last', '/dashboard/setting/offer/last')->name('offer.last');
+            Route::redirect('search', '/dashboard/setting/offer/search')->name('offer.search');
+            Route::redirect('send/{offer}', '/dashboard/setting/offer/send/{offer}')->name('offer.send');
+            Route::redirect('file/{offer}', '/dashboard/setting/offer/file/{offer}')->name('offer.show.file');
+            Route::redirect('download/{offer}', '/dashboard/setting/offer/download/{offer}')->name('offer.download');
+            Route::redirect('store/from/{offer}', '/dashboard/setting/offer/store/from/{offer}')->name('offer.store.from');
+        });
+        Route::prefix('client')->group(function () {
+            Route::redirect('/', '/dashboard/setting/client')->name('client');
+            Route::redirect('create', '/dashboard/setting/client/create')->name('client.create');
+            Route::redirect('store', '/dashboard/setting/client/store')->name('client.store');
+            Route::redirect('search', '/dashboard/setting/client/search')->name('client.search');
+            Route::redirect('show/{client}', '/dashboard/setting/client/show/{client}')->name('client.show');
+            Route::redirect('edit/{client}', '/dashboard/setting/client/edit/{client}')->name('client.edit');
+            Route::redirect('update/{client}', '/dashboard/setting/client/update/{client}')->name('client.update');
+            Route::redirect('delete/{client}', '/dashboard/setting/client/delete/{client}')->name('client.delete');
+        });
+
+
+
         Route::prefix('project')->group(function () {
             Route::get('/', [ProjectController::class, 'index'])->name('project');
             Route::get('refresh', [ProjectController::class, 'index_refresh'])->name('project.refresh');
@@ -302,23 +396,6 @@ Route::middleware([
             Route::get('search', [CostController::class, 'search'])->name('cost.search');
         });
 
-        Route::prefix('offer')->group(function () {
-            Route::get('/', [OfferController::class, 'index'])->name('offer');
-            Route::get('create/{project}', [OfferController::class, 'create'])->name('offer.create.project');
-            Route::post('store', [OfferController::class, 'store'])->name('offer.store');
-            Route::get('show/{offer}', [OfferController::class, 'show'])->name('offer.show');
-            Route::get('edit/{offer}', [OfferController::class, 'edit'])->name('offer.edit');
-            Route::put('update/{offer}', [OfferController::class, 'update'])->name('offer.update');
-            Route::delete('delete/{offer}', [OfferController::class, 'delete'])->name('offer.delete');
-
-            Route::get('now', [OfferController::class, 'index_now'])->name('offer.now');
-            Route::get('last', [OfferController::class, 'index_last'])->name('offer.last');
-            Route::get('/search', [OfferController::class, 'search'])->name('offer.search');
-            Route::get('/send/{offer}', [OfferController::class, 'send_offer'])->name('offer.send');
-            Route::get('file/{offer}', [OfferController::class, 'file'])->name('offer.show.file');
-            Route::get('download/{offer}', [OfferController::class, 'download'])->name('offer.download');
-            Route::get('store/from/{offer}', [OfferController::class, 'store_from'])->name('offer.store.from');
-        });
         Route::prefix('magazine')->group(function () {
             Route::prefix('set')->group(function () {
                 Route::get('/', [SetController::class, 'index'])->name('set');
@@ -350,31 +427,9 @@ Route::middleware([
                 Route::delete('delete/{service}', [ServiceController::class, 'delete'])->name('service.delete');
             });
         });
-
-        Route::prefix('setting')->group(function () {
-            Route::get('/', [SettingController::class, 'index'])->name('setting');
-            Route::get('create', [SettingController::class, 'create'])->name('setting.create');
-            Route::post('store', [SettingController::class, 'store'])->name('setting.store');
-            Route::get('edit/{company}', [SettingController::class, 'edit'])->name('setting.edit');
-            Route::put('update/{company}', [SettingController::class, 'update'])->name('setting.update');
-            Route::get('disconnect/{user}', [SettingController::class, 'disconnect'])->name('setting.user.disconnect');
-            Route::get('invitations/accept/{id}', [SettingController::class, 'acceptInvitation'])->name('setting.user.invitations.accept');
-            Route::get('invitations/reject/{id}', [SettingController::class, 'rejectInvitation'])->name('setting.user.invitations.reject');
-
-            Route::prefix('version')->group(function () {
-                Route::get('/', [DashboardController::class, 'version'])->name('version');
-            });
-        });
     });
 });
-//TO DO LIST:
-//Manager nie ma edycji RCP
-//Dodać dzień tygodnia, dzień miesiąca, miesiąc w zakładce RCP
-//responsywność zakładki Zespół
-//blokowanie dat na święto przy tworzeniu RCP i Wniosków
-//Zakładka ewidencja czasu pracy
-//zakładka kalendarz
-//rozbuduj użytkownika podgląd
-//dodaj więcej filtrów
-//konfiguracja pobierania na serwerze
-//powielanie się stopa zdarzenia
+
+//Przekierowania ustawione dla wystawiania faktur (bo kiedys zmieniałem z fakturowni na rcp) a żeby teraz wystawić fakture trzeba błędy notfound ogarnąć
+//REDIRECTS ---------------------------------------------------------------------------
+Route::get('api-search-gus-old/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.search.gus'); //TSI

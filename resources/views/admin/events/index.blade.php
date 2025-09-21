@@ -46,7 +46,7 @@
                                         </x-status-green>
                                         @endif
                                     </div>
-                                    @if($role == 'admin')
+                                    @if($role == 'admin' || $role == 'właściciel')
                                     <form action="{{route('rcp.event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                                         @csrf
                                         @method('DELETE')
@@ -75,7 +75,7 @@
                                     <x-button-link-neutral href="{{route('rcp.event.show', $event)}}" class="min-h-[38px]">
                                         <i class="fa-solid fa-eye"></i>
                                     </x-button-link-neutral>
-                                    @if($role == 'admin')
+                                    @if($role == 'admin' || $role == 'właściciel')
                                     <x-button-link-blue href="" class="min-h-[38px]">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </x-button-link-blue>
@@ -160,6 +160,10 @@
                                     @elseif($event->user->role == 'użytkownik')
                                     <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                         Użytkownik
+                                    </span>
+                                    @elseif($event->user->role == 'właściciel')
+                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                        Właściciel
                                     </span>
                                     @endif
                                 </div>
@@ -257,6 +261,12 @@
                                         ${event.user.role == 'użytkownik'
                                         ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 Użytkownik
+                                            </span>`
+                                        : ``
+                                        }
+                                        ${event.user.role == 'właściciel'
+                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                Właściciel
                                             </span>`
                                         : ``
                                         }

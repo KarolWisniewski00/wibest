@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
+use App\Models\Company;
 use App\Models\Invoice;
 use App\Models\Offer;
 use App\Models\Project;
@@ -17,13 +18,24 @@ class ClientController extends Controller
     /**
      * Pokazuje klientów.
      */
-    public function index()
+    public function index_old()
     {
         $clients = $this->get_clients();
         $clients_sugestion = $this->get_sugestion_clients();
         $clients_all =  $this->get_all_clients();
 
         return view('admin.client.index', compact('clients', 'clients_sugestion', 'clients_all'));
+    }
+
+    /**
+     * Pokazuje klientów.
+     */
+    public function index()
+    {
+        $users = User::where('company_id', $this->get_company_id())->get();
+        $companies = Company::all();
+        $user_id = auth()->id();
+        return view('admin.client.client', compact('users', 'user_id', 'companies'));
     }
 
     /**

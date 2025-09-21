@@ -25,7 +25,7 @@ $icons = [
 @endphp
 
 <div>
-    <div class="space-y-6 px-6 py-4">
+    <div class="space-y-6 md:px-6 py-4">
         <div class="mb-6" id="leave-requests">
             <h3 class="mb-5 text-xl font-bold text-gray-900 dark:text-white">📋 Rodzaje wniosków</h3>
             <ul class="grid w-full gap-6 md:grid-cols-2 lg:grid-cols-4">

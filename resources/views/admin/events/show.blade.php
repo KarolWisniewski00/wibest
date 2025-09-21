@@ -7,7 +7,7 @@
             <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
                 Podgląd elementu zdarzenia START lub STOP który jest częścią elementu RCP
             </div>
-            @if($role == 'admin' || $role == 'menedżer')
+            @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
             <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
                 <span class="font-medium">Ostrzeżenie!</span> Usunięcie zdarzenia START lub STOP spowoduje usunięcie całego RCP.
             </div>
@@ -60,7 +60,7 @@
                     </div>
                 </x-text-cell>
                 <!--Czas w pracy-->
-                @if($role == 'admin' || $role == 'menedżer')
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 <!--Użytkownik-->
                 <x-text-cell class="mx-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
@@ -91,6 +91,10 @@
                             @elseif($event->user->role == 'użytkownik')
                             <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Użytkownik
+                            </span>
+                            @elseif($event->user->role == 'właściciel')
+                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                Właściciel
                             </span>
                             @endif
                         </span>
@@ -132,7 +136,7 @@
             </x-container-gray>
 
             <div class="flex justify-end mt-4">
-                @if($role == 'admin' || $role == 'menedżer')
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 <form action="{{route('rcp.event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                     @csrf
                     @method('DELETE')

@@ -2,6 +2,7 @@
     $shortType = ['wolne za pracę w święto' => 'WPS',
     'zwolnienie lekarskie' => 'ZL',
     'urlop wypoczynkowy' => 'UW',
+    'urlop planowany' => 'UP',
     'urlop rodzicielski' => 'UR',
     'wolne za nadgodziny' => 'WN',
     'wolne za święto w sobotę' => 'WSS',
@@ -26,6 +27,7 @@
     'wolne za pracę w święto' => '🕊️',
     'zwolnienie lekarskie' => '🤒',
     'urlop wypoczynkowy' => '🏖️',
+    'urlop planowany' => '🏖️',
     'urlop rodzicielski' => '👶',
     'wolne za nadgodziny' => '⏰',
     'wolne za święto w sobotę' => '🗓️',
@@ -48,7 +50,7 @@
     ];
     @endphp
     <div>
-        <div class="mx-4 relative mb-3 border-gray-300">
+        <div class="md:mx-4 relative mb-3 border-gray-300">
             <input
                 value="{{ $selectedDate }}"
                 type="text"
@@ -62,14 +64,14 @@
                 <i class="fa-solid fa-calendar-days"></i>
             </span>
         </div>
-        <div class="flex justify-between items-center mb-4 mx-4 mt-8">
-            <span class="text-lg font-bold text-gray-800 dark:text-white">{{ $monthName }}</span>
-            <div>
+        <div class="flex justify-between items-center mb-4 md:mx-4 mt-8">
+            <span class="text-md md:text-lg font-bold text-gray-800 dark:text-white">{{ $monthName }}</span>
+            <div class="space-x-2 md:space-x-0">
                 <button wire:click="goToPreviousMonth" class="text-gray-600 dark:text-white" type="button">
-                    <i class="fa-solid fa-chevron-left"></i>
+                    <i class="fa-solid fa-chevron-left"></i><span class="md:hidden mx-1">poprzedni</span>
                 </button>
                 <button wire:click="goToNextMonth" class="text-gray-600 dark:text-white" type="button">
-                    <i class="fa-solid fa-chevron-right"></i>
+                    <span class="md:hidden mx-1">następny</span><i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
         </div>
@@ -77,7 +79,7 @@
             <div class="grid grid-cols-7 gap-px w-full overflow-hidden text-xs font-medium rounded-lg">
                 {{-- Nagłówki dni tygodnia --}}
                 @foreach (['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as $dayName)
-                <div class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white py-2 m-1 text-center  rounded-lg">
+                <div class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-white py-2 m-0.5 text-center  rounded-lg">
                     {{ $dayName }}
                 </div>
                 @endforeach
@@ -87,7 +89,7 @@
                     <button
                     type="button"
                     
-                        @if ($day['leave'] || $day['isHoliday'])
+                        @if ($day['leave'] || $day['isHoliday'] || $day['rcp'])
                         x-data="{ clicked: false }"
                         @click="
                             $dispatch('calendar-unselect');
@@ -108,9 +110,9 @@
                         @calendar-unselect.window="clicked = false"
                         class="
                             bg-white dark:bg-gray-900 h-28 w-full relative p-2 border-2 rounded-lg
-                            flex flex-row items-start justify-start
+                            flex flex-col items-start justify-start
                             @if ($selectedDate === $day['date']->format('Y-m-d'))
-                                @if ($day['leave'] || $day['isHoliday'])
+                                @if ($day['leave'] || $day['isHoliday'] || $day['rcp'])
                                     border-red-400 dark:border-red-500
                                 @else
                                     border-green-500 dark:border-green-400
@@ -131,17 +133,23 @@
                             @endif
                         </div>
                         @if ($day['isHoliday'])
-                            <div class="flex flex-col items-center justify-center h-full w-full mt-2 mr-2">
+                            <div class="flex flex-col items-center justify-center h-full w-full mt-2 md:mr-2">
                                 <span class="text-lg md:text-xl">{{ $icons['święto'] ?? '' }}</span>
-                                <span class="px-2 py-0.5 mt-1 rounded-full text-xs font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
+                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
                                     {{ $shortType['święto'] ?? '' }}
                                 </span>
                             </div>
-                        @endif
-                        @if ($day['leave'])
-                            <div class="flex flex-col items-center justify-center h-full w-full mt-2 mr-2">
+                        @elseif ($day['rcp'])
+                            <div class="flex flex-col items-center justify-center h-full w-full mt-2 md:mr-2">
+                                <span class="text-lg md:text-xl">⏱️</span>
+                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-green-300 dark:bg-green-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
+                                    RCP
+                                </span>
+                            </div>
+                        @elseif ($day['leave'])
+                            <div class="flex flex-col items-center justify-center h-full w-full mt-2 md:mr-2">
                                 <span class="text-lg md:text-xl">{{ $icons[$day['leave']] ?? '' }}</span>
-                                <span class="px-2 py-0.5 mt-1 rounded-full text-xs font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
+                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
                                     {{ $shortType[$day['leave']] ?? '' }}
                                 </span>
                             </div>

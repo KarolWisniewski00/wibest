@@ -14,6 +14,7 @@ class Invoice extends Model
         'number', // Unikalny numer faktury
         'invoice_type', // Typ faktury (np. faktura lub faktura proforma)
         'company_id', // ID firmy wystawiającej fakturę
+        'client_company_id', // ID firmy klienta na którego wystawiana jest faktura
         'issue_date', // Data wystawienia faktury
         'due_date', // Termin płatności faktury
         'status', // Status faktury (np. draft, sent, paid, canceled)
@@ -54,6 +55,15 @@ class Invoice extends Model
     public function client()
     {
         return $this->belongsTo(Client::class); // Faktura jest przypisana do klienta
+    }
+
+    /**
+     * Relacja z modelem `Company` jako klient.
+     * Faktura może być przypisana do jednej firmy-klienta.
+     */
+    public function clientCompany()
+    {
+        return $this->belongsTo(Company::class, 'client_company_id');
     }
 
     /**

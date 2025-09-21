@@ -47,6 +47,14 @@ class Company extends Model
         return $this->hasMany(Client::class); // Firma może mieć wielu klientów
     }
     /**
+     * Definiuje relację jeden-do-wielu (firma -> klienci).
+     * Firma może mieć wielu klientów.
+     */
+    public function companies()
+    {
+        return $this->hasMany(Company::class); // Firma może mieć wielu klientów
+    }
+    /**
      * Definiuje relację jeden-do-wielu (firma -> produkty).
      * Firma może mieć wiele produktów.
      */

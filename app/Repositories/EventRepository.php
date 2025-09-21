@@ -57,6 +57,8 @@ class EventRepository
                 return true;
             }elseif($user->role == 'menedżer'){
                 return true;
+            }elseif($user->role == 'właściciel'){
+                return true;
             } else {
                 return false;
             }

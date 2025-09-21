@@ -9,7 +9,7 @@ use App\Steps\EditLeaveStep;
 use App\Steps\EditManagerStep;
 use Illuminate\Support\Facades\Auth;
 use Vildanbina\LivewireWizard\WizardComponent;
-
+use Livewire\Attributes\On;
 class EditLeaveWizard extends WizardComponent
 {
     public Leave $leave;
@@ -33,7 +33,19 @@ class EditLeaveWizard extends WizardComponent
             'leave_id'   => $leaveId,
         ]);
     }
-
+    #[On('selectDate')]
+    public function handleCalendarDateSelected($selectedDate, $typeTime = 'start_time')
+    {
+        if ($typeTime === 'start_time') {
+            $this->mergeState([
+                'start_time' => $selectedDate,
+            ]);
+        } else {
+            $this->mergeState([
+                'end_time' => $selectedDate,
+            ]);
+        }
+    }
     public function model(): Leave
     {
         return $this->leave;

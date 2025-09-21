@@ -11,7 +11,7 @@ use Vildanbina\LivewireWizard\Components\Step;
 
 class PlannedLeaveDateStep extends Step
 {
-    protected string $view = 'livewire.steps.leave-date-step';
+    protected string $view = 'livewire.steps.planned-leave-date-step';
 
     public function mount()
     {
@@ -46,7 +46,7 @@ class PlannedLeaveDateStep extends Step
         return [
             [
                 'state.start_time'     => ['required', 'date'],
-                'state.end_time'     => ['required', 'date', 'after_or_equal:today', 'after_or_equal:start_date'],
+                'state.end_time'     => ['required', 'date', 'after_or_equal:state.start_time'],
             ],
             [],
             [

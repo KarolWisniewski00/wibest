@@ -7,7 +7,7 @@
             <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
                 Podgląd elementu RCP w którego skład wchodzą dwa mniejsze zdarzenia START i STOP.
             </div>
-            @if($role == 'admin' || $role == 'menedżer')
+            @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
             @if($work_session->status != 'Praca zakończona')
             <div class="p-4 mb-4 text-sm text-yellow-800 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300" role="alert">
                 <span class="font-medium">Ostrzeżenie!</span> Edycja nie jest możliwa, ponieważ sesja pracy jeszcze nie została zakończona.
@@ -40,7 +40,25 @@
                     </div>
                 </x-text-cell>
                 <!--status-->
+                @php
+                [$hours, $minutes, $seconds] = explode(":", $work_session->time_in_work);
+                $totalSeconds = $hours * 3600 + $minutes * 60 + $seconds;
+                @endphp
                 @if($work_session->time_in_work == '24:00:00' && $work_session->user->working_hours_from && $work_session->user->working_hours_to && $work_session->user->working_hours_start_day && $work_session->user->working_hours_stop_day)
+                <x-text-cell class="mx-4 gap-4 row-span-3">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                        Przesuń czas
+                    </p>
+                    <div class="flex flex-col items-start w-full justify-start gap-2">
+                        <x-button-link-green href="{{ route('rcp.work-session.start.plus', $work_session) }}">
+                            <i class="fa-solid fa-clock mr-2"></i>start + {{$work_session->user->working_hours_custom}}h
+                        </x-button-link-green>
+                        <x-button-link-red href="{{ route('rcp.work-session.stop.minus', $work_session) }}">
+                            <i class="fa-solid fa-clock mr-2"></i>stop - {{$work_session->user->working_hours_custom}}h
+                        </x-button-link-red>
+                    </div>
+                </x-text-cell>
+                @elseif($totalSeconds < $work_session->user->working_hours_custom*3600)
                 <x-text-cell class="mx-4 gap-4 row-span-3">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
                         Przesuń czas
@@ -67,13 +85,15 @@
                         <span class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
                             @if($work_session->time_in_work == '24:00:00')
                             <span title="Automatyczne zakończenie" class="text-red-500">⚠️</span>
+                            @elseif($totalSeconds < $work_session->user->working_hours_custom*3600)
+                            <span title="Brak normy" class="text-red-500">⚠️</span>
                             @endif
                             {{ $work_session->time_in_work }}
                         </span>
                     </div>
                 </x-text-cell>
                 <!--Czas w pracy-->
-                @if($role == 'admin' || $role == 'menedżer')
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 <!--Użytkownik-->
                 <x-text-cell class="mx-4 gap-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
@@ -105,6 +125,10 @@
                             <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                 Użytkownik
                             </span>
+                            @elseif($work_session->user->role == 'właściciel')
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                Właściciel
+                            </span>
                             @endif
                         </span>
                     </div>
@@ -112,7 +136,7 @@
                 <!--Użytkownik-->
                 @endif
             </x-container-gray>
-            <div class="grid grid-cols-2 mt-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 mt-4 gap-4">
                 @if($work_session->eventStart != null)
                 <x-container-gray class="px-0">
                     <!--status-->
@@ -227,7 +251,7 @@
                 @endif
             </div>
             <div class="flex justify-end mt-4">
-                @if($role == 'admin' || $role == 'menedżer')
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 @if($work_session->status == 'Praca zakończona')
                 <x-button-link-cello href="{{route('rcp.work-session.edit', $work_session)}}" class="text-lg mr-2">
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
