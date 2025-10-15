@@ -55,7 +55,7 @@
             </div>
             <!-- miejsce na obrazek -->
             <div class="mt-12 flex justify-center">
-                <div class="overflow-hidden w-full md:w-2/3 h-72 bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
+                <div class="overflow-hidden w-full md:w-2/3 h-auto bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center">
                     <img class="img-fluid" alt="" src="{{asset('img.png')}}">
                 </div>
             </div>
