@@ -17,6 +17,9 @@ class Permission extends Model
      */
     public function users()
     {
-        return $this->belongsToMany(User::class, 'permission_user')->withTimestamps();
+        return $this->belongsToMany(User::class, 'permission_user')->withTimestamps()->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 }

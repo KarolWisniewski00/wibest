@@ -68,7 +68,10 @@ class Offer extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class); // Oferta należy do jednego użytkownika
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]); // Oferta należy do jednego użytkownika
     }
     public function project()
     {

@@ -16,13 +16,13 @@
         <x-team.nav :role="$role" :invitations="$invitations" />
 
         <!--CONTENT-->
-        <div class="px-4 py-5 sm:px-6 lg:px-8">
+        <div class="p-4">
             <!--POWRÓT-->
             <x-button-link-back href="{{ route('team.user.show', $user) }}" class="text-lg mb-4">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do profilu
             </x-button-link-back>
             <!--POWRÓT-->
-            <h2 class="text-xl font-semibold dark:text-white mb-3">Edytuj planing Użytkownika</h2>
+            <h2 class="text-xl font-semibold dark:text-white mb-4">Edytuj planing Użytkownika</h2>
             
             <livewire:planing-wizard userId="{{$user->id}}" />
 

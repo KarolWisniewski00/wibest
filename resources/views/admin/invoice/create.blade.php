@@ -3,7 +3,7 @@
         @include('admin.elements.alerts')
         <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <!--POWRÓT-->
                     <x-button-link-back href="{{ route('invoice') }}" class="text-lg">
@@ -925,7 +925,7 @@
                                                         id="buyer_name"
                                                         name="buyer_name"
                                                         required
-                                                        class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                                        class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                                     <datalist id="buyer_name_suggestions">
                                                         @foreach ($clients as $client)
                                                         <option value="{{ $client->name }}"
@@ -959,7 +959,7 @@
                                                         id="buyer_address"
                                                         name="buyer_adress"
                                                         required
-                                                        class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                                        class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                                     @error('buyer_adress')
                                                     <p class="my-3 block text-center text-sm font-medium text-red-700 dark:text-red-500">{{ $message }}</p>
                                                     @enderror
@@ -976,7 +976,7 @@
                                                             id="buyer_vat_number"
                                                             name="buyer_vat_number"
                                                             required
-                                                            class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                                            class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
 
                                                         @error('buyer_vat_number')
                                                         <p class="my-3 block text-center text-sm font-medium text-red-700 dark:text-red-500">{{ $message }}</p>
@@ -1069,7 +1069,7 @@
                                             <!-- Nazwa produktu/usługi -->
                                             <div class="flex flex-col col-span-2">
                                                 <label for="item_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa produktu/usługi</label>
-                                                <input list="name_item_suggestions" type="text" name="items[0][name]" id="item_name" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                                                <input list="name_item_suggestions" type="text" name="items[0][name]" id="item_name" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
                                                 <datalist id="name_item_suggestions">
                                                 </datalist>
                                             </div>
@@ -1087,7 +1087,7 @@
                                             <!-- Jednostka miary -->
                                             <div class="flex flex-col">
                                                 <label for="item_unit" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jednostka miary</label>
-                                                <select name="items[0][unit]" id="item_unit" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                                                <select name="items[0][unit]" id="item_unit" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
                                                     <option value="szt">szt</option>
                                                     <option value="kg">kg</option>
                                                     <option value="m">m</option>
@@ -1099,13 +1099,13 @@
                                             <!-- Cena netto -->
                                             <div class="flex flex-col">
                                                 <label for="item_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cena netto</label>
-                                                <input type="number" step="0.01" name="items[0][price]" id="item_price" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                                                <input type="number" step="0.01" name="items[0][price]" id="item_price" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
                                             </div>
 
                                             <!-- Stawka VAT -->
                                             <div class="flex flex-col">
                                                 <label for="item_vat" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stawka VAT (%)</label>
-                                                <select name="items[0][vat]" id="item_vat" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                                                <select name="items[0][vat]" id="item_vat" class="min-h-[44px] mt-1 block w-full p-2 border bg-gray-100 text-gray-700 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
                                                     <option value="23">23%</option>
                                                     <option value="8">8%</option>
                                                     <option value="5">5%</option>
@@ -1116,13 +1116,13 @@
                                             <!-- Kwota netto -->
                                             <div class="flex flex-col">
                                                 <label for="item_netto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kwota netto</label>
-                                                <input type="number" step="0.01" value="0" name="items[0][netto]" id="item_netto" class="min-h-[44px] mt-1 block w-full p-2 bg-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:bg-gray-800 border border-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:border-gray-600 dark:text-gray-100" required readonly>
+                                                <input type="number" step="0.01" value="0" name="items[0][netto]" id="item_netto" class="min-h-[44px] mt-1 block w-full p-2 bg-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:bg-gray-800 border border-white rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:border-gray-600 dark:text-gray-100" required readonly>
                                             </div>
 
                                             <!-- Kwota brutto -->
                                             <div class="flex flex-col">
                                                 <label for="item_brutto" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kwota brutto</label>
-                                                <input type="number" step="0.01" value="0" name="items[0][brutto]" id="item_brutto" class="min-h-[44px] mt-1 block w-full p-2 bg-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:bg-gray-800 border border-white rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:border-gray-600 dark:text-gray-100" required readonly>
+                                                <input type="number" step="0.01" value="0" name="items[0][brutto]" id="item_brutto" class="min-h-[44px] mt-1 block w-full p-2 bg-white dark:hover:bg-gray-700 dark:hover:border-gray-700 dark:bg-gray-800 border border-white rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:border-gray-600 dark:text-gray-100" required readonly>
                                             </div>
                                         </div>
 
@@ -1356,7 +1356,7 @@
                                 <!-- Uwagi -->
                                 <div class="mb-6">
                                     <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
-                                    <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full p-2 border border-gray-100 bg-gray-100 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
+                                    <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full p-2 border border-gray-100 bg-gray-100 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
                                     @error('notes')
                                     <p class="my-3 block text-center text-sm font-medium text-red-700 dark:text-red-500">{{ $message }}</p>
                                     @enderror

@@ -3,7 +3,7 @@
         @include('admin.elements.alerts')
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Formularz edycji firmy -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <!--POWRÓT-->
                     <a href="{{ route('setting') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 dark:bg-gray-700 border border-transparent rounded-lg font-semibold text-lg dark:text-gray-900 uppercase tracking-widest hover:bg-gray-700 hover:text-white dark:hover:bg-gray-300 dark:hover:text-gray-900 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
@@ -24,7 +24,7 @@
 
                         <div class="mb-6">
                             <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa firmy</label>
-                            <input type="text" id="name" name="name" value="{{ old('name', $company->name) }}" autofocus required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            <input type="text" id="name" name="name" value="{{ old('name', $company->name) }}" autofocus required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                             @error('name')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -33,7 +33,7 @@
                         <!-- Adres -->
                         <div class="mb-6">
                             <label for="adress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres</label>
-                            <input type="text" id="adress" name="adress" value="{{ old('adress', $company->adress) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            <input type="text" id="adress" name="adress" value="{{ old('adress', $company->adress) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                             @error('adress')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror

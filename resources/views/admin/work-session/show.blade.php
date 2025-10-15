@@ -10,7 +10,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- WIDGET TASK -->
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <!--POWRÓT-->
                     <a href="{{ route('work.session') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 dark:bg-gray-700 border border-transparent rounded-lg font-semibold text-lg dark:text-gray-900 uppercase tracking-widest hover:bg-gray-700 hover:text-white dark:hover:bg-gray-300 dark:hover:text-gray-900 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
@@ -31,7 +31,7 @@
                     </div>
 
                     @if ($company)
-                    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-8">
+                    <div class="relative overflow-x-auto shadow sm:rounded-lg mt-8">
                         <div class="flex flex-col gap-4 w-full h-full appearance-none rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-100 p-4 outline-none  dark:bg-gray-700 dark:text-gray-50">
                             <div class="md:grid grid-cols-2 md:gap-4 py-4 border-b border-gray-100 dark:border-gray-700">
                                 <div class="col-span-2 flex flex-col gap-4">

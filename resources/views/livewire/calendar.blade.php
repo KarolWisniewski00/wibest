@@ -49,8 +49,8 @@
     'święto' => '🎌',
     ];
     @endphp
-    <div>
-        <div class="md:mx-4 relative mb-3 border-gray-300">
+    <div class="mb-4">
+        <div class="relative mb-4 border-gray-300">
             <input
                 value="{{ $selectedDate }}"
                 type="text"
@@ -64,18 +64,18 @@
                 <i class="fa-solid fa-calendar-days"></i>
             </span>
         </div>
-        <div class="flex justify-between items-center mb-4 md:mx-4 mt-8">
+        <div class="flex justify-between items-center my-4 px-1">
             <span class="text-md md:text-lg font-bold text-gray-800 dark:text-white">{{ $monthName }}</span>
             <div class="space-x-2 md:space-x-0">
                 <button wire:click="goToPreviousMonth" class="text-gray-600 dark:text-white" type="button">
-                    <i class="fa-solid fa-chevron-left"></i><span class="md:hidden mx-1">poprzedni</span>
+                    <i class="fa-solid fa-chevron-left"></i><span class="md:hidden mx-1">pop</span>
                 </button>
                 <button wire:click="goToNextMonth" class="text-gray-600 dark:text-white" type="button">
-                    <span class="md:hidden mx-1">następny</span><i class="fa-solid fa-chevron-right"></i>
+                    <span class="md:hidden mx-1">nas</span><i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
         </div>
-        <x-container>
+        <x-container-calendar>
             <div class="grid grid-cols-7 gap-px w-full overflow-hidden text-xs font-medium rounded-lg">
                 {{-- Nagłówki dni tygodnia --}}
                 @foreach (['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as $dayName)
@@ -113,9 +113,9 @@
                             flex flex-col items-start justify-start
                             @if ($selectedDate === $day['date']->format('Y-m-d'))
                                 @if ($day['leave'] || $day['isHoliday'] || $day['rcp'])
-                                    border-red-400 dark:border-red-500
+                                    border-red-300 dark:border-red-300
                                 @else
-                                    border-green-500 dark:border-green-400
+                                    border-green-300 dark:border-green-300
                                 @endif
                             @else
                                 border-gray-200 dark:border-gray-800
@@ -123,7 +123,7 @@
                         ">
                         <div class="flex flex-col items-start justify-start">
                             @if ($day['date']->isToday())
-                                <div class="text-white bg-red-500 dark:bg-red-700 rounded-full w-6 h-6 flex items-center justify-center text-[11px] font-semibold mb-1">
+                                <div class="text-gray-900 bg-red-300 dark:bg-red-300 rounded-full w-6 h-6 flex items-center justify-center text-[11px] font-semibold mb-1">
                                     {{ $day['date']->day }} 
                                 </div>
                             @else
@@ -132,25 +132,25 @@
                                 </div>
                             @endif
                         </div>
-                        @if ($day['isHoliday'])
-                            <div class="flex flex-col items-center justify-center h-full w-full mt-2 md:mr-2">
-                                <span class="text-lg md:text-xl">{{ $icons['święto'] ?? '' }}</span>
-                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
-                                    {{ $shortType['święto'] ?? '' }}
-                                </span>
-                            </div>
-                        @elseif ($day['rcp'])
+                        @if ($day['rcp'])
                             <div class="flex flex-col items-center justify-center h-full w-full mt-2 md:mr-2">
                                 <span class="text-lg md:text-xl">⏱️</span>
-                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-green-300 dark:bg-green-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
+                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-green-300 dark:bg-green-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
                                     RCP
                                 </span>
                             </div>
                         @elseif ($day['leave'])
                             <div class="flex flex-col items-center justify-center h-full w-full mt-2 md:mr-2">
                                 <span class="text-lg md:text-xl">{{ $icons[$day['leave']] ?? '' }}</span>
-                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-400 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
+                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
                                     {{ $shortType[$day['leave']] ?? '' }}
+                                </span>
+                            </div>
+                        @elseif ($day['isHoliday'])
+                            <div class="flex flex-col items-center justify-center h-full w-full mt-2 md:mr-2">
+                                <span class="text-lg md:text-xl">{{ $icons['święto'] ?? '' }}</span>
+                                <span class="px-1 md:px-2 py-0.5 mt-1 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest">
+                                    {{ $shortType['święto'] ?? '' }}
                                 </span>
                             </div>
                         @endif
@@ -158,5 +158,5 @@
                 @endforeach
                 @endforeach
             </div>
-        </x-container>
+        </x-container-calendar>
     </div>

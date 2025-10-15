@@ -1,10 +1,57 @@
+    @php
+    $shortType = ['wolne za pracę w święto' => 'WPS',
+    'zwolnienie lekarskie' => 'ZL',
+    'urlop wypoczynkowy' => 'UW',
+    'urlop rodzicielski' => 'UR',
+    'wolne za nadgodziny' => 'WN',
+    'wolne za święto w sobotę' => 'WSS',
+    'urlop bezpłatny' => 'UB',
+    'wolne z tytułu 5-dniowego tygodnia pracy' => 'WT5',
+    'zwolnienie lekarsie - opieka' => 'ZLO',
+    'urlop okolicznościowy' => 'UO',
+    'urlop wypoczynkowy "na żądanie"' => 'UWZ',
+    'oddanie krwi' => 'OK',
+    'urlop ojcowski' => 'UOJC',
+    'urlop macieżyński' => 'UM',
+    'świadczenie rehabilitacyjne' => 'SR',
+    'opieka' => 'OP',
+    'świadek w sądzie' => 'SWS',
+    'praca zdalna' => 'PZ',
+    'kwarantanna' => 'KW',
+    'kwarantanna z pracą zdalną' => 'KWZPZ',
+    'delegacja' => 'DEL'
+    ];
+    $icons = [
+    'wolne za pracę w święto' => '🕊️',
+    'zwolnienie lekarskie' => '🤒',
+    'urlop wypoczynkowy' => '🏖️',
+    'urlop rodzicielski' => '👶',
+    'wolne za nadgodziny' => '⏰',
+    'wolne za święto w sobotę' => '🗓️',
+    'urlop bezpłatny' => '💸',
+    'wolne z tytułu 5-dniowego tygodnia pracy' => '📆',
+    'zwolnienie lekarsie - opieka' => '🧑‍⚕️',
+    'urlop okolicznościowy' => '🎉',
+    'urlop wypoczynkowy "na żądanie"' => '📢',
+    'oddanie krwi' => '🩸',
+    'urlop ojcowski' => '👨‍👧',
+    'urlop macieżyński' => '🤱',
+    'świadczenie rehabilitacyjne' => '🦾',
+    'opieka' => '🧑‍🍼',
+    'świadek w sądzie' => '⚖️',
+    'praca zdalna' => '💻',
+    'kwarantanna' => '🦠',
+    'kwarantanna z pracą zdalną' => '🏠💻',
+    'delegacja' => '✈️',
+    ];
+    @endphp
 <nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 dark:border-gray-700 shadow fixed w-full z-10">
     <!-- Primary Navigation Menu -->
     <div class="w-full">
         <div class="flex justify-between h-20">
             <div class="flex">
                 <!-- Logo -->
-                <div class="shrink-0 flex items-center w-64 justify-center">
+                <div class="shrink-0 flex items-center ms-8 md:ms-0 md:w-64 justify-center">
                     <a href="{{ route('dashboard') }}">
                         <span class="sm:order-1 text-green-300 flex-none text-xl font-semibold focus:outline-none focus:opacity-80 dark:text-green-300" style='font-family: "Raleway", sans-serif;'>WIBEST</span>
                     </a>
@@ -38,8 +85,61 @@
                 </div>
             </div>
             @if ($company)
-            <div class="items-center hidden sm:flex">
-                <x-widget-display-nav class="grid-cols-3 grid-rows-1 h-fit">
+            <div class="items-center hidden sm:flex xl:hidden 2xl:flex">
+                @if($date['leave'] != null)
+                <x-widget-display-nav class="grid grid-cols-1 gap-4 p-2 m-2 w-full">
+                    <!-- Lewa kolumna: Data i Timer -->
+                    <div class="space-y-1 flex flex-col justify-center">
+                        <!-- Data -->
+                        <x-flex-center>
+                            <x-paragraf-display id="date" class="text-xs text-gray-600 dark:text-gray-300">
+                                <!-- Data -->
+                            </x-paragraf-display>
+                        </x-flex-center>
+
+                        <!-- Timer -->
+                        <x-flex-center>
+                            <x-paragraf-display class="text-xs font-bold text-gray-900 dark:text-white">
+                                <div class="flex flex-row gap-1 justify-start items-center">
+                                    <div class="text-md mx-2">{{ $icons[$date['leave']] ?? '' }}</div>
+                                    <div class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-md">{{ $date['leave'] ?? '' }}</div>
+                                    <span class="px-3 py-1 mx-2 rounded-full text-[0.5rem] w-fit font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                        {{ $shortType[$date['leave']] ?? '' }}
+                                    </span>
+                                </div>
+                            </x-paragraf-display>
+                        </x-flex-center>
+                    </div>
+                </x-widget-display-nav>
+                @elseif($date['isHoliday'] == true)
+                <x-widget-display-nav class="grid grid-cols-1 gap-4 p-2 m-2 w-full">
+                    <!-- Lewa kolumna: Data i Timer -->
+                    <div class="space-y-1 flex flex-col justify-center">
+                        <!-- Data -->
+                        <x-flex-center>
+                            <x-paragraf-display id="date" class="text-xs text-gray-600 dark:text-gray-300">
+                                <!-- Data -->
+                            </x-paragraf-display>
+                        </x-flex-center>
+
+                        <!-- Timer -->
+                        <x-flex-center>
+                            <x-paragraf-display class="text-xs font-bold text-gray-900 dark:text-white">
+                                <div class="flex flex-row gap-1 justify-start items-center">
+                                    <div class="text-md mx-2">🎌</div>
+                                    <div class="flex flex-row gap-1 items-center">
+                                        <div class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-md">Święto ustawowo wolne</div>
+                                        <span class="px-3 py-1 mx-2 rounded-full text-[0.5rem] w-fit font-semibold bg-pink-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-pink-200 dark:hover:bg-pink-400 focus:bg-pink-200 dark:focus:bg-pink-300 active:bg-pink-200 dark:active:bg-pink-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                            ŚUW
+                                        </span>
+                                    </div>
+                                </div>
+                            </x-paragraf-display>
+                        </x-flex-center>
+                    </div>
+                </x-widget-display-nav>
+                @elseif($date['leave'] == null)
+                <x-widget-display-nav class="grid-cols-3 grid-rows-1 gap-4 p-2 m-2 w-full">
                     <div class="col-span-2">
                         <!-- Data -->
                         <div class="">
@@ -51,7 +151,7 @@
                         <!-- Timer -->
                         <div>
                             <x-flex-center>
-                                <x-paragraf-display id="timer" class="text-xl">
+                                <x-paragraf-display id="timer" class="text-lg">
                                     00:00:00
                                 </x-paragraf-display>
                             </x-flex-center>
@@ -62,18 +162,19 @@
                         <div class="text-center flex justify-center items-center h-full">
                             <button
                                 id="startButton"
-                                class="whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 dark:bg-green-300 border border-transparent rounded-lg font-semibold text-xs text-gray-900 dark:text-gray-900 uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-600 active:bg-green-900 dark:active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                class="text-xs whitespace-nowrap inline-flex items-center px-4 py-2 bg-green-300 text-gray-900 dark:bg-green-300 border border-transparent rounded-lg font-semibold dark:text-gray-900 uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-green-300 focus:ring-offset-2 dark:focus:ring-offset-green-800 transition ease-in-out duration-150">
                                 <i class="fa-solid fa-play mr-2"></i>Start
                             </button>
                             <!-- Przycisk Stop -->
                             <button
                                 id="stopButton"
-                                class="hidden whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-xs text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                class="hidden text-xs min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-300 text-gray-900 dark:bg-red-300 border border-transparent rounded-lg font-semibold dark:text-gray-900 uppercase tracking-widest hover:bg-red-200 dark:hover:bg-red-400 focus:bg-red-200 dark:focus:bg-red-300 active:bg-red-200 dark:active:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 dark:focus:ring-offset-red-800 transition ease-in-out duration-150">
                                 <i class="fa-solid fa-stop mr-2"></i>Stop
                             </button>
                         </div>
                     </div>
                 </x-widget-display-nav>
+                @endif
             </div>
             @endif
             <div class="hidden xl:flex xl:items-center xl:ms-6">
@@ -130,7 +231,7 @@
                 @endif
 
                 <!-- Settings Dropdown -->
-                <div class="me-2 relative">
+                <div class="me-4 relative">
                     <x-dropdown-jets align="right" width="48">
                         <x-slot name="trigger">
                             @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
@@ -183,8 +284,8 @@
             </div>
 
             <!-- Hamburger -->
-            <div class="me-2 flex items-center xl:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
+            <div class="me-4 flex items-center xl:hidden">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-4 rounded-md text-gray-400 dark:text-gray-500 hover:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900 focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-900 focus:text-gray-500 dark:focus:text-gray-400 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

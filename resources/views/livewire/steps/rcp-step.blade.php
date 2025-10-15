@@ -2,7 +2,7 @@
     <!-- Start i Stop -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div>
-            <label for="datepicker" class="md:mx-4 my-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label for="datepicker" class="my-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 📅 Wybierz dzień
             </label>
             <!-- START -->
@@ -16,10 +16,10 @@
 
         <!-- STOP -->
         <div>
-            <label for="start_time_clock" class="md:mx-4 my-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label for="start_time_clock" class="my-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 ⏱️Wybierz godzinę rozpoczęcia
             </label>
-            <div class="md:mx-4 relative mb-3 border-gray-300">
+            <div class="relative mb-4 border-gray-300">
                 <input
                     type="time"
                     id="start_time_clock"
@@ -33,10 +33,10 @@
                     <i class="fa-regular fa-clock"></i>
                 </span>
             </div>
-            <label for="end_time_clock" class="md:mx-4 my-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label for="end_time_clock" class=" my-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 ⏱️Wybierz godzinę zakończenia
             </label>
-            <div class="md:mx-4 relative mb-3 border-gray-300">
+            <div class=" relative mb-4 border-gray-300">
                 <input
                     type="time"
                     id="end_time_clock"

@@ -58,6 +58,17 @@ class RCPController extends Controller
         return view('admin.rcp.create', compact('users', 'userId'));
     }
     /**
+     * Wyświetla formularz do dodawania notatki.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function createNote(WorkSession $work_session): \Illuminate\View\View
+    {
+        $userId = Auth::id();
+        $users = $this->userService->getUsersFromCompany();
+        return view('admin.rcp.create-note', compact('work_session', 'users', 'userId'));
+    }
+    /**
      * Zapisuje nową sesję pracy.
      *
      * @param StoreWorkSessionRequest $request
@@ -73,6 +84,17 @@ class RCPController extends Controller
         return redirect()->route('rcp.work-session.index')->with('success', 'Sesja pracy została dodana.');
     }
     /**
+     * Zapisuje nową notatkę.
+     *
+     * @param Request $request
+     */
+    public function storeNote(WorkSession $work_session, Request $request)
+    {
+        $work_session->notes = $request->content;
+        $work_session->save();
+        return redirect()->route('rcp.work-session.show', $work_session)->with('success', 'Notatka sesji pracy została dodana.');
+    }
+    /**
      * Wyświetla formularz do edytowania sesji pracy.
      *
      * @param WorkSession $work_session
@@ -84,7 +106,18 @@ class RCPController extends Controller
         $users = $this->userService->getUsersFromCompany();
         return view('admin.rcp.edit', compact('work_session', 'users', 'userId'));
     }
-
+    /**
+     * Wyświetla formularz do edytowania notatki.
+     *
+     * @param WorkSession $work_session
+     * @return \Illuminate\View\View
+     */
+    public function editNote(WorkSession $work_session)
+    {
+        $userId = Auth::id();
+        $users = $this->userService->getUsersFromCompany();
+        return view('admin.rcp.edit-note', compact('work_session', 'users', 'userId'));
+    }
     /**
      * Aktualizuje sesję pracy.
      *
@@ -101,6 +134,19 @@ class RCPController extends Controller
             endTime: $request->end_time,
         );
         return redirect()->route('rcp.work-session.index')->with('success', 'Sesja pracy została zaktualizowana.');
+    }
+        /**
+     * Aktualizuje sesję pracy.
+     *
+     * @param StoreWorkSessionRequest $request
+     * @param WorkSession $work_session
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateNote(Request $request, WorkSession $work_session): \Illuminate\Http\RedirectResponse
+    {
+        $work_session->notes = $request->content;
+        $work_session->save();
+        return redirect()->route('rcp.work-session.show', $work_session)->with('success', 'Notatka sesji pracy została zaktualizowana.');
     }
     /**
      * Wyświetla szczegóły sesji pracy.
@@ -183,7 +229,7 @@ class RCPController extends Controller
     {
         $perPage = $request->input('per_page', 10);
 
-        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer' || Auth::user()->role == 'właściciel') {
             $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.company_id', Auth::user()->company_id);
         } else {
             $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.user_id', Auth::id());
@@ -221,7 +267,7 @@ class RCPController extends Controller
         $request->session()->put('start_date', $request->input('start_date'));
         $request->session()->put('end_date', $request->input('end_date'));
 
-        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer') {
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer' || Auth::user()->role == 'właściciel') {
             $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.company_id', Auth::user()->company_id);
         } else {
             $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.user_id', Auth::id());
@@ -257,7 +303,6 @@ class RCPController extends Controller
                 'Nazwa użytkownika' => 'Nazwa użytkownika',
                 'Czas rozpoczęcia zdarzenia' => 'Czas rozpoczęcia zdarzenia',
                 'Czas zakończenia zdarzenia' => 'Czas zakończenia zdarzenia',
-                'Czas rozpoczęcia zdarzenia (duplikat)' => 'Czas rozpoczęcia zdarzenia (duplikat)',
                 'Czas w pracy' => 'Czas w pracy',
             ]
         ])->concat(
@@ -266,7 +311,6 @@ class RCPController extends Controller
                     'Nazwa użytkownika' => (string) ($session->user->name ?? 'Brak danych'),
                     'Czas rozpoczęcia zdarzenia' => $session->eventStart->time ?? 'Brak danych',
                     'Czas zakończenia zdarzenia' => $session->eventStop->time ?? 'Brak danych',
-                    'Czas rozpoczęcia zdarzenia (duplikat)' => $session->eventStart->time ?? 'Brak danych',
                     'Czas w pracy' => $session->time_in_work ?? 'Brak danych',
                 ];
             })

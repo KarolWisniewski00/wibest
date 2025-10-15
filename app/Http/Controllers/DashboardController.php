@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Livewire\Calendar;
 use App\Repositories\WorkSessionRepository;
 use App\Services\LeaveService;
 use Carbon\Carbon;
@@ -20,36 +21,11 @@ class DashboardController extends Controller
     /**
      * Wyświetla stronę główną.
      *
-     * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request): \Illuminate\View\View
+    public function index()
     {
-        $leaves = $this->leaveService->getMainByManagerId($request);
-        $leavesUser = $this->leaveService->getMainByUserId($request);
-        $datesBufor = [];
-        $dates = [];
-        // Set week to start on Sunday (0)
-        $startOfWeek = now()->startOfWeek(\Carbon\Carbon::SUNDAY);
-        $endOfWeek = now()->endOfWeek(\Carbon\Carbon::SUNDAY)->subDay();
-
-        $currentDate = $startOfWeek->copy();
-        while ($currentDate->lte($endOfWeek)) {
-            $datesBufor[] = $currentDate->format('d.m.y');
-            $currentDate->addDay();
-        }
-        foreach ($datesBufor as $date) {
-            $workSessionRepository = new WorkSessionRepository();
-            $leave = $workSessionRepository->hasLeave(Auth::user()->id, $date);
-            $leaveFirst = $workSessionRepository->getFirstLeave(Auth::user()->id, $date);
-            $day = Carbon::createFromFormat('d.m.y', $date)->format('d');
-            if ($leave) {
-                $dates[] = ['day' => $day, 'leave' => $leaveFirst->type, 'date' => $date];
-            } else {
-                $dates[] = ['day' => $day, 'leave' => null, 'date' => $date];
-            }
-        }
-        return view('dashboard', compact('leaves', 'leavesUser', 'dates'));
+        return view('dashboard');
     }
 
     public function version()

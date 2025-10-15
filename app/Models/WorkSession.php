@@ -17,21 +17,28 @@ class WorkSession extends Model
         'event_stop_id',
         'time_in_work',
         'created_user_id',
+        'notes',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     public function company()
     {
         return $this->belongsTo(Company::class);
     }
-    
+
     public function created_user()
     {
-        return $this->belongsTo(User::class, 'created_user_id');
+        return $this->belongsTo(User::class, 'created_user_id')->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     public function eventStart()

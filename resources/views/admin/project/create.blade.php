@@ -3,7 +3,7 @@
         @include('admin.elements.alerts')
         <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <!--POWRÓT-->
                     <x-button-link-back href="{{ route('client.show', $client) }}" class="text-lg">
@@ -23,27 +23,27 @@
                                     <!-- Nazwa -->
                                     <div class="mb-4">
                                         <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa</label>
-                                        <input type="text" id="name" name="name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input type="text" id="name" name="name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                     </div>
                                     <!-- Skrót -->
                                     <div class="mb-4">
                                         <label for="shortcut" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Skrót</label>
-                                        <input type="text" id="shortcut" name="shortcut" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input type="text" id="shortcut" name="shortcut" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                     </div>
                                     <!-- Domena sandbox -->
                                     <div class="mb-4">
                                         <label for="sandbox_domain" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Domena sandbox</label>
-                                        <input type="text" id="sandbox_domain" name="sandbox_domain" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input type="text" id="sandbox_domain" name="sandbox_domain" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                     </div>
                                     <!-- Domena produkcja -->
                                     <div class="mb-4">
                                         <label for="production_domain" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Domena produkcja</label>
-                                        <input type="text" id="production_domain" name="production_domain" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input type="text" id="production_domain" name="production_domain" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                     </div>
                                     <!-- Technologia -->
                                     <div class="mb-4">
                                         <label for="technology" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Technologia</label>
-                                        <input type="text" id="technology" name="technology" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input type="text" id="technology" name="technology" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                     </div>
                                 </li>
                                 <li>

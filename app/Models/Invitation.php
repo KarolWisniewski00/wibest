@@ -12,7 +12,10 @@ class Invitation extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     public function company(): BelongsTo

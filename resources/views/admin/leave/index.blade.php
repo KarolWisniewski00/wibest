@@ -61,13 +61,13 @@
             Moje wnioski
         </x-leave.header>
         <!--HEADER-->
-        <x-status-cello id="show-filter" class="mx-2 mt-8 ">
+        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
             {{ $startDate }} - {{ $endDate }}
         </x-status-cello>
         <!--CONTENT-->
         <x-flex-center class="px-4 pb-4 flex flex-col">
             <!--MOBILE VIEW-->
-            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
+            <div class="relative overflow-x-auto md:shadow sm:rounded-lg w-full">
                 <ul id="list" class="grid w-full gap-y-4 block lg:hidden">
                     <!-- EMPTY PLACE -->
                     @if ($leaves->isEmpty())
@@ -78,7 +78,7 @@
                     <!-- WORK SESSIONS ELEMENT VIEW -->
                     <li>
                         <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                            <div class="block w-full">
+                            <div class="flex flex-col w-full gap-4">
                                 <div class="flex justify-between w-full">
                                     <div class="flex justify-start items-center w-full justify-start">
                                         <x-paragraf-display class="text-xs">
@@ -102,7 +102,7 @@
                                         </x-paragraf-display>
                                     </div>
                                 </div>
-                                <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                <div class="text-start text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
                                     <x-paragraf-display class="text-xs">
                                         {{$leave->start_date}}
                                     </x-paragraf-display>
@@ -123,7 +123,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full p-2 justify-start">
+                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full justify-start">
                                     <div class="flex items-center gap-4">
                                         @if($leave->user->profile_photo_url)
                                         <img src="{{ $leave->user->profile_photo_url }}" alt="{{ $leave->user->name }}" class="w-10 h-10 rounded-full">
@@ -162,7 +162,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex space-x-4 p-2 mt-4">
+                                <div class="flex space-x-4">
                                     <x-button-link-blue href="{{route('leave.single.edit', $leave)}}" class="min-h-[38px]">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </x-button-link-blue>
@@ -504,7 +504,7 @@
                             const rowMobile = `
                             <li>
                                 <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                    <div class="block w-full">
+                                    <div class="flex flex-col w-full gap-4">
                                         <div class="flex justify-between w-full">
                                             <div class="flex justify-start items-center w-full justify-start">
                                                 <x-paragraf-display class="text-xs">
@@ -535,7 +535,7 @@
                                                 </x-paragraf-display>
                                             </div>
                                         </div>
-                                        <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                        <div class="text-start text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
                                             <x-paragraf-display class="text-xs">
                                                 ${leave.start_date}
                                             </x-paragraf-display>
@@ -556,7 +556,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full p-2 justify-start">
+                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full justify-start">
                                             <div class="flex items-center gap-4">
                                                 ${leave.user.profile_photo_url
                                                     ? `<img src="${leave.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
@@ -601,7 +601,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="flex space-x-4 mt-4">
+                                        <div class="flex space-x-4">
                                             <x-button-link-blue href="{{route('leave.single.edit', '')}}/${leave.id}" class="min-h-[38px]">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </x-button-link-blue>

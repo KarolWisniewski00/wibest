@@ -80,7 +80,10 @@ class Invoice extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class); // Faktura należy do jednego użytkownika
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]); // Faktura należy do jednego użytkownika
     }
     // Faktura sprzedażowa powiązana z proformą
     public function proforma()

@@ -14,21 +14,16 @@
             Urlopy planowane
         </x-calendar.header>
         <!--HEADER-->
-        <x-status-cello id="show-filter" class="mx-2 mt-8 ">
+        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
             {{ $startDate }} - {{ $endDate }}
         </x-status-cello>
 
         <x-flex-center class="px-4 pb-4 flex flex-col">
-            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
+            <div class="relative overflow-x-auto md:shadow sm:rounded-lg w-full">
 
                 <table id="table" class="w-full text-sm text-center text-gray-500 dark:text-gray-400 table">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                         <tr id="table-head">
-                            <th scope="col" class="px-2 py-3 hidden lg:table-cell">
-                                <x-flex-center>
-                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
-                            </th>
                             <th scope="col" class="px-2 py-3">
                                 Zdjęcie
                             </th>
@@ -45,11 +40,6 @@
                     <tbody id="work-sessions-body">
                         @foreach ($users as $user)
                         <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                            <td class="px-2 py-2 hidden lg:table-cell">
-                                <x-flex-center>
-                                    <input data-id="{{$user->id}}" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
-                            </td>
                             <td class="px-3 py-2 flex items-center justify-center">
                                 @if($user->profile_photo_url)
                                 <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
@@ -162,11 +152,6 @@
 
                             const row = `
                             <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                <td class="px-2 py-2 hidden lg:table-cell">
-                                    <x-flex-center>
-                                        <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
-                                    </x-flex-center>
-                                </td>
                                 <td class="px-3 py-2  flex items-center justify-center">
                                     ${user.profile_photo_url
                                         ? `<img src="${user.profile_photo_url}" class="w-10 h-10 rounded-full">`

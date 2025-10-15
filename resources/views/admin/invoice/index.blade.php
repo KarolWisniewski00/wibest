@@ -51,13 +51,13 @@
         <div class="py-12">
             <div class=" mx-auto sm:px-6 lg:px-8 mt-16">
                 <!-- WIDGET TASK -->
-                <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+                <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                     <x-setting.nav />
                     <x-setting.header>
                         Fakury
                     </x-setting.header>
                     <x-flex-center class="px-4 pb-4">
-                        <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
+                        <div class="relative overflow-x-auto md:shadow sm:rounded-lg mt-8 w-full">
                             <div id="space" class="xl:hidden"></div>
                             <!-- Napis z przyciskiem tworzenia -->
 
@@ -215,7 +215,7 @@
 
 
                             <!--Tabela-->
-                            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8">
+                            <div class="relative overflow-x-auto md:shadow sm:rounded-lg mt-8">
                                 @if ($company)
                                 <!-- Lista sugerowanych faktur -->
                                 <div id="suggestions-container">

@@ -149,13 +149,83 @@
         <x-team.header>
             Mój zespół
         </x-team.header>
-        <x-status-cello id="show-filter" class="mx-2 mt-8 ">
+        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
             WSZYSTKO
         </x-status-cello>
         <x-flex-center class="px-4 pb-4">
-            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
-
-                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table">
+            <div class="relative overflow-x-auto md:shadow rounded-lg w-full">
+                <ul id="list" class="grid w-full gap-y-4 block md:hidden">
+                    <!-- EMPTY PLACE -->
+                    @if ($users->isEmpty())
+                    <x-empty-place />
+                    @else
+                    <!-- EMPTY PLACE -->
+                    @foreach ($users as $user)
+                    <!-- WORK SESSIONS ELEMENT VIEW -->
+                    <li>
+                        <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                            <div class="block w-full">
+                                <div class="text-sm text-gray-700 dark:text-gray-400 flex flex-col gap-4 w-full justify-start">
+                                    <div class="flex items-center gap-4">
+                                        @if($user->profile_photo_url)
+                                        <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
+                                        @else
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                            {{ strtoupper(substr($user->name, 0, 1)) }}
+                                        </div>
+                                        @endif
+                                        <div>
+                                            <div class="flex flex-col justify-center w-fit">
+                                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                    {{$user->name}}
+                                                </x-paragraf-display>
+                                                @if($user->role == 'admin')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>
+                                                @elseif($user->role == 'menedżer')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>
+                                                @elseif($user->role == 'kierownik')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>
+                                                @elseif($user->role == 'użytkownik')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>
+                                                @elseif($user->role == 'właściciel')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                    Właściciel
+                                                </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @if($user->working_hours_custom != null && $user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
+                                    @else
+                                    <div class="flex items-center gap-4">
+                                        <a href="{{ route('team.user.planing', $user->id) }}" class="text-xs text-center inline-flex items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                            ⚠️Ustaw godziny pracy
+                                        </a>
+                                    </div>
+                                    @endif
+                                    <div class="flex space-x-4">
+                                        <x-button-link-neutral href="{{route('team.user.show', $user )}}" class="min-h-[38px]">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </x-button-link-neutral>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- WORK SESSIONS ELEMENT VIEW -->
+                    @endforeach
+                    @endif
+                </ul>
+                <!-- WORK SESSIONS VIEW -->
+                <table id="table" class="hidden w-full text-sm text-left text-gray-500 dark:text-gray-400 md:table">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                         <tr>
                             <th scope="col" class="px-6 py-3 hidden lg:table-cell">
@@ -254,7 +324,7 @@
             </div>
         </x-flex-center>
         @php
-        $file = 'Użytkownicy_' . str_replace(' ', '_', $company->name) . '.xlsx';
+        $file = 'Użytkownicy_' . str_replace(' ', '_', $company->name);
         @endphp
         <x-download :file="$file">
             {{ route('api.v1.team.user.export.xlsx') }}
@@ -334,6 +404,73 @@
                                 </td>
                                 <x-show-cell href="{{route('team.user.show', '' )}}/${session.id}" />
                             </tr>`;
+                            const rowMobile = `
+                            <li>
+                                <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
+                                    <div class="block w-full">
+                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex flex-col gap-4 w-full justify-start">
+                                            <div class="flex items-center gap-4">
+                                                ${session.profile_photo_url
+                                                    ? `<img src="${session.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                                    : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.name[0].toUpperCase()}</div>`
+                                                }
+                                                <div>
+                                                    <div class="flex flex-col justify-center w-fit">
+                                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                            ${session.name}
+                                                        </x-paragraf-display>
+                                                    ${session.role == 'admin'
+                                                    ? ` <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                            Admin
+                                                        </span>`
+                                                    : ``
+                                                    }
+                                                    ${session.role == 'menedżer'
+                                                    ? ` <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                            Menedżer
+                                                        </span>`
+                                                    : ``
+                                                    }
+                                                    ${session.role == 'kierownik'
+                                                    ? ` <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                            Kierownik
+                                                        </span>`
+                                                    : ``
+                                                    }
+                                                    ${session.role == 'użytkownik'
+                                                    ? ` <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                            Użytkownik
+                                                        </span>`
+                                                    : ``
+                                                    }
+                                                    ${session.role == 'właściciel'
+                                                    ? ` <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                            Właściciel
+                                                        </span>`
+                                                    : ``
+                                                    }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            ${(session.working_hours_custom != null && session.working_hours_from != null && session.working_hours_to != null && session.working_hours_start_day != null && session.working_hours_stop_day != null)
+                                                ? ''
+                                                : `
+                                                <div class="flex items-center gap-4">
+                                                    <a href="{{ route('team.user.planing', '' )}}/${session.id}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                                        ⚠️Ustaw godziny pracy
+                                                    </a>
+                                                </div>`
+                                            }
+                                            <div class="flex space-x-4">
+                                                <x-button-link-neutral href="{{route('team.user.show', '' )}}/${session.id}" class="min-h-[38px]">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </x-button-link-neutral>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>`;
+                            $list.append(rowMobile);
                             $body.append(row);
                         });
 

@@ -18,7 +18,7 @@ class UserRepository
             ->where('role', '!=', null)
             ->paginate(10);
     }
-        /**
+    /**
      * Zwraca użytkowników dla menadżera.
      *
      * @return \Illuminate\Pagination\LengthAwarePaginator
@@ -51,6 +51,18 @@ class UserRepository
     {
         return User::where('company_id', Auth::user()->company_id)
             ->where('role', '!=', null)
+            ->get();
+    }
+    /**
+     * Zwraca użytkowników dla admina oprócz zalogowanego.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getByAdminWithoutLogged(): \Illuminate\Support\Collection
+    {
+        return User::where('company_id', Auth::user()->company_id)
+            ->where('role', '!=', null)
+            ->where('id', '!=', Auth::id())
             ->get();
     }
     /**

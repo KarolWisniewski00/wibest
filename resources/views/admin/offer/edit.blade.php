@@ -3,7 +3,7 @@
         @include('admin.elements.alerts')
         <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
 
                     <!--POWRÓT-->
@@ -20,7 +20,7 @@
                             <!-- Numer faktury -->
                             <div class="mb-6">
                                 <label for="number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer faktury</label>
-                                <input type="text" id="number" name="number" value="{{ $offer->number }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="text" id="number" name="number" value="{{ $offer->number }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('number')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -29,7 +29,7 @@
                             <!-- Data wystawienia -->
                             <div class="mb-6">
                                 <label for="issue_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Data wystawienia</label>
-                                <input type="date" id="issue_date" name="issue_date" value="{{ $offer->issue_date }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="date" id="issue_date" name="issue_date" value="{{ $offer->issue_date }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('issue_date')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -171,7 +171,7 @@
                                     <!-- Klient -->
                                     <div class="mb-6">
                                         <label for="buyer_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa nabywcy</label>
-                                        <input value="{{ $offer->buyer_name }}" list="buyer_name_suggestions" id="buyer_name" name="buyer_name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input value="{{ $offer->buyer_name }}" list="buyer_name_suggestions" id="buyer_name" name="buyer_name" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         <datalist id="buyer_name_suggestions">
                                             @foreach ($clients as $client)
                                             <option value="{{ $client->name }}" data-id="{{ $client->id }}" data-name="{{ $client->name }}" data-address="{{ $client->adress }}" data-vat-number="{{ $client->vat_number }}">
@@ -191,7 +191,7 @@
                                     <!-- Adres -->
                                     <div class="mb-6">
                                         <label for="buyer_adress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres nabywcy</label>
-                                        <input value="{{ $offer->buyer_adress }}" type="text" id="buyer_address" name="buyer_adress" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input value="{{ $offer->buyer_adress }}" type="text" id="buyer_address" name="buyer_adress" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         @error('buyer_adress')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
@@ -204,7 +204,7 @@
                                             <button type="button" id="fetch_vat_data" class="inline-flex items-center px-4 py-2 bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 dark:hover:bg-indigo-400 focus:bg-indigo-700 dark:focus:bg-indigo-400 active:bg-indigo-800 dark:active:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                                                 Pobierz dane podatnika VAT
                                             </button>
-                                            <input value="{{ $offer->buyer_tax_id }}" type="text" id="buyer_vat_number" name="buyer_vat_number" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                            <input value="{{ $offer->buyer_tax_id }}" type="text" id="buyer_vat_number" name="buyer_vat_number" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                             @error('buyer_vat_number')
                                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                             @enderror
@@ -214,7 +214,7 @@
                                     <!-- Imię i nazwisko -->
                                     <div class="mb-6">
                                         <label for="buyer_person_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Imię i nazwisko</label>
-                                        <input type="text" id="buyer_person_name" value="{{ $offer->buyer_person_name }}" name="buyer_person_name" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input type="text" id="buyer_person_name" value="{{ $offer->buyer_person_name }}" name="buyer_person_name" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         @error('buyer_person_name')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
@@ -222,7 +222,7 @@
                                     <!-- Email -->
                                     <div class="mb-6">
                                         <label for="buyer_person_email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres email</label>
-                                        <input type="text" id="buyer_person_email" value="{{ $offer->buyer_person_email }}" name="buyer_person_email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                        <input type="text" id="buyer_person_email" value="{{ $offer->buyer_person_email }}" name="buyer_person_email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         @error('buyer_person_email')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                         @enderror
@@ -283,7 +283,7 @@
                             <!-- Uwagi -->
                             <div class="mb-6">
                                 <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
-                                <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
+                                <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
                                 @error('notes')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -346,7 +346,7 @@
         <div id="item_id_${this.length}" class="offer-item grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 relative" data-index="${this.length}">
             <div>
             <label for="item_name_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa produktu/usługi</label>
-            <input list="name_item_suggestions_${this.length}" type="text" name="items[${this.length}][name]" id="item_name_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+            <input list="name_item_suggestions_${this.length}" type="text" name="items[${this.length}][name]" id="item_name_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
             <datalist id="name_item_suggestions_${this.length}">
                 @foreach ($services as $service)
                 <option value="{{ $service->name }}" data-id="{{ $service->id }}" data-unit_price="{{ $service->unit_price }}" data-vat_rate="{{ $service->vat_rate }}" >
@@ -362,24 +362,24 @@
             </div>
             <div>
                 <label for="item_quantity_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Ilość</label>
-                <input value="1" type="number" step="1" name="items[${this.length}][quantity]" id="item_quantity_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                <input value="1" type="number" step="1" name="items[${this.length}][quantity]" id="item_quantity_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
             </div>
             <div>
                 <label for="item_price_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cena jednostkowa netto</label>
-                <input type="number" step="0.01" name="items[${this.length}][price]" id="item_price_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                <input type="number" step="0.01" name="items[${this.length}][price]" id="item_price_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
             </div>
             <div>
                 <label for="item_vat_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stawka VAT (%)</label>
-                <input type="number" value="0" step="0.01" name="items[${this.length}][vat]" id="item_vat_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
+                <input type="number" value="0" step="0.01" name="items[${this.length}][vat]" id="item_vat_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required>
             </div>
             <div>
                 <label for="item_netto_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kwota netto</label>
-                <input type="number" step="0.01" value="0" name="items[${this.length}][netto]" id="item_netto_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required readonly>
+                <input type="number" step="0.01" value="0" name="items[${this.length}][netto]" id="item_netto_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required readonly>
                 <p class="text-indigo-500 text-xs mt-1">Wartość automatycznie obliczana</p>
             </div>
             <div>
                 <label for="item_brutto_${this.length}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Kwota brutto</label>
-                <input type="number" step="0.01" name="items[${this.length}][brutto]" id="item_brutto_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required readonly>
+                <input type="number" step="0.01" name="items[${this.length}][brutto]" id="item_brutto_${this.length}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100" required readonly>
                 <p class="text-indigo-500 text-xs mt-1">Wartość automatycznie obliczana</p>
             </div>
         </div>

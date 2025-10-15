@@ -9,7 +9,7 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="px-6 lg:px-8 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
                         <x-nav-link class="h-full text-center" href="{{ route('work.session') }}" :active="request()->routeIs('work.session')">
@@ -167,7 +167,7 @@
                     </script>
 
                     <!--Tabela-->
-                    <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8">
+                    <div class="relative overflow-x-auto md:shadow sm:rounded-lg mt-8">
                         @if ($company)
                         <!-- Lista sugerowanych faktur -->
                         <div id="suggestions-container">

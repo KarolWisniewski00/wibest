@@ -62,7 +62,7 @@ class LeaveSingleController extends Controller
         $leavePending = $this->leaveService->countByUserId($request);
         return view('admin.leave.edit', compact('leave', 'leavePending'));
     }
-        /**
+    /**
      * Usuwa wniosek.
      *
      * @param Leave $leave

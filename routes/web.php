@@ -189,14 +189,14 @@ Route::middleware([
             Route::prefix('single')->group(function () {
                 Route::get('/', [LeaveSingleController::class, 'index'])->name('leave.single.index');
                 Route::get('/create', [LeaveSingleController::class, 'create'])->name('leave.single.create');
-                Route::post('/store', [LeaveSingleController::class, 'store'])->name('leave.single.store');
                 Route::get('/edit/{leave}', [LeaveSingleController::class, 'edit'])->name('leave.single.edit');
-                Route::post('/update/{leave}', [LeaveSingleController::class, 'update'])->name('leave.single.update');
                 Route::delete('/delete/{leave}', [LeaveSingleController::class, 'delete'])->name('leave.single.delete');
             });
 
             Route::prefix('pending-review')->group(function () {
                 Route::get('/', [LeavePendingReviewController::class, 'index'])->name('leave.pending.index');
+                Route::get('/create', [LeavePendingReviewController::class, 'create'])->name('leave.pending.create');
+                Route::get('/edit/{leave}', [LeavePendingReviewController::class, 'edit'])->name('leave.pending.edit');
                 Route::get('accept/{leave}', [LeavePendingReviewController::class, 'accept'])->name('leave.pending.accept');
                 Route::get('reject/{leave}', [LeavePendingReviewController::class, 'reject'])->name('leave.pending.reject');
                 Route::get('cancel/{leave}', [LeavePendingReviewController::class, 'cancel'])->name('leave.pending.cancel');
@@ -212,11 +212,15 @@ Route::middleware([
             Route::prefix('work-session')->group(function () {
                 Route::get('/', [RCPController::class, 'index'])->name('rcp.work-session.index');
                 Route::get('/create', [RCPController::class, 'create'])->name('rcp.work-session.create');
+                Route::get('/create-note/{work_session}', [RCPController::class, 'createNote'])->name('rcp.work-session.create.note');
                 Route::post('/store', [RCPController::class, 'store'])->name('rcp.work-session.store');
+                Route::post('/store-note/{work_session}', [RCPController::class, 'storeNote'])->name('rcp.work-session.store.note');
                 Route::get('/start/plus/{work_session}', [RCPController::class, 'startPlus'])->name('rcp.work-session.start.plus');
                 Route::get('/stop/minus/{work_session}', [RCPController::class, 'stopMinus'])->name('rcp.work-session.stop.minus');
                 Route::get('/edit/{work_session}', [RCPController::class, 'edit'])->name('rcp.work-session.edit');
+                Route::get('/edit-note/{work_session}', [RCPController::class, 'editNote'])->name('rcp.work-session.edit.note');
                 Route::put('/update/{work_session}', [RCPController::class, 'update'])->name('rcp.work-session.update');
+                Route::put('/update-note/{work_session}', [RCPController::class, 'updateNote'])->name('rcp.work-session.update.note');
                 Route::get('/show/{work_session}', [RCPController::class, 'show'])->name('rcp.work-session.show');
                 Route::delete('/delete/{work_session}', [RCPController::class, 'delete'])->name('rcp.work-session.delete');
             });
@@ -333,7 +337,7 @@ Route::middleware([
             Route::redirect('store/from/{invoice}', '/dashboard/setting/invoice/store/from/{invoice}')->name('invoice.store.from');
             Route::redirect('store/from/ofr/{offer}', '/dashboard/setting/invoice/store/from/ofr/{offer}')->name('invoice.store.from.ofr');
         });
-        
+
         Route::prefix('offer')->group(function () {
             Route::redirect('/', '/dashboard/setting/offer')->name('offer');
             Route::redirect('create/{project}', '/dashboard/setting/offer/create/{project}')->name('offer.create.project');

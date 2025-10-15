@@ -3,7 +3,7 @@
         @include('admin.elements.alerts')
         <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <!--POWRÓT-->
                     <x-button-link-back href="{{ route('client') }}" class="text-lg">
@@ -28,7 +28,7 @@
                                             id="name"
                                             name="name"
                                             required
-                                            class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                            class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         @error('name')
                                         <p class="my-3 block text-center text-sm font-medium text-red-700 dark:text-red-500">{{ $message }}</p>
                                         @enderror
@@ -44,7 +44,7 @@
                                             id="adress"
                                             name="adress"
                                             required
-                                            class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                            class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                         @error('adress')
                                         <p class="my-3 block text-center text-sm font-medium text-red-700 dark:text-red-500">{{ $message }}</p>
                                         @enderror
@@ -61,7 +61,7 @@
                                                 id="vat_number"
                                                 name="vat_number"
                                                 required
-                                                class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                                class="mt-1 block w-full p-2 border text-gray-700 bg-gray-100 border-gray-100 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
 
                                             @error('vat_number')
                                             <p class="my-3 block text-center text-sm font-medium text-red-700 dark:text-red-500">{{ $message }}</p>
@@ -84,11 +84,11 @@
                             <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
                                 <div>
                                     <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                                    <input type="email" id="email" name="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                    <input type="email" id="email" name="email" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 </div>
                                 <div>
                                     <label for="email2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email dodatkowy</label>
-                                    <input type="email" id="email2" name="email2" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                    <input type="email" id="email2" name="email2" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 </div>
                             </div>
 
@@ -96,18 +96,18 @@
                             <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefon</label>
-                                    <input type="text" id="phone" name="phone" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                    <input type="text" id="phone" name="phone" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 </div>
                                 <div>
                                     <label for="phone2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefon dodatkowy</label>
-                                    <input type="text" id="phone2" name="phone2" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                    <input type="text" id="phone2" name="phone2" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 </div>
                             </div>
 
                             <!-- Uwagi -->
                             <div class="mb-4">
                                 <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
-                                <textarea id="notes" name="notes" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
+                                <textarea id="notes" name="notes" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
                             </div>
 
                             <!--ZAPISZ LUB ANULUJ FORMULARZ-->

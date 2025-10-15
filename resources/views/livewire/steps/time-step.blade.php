@@ -1,11 +1,11 @@
 <div>
-    <div class="space-y-6 md:px-2 py-4">
-        <div class="mb-6" id="days">
-            <h3 class="mb-5 text-lg font-medium text-gray-900 dark:text-white">Wybierz godziny pracy</h3>
-            <label for="end_time_clock" class="my-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+    <div>
+        <div class="mb-4" id="days">
+            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Wybierz godziny pracy</h3>
+            <label for="end_time_clock" class="my-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 ⏱️Wybierz godzinę rozpoczęcia
             </label>
-            <div class="relative mb-3 border-gray-300">
+            <div class="relative mb-4 border-gray-300">
                 <input
                     type="time"
                     id="start_time_clock"
@@ -19,10 +19,10 @@
                     <i class="fa-regular fa-clock"></i>
                 </span>
             </div>
-            <label for="end_time_clock" class="my-3 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label for="end_time_clock" class="my-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 ⏱️Wybierz godzinę zakończenia
             </label>
-            <div class="relative mb-3 border-gray-300">
+            <div class="relative mb-4 border-gray-300">
                 <input
                     type="time"
                     id="end_time_clock"

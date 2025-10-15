@@ -53,7 +53,7 @@
 
         <div class="flex items-center mt-5">
             <x-button-green wire:click="confirmLogout" wire:loading.attr="disabled">
-                Wyloguj inne sesje przeglądarki
+                Wyloguj inne sesje
             </x-button-green>
 
             <x-action-message class="ms-3" on="loggedOut">
@@ -71,7 +71,7 @@
                 Proszę podać swoje hasło, aby potwierdzić wylogowanie z innych sesji przeglądarki na wszystkich urządzeniach.
 
                 <div class="mt-4" x-data="{}" x-on:confirming-logout-other-browser-sessions.window="setTimeout(() => $refs.password.focus(), 250)">
-                    <x-input type="password" class="mt-1 block w-3/4"
+                    <x-input type="password" class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold w-3/4"
                         autocomplete="current-password"
                         placeholder="Hasło"
                         x-ref="password"
@@ -90,7 +90,7 @@
                 <x-button-green class="ms-3"
                     wire:click="logoutOtherBrowserSessions"
                     wire:loading.attr="disabled">
-                    Wyloguj inne sesje przeglądarki
+                    Wyloguj inne sesje
                 </x-button-green>
             </x-slot>
         </x-dialog-modal>

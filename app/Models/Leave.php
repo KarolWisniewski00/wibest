@@ -25,7 +25,10 @@ class Leave extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     /**
@@ -33,7 +36,10 @@ class Leave extends Model
      */
     public function manager()
     {
-        return $this->belongsTo(User::class, 'manager_id');
+        return $this->belongsTo(User::class, 'manager_id')->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     /**
@@ -49,6 +55,9 @@ class Leave extends Model
      */
     public function createdBy()
     {
-        return $this->belongsTo(User::class, 'created_user_id');
+        return $this->belongsTo(User::class, 'created_user_id')->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 }

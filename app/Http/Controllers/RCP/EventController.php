@@ -57,7 +57,7 @@ class EventController extends Controller
     
         $query = Event::with('user')->orderBy('time', 'desc');
 
-        if(Auth::user()->role == 'admin' || Auth::user()->role == 'manedżer') {
+        if(Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer' || Auth::user()->role == 'właściciel') {
             $query->where('company_id', Auth::user()->company_id);
         } else {
             $query->where('user_id', Auth::id());
@@ -94,7 +94,7 @@ class EventController extends Controller
         if ($request->filled('end_date')) {
             $query->whereDate('time', '<=', $request->input('end_date'));
         }
-        if(Auth::user()->role == 'admin' || Auth::user()->role == 'manedżer') {
+        if(Auth::user()->role == 'admin' || Auth::user()->role == 'menedżer' || Auth::user()->role == 'właściciel') {
             $query->where('company_id', Auth::user()->company_id);
         } else {
             $query->where('user_id', Auth::id());

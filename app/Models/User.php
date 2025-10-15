@@ -140,12 +140,18 @@ class User extends Authenticatable
      */
     public function supervisor()
     {
-        return $this->belongsTo(User::class, 'supervisor_id');
+        return $this->belongsTo(User::class, 'supervisor_id')->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     public function subordinates()
     {
-        return $this->hasMany(User::class, 'supervisor_id');
+        return $this->hasMany(User::class, 'supervisor_id')->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     /**

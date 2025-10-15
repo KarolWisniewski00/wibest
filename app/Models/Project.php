@@ -40,7 +40,10 @@ class Project extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class); // Klient należy do jednego użytkownika
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]); // Klient należy do jednego użytkownika
     }
     /**
      * Definiuje relację odwrotną jeden-do-wielu (firma -> klient).

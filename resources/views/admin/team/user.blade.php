@@ -16,7 +16,7 @@
         <x-team.nav :role="$role" :invitations="$invitations" />
 
         <!--CONTENT-->
-        <div class="px-4 py-5 sm:px-6 lg:px-8">
+        <div class="p-4">
             <!--POWRÓT-->
             <x-button-link-back href="{{ route('team.user.index') }}" class="text-lg mb-4">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
@@ -38,28 +38,30 @@
                                     {{ strtoupper(substr($user->name, 0, 1)) }}
                                 </div>
                                 @endif
-                                {{ $user->name }}
-                                @if($user->role == 'admin')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Admin
+                                <span class="flex flex-wrap items-center gap-2">
+                                    {{ $user->name }}
+                                    @if($user->role == 'admin')
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                        Admin
+                                    </span>
+                                    @elseif($user->role == 'menedżer')
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                        Menedżer
+                                    </span>
+                                    @elseif($user->role == 'kierownik')
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                        Kierownik
+                                    </span>
+                                    @elseif($user->role == 'użytkownik')
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                        Użytkownik
+                                    </span>
+                                    @elseif($user->role == 'właściciel')
+                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150 whitespace-normal">
+                                        Właściciel
+                                    </span>
+                                    @endif
                                 </span>
-                                @elseif($user->role == 'menedżer')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Menedżer
-                                </span>
-                                @elseif($user->role == 'kierownik')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Kierownik
-                                </span>
-                                @elseif($user->role == 'użytkownik')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Użytkownik
-                                </span>
-                                @elseif($user->role == 'właściciel')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                    Właściciel
-                                </span>
-                                @endif
                             </span>
                         </div>
                     </x-text-cell>
@@ -69,7 +71,7 @@
                             Email
                         </p>
                         <div class="flex justify-start items-center w-full justify-start">
-                            <a href="mailto:{{$user->email}}" class="grid mt-2 md:mt-0 md:inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-xs md:text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                            <a href="mailto:{{$user->email}}" class="grid mt-2 md:mt-0 md:inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-xs md:text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 break-all">
                                 <span class="text-2xl">📧</span>
                                 {{ $user->email }}
                             </a>
@@ -236,13 +238,13 @@
                 <x-button-link-orange href="{{route('team.user.restart', $user)}}" class="text-lg md:mr-2">
                     <i class="fa-solid fa-paper-plane mr-2"></i>Reset hasła
                 </x-button-link-orange>
-                <x-button-link-cello href="{{route('team.user.edit', $user)}}" class="text-lg md:mr-2">
+                <x-button-link-blue href="{{route('team.user.edit', $user)}}" class="text-lg md:mr-2">
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
-                </x-button-link-cello>
+                </x-button-link-blue>
                 @if($user->id != $user_id)
                 <form action="{{route('team.user.disconnect', $user)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz rozłączyć?');">
                     @csrf
-                    <button type="submit" class="min-h-[34px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                    <button type="submit" class="text-lg min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-300 text-gray-900 dark:bg-red-300 border border-transparent rounded-lg font-semibold dark:text-gray-900 uppercase tracking-widest hover:bg-red-200 dark:hover:bg-red-400 focus:bg-red-200 dark:focus:bg-red-300 active:bg-red-200 dark:active:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 dark:focus:ring-offset-red-800 transition ease-in-out duration-150">
                         <i class="fa-solid fa-user-minus mr-2"></i>Rozłącz
                     </button>
                 </form>

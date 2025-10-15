@@ -2,10 +2,10 @@
     <div class="grid grid-cols-1 gap-4 mt-4">
         <div class="mb-6" id="working_hours_regular">
             <h3 class="mb-5 text-lg font-medium text-gray-900 dark:text-white">Stałe czy zmienne godziny pracy?</h3>
-            <ul class="grid w-full gap-6 md:grid-cols-2">
+            <ul class="grid w-full gap-4 md:grid-cols-2">
                 <li>
                     <input name="working_hours_regular-true" wire:model="state.working_hours_regular" type="radio" id="working_hours_regular-true" value="true" class="hidden peer">
-                    <label for="working_hours_regular-true" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-300 dark:peer-checked:border-green-300 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                    <label for="working_hours_regular-true" class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-300 dark:peer-checked:border-green-300 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <div class="flex items-center gap-4">
                             <div class="text-2xl">🕒</div>
                             <div>
@@ -16,7 +16,7 @@
                 </li>
                 <li>
                     <input name="working_hours_regular-false" wire:model="state.working_hours_regular" type="radio" id="working_hours_regular-false" value="false" class="hidden peer">
-                    <label for="working_hours_regular-false" class="h-full inline-flex items-center justify-between w-full p-5 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-300 dark:peer-checked:border-green-300 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                    <label for="working_hours_regular-false" class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-300 dark:peer-checked:border-green-300 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
                         <div class="flex items-center gap-4">
                             <div class="text-2xl">📅</div>
                             <div>
@@ -30,7 +30,7 @@
         <div>
             <h3 class="mb-5 text-lg font-medium text-gray-900 dark:text-white">Od której do której chcesz stałe godziny?</h3>
             <!-- Dodane przyciski ustawień godzin -->
-            <div class="grid w-full md:grid-cols-2 mt-8 gap-6 text-xl">
+            <div class="grid w-full md:grid-cols-2 mt-8 gap-4 text-xl">
                 <div class="flex items-center w-full justify-center gap-4">
                     <div class="flex items-center">
                         <x-button-link-red href="" class="text-2xl mx-3 px-4 py-4">

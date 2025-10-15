@@ -139,4 +139,29 @@ class LeavePendingReviewController extends Controller
             return redirect()->route('leave.single.index')->with('success', 'Anulowane.');
         }
     }
+    /**
+     * Zwraca widok do tworzenia nowego wniosku w imieniu użytkownika.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function create(Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $leavePending = $this->leaveService->countByUserId($request);
+        return view('admin.leave-pending.create', compact('leavePending'));
+    }
+    /**
+     * Zwraca widok do edycji w imieniu użytkownika.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
+    public function edit(Leave $leave, Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $leave = $this->leaveService->getLeaveById($leave);
+        $leavePending = $this->leaveService->countByUserId($request);
+        return view('admin.leave-pending.edit', compact('leave', 'leavePending'));
+    }
 }

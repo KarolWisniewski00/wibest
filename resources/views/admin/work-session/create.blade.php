@@ -10,7 +10,7 @@
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Formularz edycji firmy -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <!--POWRÓT-->
                     <a href="{{ route('work.session') }}" class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 dark:bg-gray-700 border border-transparent rounded-lg font-semibold text-lg dark:text-gray-900 uppercase tracking-widest hover:bg-gray-700 hover:text-white dark:hover:bg-gray-300 dark:hover:text-gray-900 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
@@ -31,7 +31,7 @@
                         <!-- Status pracy -->
                         <div class="mt-4">
                             <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status Pracy</label>
-                            <select id="status" name="status" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            <select id="status" name="status" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 <option value="W trakcie pracy" {{ old('status') == 'W trakcie pracy' ? 'selected' : '' }}>W trakcie pracy</option>
                                 <option value="Praca zakończona" {{ old('status') == 'Praca zakończona' ? 'selected' : '' }}>Praca zakończona</option>
                             </select>
@@ -43,7 +43,7 @@
                         <!-- Rozpoczęcie pracy -->
                         <div class="mt-4">
                             <label for="start_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rozpoczęcie Pracy</label>
-                            <input type="datetime-local" id="start_time" name="start_time" value="{{ old('start_time') }}" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            <input type="datetime-local" id="start_time" name="start_time" value="{{ old('start_time') }}" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                             @error('start_time')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -52,7 +52,7 @@
                         <!-- Zakończenie pracy -->
                         <div class="mt-4" id="end_time_container">
                             <label for="end_time" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Zakończenie Pracy</label>
-                            <input type="datetime-local" id="end_time" name="end_time" value="{{ old('end_time') }}" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            <input type="datetime-local" id="end_time" name="end_time" value="{{ old('end_time') }}" class="mt-1 block w-full p-2 border-gray-300 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                             @error('end_time')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -60,7 +60,7 @@
 
                         <div class="mt-4">
                             <label for="user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Użytkownik</label>
-                            <select id="user_id" name="user_id" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                            <select id="user_id" name="user_id" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @foreach($users as $user)
                                 <option value="{{$user->id}}" {{ old('user_id') == $user->id ? 'selected' : '' }}>{{$user->name}}</option>
                                 @endforeach

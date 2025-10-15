@@ -36,5 +36,5 @@
             />
         </div>
     </div>
-    <div class="text-xs text-center md:text-base font-semibold dark:text-white mb-3">{{ $stepInstance->title() }}</div>
+    <div class="text-xs text-center md:text-base font-semibold dark:text-white mb-4">{{ $stepInstance->title() }}</div>
 </div>

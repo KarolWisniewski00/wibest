@@ -9,7 +9,7 @@
 
         <div class="w-full bg-white dark:bg-gray-800 rounded-xl shadow p-2 text-sm text-gray-900 dark:text-white">
             <!-- Nagłówek -->
-            <div class="flex justify-between items-center mb-3">
+            <div class="flex justify-between items-center mb-4">
                 <span id="calendar-month" class="font-semibold text-md">Kwiecień 2025</span>
                 <div class="space-x-2">
                     <button id="prev-month" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
@@ -23,15 +23,15 @@
             </div>
 
             <!-- Przyciskowe skróty -->
-            <div class="grid grid-cols-2 gap-2 mb-3">
-                <button id="btn-today" class="w-full px-2 py-1 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white">Dzisiaj</button>
-                <button id="btn-this-week" class="w-full px-2 py-1 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white">Ten tydzień</button>
-                <button id="btn-this-month" class="w-full px-2 py-1 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2">Ten miesiąc</button>
-                <button id="btn-custom-range" class="w-full px-2 py-1 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2">Zakres dat</button>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button id="btn-today" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white dark:hover:text-gray-900 tracking-widest">Dzisiaj</button>
+                <button id="btn-this-week" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white dark:hover:text-gray-900 tracking-widest">Ten tydzień</button>
+                <button id="btn-this-month" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2 dark:hover:text-gray-900 tracking-widest">Ten miesiąc</button>
+                <button id="btn-custom-range" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2 dark:hover:text-gray-900 tracking-widest">Zakres dat</button>
             </div>
 
             <!-- Dni tygodnia -->
-            <div class="grid grid-cols-7 text-center text-gray-500 dark:text-gray-400 mb-1">
+            <div class="grid grid-cols-7 text-center text-gray-500 dark:text-gray-400 mb-2">
                 <div>Pon</div>
                 <div>Wt</div>
                 <div>Śr</div>
@@ -81,7 +81,7 @@
                         let dateStr = `${year}-${month + 1}-${d}`;
 
                         const selectedDate = new Date(year, month, d);
-                        console.log('Selected Date:', selectedDate, 'Range Start:', rangeStart, 'Range End:', rangeEnd);
+                        //console.log('Selected Date:', selectedDate, 'Range Start:', rangeStart, 'Range End:', rangeEnd);
                         if (
                             (rangeStart && !rangeEnd && selectedDate.getTime() === rangeStart.getTime()) ||
                             (rangeStart && rangeEnd && selectedDate >= rangeStart && selectedDate <= rangeEnd)
@@ -152,6 +152,17 @@
                         success: function(response) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
 
+                            // 🔹 jeśli brak danych, pokaż
+                            if (!response || response.length === 0) {
+                                const emptyRow = `
+                                    <tr class="bg-white dark:bg-gray-800">
+                                        <td colspan="8" class="px-3 py-2 text-center">
+                                            <x-empty-place />
+                                        </td>
+                                    </tr>
+                                `;
+                                $tbody.append(emptyRow);
+                            }
                             response.forEach(session => {
                                 if (session.status == 'Praca zakończona') {
 
@@ -385,7 +396,17 @@
                         method: 'get',
                         success: function(response) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
-
+                            // 🔹 jeśli brak danych, pokaż
+                            if (!response || response.length === 0) {
+                                const emptyRow = `
+                                    <tr class="bg-white dark:bg-gray-800">
+                                        <td colspan="8" class="px-3 py-2 text-center">
+                                            <x-empty-place />
+                                        </td>
+                                    </tr>
+                                `;
+                                $tbody.append(emptyRow);
+                            }
                             response.forEach(leave => {
                                 // generujemy każdy wiersz
                                 const shortType = {
@@ -574,7 +595,17 @@
                         method: 'get',
                         success: function(response) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
-
+                            // 🔹 jeśli brak danych, pokaż
+                            if (!response || response.length === 0) {
+                                const emptyRow = `
+                                    <tr class="bg-white dark:bg-gray-800">
+                                        <td colspan="8" class="px-3 py-2 text-center">
+                                            <x-empty-place />
+                                        </td>
+                                    </tr>
+                                `;
+                                $tbody.append(emptyRow);
+                            }
                             response.forEach(leave => {
                                 // generujemy każdy wiersz
                                 const shortType = {
@@ -722,7 +753,7 @@
                                     </div>
                                 </td>
                                 <td class="px-3 py-2">
-                                    <x-button-link-blue href="{{route('leave.single.edit', '')}}/${leave.id}" class="min-h-[38px]">
+                                    <x-button-link-blue href="{{route('leave.pending.edit', '')}}/${leave.id}" class="min-h-[38px]">
                                         <i class="fa-solid fa-pen-to-square"></i>
                                     </x-button-link-blue>
                                 </td>
@@ -825,11 +856,6 @@
 
                                 const row = `
                                 <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                    <td class="px-3 py-2">
-                                        <x-flex-center>
-                                            <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
-                                        </x-flex-center>
-                                    </td>
                                     <td class="px-3 py-2  flex items-center justify-center">
                                         ${user.profile_photo_url
                                             ? `<img src="${user.profile_photo_url}" class="w-10 h-10 rounded-full">`
@@ -1283,14 +1309,11 @@
                 const endInputVal = $('#end_date').val();
 
                 if (startInputVal && endInputVal) {
-                    const start = new Date(startInputVal);
-                    const end = new Date(endInputVal);
+                    let start = new Date(startInputVal);
+                    let end = new Date(endInputVal);
 
-                    // Odejmij 2 godziny od start i end 
-                    // TYLKO DLATEGO ŻE Z NIEWIADOMEGO POWODU RÓŻNI SIĘ O 2 H
-                    //WZGLĘDEM TEGO CO JEST W BAZIE
-                    start.setHours(start.getHours() - 2);
-                    end.setHours(end.getHours() - 2);
+                    start.setHours(0, 0, 0, 0);//zmiana czasu letni/zimowy
+                    end.setHours(23, 59, 59, 999);//zmiana czasu letni/zimowy
 
                     setRange(start, end);
                 } else {

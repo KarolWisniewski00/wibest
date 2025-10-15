@@ -11,15 +11,15 @@
     <!--MAIN-->
     <x-main>
         <x-RCP.nav />
-        <x-RCP.header>Rejestracja czasu pracy ⏱️</x-RCP.header>
-        <x-status-cello id="show-filter" class="mx-2 mt-8">
+        <x-RCP.header>RCP ⏱️</x-RCP.header>
+        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
             {{ $startDate }} - {{ $endDate }}
         </x-status-cello>
         <!--CONTENT-->
         <x-flex-center class="px-4 pb-4 flex flex-col">
             <!--MOBILE VIEW-->
-            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
-                <ul id="list" class="grid w-full gap-y-4 block lg:hidden">
+            <div class="relative overflow-x-auto md:shadow sm:rounded-lg w-full">
+                <ul id="list" class="grid w-full gap-y-4 block md:hidden">
                     <!-- EMPTY PLACE -->
                     @if ($work_sessions->isEmpty())
                     <x-empty-place />
@@ -29,13 +29,13 @@
                     <!-- WORK SESSIONS ELEMENT VIEW -->
                     <li>
                         <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                            <div class="block w-full">
+                            <div class="flex flex-col w-full gap-4">
                                 <div class="flex justify-between w-full">
                                     <div class="flex justify-start items-center w-full justify-start">
                                         <x-RCP.work-session-status :work_session="$work_session" class="text-xl" />
                                     </div>
                                 </div>
-                                <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
                                     @if(isset($work_session->eventStart))
                                     @if($work_session->eventStart->location_id)
                                     <x-status-green>
@@ -64,7 +64,7 @@
                                     </span>
                                     @endif
                                 </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full p-2 justify-start">
+                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
                                     <div class="flex items-center gap-4">
                                         @if($work_session->user->profile_photo_url)
                                         <img src="{{ $work_session->user->profile_photo_url }}" alt="{{ $work_session->user->name }}" class="w-10 h-10 rounded-full">
@@ -103,7 +103,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="flex space-x-4 p-2 mt-4">
+                                <div class="flex space-x-4">
                                     <x-button-link-neutral href="{{route('rcp.work-session.show', $work_session)}}" class="min-h-[38px]">
                                         <i class="fa-solid fa-eye"></i>
                                     </x-button-link-neutral>
@@ -125,7 +125,7 @@
                 <!-- WORK SESSIONS VIEW -->
 
                 <!-- PC VIEW -->
-                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden lg:table">
+                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden md:table">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                         <tr>
                             <th scope="col" class="px-6 py-3">
@@ -412,7 +412,7 @@
                             const rowMobile = `
                             <li>
                                 <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                    <div class="block w-full">
+                                    <div class="flex flex-col w-full gap-4">
                                         <div class="flex justify-between w-full">
                                             <div class="flex justify-start items-center w-full justify-start">
                                                 ${session.status === 'W trakcie pracy' 
@@ -432,7 +432,7 @@
                                             <i class="fa-solid fa-location-dot mx-1"></i>
                                         </x-status-red>`
                                         : ''}
-                                        <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                        <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
                                             ${session.status === 'Praca zakończona'
                                             ?
                                             `${session.time_in_work == '24:00:00'
@@ -444,7 +444,7 @@
                                                 ${resultText ?? '-'}
                                             </span>
                                         </div>
-                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full p-2 justify-start">
+                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
                                             <div class="flex items-center gap-4">
                                                 ${session.user.profile_photo_url
                                                     ? `<img src="${session.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
@@ -489,7 +489,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="flex space-x-4 mt-4">
+                                        <div class="flex space-x-4">
                                             <x-button-link-neutral href="{{ route('rcp.work-session.show', '') }}/${session.id}" class="min-h-[38px]">
                                                 <i class="fa-solid fa-eye"></i>
                                             </x-button-link-neutral>

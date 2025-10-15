@@ -41,9 +41,14 @@
                 </x-text-cell>
                 <!--status-->
                 @php
-                [$hours, $minutes, $seconds] = explode(":", $work_session->time_in_work);
-                $totalSeconds = $hours * 3600 + $minutes * 60 + $seconds;
+                if ($work_session->time_in_work) {
+                    [$hours, $minutes, $seconds] = explode(":", $work_session->time_in_work);
+                    $totalSeconds = $hours * 3600 + $minutes * 60 + $seconds;
+                } else {
+                    $totalSeconds = 0;
+                }
                 @endphp
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 @if($work_session->time_in_work == '24:00:00' && $work_session->user->working_hours_from && $work_session->user->working_hours_to && $work_session->user->working_hours_start_day && $work_session->user->working_hours_stop_day)
                 <x-text-cell class="mx-4 gap-4 row-span-3">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
@@ -76,6 +81,10 @@
                 <x-text-cell class="mx-4 gap-4 row-span-3 hidden md:flex">
                 </x-text-cell>
                 @endif
+                @else
+                <x-text-cell class="mx-4 gap-4 row-span-3 hidden md:flex">
+                </x-text-cell>
+                @endif
                 <!--Czas w pracy-->
                 <x-text-cell class="mx-4 gap-4 hidden md:flex">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
@@ -93,7 +102,6 @@
                     </div>
                 </x-text-cell>
                 <!--Czas w pracy-->
-                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 <!--Użytkownik-->
                 <x-text-cell class="mx-4 gap-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
@@ -108,33 +116,34 @@
                                 {{ strtoupper(substr($work_session->user->name, 0, 1)) }}
                             </div>
                             @endif
-                            {{ $work_session->user->name }}
-                            @if($work_session->user->role == 'admin')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Admin
+                            <span class="flex flex-wrap items-center gap-2">
+                                {{ $work_session->user->name }}
+                                @if($work_session->user->role == 'admin')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Admin
+                                </span>
+                                @elseif($work_session->user->role == 'menedżer')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Menedżer
+                                </span>
+                                @elseif($work_session->user->role == 'kierownik')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Kierownik
+                                </span>
+                                @elseif($work_session->user->role == 'użytkownik')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Użytkownik
+                                </span>
+                                @elseif($work_session->user->role == 'właściciel')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Właściciel
+                                </span>
+                                @endif
                             </span>
-                            @elseif($work_session->user->role == 'menedżer')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Menedżer
-                            </span>
-                            @elseif($work_session->user->role == 'kierownik')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Kierownik
-                            </span>
-                            @elseif($work_session->user->role == 'użytkownik')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Użytkownik
-                            </span>
-                            @elseif($work_session->user->role == 'właściciel')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                Właściciel
-                            </span>
-                            @endif
                         </span>
                     </div>
                 </x-text-cell>
                 <!--Użytkownik-->
-                @endif
             </x-container-gray>
             <div class="grid grid-cols-1 md:grid-cols-2 mt-4 gap-4">
                 @if($work_session->eventStart != null)
@@ -250,17 +259,36 @@
                 </x-container-gray>
                 @endif
             </div>
+            @if($work_session->notes == null)
+            <div class="flex justify-end mt-4">
+                <x-button-link-green href="{{ route('rcp.work-session.create.note', $work_session) }}" class="text-lg">
+                    <i class="fa-solid fa-plus mr-2"></i>Dodaj notatkę
+                </x-button-link-green>
+            </div>
+            @else
+            <div class="flex justify-end mt-4">
+                <x-container-gray>
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
+                        Notatka
+                    </p>
+                    {!! $work_session->notes !!}
+                    <x-button-link-blue href="{{route('rcp.work-session.edit.note', $work_session)}}" class="text-lg mr-2">
+                        <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
+                    </x-button-link-blue>
+                </x-container-gray>
+            </div>
+            @endif
             <div class="flex justify-end mt-4">
                 @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 @if($work_session->status == 'Praca zakończona')
-                <x-button-link-cello href="{{route('rcp.work-session.edit', $work_session)}}" class="text-lg mr-2">
+                <x-button-link-blue href="{{route('rcp.work-session.edit', $work_session)}}" class="text-lg mr-2">
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
-                </x-button-link-cello>
+                </x-button-link-blue>
                 @endif
                 <form action="{{route('rcp.work-session.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="min-h-[34px] inline-flex items-center px-4 py-2 bg-red-500 dark:bg-red-300 border border-transparent rounded-lg font-semibold text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-600 active:bg-red-900 dark:active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                    <button type="submit" class="text-lg min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-300 text-gray-900 dark:bg-red-300 border border-transparent rounded-lg font-semibold dark:text-gray-900 uppercase tracking-widest hover:bg-red-200 dark:hover:bg-red-400 focus:bg-red-200 dark:focus:bg-red-300 active:bg-red-200 dark:active:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 dark:focus:ring-offset-red-800 transition ease-in-out duration-150">
                         <i class="fa-solid fa-trash mr-2"></i> USUŃ
                     </button>
                 </form>

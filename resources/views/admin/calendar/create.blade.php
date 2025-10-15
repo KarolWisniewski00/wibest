@@ -20,7 +20,7 @@
             <x-button-link-back href="{{ route('calendar.all.index') }}" class="text-lg mb-4">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do kalendarza urlopu planowanego
             </x-button-link-back>
-            <h2 class="text-xl font-semibold dark:text-white mb-3 text-center">Nowy urlop planowany</h2>
+            <h2 class="text-xl font-semibold dark:text-white mb-4 text-center">Nowy urlop planowany</h2>
             <!--POWRÓT-->
             <span>
                 @csrf

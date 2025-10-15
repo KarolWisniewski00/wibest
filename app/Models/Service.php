@@ -45,6 +45,9 @@ class Service extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class); // Usługa należy do jednego użytkownika
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]); // Usługa należy do jednego użytkownika
     }
 }

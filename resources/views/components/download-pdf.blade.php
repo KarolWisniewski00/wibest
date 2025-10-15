@@ -1,11 +1,11 @@
 <script>
     $(document).ready(function() {
         const $table = $('#table');
-        const $masterCheckbox = $table.find('thead input[type="checkbox"]');
+        const $masterCheckbox = $table.find('thead input[type="radio"]');
         const $label = $('#selected-count');
 
         function getCheckboxes() {
-            return $table.find('tbody input[type="checkbox"]');
+            return $table.find('tbody input[type="radio"]');
         }
 
         function updateSelectedCount() {
@@ -21,7 +21,7 @@
         }
 
         // Delegacja zdarzeń – działa też na przyszłe checkboxy
-        $table.on('change', 'tbody input[type="checkbox"]', function() {
+        $table.on('change', 'tbody input[type="radio"]', function() {
             updateSelectedCount();
 
             const $checkboxes = getCheckboxes();

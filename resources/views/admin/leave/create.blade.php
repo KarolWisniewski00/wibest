@@ -20,7 +20,7 @@
             <x-button-link-back href="{{ route('leave.single.index') }}" class="text-lg mb-4">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do wniosków
             </x-button-link-back>
-            <h2 class="text-xl font-semibold dark:text-white mb-3 text-center">Złóż nowy wniosek</h2>
+            <h2 class="text-xl font-semibold dark:text-white mb-4 text-center">Złóż nowy wniosek</h2>
             <!--POWRÓT-->
             <span>
                 @csrf

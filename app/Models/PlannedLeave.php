@@ -23,7 +23,10 @@ class PlannedLeave extends Model
     // 📌 Relacja do użytkownika, który bierze urlop
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 
     // 📌 Relacja do firmy (jeśli wielofirmowe)
@@ -35,6 +38,9 @@ class PlannedLeave extends Model
     // 📌 Relacja do użytkownika, który stworzył wpis (np. HR)
     public function createdBy()
     {
-        return $this->belongsTo(User::class, 'created_user_id');
+        return $this->belongsTo(User::class, 'created_user_id')->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 }

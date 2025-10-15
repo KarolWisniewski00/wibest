@@ -3,7 +3,7 @@
         @include('admin.elements.alerts')
         <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
+            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
 
                     <!--POWRÓT-->
@@ -20,7 +20,7 @@
                             <!-- Numer faktury -->
                             <div class="mb-6">
                                 <label for="number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Numer faktury</label>
-                                <input type="text" id="number" name="number" value="" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="text" id="number" name="number" value="" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('number')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -29,7 +29,7 @@
                             <!-- kwota -->
                             <div class="mb-6">
                                 <label for="total" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Do zapłaty</label>
-                                <input type="number" step="0.01" id="total" name="total" value="" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="number" step="0.01" id="total" name="total" value="" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('total')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -38,7 +38,7 @@
                             <!-- Termin płatności -->
                             <div class="mb-6">
                                 <label for="due_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Termin płatności</label>
-                                <input type="date" id="due_date" name="due_date" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+                                <input type="date" id="due_date" name="due_date" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
                                 @error('due_date')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror
@@ -47,7 +47,7 @@
                             <!-- Uwagi -->
                             <div class="mb-6">
                                 <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
-                                <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
+                                <textarea id="notes" name="notes" rows="4" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100"></textarea>
                                 @error('notes')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                 @enderror

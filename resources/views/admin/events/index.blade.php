@@ -12,74 +12,86 @@
     <x-main>
         <x-RCP.nav />
         <x-RCP.header>Zdarzenia 📆</x-RCP.header>
-        <x-status-cello id="show-filter" class="mx-2 mt-8 ">
+        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
             {{ $startDate }} - {{ $endDate }}
         </x-status-cello>
 
         <!--CONTENT-->
-        <x-flex-center class="px-4 flex flex-col">
+        <x-flex-center class="px-4 pb-4 flex flex-col">
             <!--MOBILE VIEW-->
-            <div class="relative overflow-x-auto md:shadow-md sm:rounded-lg mt-8 w-full">
+            <div class="relative overflow-x-auto md:shadow sm:rounded-lg w-full">
                 @if ($company)
-                <ul id="list" class="grid w-full gap-y-4 hidden">
+                <ul id="list" class="grid w-full gap-y-4 block md:hidden">
                     <!-- EMPTY PLACE -->
                     @if ($events->isEmpty())
                     <x-empty-place />
                     @else
                     <!-- EMPTY PLACE -->
-
-                    @foreach ($events as $key => $event)
+                    @foreach ($events as $event)
                     <!-- WORK SESSIONS ELEMENT VIEW -->
                     <li>
                         <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                            <div class="block w-full">
+                            <div class="flex flex-col w-full gap-4">
                                 <div class="flex justify-between w-full">
                                     <div class="flex justify-start items-center w-full justify-start">
-                                        @if($event->status == 'W trakcie pracy')
-                                        <x-status-yellow class="text-xl">
-                                            {{ $event->status }}
-                                        </x-status-yellow>
+                                        @if($event->event_type == 'stop')
+                                        <x-status-red>
+                                            Stop
+                                        </x-status-red>
                                         @endif
-                                        @if($event->status == 'Praca zakończona')
-                                        <x-status-green class="text-xl">
-                                            {{ $event->status }}
+                                        @if($event->event_type == 'start')
+                                        <x-status-green>
+                                            Start
                                         </x-status-green>
                                         @endif
                                     </div>
-                                    @if($role == 'admin' || $role == 'właściciel')
-                                    <form action="{{route('rcp.event.delete', $event)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <x-button-red type="submit" class="min-h-[38px]">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </x-button-red>
-                                    </form>
-                                    @endif
                                 </div>
-                                <x-paragraf-display class="text-xl">
-                                    @if($event->status == 'Praca zakończona')
-                                    {{ $event->time_in_work }}
-                                    @endif
-                                </x-paragraf-display>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                    <div class="flex flex-col">
-                                        {{$event->user->name}}
+                                <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                    {{ $event->time }}
+                                </div>
+                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
+                                    <div class="flex items-center gap-4">
+                                        @if($event->user->profile_photo_url)
+                                        <img src="{{ $event->user->profile_photo_url }}" alt="{{ $event->user->name }}" class="w-10 h-10 rounded-full">
+                                        @else
+                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
+                                            {{ strtoupper(substr($event->user->name, 0, 1)) }}
+                                        </div>
+                                        @endif
+                                        <div>
+                                            <div class="flex flex-col justify-center w-fit">
+                                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                    {{$event->user->name}}
+                                                </x-paragraf-display>
+                                                @if($event->user->role == 'admin')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Admin
+                                                </span>
+                                                @elseif($event->user->role == 'menedżer')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Menedżer
+                                                </span>
+                                                @elseif($event->user->role == 'kierownik')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Kierownik
+                                                </span>
+                                                @elseif($event->user->role == 'użytkownik')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                    Użytkownik
+                                                </span>
+                                                @elseif($event->user->role == 'właściciel')
+                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                    Właściciel
+                                                </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                    <div class="flex flex-col">
-                                        {{$event->company->name}}
-                                    </div>
-                                </div>
-                                <div class="flex space-x-4 mt-4">
+                                <div class="flex space-x-4">
                                     <x-button-link-neutral href="{{route('rcp.event.show', $event)}}" class="min-h-[38px]">
                                         <i class="fa-solid fa-eye"></i>
                                     </x-button-link-neutral>
-                                    @if($role == 'admin' || $role == 'właściciel')
-                                    <x-button-link-blue href="" class="min-h-[38px]">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </x-button-link-blue>
-                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -91,7 +103,7 @@
                 <!-- WORK SESSIONS VIEW -->
 
                 <!-- PC VIEW -->
-                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 table">
+                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden md:table">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
                         <tr>
                             <th scope="col" class="px-6 py-3">
@@ -287,25 +299,65 @@
                             const rowMobile = `
                             <li>
                                 <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                    <div class="block w-full">
+                                    <div class="flex flex-col w-full gap-4">
                                         <div class="flex justify-between w-full">
                                             <div class="flex justify-start items-center w-full justify-start">
-                                                ${event.status === 'W trakcie pracy' 
-                                                ? `<x-status-yellow class="text-xl">${event.status}</x-status-yellow>` 
-                                                : event.status === 'Praca zakończona' 
-                                                    ? `<x-status-green class="text-xl">${event.status}</x-status-green>` 
+                                                ${event.event_type === 'stop' 
+                                                ? `<x-status-red>${event.event_type}</x-status-red>` 
+                                                : event.event_type === 'start' 
+                                                    ? `<x-status-green>${event.event_type}</x-status-green>` 
                                                     : ''}
                                             </div>
                                         </div>
-                                        <div class="text-start p-2 text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
+                                        <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
                                             ${event.time ?? '-'}
                                         </div>
-                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full my-2 justify-end">
-                                            <div class="flex flex-col">
-                                                ${event.user.name}
+                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
+                                            <div class="flex items-center gap-4">
+                                                ${event.user.profile_photo_url
+                                                    ? `<img src="${event.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
+                                                    : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${event.user.name[0].toUpperCase()}</div>`
+                                                }
+                                                <div>
+                                                    <div class="flex flex-col justify-center w-fit">
+                                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                                            ${event.user.name}
+                                                        </x-paragraf-display>
+                                                        ${event.user.role == 'admin'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Admin
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                        ${event.user.role == 'menedżer'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Menedżer
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                        ${event.user.role == 'kierownik'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Kierownik
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                        ${event.user.role == 'użytkownik'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                                                                Użytkownik
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                        ${event.user.role == 'właściciel'
+                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
+                                                                Właściciel
+                                                            </span>`
+                                                        : ``
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="flex space-x-4 mt-4">
+                                        <div class="flex space-x-4">
                                             <x-button-link-neutral href="{{ route('rcp.event.show', '') }}/${event.id}" class="min-h-[38px]">
                                                 <i class="fa-solid fa-eye"></i>
                                             </x-button-link-neutral>

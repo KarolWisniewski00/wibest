@@ -17,8 +17,9 @@
     <script src="https://kit.fontawesome.com/e37acf9c2e.js" crossorigin="anonymous"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <!-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
+
     <wireui:scripts />
-    <script src="//unpkg.com/alpinejs" defer></script>
+    <!--<script src="//unpkg.com/alpinejs" defer></script>-->
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -50,8 +51,46 @@
     <input type="hidden" id="company_id" value="{{ $company_id }}">
     <input type="hidden" id="work_sessions_logged_user" value="{{ $work_sessions_logged_user }}">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <input type="hidden" id="lat" value="">
+    <input type="hidden" id="lon" value="">
     <script>
         $(document).ready(function() {
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition, showError);
+                } else {
+                    $('#locationWidget').text("Geolokalizacja nie jest wspierana przez tę przeglądarkę.");
+                }
+            }
+
+            function showPosition(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const acc = position.coords.accuracy;
+
+                $('#locationWidget').text(
+                    "Szerokość: " + lat + "\nDługość: " + lon + "\nDokładność: " + Math.round(acc) + " metrów"
+                );
+                $('#lat').val(lat);
+                $('#lon').val(lon);
+            }
+
+            function showError(error) {
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        $('#locationWidget').text("Użytkownik odmówił dostępu do lokalizacji.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        $('#locationWidget').text("Informacje o lokalizacji są niedostępne.");
+                        break;
+                    case error.TIMEOUT:
+                        $('#locationWidget').text("Przekroczono czas oczekiwania na lokalizację.");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        $('#locationWidget').text("Wystąpił nieznany błąd.");
+                        break;
+                }
+            }
             class WorkSessions {
                 constructor() {
                     const self = this;
@@ -70,8 +109,11 @@
                     const self = this;
                     self.timerInterval = setInterval(() => {
                         self.elapsedSeconds++;
+                        $('#timerWidget').text(self.formatTime(self.elapsedSeconds));
                         $('#timer').text(self.formatTime(self.elapsedSeconds));
                     }, 1000);
+                    $('#startButtonWidget').addClass('hidden');
+                    $('#stopButtonWidget').removeClass('hidden');
                     $('#startButton').addClass('hidden');
                     $('#stopButton').removeClass('hidden');
                 }
@@ -102,9 +144,16 @@
                 // Funkcja do rozpoczęcia pracy
                 ajaxStart() {
                     const self = this;
+                    const lat = $('#lat').val();
+                    const lon = $('#lon').val();
                     $.ajax({
                         url: self.workStart + '/' + self.userId,
                         type: 'GET',
+                        data: {
+                            name: 'Widget',
+                            lat: lat,
+                            lon: lon
+                        },
                         dataType: 'json',
                         success: function(response) {
                             console.log(self.workStart + '/' + self.userId)
@@ -118,9 +167,16 @@
                 // Funkcja do zakończenia pracy
                 ajaxStop() {
                     const self = this;
+                    const lat = $('#lat').val();
+                    const lon = $('#lon').val();
                     $.ajax({
                         url: self.workStop + '/' + self.session_id,
                         type: 'GET',
+                        data: {
+                            name: 'Widget',
+                            lat: lat,
+                            lon: lon
+                        },
                         dataType: 'json',
                         success: function(response) {
                             console.log(self.workStop + '/' + self.session_id)
@@ -133,10 +189,14 @@
                 // Funkcja do aktualizacji daty
                 updateTodayDate() {
                     const self = this;
-                    const days = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
-                    const months = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
+                    const days = ["Nie", "Pon", "Wto", "Śro", "Czw", "Pią", "Sob"];
+                    const daysWidget = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
+                    const months = ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"];
+                    const monthsWidget = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
                     const today = new Date();
-                    const formattedDate = `${days[today.getDay()]} ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+                    const formattedDateWidget = `${daysWidget[today.getDay()]} ${today.getDate()} ${monthsWidget[today.getMonth()]} ${today.getFullYear()}`;
+                    const formattedDate = `${days[today.getDay()]} ${today.getDate()} ${months[today.getMonth()]}`;
+                    $('#dateWidget').text(formattedDateWidget);
                     $('#date').text(formattedDate);
                 }
 
@@ -162,6 +222,10 @@
                     self.ajaxStop();
                     clearInterval(self.timerInterval);
                     self.elapsedSeconds = 0;
+                    $('#timerWidget').text(self.formatTime(self.elapsedSeconds));
+                    $('#stopButtonWidget').addClass('hidden');
+                    $('#startButtonWidget').removeClass('hidden');
+
                     $('#timer').text(self.formatTime(self.elapsedSeconds));
                     $('#stopButton').addClass('hidden');
                     $('#startButton').removeClass('hidden');
@@ -173,11 +237,13 @@
                     self.updateTodayDate();
                     self.updateWidgetWorkSession();
 
-                    $('#startButton').click(function() {
+                    $('#startButton, #startButtonWidget').click(function() {
+                        getLocation();
                         self.startTimer();
                     });
 
-                    $('#stopButton').click(function() {
+                    $('#stopButton, #stopButtonWidget').click(function() {
+                        getLocation();
                         self.stopTimer();
                     });
                 }

@@ -46,6 +46,9 @@ class Product extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class); // Produkt należy do jednego użytkownika
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]); // Produkt należy do jednego użytkownika
     }
 }

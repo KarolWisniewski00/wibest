@@ -23,7 +23,10 @@ class Company extends Model
      */
     public function users()
     {
-        return $this->hasMany(User::class); // Firma ma wielu użytkowników
+        return $this->hasMany(User::class)->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]); // Firma ma wielu użytkowników
     }
 
     /**
