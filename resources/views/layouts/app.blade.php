@@ -56,11 +56,23 @@
     <script>
         $(document).ready(function() {
             function getLocation() {
-                if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(showPosition, showError);
-                } else {
-                    $('#locationWidget').text("Geolokalizacja nie jest wspierana przez tę przeglądarkę.");
-                }
+                return new Promise((resolve) => {
+                    if (navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(
+                            position => {
+                                showPosition(position);
+                                resolve(true); // sukces
+                            },
+                            error => {
+                                showError(error);
+                                resolve(false); // błąd, ale dalej kontynuujemy
+                            }
+                        );
+                    } else {
+                        $('#locationWidget').text("Geolokalizacja nie jest wspierana przez tę przeglądarkę.");
+                        resolve(false);
+                    }
+                });
             }
 
             function showPosition(position) {
@@ -237,13 +249,13 @@
                     self.updateTodayDate();
                     self.updateWidgetWorkSession();
 
-                    $('#startButton, #startButtonWidget').click(function() {
-                        getLocation();
+                    $('#startButton, #startButtonWidget').click(async function() {
+                        await getLocation();
                         self.startTimer();
                     });
 
-                    $('#stopButton, #stopButtonWidget').click(function() {
-                        getLocation();
+                    $('#stopButton, #stopButtonWidget').click(async function() {
+                        await getLocation();
                         self.stopTimer();
                     });
                 }
