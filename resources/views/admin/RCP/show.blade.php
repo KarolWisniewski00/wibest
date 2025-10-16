@@ -294,13 +294,13 @@
                 </form>
                 @endif
             </div>
-            <x-label class="my-2">
+            <x-label class="py-2 mt-4">
                 Utworzono {{ $work_session->created_at }}
             </x-label>
-            <x-label class="my-2">
+            <x-label class="py-2">
                 Utoworzono przez {{ $work_session->created_user->name }}
             </x-label>
-            <x-label class="my-2">
+            <x-label class="py-2">
                 Ostatnia aktualizacja {{ $work_session->updated_at }}
             </x-label>
         </div>

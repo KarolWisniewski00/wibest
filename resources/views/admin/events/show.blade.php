@@ -62,7 +62,7 @@
                 <!--Czas w pracy-->
                 @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 <!--Użytkownik-->
-                <x-text-cell class="mx-4">
+                <x-text-cell class="mx-4 gap-4">
                     <p class="text-gray-700 dark:text-gray-300 test-sm">
                         Użytkownik
                     </p>
@@ -75,28 +75,30 @@
                                 {{ strtoupper(substr($event->user->name, 0, 1)) }}
                             </div>
                             @endif
-                            {{ $event->user->name }}
-                            @if($event->user->role == 'admin')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Admin
+                            <span class="flex flex-wrap items-center gap-2">
+                                {{ $event->user->name }}
+                                @if($event->user->role == 'admin')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Admin
+                                </span>
+                                @elseif($event->user->role == 'menedżer')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Menedżer
+                                </span>
+                                @elseif($event->user->role == 'kierownik')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Kierownik
+                                </span>
+                                @elseif($event->user->role == 'użytkownik')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Użytkownik
+                                </span>
+                                @elseif($event->user->role == 'właściciel')
+                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150 whitespace-normal">
+                                    Właściciel
+                                </span>
+                                @endif
                             </span>
-                            @elseif($event->user->role == 'menedżer')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Menedżer
-                            </span>
-                            @elseif($event->user->role == 'kierownik')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Kierownik
-                            </span>
-                            @elseif($event->user->role == 'użytkownik')
-                            <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Użytkownik
-                            </span>
-                            @elseif($event->user->role == 'właściciel')
-                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                Właściciel
-                            </span>
-                            @endif
                         </span>
                     </div>
                 </x-text-cell>
@@ -123,13 +125,29 @@
 
                 <script>
                     $(document).ready(function() {
-                        const map = L.map('map').setView([{{$event->location->latitude}}, {{$event->location->longitude}}], 13); // Warszawa
+                        const map = L.map('map').setView([{
+                            {
+                                $event - > location - > latitude
+                            }
+                        }, {
+                            {
+                                $event - > location - > longitude
+                            }
+                        }], 13); // Warszawa
 
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                             attribution: '© OpenStreetMap contributors'
                         }).addTo(map);
 
-                        L.marker([{{$event->location->latitude}}, {{$event->location->longitude}}]).addTo(map);
+                        L.marker([{
+                            {
+                                $event - > location - > latitude
+                            }
+                        }, {
+                            {
+                                $event - > location - > longitude
+                            }
+                        }]).addTo(map);
                     });
                 </script>
                 @endif
@@ -146,13 +164,13 @@
                 </form>
                 @endif
             </div>
-            <x-label class="my-2">
+            <x-label class="py-2 mt-4">
                 Utworzono {{ $event->created_at }}
             </x-label>
-            <x-label class="my-2">
+            <x-label class="py-2">
                 Utoworzono przez {{ $event->created_user->name }}
             </x-label>
-            <x-label class="my-2">
+            <x-label class="py-2">
                 Ostatnia aktualizacja {{ $event->updated_at }}
             </x-label>
         </div>

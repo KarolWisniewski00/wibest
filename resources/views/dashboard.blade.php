@@ -163,7 +163,7 @@
                     @endif
                     <!--HEADER-->
                     <div class="flex flex-col w-full md:pt-4 md:px-4">
-                        <x-h1-display class="text-center md:text-start mb-4 md:mb-0">
+                        <x-h1-display class="text-center md:text-start my-4 md:my-0">
                             📅 Kalendarz
                         </x-h1-display>
                     </div>
