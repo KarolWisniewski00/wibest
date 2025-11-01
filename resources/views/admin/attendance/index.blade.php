@@ -11,7 +11,7 @@
         <x-raport.nav />
         <!--HEADER-->
         <x-raport.header>
-            Ewidencja czasu pracy 🕒
+            Ewidencja czasu pracy
         </x-raport.header>
         <!--HEADER-->
         <x-status-cello id="show-filter" class="mx-4 mb-4 md:m-4">
@@ -36,6 +36,9 @@
                                 Zaplanowany czas pracy
                             </th>
                             <th scope="col" class="px-2 py-3">
+                                Wnioski + Czas pracy
+                            </th>
+                            <th scope="col" class="px-2 py-3">
                                 Czas pracy
                             </th>
                             <th scope="col" class="px-2 py-3">
@@ -45,13 +48,7 @@
                                 Brak normy
                             </th>
                             <th scope="col" class="px-2 py-3">
-                                Wypłata podstawowa
-                            </th>
-                            <th scope="col" class="px-2 py-3">
-                                Wypłata za nadgodziny
-                            </th>
-                            <th scope="col" class="px-2 py-3">
-                                Wypłata całkowita
+                                Wnioski
                             </th>
                         </tr>
                     </thead>
@@ -60,7 +57,7 @@
                         <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                             <td class="px-2 py-2 hidden md:table-cell">
                                 <x-flex-center>
-                                    <input data-id="{{$user->id}}" name="radio" type="radio" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                    <input data-id="{{$user->id}}" data-name="{{$user->name}}" name="radio" type="radio" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
                                 </x-flex-center>
                             </td>
                             <td class="px-3 py-2 flex items-center justify-center">
@@ -103,12 +100,21 @@
                             <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                 <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                     <span class="text-gray-400">
-                                        @if($user->time_in_work_hms_planned != '00h 00min 00s')
+                                        @if($user->time_in_work_hms_planned != '00h')
                                         {{$user->time_in_work_hms_planned}}
                                         @else
                                         <a href="{{ route('team.user.planing', $user->id) }}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
                                             ⚠️Ustaw godziny pracy
                                         </a>
+                                        @endif
+                                    </span>
+                                </x-paragraf-display>
+                            </td>
+                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                    <span class="text-gray-400">
+                                        @if($user->time_in_work_hms_total != '00h')
+                                        {{$user->time_in_work_hms_total}}
                                         @endif
                                     </span>
                                 </x-paragraf-display>
@@ -140,6 +146,15 @@
                                     </span>
                                 </x-paragraf-display>
                             </td>
+                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                    <span class="text-gray-400">
+                                        @if($user->time_in_work_hms_leave != '00h')
+                                        {{$user->time_in_work_hms_leave}}
+                                        @endif
+                                    </span>
+                                </x-paragraf-display>
+                            </td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -148,7 +163,7 @@
             </div>
         </x-flex-center>
         @php
-        $file = 'ewidencja_czasu_pracy' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
+        $file = 'ewidencja_czasu_pracy_' . '_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
         @endphp
         <x-download-pdf :file="$file">
             {{ route('api.v1.raport.attendance-sheet.export.xlsx') }}
@@ -228,11 +243,21 @@
                                 <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                     <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                         <span class="text-gray-400">
-                                            ${user.time_in_work_hms_planned != '00h 00min 00s'
+                                            ${user.time_in_work_hms_planned != '00h'
                                             ? user.time_in_work_hms_planned
                                             :  `<a href="{{ route('team.user.planing', '') }}/${user.id}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
                                                     ⚠️Ustaw godziny pracy
                                                 </a>`
+                                            }
+                                        </span>
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                        <span class="text-gray-400">
+                                            ${user.time_in_work_hms_total != '00h'
+                                            ? user.time_in_work_hms_total
+                                            : ``
                                             }
                                         </span>
                                     </x-paragraf-display>
@@ -262,6 +287,16 @@
                                         <span class="text-gray-400">
                                             ${user.time_in_work_hms_under != '00h 00min 00s'
                                             ? user.time_in_work_hms_under
+                                            : ``
+                                            }
+                                        </span>
+                                    </x-paragraf-display>
+                                </td>
+                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                        <span class="text-gray-400">
+                                            ${user.time_in_work_hms_leave != '00h'
+                                            ? user.time_in_work_hms_leave
                                             : ``
                                             }
                                         </span>

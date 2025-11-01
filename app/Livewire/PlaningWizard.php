@@ -24,7 +24,7 @@ class PlaningWizard extends WizardComponent
         TimeStep::class,
     ];
     // 👇 Wczytaj model z bazy na podstawie ID
-    public function mount($userId = null)
+    public function mount($userId = null, $routeBack = 'team.user.show')
     {
         $this->user = User::findOrFail($userId);
 
@@ -34,6 +34,7 @@ class PlaningWizard extends WizardComponent
             'working_hours_from' => date('H:i', strtotime($this->user->working_hours_from)),
             'working_hours_to' => date('H:i', strtotime($this->user->working_hours_to)),
             'user_id'   => $userId,
+            'route_back'   => $routeBack,
         ]);
     }
     public function model(): User

@@ -1,130 +1,116 @@
-<x-app-layout>
-    <div class="py-12 pt-48">
-        @include('admin.elements.alerts')
-        <x-old-school-nav></x-old-school-nav>
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
-                <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                    <a href="{{ route('client') }}" class="inline-flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-white dark:text-gray-800 uppercase tracking-widest hover:bg-gray-700 dark:hover:bg-gray-300 focus:bg-gray-700 dark:focus:bg-gray-300 active:bg-gray-900 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                        <i class="fa-solid fa-chevron-left mr-2"></i>Powrót do listy Klientów
-                    </a>
-                    <div class="flex flex-row justify-between items-center">
-                        <h1 class="mt-8 mb-4 text-2xl font-medium text-gray-900 dark:text-gray-100">
-                            Edytuj klienta
-                        </h1>
-                    </div>
+<x-app-layout class="flex">
+    @include('admin.elements.alerts')
+    <!--MAIN-->
+    <x-main-no-filter>
+        <x-setting.nav />
 
-                    <form method="POST" action="{{ route('client.update', $client) }}">
-                        @csrf
-                        @method('PUT')
-                        <!-- Nazwa -->
-                        <div class="mb-4">
-                            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nazwa</label>
-                            <input type="text" id="name" name="name" value="{{ old('name', $client->name) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                        </div>
+        <!--CONTENT-->
+        <x-container-content-form>
 
-                        <!-- NIP -->
-                        <div class="mb-4">
-                            <label for="tax_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">NIP</label>
-                            <div class="flex justify-end space-x-4">
-                                <button type="button" id="fetch_vat_data" class="inline-flex items-center px-4 py-2 bg-blue-600 dark:bg-blue-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 dark:hover:bg-blue-400 focus:bg-blue-700 dark:focus:bg-blue-400 active:bg-blue-800 dark:active:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Pobierz dane podatnika VAT
-                                </button>
-                                <input type="text" id="tax_id" name="tax_id" value="{{ old('tax_id', $client->vat_number) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                            </div>
-                            <a href="https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat" class="text-blue-500 text-xs mt-1">Źródło: https://www.gov.pl/web/kas/api-wykazu-podatnikow-vat</a>
-                        </div>
+            <!--POWRÓT-->
+            <x-button-link-back href="{{ route('setting.client') }}" class="text-lg mb-4">
+                <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
+            </x-button-link-back>
+            <!--POWRÓT-->
 
-                        <!-- Adres -->
-                        <div class="mb-4">
-                            <label for="adress" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Adres</label>
-                            <input type="text" id="adress" name="adress" value="{{ old('adress', $client->adress) }}" required class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                        </div>
+            <x-header-form>
+                <span>📋</span> Edytuj klienta
+            </x-header-form>
 
-                        <div class="inline-flex items-center justify-center w-full">
-                            <hr class="w-64 h-px my-8 bg-gray-200 border-0 dark:bg-gray-600">
-                            <span class="absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-800">Niżej pola dodatkowe</span>
-                        </div>
-
-                        <!-- Email i Email2 -->
-                        <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                                <input type="email" id="email" name="email" value="{{ old('email', $client->email) }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                            </div>
-                            <div>
-                                <label for="email2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email dodatkowy</label>
-                                <input type="email" id="email2" name="email2" value="{{ old('email2', $client->email2) }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                            </div>
-                        </div>
-
-                        <!-- Telefon i Telefon2 -->
-                        <div class="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefon</label>
-                                <input type="text" id="phone" name="phone" value="{{ old('phone', $client->phone) }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                            </div>
-                            <div>
-                                <label for="phone2" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Telefon dodatkowy</label>
-                                <input type="text" id="phone2" name="phone2" value="{{ old('phone2', $client->phone2) }}" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
-                            </div>
-                        </div>
-
-                        <!-- Uwagi -->
-                        <div class="mb-4">
-                            <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uwagi</label>
-                            <textarea id="notes" name="notes" class="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">{{ old('notes', $client->notes) }}</textarea>
-                        </div>
-
-                        <!-- Przycisk zapisu -->
-                        <div class="mt-8 flex justify-end space-x-4">
-                            <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 dark:bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 dark:hover:bg-green-400 focus:bg-green-700 dark:focus:bg-green-400 active:bg-green-800 dark:active:bg-green-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                <i class="fa-solid fa-check mr-2"></i>Zapisz
-                            </button>
-
-                            <a href="{{ route('client') }}" class="inline-flex items-center px-4 py-2 bg-red-600 dark:bg-red-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 dark:hover:bg-red-400 focus:bg-red-700 dark:focus:bg-red-400 active:bg-red-800 dark:active:bg-red-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                <i class="fa-solid fa-trash mr-2"></i>Anuluj
-                            </a>
-                        </div>
-                    </form>
+            <!--FORMULARZ-->
+            <form method="POST" action="{{ route('setting.client.update', $client) }}">
+                @csrf
+                @method('PUT')
+                <!--NAZWA FIRMY-->
+                <div class="mt-2">
+                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                        <span>🏢</span> Nazwa firmy
+                    </label>
+                    <input type="text" id="name" name="name" value="{{ old('name', $client->name) }}" autofocus required
+                        class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold">
+                    @error('name')
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ $message }}
+                    </p>
+                    @enderror
                 </div>
-            </div>
-            <!--END WIDGET TASK-->
-        </div>
-    </div>
-    <script>
-        $(document).ready(function() {
-            $('#fetch_vat_data').click(function() {
-                var taxId = $('#tax_id').val();
-                var today = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
+                <!--NAZWA FIRMY-->
 
-                if (taxId) {
-                    $.ajax({
-                        url: `https://wl-api.mf.gov.pl/api/search/nip/${taxId}?date=${today}`,
-                        method: 'GET',
-                        dataType: 'json',
-                        success: function(data) {
-                            console.log('Dane podatnika VAT:', data);
+                <!--ADRES-->
+                <div class="mt-2">
+                    <label for="adress" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                        <span>📍</span> Adres
+                    </label>
+                    <input type="text" id="adress" name="adress" value="{{ old('adress', $client->adress) }}" autofocus required
+                        class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold">
+                    @error('adress')
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ $message }}
+                    </p>
+                    @enderror
+                </div>
+                <!--ADRES-->
 
-                            // Wstawianie danych do formularza
-                            var subject = data.result.subject;
-                            $('#name').val(subject.name || '');
+                <!--NIP-->
+                <div class="mt-2">
+                    <label for="vat_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                        <span>🧾</span> NIP
+                    </label>
+                    <input type="text" id="vat_number" name="vat_number" value="{{ old('vat_number', $client->vat_number) }}"
+                        class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" required>
+                    <x-button-orange id="fetch_vat_data" type="button" class="text-lg mt-2">
+                        <i class="fa-solid fa-magnifying-glass mr-2"></i>Znajdź w GUS
+                    </x-button-orange>
+                    @error('vat_number')
+                    <p class="text-red-500 text-xs mt-1">
+                        {{ $message }}
+                    </p>
+                    @enderror
+                </div>
+                <input type="hidden" id="api-link-gus" value="{{route('api.v1.search.gus',[''])}}">
+                <script>
+                    $(document).ready(function() {
+                        $('#fetch_vat_data').click(function() {
+                            let apiLinkGus = $('#api-link-gus');
+                            var nip = $('#vat_number').val();
 
-                            // Wstawianie pełnego adresu
-                            if (subject.workingAddress) {
-                                $('#adress').val(subject.workingAddress || '');
+                            if (nip) {
+                                $.ajax({
+                                    url: apiLinkGus.val() + '/' + nip,
+                                    method: 'GET',
+                                    dataType: 'json',
+                                    success: function(data) {
+                                        console.log('Dane podatnika VAT:', data['response']);
+                                        $('#name').val(data['response']['name'] || '');
+                                        $('#adress').val(data['response']['adres'] || '');
+                                        toastr.success('Operacja zakończona powodzeniem!');
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Błąd:', error);
+                                        // Możesz tutaj dodać kod do obsługi błędów
+                                        toastr.error('Operacja zakończona niepowodzeniem!');
+                                    }
+                                });
+                            } else {
+                                alert('Proszę wprowadzić numer NIP.');
                             }
-
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Błąd:', error);
-                            // Możesz tutaj dodać kod do obsługi błędów
-                        }
+                        });
                     });
-                } else {
-                    alert('Proszę wprowadzić numer NIP.');
-                }
-            });
-        });
-    </script>
+                </script>
+                <!--NIP-->
+
+                <!--ZAPISZ-->
+                <div class="flex justify-end mt-4">
+                    <x-button-green type="submit" class="text-lg">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i>Zapisz
+                    </x-button-green>
+                </div>
+                <!--ZAPISZ-->
+            </form>
+            <!--Formularz-->
+        </x-container-content-form>
+        <!--CONTENT-->
+
+    </x-main-no-filter>
+    <!--MAIN-->
 </x-app-layout>

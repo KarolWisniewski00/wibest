@@ -10,257 +10,246 @@
         </li>
     </x-sidebar-left>
     <!--SIDE BAR-->
-
     <!--MAIN-->
     <x-main>
         <x-team.nav :role="$role" :invitations="$invitations" />
 
         <!--CONTENT-->
-        <div class="p-4">
+        <x-container-content-form>
             <!--POWRÓT-->
-            <x-button-link-back href="{{ route('team.user.index') }}" class="text-lg mb-4">
+            <x-button-link-back href="{{ route('team.user.index') }}" class="text-lg">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
             </x-button-link-back>
             <!--POWRÓT-->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <x-container-gray class="px-0">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+                <x-container-gray>
                     <!--Użytkownik-->
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                    <x-text-cell>
+                        <x-text-cell-label>
                             Użytkownik
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
-                            <span class="grid mt-2 md:mt-0 md:inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                @if($user->profile_photo_url)
-                                <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
-                                @else
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                    {{ strtoupper(substr($user->name, 0, 1)) }}
-                                </div>
-                                @endif
-                                <span class="flex flex-wrap items-center gap-2">
-                                    {{ $user->name }}
-                                    @if($user->role == 'admin')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
-                                        Admin
-                                    </span>
-                                    @elseif($user->role == 'menedżer')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
-                                        Menedżer
-                                    </span>
-                                    @elseif($user->role == 'kierownik')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
-                                        Kierownik
-                                    </span>
-                                    @elseif($user->role == 'użytkownik')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150 whitespace-normal">
-                                        Użytkownik
-                                    </span>
-                                    @elseif($user->role == 'właściciel')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150 whitespace-normal">
-                                        Właściciel
-                                    </span>
-                                    @endif
-                                </span>
-                            </span>
-                        </div>
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span class="gap-2">
+                                <x-user-photo :user="$user" />
+                                <x-user-name :user="$user" />
+                            </x-text-cell-span>
+                        </x-text-cell-value>
                     </x-text-cell>
                     <!--Użytkownik-->
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+
+                    <!--Email-->
+                    <x-text-cell>
+                        <x-text-cell-label>
                             Email
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
-                            <a href="mailto:{{$user->email}}" class="grid mt-2 md:mt-0 md:inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-xs md:text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 break-all">
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-a href="mailto:{{$user->email}}" style="word-break: break-all;">
                                 <span class="text-2xl">📧</span>
                                 {{ $user->email }}
-                            </a>
-                        </div>
+                            </x-text-cell-a>
+                        </x-text-cell-value>
                     </x-text-cell>
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                    <!--Email-->
+
+                    <!--Numer telefonu-->
+                    <x-text-cell>
+                        <x-text-cell-label>
                             Numer telefonu
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
-                            <a href="tel:{{$user->phone}}" class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-a href="tel:{{$user->phone}}">
                                 <span class="text-2xl">📱</span>
                                 {{ $user->phone }}
-                            </a>
-                        </div>
+                            </x-text-cell-a>
+                        </x-text-cell-value>
                     </x-text-cell>
+                    <!--Numer telefonu-->
+
+                    <!--Logowanie przez Google-->
                     @if($user->oauth_id != null)
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                    <x-text-cell>
+                        <x-text-cell-label>
                             Logowanie przez Google
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
+                        </x-text-cell-label>
+                        <x-text-cell-value>
                             <x-status-green>
                                 <i class="fa-brands fa-google mr-2"></i> Połączono
                             </x-status-green>
-                        </div>
+                        </x-text-cell-value>
                     </x-text-cell>
                     @endif
+                    <!--Logowanie przez Google-->
                 </x-container-gray>
+
                 @if($user->supervisor || $user->position || $user->assigned_at)
-                <x-container-gray class="px-0">
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                @if($user->company)
+                <x-container-gray>
+                    <x-text-cell>
+                        <x-text-cell-label>
                             Bezpośredni przełożony
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
+                        </x-text-cell-label>
+                        <x-text-cell-value>
                             @if($user->supervisor)
-                            <span class="grid mt-2 md:mt-0 md:inline-flex items-center gap-2 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                @if($user->supervisor->profile_photo_url)
-                                <img src="{{ $user->supervisor->profile_photo_url }}" alt="{{ $user->supervisor->name }}" class="w-10 h-10 rounded-full">
-                                @else
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                    {{ strtoupper(substr($user->supervisor->name, 0, 1)) }}
-                                </div>
-                                @endif
-                                {{ $user->supervisor->name }}
-                                @if($user->supervisor->role == 'admin')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Admin
-                                </span>
-                                @elseif($user->supervisor->role == 'menedżer')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Menedżer
-                                </span>
-                                @elseif($user->supervisor->role == 'kierownik')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Kierownik
-                                </span>
-                                @elseif($user->supervisor->role == 'użytkownik')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                    Użytkownik
-                                </span>
-                                @elseif($user->role == 'właściciel')
-                                <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                    Właściciel
-                                </span>
-                                @endif
-                            </span>
+                            <x-text-cell-span class="gap-2">
+                                <x-user-photo :user="$user->supervisor" />
+                                <x-user-name :user="$user->supervisor" />
+                            </x-text-cell-span>
                             @else
-                            <span class="text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest">
+                            <x-text-cell-span>
                                 Brak przełożonego
-                            </span>
+                            </x-text-cell-span>
                             @endif
-                        </div>
+                        </x-text-cell-value>
                     </x-text-cell>
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                    <x-text-cell>
+                        <x-text-cell-label>
                             Stanowisko
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
-                            <span class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
                                 <span class="text-2xl">💼</span>
                                 {{ $user->position ? $user->position : 'Brak stanowiska' }}
-                            </span>
-                        </div>
+                            </x-text-cell-span>
+                        </x-text-cell-value>
                     </x-text-cell>
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
+                    <x-text-cell>
+                        <x-text-cell-label>
                             Data dołączenia do zespołu
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
-                            <span class="inline-flex items-center gap-4 text-gray-600 dark:text-gray-300 font-semibold text-2xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
                                 <span class="text-2xl">📅</span>
                                 {{ $user->assigned_at ? $user->assigned_at : 'Brak daty' }}
-                            </span>
-                        </div>
+                            </x-text-cell-span>
+                        </x-text-cell-value>
                     </x-text-cell>
                 </x-container-gray>
+                @endif
                 @endif
                 @if($user->working_hours_from && $user->working_hours_to || $user->working_hours_start_day || $user->working_hours_stop_day)
-                <x-container-gray class="px-0">
-                    <x-text-cell class="mx-4">
-                        <p class="text-gray-700 dark:text-gray-300 test-sm">
-                            Godziny pracy
-                        </p>
-                        <div class="flex justify-start items-center w-full justify-start">
+                @if($user->company)
+                <x-container-gray>
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Ustawienia pracy
+                        </x-text-cell-label>
+                        <x-text-cell-value>
                             @if($user->working_hours_regular)
-                            <div class="flex items-center gap-4">
-                                <div class="text-2xl">🕒</div>
-                                <div>
-                                    <div class="text-lg font-semibold mb-1">Stałe godziny pracy regulowane przez ustawienia niżej</div>
-                                </div>
-                            </div>
+                            <x-text-cell-span>
+                                <span class="text-2xl">🕒</span>
+                                Stałe godziny pracy
+                            </x-text-cell-span>
                             @else
-                            <div class="flex items-center gap-4">
-                                <div class="text-2xl">📅</div>
-                                <div>
-                                    <div class="text-lg font-semibold mb-1">Zmienne godziny pracy regulowane przez harmonogram</div>
-                                </div>
-                            </div>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📅</span>
+                                Zmienne godziny pracy
+                            </x-text-cell-span>
                             @endif
-                        </div>
-                        <div class="flex justify-start items-center w-full justify-start mt-2">
-                            @if($user->working_hours_regular)
-                            <div class="flex items-center gap-4">
-                                <div class="text-2xl">🕒</div>
-                                <div>
-                                    <div class="text-lg font-semibold mb-1">
-                                        Od {{ \Carbon\Carbon::parse($user->working_hours_from)->format('H:i') }} do {{ \Carbon\Carbon::parse($user->working_hours_to)->format('H:i') }}
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
-                        <div class="flex justify-start items-center w-full justify-start mt-2">
-                            @if($user->working_hours_regular)
-                            <div class="flex items-center gap-4">
-                                <div class="text-2xl">📆</div>
-                                <div>
-                                    <div class="text-lg font-semibold mb-1">
-                                        Od {{ $user->working_hours_start_day }} do {{ $user->working_hours_stop_day }}
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
-                        </div>
+                        </x-text-cell-value>
                     </x-text-cell>
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Godziny pracy
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            @if($user->working_hours_regular)
+                            <x-text-cell-span>
+                                <span class="text-2xl">🕒</span>
+                                Od {{ \Carbon\Carbon::parse($user->working_hours_from)->format('H:i') }} do {{ \Carbon\Carbon::parse($user->working_hours_to)->format('H:i') }}
+                            </x-text-cell-span>
+                            @endif
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Dni tygodnia
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            @if($user->working_hours_regular)
+                            <x-text-cell-span>
+                                <span class="text-2xl">📆</span>
+                                Od {{ $user->working_hours_start_day }} do {{ $user->working_hours_stop_day }}
+                            </x-text-cell-span>
+                            @endif
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
+                    <!-- Edytuj planning -->
+                    <x-button-link-blue href="{{route('team.user.planing', $user)}}" class="text-lg md:mr-2">
+                        <i class="fa-solid fa-calendar mr-2"></i>Edytuj planning
+                    </x-button-link-blue>
+                    <!-- Edytuj planning -->
+                    @endif
                 </x-container-gray>
+                @endif
                 @else
-                <x-container-gray class="px-0">
-                    <x-text-cell class="mx-4">
-                        <a href="{{ route('team.user.planing', $user->id) }}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
-                            ⚠️Ustaw godziny pracy
-                        </a>
+                @if($user->company)
+                <x-container-gray>
+                    <x-text-cell>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
+                                <x-alert-link href="{{ route('team.user.planing', $user->id) }}" class="text-2xl">
+                                    Ustaw godziny pracy
+                                </x-alert-link>
+                                @else
+                                <x-alert-link href="" class="text-2xl">
+                                    Ustaw godziny pracy
+                                </x-alert-link>
+                                @endif
+                            </x-text-cell-span>
+                        </x-text-cell-value>
                     </x-text-cell>
                 </x-container-gray>
                 @endif
+                @endif
             </div>
-            <div class="grid gap-4 md:flex md:justify-end mt-4">
+
+            <!--PRZYCISKI-->
+            <div class="flex justify-end gap-4 mt-4">
                 @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
-                <x-button-link-violet href="{{route('team.user.planing', $user)}}" class="text-lg md:mr-2">
-                    <i class="fa-solid fa-calendar mr-2"></i>Edytuj planning
-                </x-button-link-violet>
-                <x-button-link-orange href="{{route('team.user.restart', $user)}}" class="text-lg md:mr-2">
+                <!-- Reset hasła -->
+                <x-button-link-orange href="{{route('team.user.restart', $user)}}" class="text-lg">
                     <i class="fa-solid fa-paper-plane mr-2"></i>Reset hasła
                 </x-button-link-orange>
-                <x-button-link-blue href="{{route('team.user.edit', $user)}}" class="text-lg md:mr-2">
-                    <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
+                <!-- Reset hasła -->
+
+                @if($user->company)
+                <!-- EDYTUJ -->
+                <x-button-link-blue href="{{route('team.user.edit', $user)}}" class="text-lg">
+                    <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
                 </x-button-link-blue>
+                <!--EDYTUJ-->
+                @endif
+
+                <!--USUŃ-->
                 @if($user->id != $user_id)
-                <form action="{{route('team.user.disconnect', $user)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz rozłączyć?');">
+                <form action="{{ route('team.user.disconnect', $user) }}" method="POST"
+                    onsubmit="return confirm('Czy na pewno chcesz usunąć tego użytkownika z firmy?');">
                     @csrf
-                    <button type="submit" class="text-lg min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-300 text-gray-900 dark:bg-red-300 border border-transparent rounded-lg font-semibold dark:text-gray-900 uppercase tracking-widest hover:bg-red-200 dark:hover:bg-red-400 focus:bg-red-200 dark:focus:bg-red-300 active:bg-red-200 dark:active:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 dark:focus:ring-offset-red-800 transition ease-in-out duration-150">
+                    <x-button-red type="submit" class="text-lg">
                         <i class="fa-solid fa-user-minus mr-2"></i>Rozłącz
-                    </button>
+                    </x-button-red>
                 </form>
+                <!--USUŃ-->
                 @endif
                 @endif
             </div>
-            <x-label class="my-2">
+            <!--PRZYCISKI-->
+
+            <x-label class="py-2 mt-4">
                 Utworzono {{ $user->created_at }}
             </x-label>
-            <x-label class="my-2">
+            <x-label class="py-2">
                 Ostatnia aktualizacja {{ $user->updated_at }}
             </x-label>
-        </div>
+        </x-container-content-form>
         <!--CONTENT-->
+
     </x-main>
     <!--MAIN-->
+
     @else
     @include('admin.elements.end_config')
     @endif

@@ -135,11 +135,15 @@ class LeaveRepository
      *
      * @param string|null $startDate
      * @param string|null $endDate
+     * @param string|null $user_id
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getByUserId(?string $startDate = null, ?string $endDate = null)
+    public function getByUserId(?string $startDate = null, ?string $endDate = null, ?string $user_id = null)
     {
-        $query = Leave::with('manager')->where('user_id', Auth::id());
+        if (is_null($user_id)) {
+            $user_id = Auth::id();
+        }
+        $query = Leave::with('manager')->where('user_id', $user_id);
         if ($startDate) {
             $query->whereDate('start_date', '>=', Carbon::parse($startDate));
         }
@@ -147,6 +151,28 @@ class LeaveRepository
         if ($endDate) {
             $query->whereDate('start_date', '<=', Carbon::parse($endDate));
         }
+        return $query->orderBy('start_date', 'desc')->get();
+    }
+    public function getByUserIdWithCutMonth(?string $startDate = null, ?string $endDate = null, ?string $user_id = null)
+    {
+        if (is_null($user_id)) {
+            $user_id = Auth::id();
+        }
+
+        $query = Leave::with('manager')->where('user_id', $user_id);
+
+        if ($startDate && $endDate) {
+            // Szukamy urlopów, które nachodzą na zakres dat
+            $query->where(function ($q) use ($startDate, $endDate) {
+                $q->whereDate('start_date', '<=', Carbon::parse($endDate))
+                    ->whereDate('end_date', '>=', Carbon::parse($startDate));
+            });
+        } elseif ($startDate) {
+            $query->whereDate('end_date', '>=', Carbon::parse($startDate));
+        } elseif ($endDate) {
+            $query->whereDate('start_date', '<=', Carbon::parse($endDate));
+        }
+
         return $query->orderBy('start_date', 'desc')->get();
     }
     /**

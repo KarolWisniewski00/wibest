@@ -54,6 +54,21 @@ class UserRepository
             ->get();
     }
     /**
+     * Zwraca użytkowników dla admina dla danej firmy.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getByAdminByCompany($company_id = null): \Illuminate\Support\Collection
+    {
+        if (is_null($company_id)) {
+            $company_id = Auth::user()->company_id;
+        }
+
+        return User::where('company_id', $company_id)
+            ->whereNotNull('role')
+            ->get();
+    }
+    /**
      * Zwraca użytkowników dla admina oprócz zalogowanego.
      *
      * @return \Illuminate\Support\Collection

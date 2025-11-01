@@ -1155,11 +1155,21 @@
                                     <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
                                         <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
                                             <span class="text-gray-400">
-                                                ${user.time_in_work_hms_planned != '00h 00min 00s'
+                                                ${user.time_in_work_hms_planned != '00h'
                                                 ? user.time_in_work_hms_planned
                                                 :  `<a href="{{ route('team.user.planing', '') }}/${user.id}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
                                                         ⚠️Ustaw godziny pracy
                                                     </a>`
+                                                }
+                                            </span>
+                                        </x-paragraf-display>
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            <span class="text-gray-400">
+                                                ${user.time_in_work_hms_total != '00h'
+                                                ? user.time_in_work_hms_total
+                                                : ``
                                                 }
                                             </span>
                                         </x-paragraf-display>
@@ -1189,6 +1199,16 @@
                                             <span class="text-gray-400">
                                                 ${user.time_in_work_hms_under != '00h 00min 00s'
                                                 ? user.time_in_work_hms_under
+                                                : ``
+                                                }
+                                            </span>
+                                        </x-paragraf-display>
+                                    </td>
+                                    <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
+                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
+                                            <span class="text-gray-400">
+                                                ${user.time_in_work_hms_leave != '00h'
+                                                ? user.time_in_work_hms_leave
                                                 : ``
                                                 }
                                             </span>

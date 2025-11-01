@@ -64,9 +64,6 @@ Route::prefix('api')->group(function () {
     Route::prefix('offer')->group(function () {
         Route::get('/{year}', [OfferController::class, 'value'])->name('api.offer.value');
     });
-    Route::prefix('user')->group(function () {
-        Route::get('update/role/{id}/{role}', [UserController::class, 'updateRole'])->name('api.user.update.role');
-    });
 
 
     //API -----------------------------------------------------------------
@@ -91,6 +88,14 @@ Route::prefix('api')->group(function () {
                 Route::get('/', [TeamUserController::class, 'get'])->name('api.v1.team.user.get');
                 Route::post('set-role/', [TeamUserController::class, 'setRole'])->name('api.v1.team.user.set.role');
                 Route::post('/export-xlsx', [TeamUserController::class, 'exportXlsx'])->name('api.v1.team.user.export.xlsx');
+            });
+        });
+        Route::prefix('setting')->group(function () {
+            Route::prefix('client')->group(function () {
+                Route::get('/', [ClientController::class, 'get'])->name('api.v1.setting.client.get');
+            });
+            Route::prefix('user')->group(function () {
+                Route::get('/', [UserController::class, 'get'])->name('api.v1.setting.user.get');
             });
         });
         Route::prefix('raport')->group(function () {
@@ -297,7 +302,6 @@ Route::middleware([
                 Route::get('/', [ClientController::class, 'index'])->name('setting.client');
                 Route::get('create', [ClientController::class, 'create'])->name('setting.client.create');
                 Route::post('store', [ClientController::class, 'store'])->name('setting.client.store');
-                Route::get('/search', [ClientController::class, 'search'])->name('setting.client.search');
                 Route::get('show/{client}', [ClientController::class, 'show'])->name('setting.client.show');
                 Route::get('edit/{client}', [ClientController::class, 'edit'])->name('setting.client.edit');
                 Route::put('update/{client}', [ClientController::class, 'update'])->name('setting.client.update');
@@ -305,6 +309,13 @@ Route::middleware([
             });
             Route::prefix('user')->group(function () {
                 Route::get('/', [UserController::class, 'index'])->name('setting.user');
+                Route::get('edit-company/{user}', [UserController::class, 'editCompany'])->name('setting.user.edit-company');
+                Route::get('edit-planing/{user}', [UserController::class, 'editPlaning'])->name('setting.user.edit-planing');
+                Route::get('edit/{user}', [UserController::class, 'edit'])->name('setting.user.edit');
+                Route::get('create/{client}', [UserController::class, 'create'])->name('setting.user.create');
+                Route::put('update-company/{user}', [UserController::class, 'updateCompany'])->name('setting.user.update-company');
+                Route::get('show/{user}', [UserController::class, 'show'])->name('setting.user.show');
+                Route::delete('delete/{user}', [UserController::class, 'delete'])->name('setting.user.delete');
             });
         });
 

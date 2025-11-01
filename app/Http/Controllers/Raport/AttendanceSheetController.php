@@ -9,6 +9,7 @@ use App\Models\WorkSession;
 use App\Repositories\UserRepository;
 use App\Repositories\WorkSessionRepository;
 use App\Services\FilterDateService;
+use App\Services\LeaveService;
 use App\Services\UserService;
 use App\Services\WorkSessionService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -84,29 +85,41 @@ class AttendanceSheetController extends Controller
         $filterDateService = new FilterDateService();
         $userRepository = new UserRepository();
         $workSessionRepository = new WorkSessionRepository();
+        $leaveService = new LeaveService();
 
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
 
         $employees = $userRepository->getByRequestIds($request->ids);
         $dates = $filterDateService->getRangeDateFilter($request);
+        $leaves = $leaveService->getByUserIdWithCutMonth($request, $employees[0]->id);
         $employees[0]->time_in_work = 0;
         $employees[0]->time_in_work_extra = 0;
         $employees[0]->time_in_work_planned = 0;
+        $employees[0]->time_in_work_leave = 0;
+        $employees[0]->time_in_work_under = 0;
         $employees[0]->time_in_work_hms = '';
         $employees[0]->time_in_work_hms_extra = '';
         $employees[0]->time_in_work_hms_planned = '';
-
+        $employees[0]->time_in_work_hms_leave = '';
+        $employees[0]->time_in_work_hms_under = '';
         $datesAll = [];
+        $datesPlanned = [];
+        $datesLeave = [];
+        $datesUnder = [];
         $datesExtra = [];
         $datesWork = [];
         foreach ($dates as $key => $date) {
             $totalDay = $workSessionRepository->getTotalOfDay($employees[0]->id, $date);
             $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($employees[0]->id, $date);
             $totalDayPlanned = $workSessionRepository->getTotalOfDayPlanned($employees[0]->id, $date);
+            $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($employees[0]->id, $date);
+            $employees[0]->time_in_work_under += $totalDayUnder;
             $employees[0]->time_in_work += $totalDay;
             $employees[0]->time_in_work_extra += $totalDayExtra;
             $employees[0]->time_in_work_planned += $totalDayPlanned;
+            $datesPlanned[$key] = sprintf('%02dh', floor($totalDayPlanned / 3600));
+            $datesUnder[$key] = sprintf('%02dh', floor($totalDayUnder / 3600));
             $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
 
             try {
@@ -127,7 +140,6 @@ class AttendanceSheetController extends Controller
                 $endTime = $lastSession && $lastSession->eventStop ? Carbon::parse($lastSession->eventStop->time)->format('H:i') : null;
 
                 $datesWork[$key] = ($startTime && $endTime) ? "$startTime - $endTime" : '';
-                
             } catch (\Exception $e) {
                 $datesWork[$key] = '';
             }
@@ -150,6 +162,28 @@ class AttendanceSheetController extends Controller
             } else {
                 $datesExtra[$key] = null;
             }
+
+            // 🔹 NOWA CZĘŚĆ — obsługa urlopów
+            $isLeaveDay = false;
+            $leaveHours = 0;
+
+            foreach ($leaves as $leave) {
+                $leaveStart = Carbon::parse($leave->start_date);
+                $leaveEnd = Carbon::parse($leave->end_date);
+
+                if (Carbon::parse($formattedDate)->betweenIncluded($leaveStart, $leaveEnd)) {
+                    $isLeaveDay = true;
+                    $leaveHours += $employees[0]->working_hours_custom ?? 8; // domyślnie 8h, jeśli brak danych
+                }
+            }
+
+            if ($isLeaveDay) {
+                $datesLeave[$key] = sprintf('%02dh', $leaveHours);
+                $employees[0]->time_in_work_leave += $leaveHours;
+                $employees[0]->time_in_work_total += $leaveHours;
+            } else {
+                $datesLeave[$key] = '';
+            }
         }
 
         $hours = floor($employees[0]->time_in_work / 3600);
@@ -159,15 +193,21 @@ class AttendanceSheetController extends Controller
         $minutesExtra = floor(($employees[0]->time_in_work_extra % 3600) / 60);
         $employees[0]->time_in_work_hms_extra = sprintf('%02dh %02dmin', $hoursExtra, $minutesExtra);
 
+        $hoursUnder = floor($employees[0]->time_in_work_under / 3600);
+        $minutesUnder = floor(($employees[0]->time_in_work_under % 3600) / 60);
+        $employees[0]->time_in_work_hms_under = sprintf('%02dh %02dmin', $hoursUnder, $minutesUnder);
+
         $hoursPlanned = floor($employees[0]->time_in_work_planned / 3600);
-        $minutesPlanned = floor(($employees[0]->time_in_work_planned % 3600) / 60);
-        $secondsPlanned = $employees[0]->time_in_work_planned % 60;
-        $employees[0]->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
+        $employees[0]->time_in_work_hms_planned = sprintf('%02dh', $hoursPlanned);
+        $employees[0]->time_in_work_hms_leave = sprintf('%02dh', $employees[0]->time_in_work_leave);
 
         $pdf = Pdf::loadView('exports.attendancesheet', [
             'employee' => $employees[0],
             'dates' => $dates,
             'datesAll' => $datesAll,
+            'datesPlanned' => $datesPlanned,
+            'datesUnder' => $datesUnder,
+            'datesLeave' => $datesLeave,
             'datesExtra' => $datesExtra,
             'datesWork' => $datesWork,
             'startDate' => $startDate,

@@ -27,8 +27,8 @@ class TimeStep extends Step
         $diff = ($to - $from) / 3600;
         $user->working_hours_custom = (int) $diff;
         $user->save();
-
-        return redirect()->route('team.user.show', $user->id)->with('success', 'Operacja zakończona powodzeniem.');
+        
+        return redirect()->route($state['route_back'], $user->id)->with('success', 'Operacja zakończona powodzeniem.');
     }
     public function icon(): string
     {

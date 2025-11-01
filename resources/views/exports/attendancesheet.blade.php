@@ -75,20 +75,23 @@
     {{-- Tabela obecności --}}
     <table>
         <thead>
-            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;"></th>
-            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Rozkład</th>
-            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Norma</th>
-            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Zdarzenie</th>
+            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Dzień</th>
+            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Zaplanowany czas</th>
+            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Zdarzenia</th>
             <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Czas pracy</th>
             <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Nadgodziny</th>
-            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Noc</th>
+            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Brak normy</th>
+            <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Wnioski</th>
         </thead>
         <tbody>
             @foreach($dates as $key => $date)
             <tr>
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $date }}</td>
+                @if($datesPlanned[$key] != '00h')
+                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $datesPlanned[$key] }}</td>
+                @else
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
-                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
+                @endif
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $datesWork[$key] }}</td>
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $datesAll[$key] }}</td>
                 @if($datesExtra[$key] != 0)
@@ -96,17 +99,22 @@
                 @else
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
                 @endif
+                @if($datesUnder[$key] != "00h")
+                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $datesUnder[$key] }}</td>
+                @else
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
+                @endif
+                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $datesLeave[$key] }}</td>
             </tr>
             @endforeach
             <tr>
-                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
-                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
-                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
+                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">Razem</td>
+                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $employee->time_in_work_hms_planned }}</td>
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $employee->time_in_work_hms }}</td>
                 <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $employee->time_in_work_hms_extra }}</td>
-                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;"></td>
+                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $employee->time_in_work_hms_under }}</td>
+                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $employee->time_in_work_hms_leave }}</td>
             </tr>
         </tbody>
     </table>

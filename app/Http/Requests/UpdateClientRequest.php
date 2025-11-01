@@ -3,57 +3,46 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class UpdateClientRequest extends FormRequest
 {
     /**
-     * Pobierz reguły walidacji dla tego wniosku.
-     *
-     * @return array
+     * Określa, czy użytkownik jest autoryzowany do wykonania tej prośby.
      */
-    public function rules()
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Zasady walidacji dla aktualizacji firmy.
+     */
+    public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'email2' => 'nullable|email|max:255',
-            'phone' => 'required|string|max:20',
-            'phone2' => 'nullable|string|max:20',
-            'tax_id' => 'required|string|max:15',
-            'adress' => 'required|string|max:255',
-            'notes' => 'nullable|string',
+            'name' => ['required', 'string', 'max:255'],
+            'adress' => ['required', 'string', 'max:255'],
+            'vat_number' => [
+                'required',
+                'digits:10',
+                Rule::unique('companies', 'vat_number')->ignore($this->client->id),
+            ],
         ];
     }
 
     /**
-     * Pobierz niestandardowe komunikaty walidacji dla tego wniosku.
-     *
-     * @return array
+     * Komunikaty walidacji.
      */
-    public function messages()
+    public function messages(): array
     {
         return [
-            'name.required' => 'Nazwa jest wymagana.',
-            'name.string' => 'Nazwa musi być ciągiem tekstowym.',
-            'name.max' => 'Nazwa nie może mieć więcej niż 255 znaków.',
-            'email.email' => 'Podaj poprawny adres e-mail.',
-            'email.max' => 'Adres e-mail nie może mieć więcej niż 255 znaków.',
-            'phone.required' => 'Numer telefonu jest wymagany.',
-            'phone.string' => 'Numer telefonu musi być ciągiem tekstowym.',
-            'phone.max' => 'Numer telefonu nie może mieć więcej niż 20 znaków.',
-            'tax_id.required' => 'NIP jest wymagany.',
-            'tax_id.string' => 'NIP musi być ciągiem tekstowym.',
-            'tax_id.max' => 'NIP nie może mieć więcej niż 15 znaków.',
-            'adress.required' => 'Adres jest wymagany.',
-            'adress.string' => 'Adres musi być ciągiem tekstowym.',
-            'adress.max' => 'Adres nie może mieć więcej niż 255 znaków.',
-            'city.required' => 'Miasto jest wymagane.',
-            'city.string' => 'Miasto musi być ciągiem tekstowym.',
-            'city.max' => 'Miasto nie może mieć więcej niż 100 znaków.',
-            'postal_code.required' => 'Kod pocztowy jest wymagany.',
-            'postal_code.string' => 'Kod pocztowy musi być ciągiem tekstowym.',
-            'postal_code.max' => 'Kod pocztowy nie może mieć więcej niż 10 znaków.',
-            'notes.string' => 'Uwagi muszą być ciągiem tekstowym.',
+            'name.required' => 'Nazwa firmy jest wymagana.',
+            'adress.required' => 'Miasto jest wymagane.',
+            'vat_number.required' => 'Numer NIP jest wymagany.',
+            'vat_number.digits' => 'Numer NIP musi zawierać dokładnie 10 cyfr.',
+            'vat_number.unique' => 'Firma z tym numerem NIP już istnieje.',
         ];
     }
 }

@@ -28,7 +28,16 @@ class Company extends Model
             'profile_photo_url' => null,
         ]); // Firma ma wielu użytkowników
     }
+    public function getUsersCount()
+    {
+        // Jeśli firma nie istnieje (np. $this->id == null), zwróć 0
+        if (!$this->id) {
+            return 0;
+        }
 
+        // Policz użytkowników powiązanych z firmą
+        return User::where('company_id', $this->id)->count() ?? 0;
+    }
     /**
      * Definiuje relację jeden-do-wielu (firma -> faktury).
      * Firma może wystawiać wiele faktur.
@@ -80,5 +89,12 @@ class Company extends Model
     public function invitations()
     {
         return $this->hasMany(Invitation::class);
+    }
+    public function created_user()
+    {
+        return $this->belongsTo(User::class, 'created_user_id')->withDefault([
+            'name' => 'Usunięto',
+            'profile_photo_url' => null,
+        ]);
     }
 }

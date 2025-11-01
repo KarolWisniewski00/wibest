@@ -193,18 +193,24 @@ class UserService
     {
         $filterDateService = new FilterDateService();
         $workSessionRepository = new WorkSessionRepository();
+        $leaveService = new LeaveService();
         $dates = $filterDateService->getRangeDateFilter($request);
         $users = $this->paginatedByRole();
 
         foreach ($users as &$user) {
+            $leaves = $leaveService->getByUserIdWithCutMonth($request, $user->id);
             $user->time_in_work = 0;
             $user->time_in_work_extra = 0;
             $user->time_in_work_under = 0;
             $user->time_in_work_planned = 0;
+            $user->time_in_work_leave = 0;
+            $user->time_in_work_total = 0;
             $user->time_in_work_hms = '';
             $user->time_in_work_hms_extra = '';
             $user->time_in_work_hms_under = '';
             $user->time_in_work_hms_planned = '';
+            $user->time_in_work_hms_leave = '';
+            $user->time_in_work_hms_total = '';
             foreach ($dates as $date) {
                 $totalDay = $workSessionRepository->getTotalOfDay($user->id, $date);
                 $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
@@ -215,9 +221,27 @@ class UserService
                 $user->time_in_work_under += $totalDayUnder;
                 $user->time_in_work_planned += $totalDayPlanned;
             }
+            foreach ($leaves as $leave) {
+                $targetStartDate = Carbon::parse($leave->start_date);
+                $targetEndDate = Carbon::parse($leave->end_date);
+                $rageStartDate = Carbon::parse($request->session()->get('start_date'));
+                $rageEndDate = Carbon::parse($request->session()->get('end_date'));
+
+                // Ustal daty "efektywne" – przycięte do zakresu, jeśli potrzeba
+                $effectiveStartDate = $targetStartDate->lessThan($rageStartDate) ? $rageStartDate : $targetStartDate;
+                $effectiveEndDate = $targetEndDate->greaterThan($rageEndDate) ? $rageEndDate : $targetEndDate;
+
+                // Oblicz liczbę dni
+                $leaveDays = $effectiveStartDate->diffInDays($effectiveEndDate) + 1;
+
+                $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
+                $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
+                $user->time_in_work_hms_leave = sprintf('%02dh', $user->time_in_work_leave);
+            }
             $hours = floor($user->time_in_work / 3600);
             $minutes = floor(($user->time_in_work % 3600) / 60);
             $seconds = $user->time_in_work % 60;
+            $user->time_in_work_total += floor($user->time_in_work / 3600);
             $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
 
             $hoursExtra = floor($user->time_in_work_extra / 3600);
@@ -231,9 +255,8 @@ class UserService
             $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
 
             $hoursPlanned = floor($user->time_in_work_planned / 3600);
-            $minutesPlanned = floor(($user->time_in_work_planned % 3600) / 60);
-            $secondsPlanned = $user->time_in_work_planned % 60;
-            $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
+            $user->time_in_work_hms_planned = sprintf('%02dh', $hoursPlanned);
+            $user->time_in_work_hms_total = sprintf('%02dh', $user->time_in_work_total);
         }
         return $users;
     }
@@ -246,18 +269,24 @@ class UserService
     {
         $filterDateService = new FilterDateService();
         $workSessionRepository = new WorkSessionRepository();
+        $leaveService = new LeaveService();
         $dates = $filterDateService->getRangeDateFilter($request);
         $users = $this->getByRole();
 
         foreach ($users as &$user) {
+            $leaves = $leaveService->getByUserIdWithCutMonth($request, $user->id);
             $user->time_in_work = 0;
             $user->time_in_work_extra = 0;
             $user->time_in_work_under = 0;
             $user->time_in_work_planned = 0;
+            $user->time_in_work_leave = 0;
+            $user->time_in_work_total = 0;
             $user->time_in_work_hms = '';
             $user->time_in_work_hms_extra = '';
             $user->time_in_work_hms_under = '';
             $user->time_in_work_hms_planned = '';
+            $user->time_in_work_hms_leave = '';
+            $user->time_in_work_hms_total = '';
             foreach ($dates as $date) {
                 $totalDay = $workSessionRepository->getTotalOfDay($user->id, $date);
                 $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
@@ -268,9 +297,27 @@ class UserService
                 $user->time_in_work_under += $totalDayUnder;
                 $user->time_in_work_planned += $totalDayPlanned;
             }
+            foreach ($leaves as $leave) {
+                $targetStartDate = Carbon::parse($leave->start_date);
+                $targetEndDate = Carbon::parse($leave->end_date);
+                $rageStartDate = Carbon::parse($request->session()->get('start_date'));
+                $rageEndDate = Carbon::parse($request->session()->get('end_date'));
+
+                // Ustal daty "efektywne" – przycięte do zakresu, jeśli potrzeba
+                $effectiveStartDate = $targetStartDate->lessThan($rageStartDate) ? $rageStartDate : $targetStartDate;
+                $effectiveEndDate = $targetEndDate->greaterThan($rageEndDate) ? $rageEndDate : $targetEndDate;
+
+                // Oblicz liczbę dni
+                $leaveDays = $effectiveStartDate->diffInDays($effectiveEndDate) + 1;
+
+                $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
+                $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
+                $user->time_in_work_hms_leave = sprintf('%02dh', $user->time_in_work_leave);
+            }
             $hours = floor($user->time_in_work / 3600);
             $minutes = floor(($user->time_in_work % 3600) / 60);
             $seconds = $user->time_in_work % 60;
+            $user->time_in_work_total += floor($user->time_in_work / 3600);
             $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
 
             $hoursExtra = floor($user->time_in_work_extra / 3600);
@@ -284,9 +331,8 @@ class UserService
             $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
 
             $hoursPlanned = floor($user->time_in_work_planned / 3600);
-            $minutesPlanned = floor(($user->time_in_work_planned % 3600) / 60);
-            $secondsPlanned = $user->time_in_work_planned % 60;
-            $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
+            $user->time_in_work_hms_planned = sprintf('%02dh', $hoursPlanned);
+            $user->time_in_work_hms_total = sprintf('%02dh', $user->time_in_work_total);
         }
         return $users;
     }

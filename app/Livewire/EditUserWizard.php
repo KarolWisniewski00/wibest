@@ -22,7 +22,7 @@ class EditUserWizard extends WizardComponent
         EditSupervisorStep::class,
     ];
     // 👇 Wczytaj model z bazy na podstawie ID
-    public function mount($userId = null)
+    public function mount($userId = null, $routeBack = 'team.user.show')
     {
         $this->user = User::findOrFail($userId);
 
@@ -33,7 +33,8 @@ class EditUserWizard extends WizardComponent
             'position' => $this->user->position,
             'role' => $this->user->role,
             'supervisor_id' => $this->user->supervisor_id,
-            'user_id' => $userId
+            'user_id' => $userId,
+            'route_back'   => $routeBack,
         ]);
     }
 
@@ -41,9 +42,12 @@ class EditUserWizard extends WizardComponent
     {
         return $this->user;
     }
-    public function getUsers()
+    public function getUsers($company_id = null)
     {
+        if (is_null($company_id)) {
+            $company_id = Auth::user()->company_id;
+        }
         $userRepository = new UserRepository();
-        return $userRepository->getByAdmin(Auth::user()->company_id);
+        return $userRepository->getByAdminByCompany($company_id);
     }
 }

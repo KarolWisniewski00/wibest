@@ -82,7 +82,6 @@ class UserController extends Controller
     }
     public function restart(User $user)
     {
-
         $password = Str::random(10);
         $user->password = Hash::make($password);
         $user->save();
@@ -92,8 +91,7 @@ class UserController extends Controller
         } catch (Exception) {
         }
         $companyId = $this->companyRepository->getCompanyId();
-        $invitations = $this->invitationRepository->getByCompanyId($companyId);
-        return view('admin.team.user', compact('user', 'invitations'));
+        return redirect()->back()->with('success', 'Hasło zostało zresetowane i wysłane e-mailem.');
     }
 
     public function get(Request $request)
@@ -192,9 +190,12 @@ class UserController extends Controller
     public function disconnect(User $user)
     {
         $user->company_id = null;
+        $user->supervisor_id = null;
+        $user->position = null;
+        $user->assigned_at = null;
         $user->role = null;
         $user->save();
-        return redirect()->route('team.user.index')->with('success', 'Rozłączono.');
+        return redirect(route('team.user.index'))->with('success', 'Rozłączono.');
     }
     public function edit(User $user)
     {

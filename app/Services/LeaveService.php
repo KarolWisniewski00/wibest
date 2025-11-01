@@ -8,6 +8,7 @@ use App\Repositories\LeaveRepository;
 use App\Repositories\WorkSessionRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveService
 {
@@ -81,14 +82,29 @@ class LeaveService
      * Zwraca wnioski dla użytkownika w zakresie dat.
      * 
      * @param Request $request
+     * @param string|null $user_id
      */
-    public function getByUserId(Request $request)
+    public function getByUserId(Request $request,  ?string $user_id = null)
     {
+        if (is_null($user_id)) {
+            $user_id = Auth::id();
+        }
         $leaveRepository = new LeaveRepository();
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
 
-        return $leaveRepository->getByUserId($startDate, $endDate);
+        return $leaveRepository->getByUserId($startDate, $endDate, $user_id);
+    }
+    public function getByUserIdWithCutMonth(Request $request,  ?string $user_id = null)
+    {
+        if (is_null($user_id)) {
+            $user_id = Auth::id();
+        }
+        $leaveRepository = new LeaveRepository();
+        $startDate = $request->session()->get('start_date');
+        $endDate = $request->session()->get('end_date');
+
+        return $leaveRepository->getByUserIdWithCutMonth($startDate, $endDate, $user_id);
     }
     /**
      * Zwraca wnioski dla menadżera w zakresie dat.

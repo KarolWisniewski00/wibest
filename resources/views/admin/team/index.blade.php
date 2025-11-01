@@ -119,6 +119,7 @@
                                     : ``
                                     }
                                 </td>
+                                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                                 <td>
                                     ${(user.working_hours_custom != null && user.working_hours_from != null && user.working_hours_to != null && user.working_hours_start_day != null && user.working_hours_stop_day != null)
                                         ? ''
@@ -127,6 +128,16 @@
                                         </a>`
                                     }
                                 </td>
+                                @else
+                                <td>
+                                    ${(user.working_hours_custom != null && user.working_hours_from != null && user.working_hours_to != null && user.working_hours_start_day != null && user.working_hours_stop_day != null)
+                                        ? ''
+                                        : `<a href="" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                            ⚠️Ustaw godziny pracy
+                                        </a>`
+                                    }
+                                </td>
+                                @endif
                                 <x-show-cell href="{{route('team.user.show', '' )}}/${user.id}" />
                                 </tr>`;
                                     $tbody.append(row);
@@ -205,11 +216,19 @@
                                     </div>
                                     @if($user->working_hours_custom != null && $user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
                                     @else
+                                    @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                                     <div class="flex items-center gap-4">
                                         <a href="{{ route('team.user.planing', $user->id) }}" class="text-xs text-center inline-flex items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
                                             ⚠️Ustaw godziny pracy
                                         </a>
                                     </div>
+                                    @else
+                                    <div class="flex items-center gap-4">
+                                        <a href="" class="text-xs text-center inline-flex items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                            ⚠️Ustaw godziny pracy
+                                        </a>
+                                    </div>
+                                    @endif
                                     @endif
                                     <div class="flex space-x-4">
                                         <x-button-link-neutral href="{{route('team.user.show', $user )}}" class="min-h-[38px]">
@@ -308,9 +327,15 @@
                             <td>
                                 @if($user->working_hours_custom != null && $user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
                                 @else
+                                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                                 <a href="{{ route('team.user.planing', $user->id) }}" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
                                     ⚠️Ustaw godziny pracy
                                 </a>
+                                @else
+                                <a href="" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                    ⚠️Ustaw godziny pracy
+                                </a>
+                                @endif
                                 @endif
                             </td>
                             <x-show-cell href="{{route('team.user.show', $user )}}" />
@@ -394,6 +419,7 @@
                                     : ``
                                     }
                                 </td>
+                                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                                 <td>
                                     ${(session.working_hours_custom != null && session.working_hours_from != null && session.working_hours_to != null && session.working_hours_start_day != null && session.working_hours_stop_day != null)
                                         ? ''
@@ -402,6 +428,16 @@
                                         </a>`
                                     }
                                 </td>
+                                @else
+                                <td>
+                                    ${(session.working_hours_custom != null && session.working_hours_from != null && session.working_hours_to != null && session.working_hours_start_day != null && session.working_hours_stop_day != null)
+                                        ? ''
+                                        : `<a href="" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                            ⚠️Ustaw godziny pracy
+                                        </a>`
+                                    }
+                                </td>
+                                @endif
                                 <x-show-cell href="{{route('team.user.show', '' )}}/${session.id}" />
                             </tr>`;
                             const rowMobile = `
@@ -452,6 +488,7 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                                             ${(session.working_hours_custom != null && session.working_hours_from != null && session.working_hours_to != null && session.working_hours_start_day != null && session.working_hours_stop_day != null)
                                                 ? ''
                                                 : `
@@ -461,6 +498,17 @@
                                                     </a>
                                                 </div>`
                                             }
+                                            @else
+                                            ${(session.working_hours_custom != null && session.working_hours_from != null && session.working_hours_to != null && session.working_hours_start_day != null && session.working_hours_stop_day != null)
+                                                ? ''
+                                                : `
+                                                <div class="flex items-center gap-4">
+                                                    <a href="" class="text-xs text-center inline-flex p-2 items-center text-yellow-500 dark:text-yellow-300 font-semibold uppercase tracking-widest hover:text-yellow-200 dark:hover:text-yellow-300 transition ease-in-out duration-150">
+                                                        ⚠️Ustaw godziny pracy
+                                                    </a>
+                                                </div>`
+                                            }
+                                            @endif
                                             <div class="flex space-x-4">
                                                 <x-button-link-neutral href="{{route('team.user.show', '' )}}/${session.id}" class="min-h-[38px]">
                                                     <i class="fa-solid fa-eye"></i>

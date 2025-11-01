@@ -6,112 +6,52 @@ use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
 use App\Models\Company;
-use App\Models\Invoice;
-use App\Models\Offer;
-use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 
 class ClientController extends Controller
 {
     /**
      * Pokazuje klientów.
      */
-    public function index_old()
-    {
-        $clients = $this->get_clients();
-        $clients_sugestion = $this->get_sugestion_clients();
-        $clients_all =  $this->get_all_clients();
-
-        return view('admin.client.index', compact('clients', 'clients_sugestion', 'clients_all'));
-    }
-
-    /**
-     * Pokazuje klientów.
-     */
     public function index()
     {
-        $users = User::where('company_id', $this->get_company_id())->get();
-        $companies = Company::all();
-        $user_id = auth()->id();
-        return view('admin.client.client', compact('users', 'user_id', 'companies'));
+        $companies = Company::orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('admin.client.index', compact('companies'));
+    }
+
+    public function get(Request $request)
+    {
+        $clients = Company::orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($clients as $client) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-client', ['client' => $client])->render());
+            array_push($rows_list, View::make('components.card-client', ['client' => $client])->render());
+        }
+
+        return response()->json([
+            'data' => $clients->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $clients->nextPageUrl(),
+        ]);
     }
 
     /**
      * Pokazuje klienta.
      */
-    public function show(Client $client)
+    public function show(Company $client)
     {
-        // Pobieranie faktur związanych z klientem
-        $invoices = Invoice::where('company_id', $this->get_company_id())
-            ->where('client_id', $client->id)
-            ->where('created_at', '>=', now()->subMonths(6)) // Dodajemy warunek daty
-            ->orderBy('created_at', 'desc')  // Sortowanie malejąco
-            ->paginate(5);
-
-        // Dodaj dane do wykresu
-        $dailyTotals = [];
-        $dailySubTotals = [];
-        $dailyCounts = []; // Tablica do zliczania dokumentów
-
-        // Dodaj dane do informacji
-        $dailyTotalsCount = 0;
-        $dailySubTotalsCount = 0;
-        $dailyCountsCount = 0;
-
-        // Inicjalizacja tablic na 6 miesięcy
-        for ($i = 0; $i < 6; $i++) {
-            $date = now()->subMonths($i)->format('Y-m');
-            $dailyTotals[$date] = 0;
-            $dailySubTotals[$date] = 0;
-            $dailyCounts[$date] = 0; // Inicjalizuj liczbę dokumentów
-        }
-
-        // Zliczanie sum dla każdego miesiąca
-        foreach ($invoices as $invoice) {
-            $date = $invoice->created_at->format('Y-m');
-            $dailyTotals[$date] += $invoice->total; // sumuj total
-            $dailySubTotals[$date] += $invoice->subtotal; // sumuj sub_total
-            $dailyCounts[$date]++; // zwiększ licznik dokumentów
-
-            $dailyTotalsCount += $invoice->total;
-            $dailySubTotalsCount += $invoice->subtotal;
-            $dailyCountsCount += 1;
-        }
-
-        // Uporządkuj dane w tablicach
-        $dates = array_keys($dailyTotals);
-        $totalValues = array_values($dailyTotals);
-        $subTotalValues = array_values($dailySubTotals);
-        $documentCounts = array_values($dailyCounts); // Liczba dokumentów
-
-        // Odwróć tablice, aby daty były od najstarszych
-        $dates = array_reverse($dates);
-        $totalValues = array_reverse($totalValues);
-        $subTotalValues = array_reverse($subTotalValues);
-        $documentCounts = array_reverse($documentCounts); // Odwróć liczbę dokumentów
-
-        $projects = Project::where('client_id', $client->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-        $offers = Offer::where('client_id', $client->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
-        // Przekazanie klienta oraz jego faktur do widoku
-        return view('admin.client.show', compact(
-            'client',
-            'projects',
-            'offers',
-            'invoices',
-            'dates',
-            'totalValues',
-            'subTotalValues',
-            'documentCounts',
-            'dailyTotalsCount',
-            'dailySubTotalsCount',
-            'dailyCountsCount'
-        ));
+        $users = User::where('company_id', $client->id)->get();
+        return view('admin.client.show', compact('client', 'users'));
     }
 
     /**
@@ -125,46 +65,30 @@ class ClientController extends Controller
     /**
      * Zapisuje nowego klienta w bazie danych.
      */
-    public function store(Request $request)
+    public function store(StoreClientRequest $request)
     {
-        $user = User::where('id', auth()->id())->first();
-        
-        // Sprawdź, czy vat_number jest unikalny dla company_id
-        $existingClient = Client::where('vat_number', $request->vat_number)
-            ->where('company_id', $user->company_id)
-            ->first();
-
-        if ($existingClient) {
-            return redirect()->route('client.create')->with('fail', 'Klient z tym numerem VAT już istnieje w tej firmie.');
-        }
         // Tworzenie nowego obiektu klienta
-        $client = new Client();
+        $client = new Company();
         $client->name = $request->name;
-        $client->email = $request->email;
-        $client->email2 = $request->email2;
-        $client->phone = $request->phone;
-        $client->phone2 = $request->phone2;
         $client->vat_number = $request->vat_number;
         $client->adress = $request->adress;
-        $client->notes = $request->notes;
-        $client->user_id = $user->id;
-        $client->company_id = $user->company_id;
+        $client->created_user_id = Auth::id();
 
         // Przechowywanie danych w bazie
         $res = $client->save();
 
         // Sprawdzanie, czy klient został zapisany pomyślnie
         if ($res) {
-            return redirect()->route('client')->with('success', 'Klient został pomyślnie dodany.');
+            return redirect()->route('setting.client')->with('success', 'Klient został pomyślnie dodany.');
         } else {
-            return redirect()->route('client.create')->with('fail', 'Wystąpił błąd podczas dodawania klienta. Proszę spróbować ponownie.');
+            return redirect()->route('setting.client.create')->with('fail', 'Wystąpił błąd podczas dodawania klienta. Proszę spróbować ponownie.');
         }
     }
 
     /**
      * Pokazuje formularz edycji klienta.
      */
-    public function edit(Client $client)
+    public function edit(Company $client)
     {
         return view('admin.client.edit', compact('client'));
     }
@@ -172,50 +96,34 @@ class ClientController extends Controller
     /**
      * Zaktualizuj dane klienta.
      */
-    public function update(Request $request, Client $client)
+    public function update(UpdateClientRequest $request, Company $client)
     {
 
         // Próbuj zaktualizować dane klienta
         $res = $client->update([
             'name' => $request->name,
-            'email' => $request->email,
-            'email2' => $request->email2,
-            'phone' => $request->phone,
-            'phone2' => $request->phone2,
-            'vat_number' => $request->tax_id,
+            'vat_number' => $request->vat_number,
             'adress' => $request->adress,
-            'notes' => $request->notes,
         ]);
 
         // Sprawdzanie, czy klient został zaktualizowany pomyślnie
         if ($res) {
-            return redirect()->route('client')->with('success', 'Klient został pomyślnie zaktualizowany.');
+            return redirect()->route('setting.client')->with('success', 'Klient został pomyślnie zaktualizowany.');
         } else {
-            return redirect()->route('client.edit')->with('fail', 'Wystąpił błąd podczas aktualizacji klienta. Proszę spróbować ponownie.');
+            return redirect()->route('setting.client.edit')->with('fail', 'Wystąpił błąd podczas aktualizacji klienta. Proszę spróbować ponownie.');
         }
     }
 
     /**
      * Usuwa klienta.
      */
-    public function delete(Client $client)
+    public function delete(Company $client)
     {
         $res = $client->delete();
         if ($res) {
-            return redirect()->route('client')->with('success', 'Produkt został usunięty.');
+            return redirect()->route('setting.client')->with('success', 'Produkt został usunięty.');
         } else {
-            return redirect()->route('client')->with('fail', 'Wystąpił błąd podczas usuwania klienta. Proszę spróbować ponownie.');
+            return redirect()->route('setting.client')->with('fail', 'Wystąpił błąd podczas usuwania klienta. Proszę spróbować ponownie.');
         }
-    }
-
-    public function search(Request $request)
-    {
-        $query = $request->input('query');
-
-        // Wyszukiwanie faktur na podstawie numeru lub klienta
-        $clients = $this->get_clients_by_query($query);
-
-        // Zwracamy faktury jako JSON
-        return response()->json($clients);
     }
 }

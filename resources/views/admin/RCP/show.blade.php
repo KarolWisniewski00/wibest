@@ -32,7 +32,7 @@
             <x-container-gray class="px-0 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                 <!--status-->
                 <x-text-cell class="mx-4 gap-4">
-                    <p class="text-gray-700 dark:text-gray-300 test-sm mx-2">
+                    <p class="text-gray-700 dark:text-gray-300 test-sm">
                         Status
                     </p>
                     <div class="flex justify-start items-center w-full justify-start">
@@ -186,7 +186,7 @@
                     @if($work_session->eventStart->location)
                     <!--Lokalizacja-->
                     <x-text-cell class="mx-4 gap-4">
-                        <div id="map" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
+                        <div id="map" style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
                     </x-text-cell>
                     <!--Lokalizacja-->
 
@@ -240,7 +240,7 @@
                     @if($work_session->eventStop->location)
                     <!--Lokalizacja-->
                     <x-text-cell class="mx-4 gap-4">
-                        <div id="map2" style="height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
+                        <div id="map2" style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
                     </x-text-cell>
                     <!--Lokalizacja-->
                     
@@ -285,7 +285,9 @@
                     <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja
                 </x-button-link-blue>
                 @endif
-                <form action="{{route('rcp.work-session.delete', $work_session)}}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                <form action="{{route('rcp.work-session.delete', $work_session)}}"
+                 method="POST"
+                  onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="text-lg min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-300 text-gray-900 dark:bg-red-300 border border-transparent rounded-lg font-semibold dark:text-gray-900 uppercase tracking-widest hover:bg-red-200 dark:hover:bg-red-400 focus:bg-red-200 dark:focus:bg-red-300 active:bg-red-200 dark:active:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 dark:focus:ring-offset-red-800 transition ease-in-out duration-150">

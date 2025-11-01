@@ -276,6 +276,9 @@ class WorkSessionRepository
         $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
 
         $user = User::findOrFail($userId);
+        if (!$user->working_hours_custom) {
+            return 0;
+        }
         $workingSeconds = (int)$user->working_hours_custom * 3600;
 
         $workSessions = WorkSession::where('user_id', $userId)
@@ -302,6 +305,9 @@ class WorkSessionRepository
         $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
 
         $user = User::findOrFail($userId);
+        if (!$user->working_hours_custom) {
+            return 0;
+        }
         $workingSeconds = (int)$user->working_hours_custom * 3600;
 
         $workSessions = WorkSession::where('user_id', $userId)
@@ -334,6 +340,9 @@ class WorkSessionRepository
     {
         $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
         $user = User::findOrFail($userId);
+        if (!$user->working_hours_custom) {
+            return 0;
+        }
 
         // Mapowanie polskich dni na numery ISO (1 = pon, 7 = niedziela)
         $daysMap = [

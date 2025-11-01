@@ -46,9 +46,30 @@
     // Pobieranie sesji pracy w formacie XLSX
     $('#download-xlsx').on('click', function() {
         const ids = [];
-
+        let name = '';
         $('#table tbody input[type="radio"]:checked').each(function() {
             const id = $(this).data('id');
+            name = String($(this).data('name'));
+            name = name
+                .replace(/ą/g, 'a')
+                .replace(/ć/g, 'c')
+                .replace(/ę/g, 'e')
+                .replace(/ł/g, 'l')
+                .replace(/ń/g, 'n')
+                .replace(/ó/g, 'o')
+                .replace(/ś/g, 's')
+                .replace(/ź/g, 'z')
+                .replace(/ż/g, 'z')
+                .replace(/Ą/g, 'A')
+                .replace(/Ć/g, 'C')
+                .replace(/Ę/g, 'E')
+                .replace(/Ł/g, 'L')
+                .replace(/Ń/g, 'N')
+                .replace(/Ó/g, 'O')
+                .replace(/Ś/g, 'S')
+                .replace(/Ź/g, 'Z')
+                .replace(/Ż/g, 'Z')
+                .replace(/\s+/g, '_'); // spacje → podkreślenia
             if (id) {
                 ids.push(id);
             }
@@ -58,7 +79,7 @@
             alert('Zaznacz przynajmniej jedną pozycję.');
             return;
         }
-
+        
         // Wysyłamy do API
         $.ajax({
             url: "{{ $slot }}",
@@ -78,7 +99,7 @@
                 });
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
-                link.download = '{{ $file }}.pdf';
+                link.download = '{{ $file }}_'+name+'.pdf';
                 link.click();
             },
             error: function() {

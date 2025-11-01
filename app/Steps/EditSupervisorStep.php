@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 
 class EditSupervisorStep extends Step
 {
-    protected string $view = 'livewire.steps.supervisor-step';
+    protected string $view = 'livewire.steps.edit-supervisor-step';
 
     public $supervisor_id;
 
@@ -32,7 +32,7 @@ class EditSupervisorStep extends Step
         $user->supervisor_id = $state['supervisor_id'];
         $user->save();
 
-        return redirect()->route('team.user.show', $user)->with('success', 'Operacja zakończona powodzeniem.');
+        return redirect()->route($state['route_back'], $user)->with('success', 'Operacja zakończona powodzeniem.');
     }
     public function validate()
     {

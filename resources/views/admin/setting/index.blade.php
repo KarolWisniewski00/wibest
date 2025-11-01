@@ -1,89 +1,126 @@
-<x-app-layout>
+<x-app-layout class="flex">
     @include('admin.elements.alerts')
     @if ($company)
-    <div class="p-4">
-        <div class="py-12">
-            <div class=" mx-auto sm:px-6 lg:px-8 mt-16">
-                <!-- WIDGET TASK -->
-                <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-                    @if($role == 'właściciel')
-                    <x-setting.nav />
-                    @endif
-                    <div class="p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                        <!-- Napis z przyciskiem tworzenia -->
-                        <x-h1-display>
-                            Moja firma
-                        </x-h1-display>
-                        @if ($company)
-                        <div class="relative overflow-x-auto shadow rounded-lg mt-8">
-                            <div class="flex flex-col gap-4 w-full h-full appearance-none rounded-lg border border-gray-100 dark:border-gray-700 bg-gray-100 p-4 outline-none  dark:bg-gray-700 dark:text-gray-50">
-                                <div class="flex flex-col md:grid gap-4  border-b border-gray-100 dark:border-gray-700">
-                                    <p class="inline-flex items-center text-gray-600 dark:text-gray-400 font-semibold text-xs uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        Nazwa
-                                    </p>
-                                    <p class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        <x-label-link-company href="{{ route('setting') }}">
-                                            {{$company->name}}
-                                        </x-label-link-company>
-                                        <input type="hidden" value="{{$company->id}}" name="company_id">
-                                        <input type="hidden" value="{{$company->name}}" name="seller_name">
-                                    </p>
-                                </div>
-                                <div class="flex flex-col md:grid gap-4  border-b border-gray-100 dark:border-gray-700">
-                                    <p class="inline-flex items-center text-gray-600 dark:text-gray-400 font-semibold text-xs uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        Adres
-                                    </p>
-                                    <p class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        {{$company->adress}}
-                                        <input type="hidden" value="{{$company->adress}}" name="seller_adress">
-                                    </p>
-                                </div>
-                                <div class="flex flex-col md:grid gap-4  border-b border-gray-100 dark:border-gray-700">
-                                    <p class="inline-flex items-center text-gray-600 dark:text-gray-400 font-semibold text-xs uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        NIP
-                                    </p>
-                                    <p class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold text-xl uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150">
-                                        {{$company->vat_number}}
-                                        <input type="hidden" value="{{$company->vat_number}}" name="seller_vat_number">
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-8 flex justify-end space-x-4">
-                            @if ($company)
-                            @if($role == 'admin' || $role == 'właściciel')
-                            <a href="{{route('setting.edit', $company)}}" class="min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-blue-300 dark:bg-blue-300 border border-transparent rounded-lg font-semibold text-sm md:text-lg text-white dark:text-gray-900 uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 dark:focus:ring-offset-blue-800 transition ease-in-out duration-150">
-                                <i class="fa-regular fa-pen-to-square mr-2"></i>Edytuj
-                            </a>
-                            @endif
-                            @endif
-                            <!-- Green button for marking as completed -->
-                        </div>
-                        @else
-                        <div id="alert-additional-content-4" class="p-4 mb-4 text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-300 dark:border-yellow-800" role="alert">
-                            <div class="flex items-center">
-                                <svg class="flex-shrink-0 w-4 h-4 me-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-                                </svg>
-                                <span class="sr-only">Info</span>
-                                <h3 class="text-lg font-medium">Dokończ konfigurację</h3>
-                            </div>
-                            <div class="mt-2 mb-4 text-sm">
-                                Brak danych sprzedawcy. Dodaj informacje o firmie. Przejdź do zakładki ustawienia i kliknij zielony plus
-                            </div>
-                            <div class="flex">
-                                <a href="{{route('setting.create')}}" class="text-white bg-yellow-800 hover:bg-yellow-900 focus:ring-4 focus:outline-none focus:ring-yellow-300 font-medium rounded-lg text-xs px-3 py-1.5 me-2 text-center inline-flex items-center dark:bg-yellow-300 dark:text-gray-800 dark:hover:bg-yellow-400 dark:focus:ring-yellow-800">
-                                    Przejdź do konfiguracji
-                                </a>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
+    <!--MAIN-->
+    <x-main-no-filter>
+        <x-setting.nav />
+        <x-setting.header>
+            <span>🏢</span> Moja firma
+        </x-setting.header>
+        <!--CONTENT-->
+        <x-container-content-form class="pt-0"> 
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <x-container-gray>
+                    <!--Nazwa-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Nazwa
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-label-link-company
+                                href="{{route('setting.client.show', $client)}}"
+                                class="flex justify-center items-center font-semibold text-2xl uppercase tracking-widest">
+                                {{ $client->name }}
+                            </x-label-link-company>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Nazwa-->
+
+                    <!--Adres-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Adres
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📍</span>
+                                {{ $client->adress }}
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Adres-->
+
+                    <!--NIP-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            NIP
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">🧾</span>
+                                {{ $client->vat_number }}
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--NIP-->
+                </x-container-gray>
+                <x-container-gray>
+                    <!--Ilość użytkowników-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Ilość użytkowników
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">👤</span>
+                                {{ $users->count() }}
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Ilość użytkowników-->
+                </x-container-gray>
+                <div class="max-h-64 overflow-y-auto md:col-span-2 rounded-lg border-2 border-gray-50 dark:border-gray-700 snap-y snap-mandatory p-4 md:p-0">
+                    <!--MOBILE VIEW-->
+                    <x-list :items="$users" emptyMessage="Brak użytkowników do wyświetlenia.">
+                        @foreach ($users as $user)
+                        <x-card-user :user="$user" />
+                        @endforeach
+                    </x-list>
+                    <!--MOBILE VIEW-->
+
+                    <!--PC VIEW-->
+                    <x-table
+                        :headers="['Firma', 'Nazwa', 'Informacje', 'Podgląd']"
+                        :items="$users"
+                        emptyMessage="Brak użytkowników do wyświetlenia.">
+                        @foreach($users as $user)
+                        <x-row-user :user="$user" />
+                        @endforeach
+                    </x-table>
+                    </table>
+                    <!--PC VIEW-->
                 </div>
             </div>
-            <!-- END WIDGET TASK -->
-        </div>
-    </div>
+
+            <!--PRZYCISKI-->
+            <div class="flex justify-end gap-4 mt-4">
+                @if ($company)
+                @if($role == 'admin' || $role == 'właściciel')
+                <!-- EDYTUJ -->
+                <x-button-link-blue href="{{route('setting.edit', $company)}}">
+                    <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
+                </x-button-link-blue>
+                <!--EDYTUJ-->
+                @endif
+                @endif
+            </div>
+            <!--PRZYCISKI-->
+
+            <x-label class="py-2 mt-4">
+                Utworzono {{ $client->created_at }}
+            </x-label>
+            <x-label class="py-2">
+                Utoworzono przez {{ $client->created_user->name }}
+            </x-label>
+            <x-label class="py-2">
+                Ostatnia aktualizacja {{ $client->updated_at }}
+            </x-label>
+
+        </x-container-content-form>
+        <!--CONTENT-->
+
+    </x-main-no-filter>
+    <!--MAIN-->
     @else
     @include('admin.elements.end_config')
     @endif

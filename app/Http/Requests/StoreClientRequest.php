@@ -7,36 +7,47 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreClientRequest extends FormRequest
 {
     /**
-     * Zasady walidacji, które będą stosowane do żądania.
+     * Określa, czy użytkownik jest autoryzowany do wykonania tej prośby.
+     *
+     * @return bool
      */
-    public function rules(): array
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Określa zasady walidacji dla tego żądania.
+     *
+     * @return array
+     */
+    public function rules()
     {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'email2' => 'nullable|email|max:255',
-            'phone' => 'nullable|string|max:20',
-            'phone2' => 'nullable|string|max:20',
-            'tax_id' => 'required|string|max:20',
             'adress' => 'required|string|max:255',
-            'notes' => 'nullable|string|max:255',
+            // vat_number: wymagany, tylko cyfry, 10 znaków, unikalny
+            'vat_number' => [
+                'required',
+                'digits:10',              // dokładnie 10 cyfr
+                'unique:companies,vat_number', // unikalny w tabeli
+            ],
         ];
     }
 
     /**
-     * Spersonalizowane komunikaty walidacji.
+     * Określa niestandardowe komunikaty walidacji.
+     *
+     * @return array
      */
-    public function messages(): array
+    public function messages()
     {
         return [
-            'name.required' => 'Pole nazwa jest wymagane.',
-            'email.required' => 'Pole email jest wymagane.',
-            'email.email' => 'Wprowadź poprawny adres email.',
-            'phone.required' => 'Pole telefon jest wymagane.',
-            'tax_id.required' => 'Pole NIP jest wymagane.',
-            'adress.required' => 'Pole adres jest wymagane.',
-            'city.required' => 'Pole miasto jest wymagane.',
-            'postal_code.required' => 'Pole kod pocztowy jest wymagane.',
+            'name.required' => 'Nazwa firmy jest wymagana.',
+            'adress.required' => 'Miasto jest wymagane.',
+            'vat_number.required' => 'Numer NIP jest wymagany.',
+            'vat_number.digits' => 'Numer NIP musi zawierać dokładnie 10 cyfr.',
+            'vat_number.unique' => 'Firma z tym numerem NIP już istnieje.',
         ];
     }
 }
