@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Team;
 use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordMail;
-use App\Mail\UserMail;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Repositories\InvitationRepository;
@@ -17,6 +16,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
 
 class UserController extends Controller
 {
@@ -43,9 +43,9 @@ class UserController extends Controller
         if ($user->role === 'admin') {
             $query = User::where('company_id', $companyId)
                 ->where('role', '!=', null);
-        } else if ($user->role === 'menadżer') {
+        } else if ($user->role === 'menedżer') {
             $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik', 'menadżer'])
+                ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
                 ->where('supervisor_id', '=', $user->supervisor_id);
         } else if ($user->role === 'kierownik') {
             $query = User::where('company_id', $companyId)
@@ -124,7 +124,20 @@ class UserController extends Controller
 
         $users = $query->paginate($perPage);
 
-        return response()->json($users);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-team', ['user' => $user])->render());
+            array_push($rows_list, View::make('components.card-team', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'data' => $users->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $users->nextPageUrl(),
+        ]);
     }
     public function setRole(Request $request)
     {
@@ -139,9 +152,9 @@ class UserController extends Controller
         if ($user->role === 'admin') {
             $query = User::where('company_id', $companyId)
                 ->where('role', '!=', null);
-        } else if ($user->role === 'menadżer') {
+        } else if ($user->role === 'menedżer') {
             $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik', 'menadżer'])
+                ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
                 ->where('supervisor_id', '=', $user->supervisor_id);
         } else if ($user->role === 'kierownik') {
             $query = User::where('company_id', $companyId)
@@ -165,7 +178,18 @@ class UserController extends Controller
 
         $users = $query->get();
 
-        return response()->json($users);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-team', ['user' => $user])->render());
+            array_push($rows_list, View::make('components.card-team', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'table' => $rows_table,
+            'list' => $rows_list,
+        ]);
     }
     public function exportXlsx(Request $request)
     {
@@ -209,32 +233,45 @@ class UserController extends Controller
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         return view('admin.team.planing', compact('user', 'invitations'));
     }
+    public function config(User $user)
+    {
+        $companyId = $this->companyRepository->getCompanyId();
+        $invitations = $this->invitationRepository->getByCompanyId($companyId);
+        return view('admin.team.config', compact('user', 'invitations'));
+    }
     public function update_planing(Request $request, User $user)
     {
         $request->validate([
-            'working_hours_custom' => 'nullable',
-            'working_hours_from' => 'nullable',
-            'working_hours_to' => 'nullable',
-            'working_hours_start_day' => 'nullable',
-            'working_hours_stop_day' => 'nullable',
+            'overtime' => 'nullable|in:on',
+            'planning_type' => 'required|in:variable,fixed-advanced,fixed-basic',
+            'overtime_threshold' => 'nullable|integer|min:0',
+            'overtime_task' => 'nullable|in:on',
+            'overtime_accept' => 'nullable|in:on',
+            'public_holidays' => 'nullable|in:on',
         ]);
 
-        $user->working_hours_custom = $request->input('working_hours_custom');
-        // konwersja z formatu HTML datetime-local (2025-08-29T08:00) na MySQL (2025-08-29 08:00:00)
-        if ($request->filled('working_hours_from')) {
-            $user->working_hours_from = \Carbon\Carbon::parse($request->input('working_hours_from'))
-                ->format('Y-m-d H:i:s');
-        }
+        // Mapa typów z formularza na wartości enum w bazie
+        $planningMap = [
+            'fixed-basic' => 'stały planing',
+            'fixed-advanced' => 'prosty planing',
+            'variable' => 'zmienny planing',
+        ];
 
-        if ($request->filled('working_hours_to')) {
-            $user->working_hours_to = \Carbon\Carbon::parse($request->input('working_hours_to'))
-                ->format('Y-m-d H:i:s');
-        }
-        $user->working_hours_start_day = $request->input('working_hours_start_day');
-        $user->working_hours_stop_day = $request->input('working_hours_stop_day');
+        $planningType = $request->input('planning_type');
+        $user->working_hours_regular = $planningMap[$planningType] ?? null;
+
+        // Pozostałe pola
+        $user->overtime = $request->has('overtime');
+        $user->overtime_threshold = $request->input('overtime_threshold', 0);
+        $user->overtime_task = $request->has('overtime_task');
+        $user->overtime_accept = $request->has('overtime_accept');
+        $user->public_holidays = $request->has('public_holidays');
+
         $user->save();
 
-        return redirect()->route('team.user.show', $user)->with('success', 'Planing zostały zaktualizowane.');
+        return redirect()
+            ->route('team.user.show', $user)
+            ->with('success', 'Konfiguracja została zaktualizowana.');
     }
     public function update(Request $request, User $user)
     {

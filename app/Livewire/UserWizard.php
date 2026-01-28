@@ -26,9 +26,13 @@ class UserWizard extends WizardComponent
     {
         return new User();
     }
+    public function getUsersChecked()
+    {
+        
+    }
     public function getUsers()
     {
         $userRepository = new UserRepository();
-        return $userRepository->getByAdmin(Auth::user()->company_id);
+        return $userRepository->getByAdmin();
     }
 }

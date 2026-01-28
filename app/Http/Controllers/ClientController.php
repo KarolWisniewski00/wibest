@@ -6,6 +6,7 @@ use App\Http\Requests\StoreClientRequest;
 use App\Http\Requests\UpdateClientRequest;
 use App\Models\Client;
 use App\Models\Company;
+use App\Models\SentMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,6 +21,10 @@ class ClientController extends Controller
     {
         $companies = Company::orderBy('created_at', 'desc')
             ->paginate(10);
+
+        foreach ($companies as $key => $company) {
+            $company->msg = SentMessage::where('company_id', $company->id)->orderByDesc('created_at')->get();
+        }
 
         return view('admin.client.index', compact('companies'));
     }
@@ -51,7 +56,9 @@ class ClientController extends Controller
     public function show(Company $client)
     {
         $users = User::where('company_id', $client->id)->get();
-        return view('admin.client.show', compact('client', 'users'));
+        $msg = SentMessage::where('company_id', $client->id)->orderByDesc('created_at')->get();
+        $msg_paginate = SentMessage::where('company_id', $client->id)->orderByDesc('created_at')->paginate(10);
+        return view('admin.client.show', compact('client', 'users', 'msg', 'msg_paginate'));
     }
 
     /**

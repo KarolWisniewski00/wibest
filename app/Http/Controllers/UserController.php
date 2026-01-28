@@ -8,6 +8,8 @@ use App\Models\Leave;
 use App\Models\PlannedLeave;
 use App\Models\User;
 use App\Models\WorkSession;
+use App\Repositories\CompanyRepository;
+use App\Repositories\InvitationRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -16,6 +18,16 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    protected InvitationRepository $invitationRepository;
+    protected CompanyRepository $companyRepository;
+
+    public function __construct(
+        InvitationRepository $invitationRepository,
+        CompanyRepository $companyRepository
+    ) {
+        $this->invitationRepository = $invitationRepository;
+        $this->companyRepository = $companyRepository;
+    }
     public function index()
     {
         $users = User::with('company')
@@ -181,12 +193,53 @@ class UserController extends Controller
             $user =  new User();
             $user->name = 'Administrator';
             $user->company_id = $client->id;
-            $user->email = 'admin';
+            $user->email = Str::random(12);
             $user->password = Hash::make(Str::random(12));
             $user->role = 'admin';
+            $user->assigned_at = Carbon::now();
             $user->save();
             return redirect()->route('setting.client.show', $client)->with('success', 'Dodano admina w celu zapewnienia prawidłowego działania.');
         }
         return view('admin.user.create', compact('client'));
+    }
+    public function config(User $user)
+    {
+        $companyId = $this->companyRepository->getCompanyId();
+        $invitations = $this->invitationRepository->getByCompanyId($companyId);
+        return view('admin.user.config', compact('user', 'invitations'));
+    }
+    public function update_planing(Request $request, User $user)
+    {
+        $request->validate([
+            'overtime' => 'nullable|in:on',
+            'planning_type' => 'required|in:variable,fixed-advanced,fixed-basic',
+            'overtime_threshold' => 'nullable|integer|min:0',
+            'overtime_task' => 'nullable|in:on',
+            'overtime_accept' => 'nullable|in:on',
+            'public_holidays' => 'nullable|in:on',
+        ]);
+
+        // Mapa typów z formularza na wartości enum w bazie
+        $planningMap = [
+            'fixed-basic' => 'stały planing',
+            'fixed-advanced' => 'prosty planing',
+            'variable' => 'zmienny planing',
+        ];
+
+        $planningType = $request->input('planning_type');
+        $user->working_hours_regular = $planningMap[$planningType] ?? null;
+
+        // Pozostałe pola
+        $user->overtime = $request->has('overtime');
+        $user->overtime_threshold = $request->input('overtime_threshold', 0);
+        $user->overtime_task = $request->has('overtime_task');
+        $user->overtime_accept = $request->has('overtime_accept');
+        $user->public_holidays = $request->has('public_holidays');
+
+        $user->save();
+
+        return redirect()
+            ->route('setting.user.show', $user)
+            ->with('success', 'Konfiguracja została zaktualizowana.');
     }
 }

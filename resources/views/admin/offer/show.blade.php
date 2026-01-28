@@ -1,13 +1,13 @@
 <x-app-layout>
     <div class="py-12 pt-48">
         @include('admin.elements.alerts')
-        <x-old-school-nav></x-old-school-nav>
+
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!--WIDGET TASK-->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">
                 <div class="p-6 lg:p-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                     <!--POWRÓT-->
-                    <x-button-link-back href="{{ route('offer') }}" class="text-lg">
+                    <x-button-link-back href="" class="text-lg">
                         <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do listy Ofert
                     </x-button-link-back>
                     <!--POWRÓT-->
@@ -27,13 +27,13 @@
                     <!--PRZYCISKI POD A4-->
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
                         <!-- EDYTUJ -->
-                        <x-button-link-blue href="{{ route('offer.edit', $offer_obj) }}">
+                        <x-button-link-blue href="">
                             <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
                         </x-button-link-blue>
                         <!--EDYTUJ-->
 
                         <!--USUŃ-->
-                        <form action="{{ route('offer.delete', $offer_obj) }}" method="POST"
+                        <form action="" method="POST"
                             onsubmit="return confirm('Czy na pewno chcesz usunąć tą ofertę?');">
                             @csrf
                             @method('DELETE')
@@ -77,7 +77,7 @@
                                     <i class="fa-solid fa-exclamation-triangle mr-2"></i>Uwaga klient nie ma adresu email
                                 </span>
                                 <p class="text-sm md:text-base text-gray-900 dark:text-gray-50 font-semibold text-start">
-                                    <a href="{{ route('client.edit', $offer_obj->client) }}" class="text-yellow-900 dark:text-yellow-800 hover:underline">
+                                    <a href="" class="text-yellow-900 dark:text-yellow-800 hover:underline">
                                         <span>, kliknij aby dodać adres email</span>
                                     </a>
                                 </p>
@@ -99,7 +99,7 @@
                     <!--ALERT-->
 
                     <!--POWRÓT-->
-                    <x-button-link-back href="{{ route('offer') }}" class="text-lg">
+                    <x-button-link-back href="" class="text-lg">
                         <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do listy Ofert
                     </x-button-link-back>
                     <!--POWRÓT-->
@@ -298,12 +298,12 @@
                                     Nazwa projektu
                                 </p>
                                 <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
-                                    {{ $offer_obj->project->name }}
+
                                 </p>
                             </x-text-cell>
                             <!--Nazwa projektu-->
 
-                            <x-project-status-link :project="$offer_obj->project" />
+
 
                             <!--domena projektu-->
                             <x-text-cell class="mx-4">
@@ -311,7 +311,7 @@
                                     Domena projektu
                                 </p>
                                 <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
-                                    {{ $offer_obj->project->production_domain }}
+
                                 </p>
                             </x-text-cell>
                             <!--domena projektu-->
@@ -325,7 +325,7 @@
                                     Zakres prac
                                 </p>
                                 <p class="text-sm md:text-xl text-gray-700 dark:text-gray-50 font-semibold">
-                                    {{ $offer_obj->project_scope }}
+
                                 </p>
                             </x-text-cell>
                         </x-container-gray>
@@ -379,7 +379,7 @@
                         <!--STATUS I UWAGI-->
                         <x-container-gray class="col-span-2">
                             <x-text-cell>
-                                <x-offer-status :offer="$offer_obj" />
+
                             </x-text-cell>
                             <x-text-cell>
                                 <p class="text-gray-600 dark:text-gray-300 test-sm">
@@ -397,13 +397,13 @@
                     <!--PRZYCISKI POD A4-->
                     <div class="mt-8 hidden md:flex justify-end items-center space-x-4">
                         <!-- EDYTUJ -->
-                        <x-button-link-blue href="{{ route('offer.edit', $offer) }}">
+                        <x-button-link-blue href="{">
                             <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
                         </x-button-link-blue>
                         <!--EDYTUJ-->
 
                         <!--USUŃ-->
-                        <form action="{{ route('offer.delete', $offer) }}" method="POST"
+                        <form action="" method="POST"
                             onsubmit="return confirm('Czy na pewno chcesz usunąć tą ofertę?');">
                             @csrf
                             @method('DELETE')

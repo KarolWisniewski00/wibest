@@ -97,4 +97,8 @@ class Company extends Model
             'profile_photo_url' => null,
         ]);
     }
+    public function workBlocks()
+    {
+        return $this->hasMany(WorkBlock::class);
+    }
 }

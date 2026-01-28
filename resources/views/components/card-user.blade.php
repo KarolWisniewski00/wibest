@@ -1,43 +1,44 @@
 @props(['user'])
-
 <li class="snap-center">
     <div class="h-full inline-flex items-center justify-between w-full p-4
                 text-gray-500 bg-white border-2 border-gray-200 rounded-lg
                 hover:text-gray-600 hover:bg-gray-50
                 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-        <div class="flex flex-col w-full gap-3">
-            @if($user->company)
-            <p class="text-start font-semibold text-gray-900 dark:text-gray-50">
-                <x-label-link-company href="{{route('setting.client.show', $user->company)}}" class="flex justify-start items-center font-semibold uppercase tracking-widest">
-                    {{ $user->company->name }}
-                </x-label-link-company>
-            </p>
-            @else
-            <p class="text-start font-semibold text-gray-900 dark:text-gray-50">
-                <x-alert-link href="{{route('setting.user.edit-company', $user)}}">
-                    Brak firmy
-                </x-alert-link>
-            </p>
-            @endif
-
-            @if($user->working_hours_custom != null && $user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
-            @else
-            @if($user->company)
-            @if(!request()->routeIs('setting'))
-            <p class="text-start font-semibold text-gray-900 dark:text-gray-50">
-                <x-alert-link href="{{route('setting.user.edit-planing', $user)}}">
-                    Ustaw godziny pracy
-                </x-alert-link>
-            </p>
-            @else
-            <p class="text-start font-semibold text-gray-900 dark:text-gray-50">
-                <x-alert-link href="{{route('team.user.planing', $user)}}">
-                    Ustaw godziny pracy
-                </x-alert-link>
-            </p>
-            @endif
-            @else
-            @endif
+        <div class="flex flex-col w-full gap-4">
+            <div class="flex justify-between w-full">
+                <div class="flex justify-start items-center w-full justify-start text-xs">
+                    <x-paragraf-display class="text-xs text-start">
+                        <x-status-gray>
+                            <span>🏢</span>@if($user->company) {{ $user->company->name }} @endif
+                        </x-status-gray>
+                    </x-paragraf-display>
+                </div>
+            </div>
+            <div class="flex justify-between w-full">
+                <div class="flex justify-start items-center w-full justify-start text-xs">
+                    <x-paragraf-display class="text-xs whitespace-nowrap gap-2">
+                        <x-status-gray>
+                            Data dołączenia
+                        </x-status-gray>
+                        <x-status-cello>
+                            {{ $user->assigned_at ? $user->assigned_at->format('d.m.Y') : '' }}
+                        </x-status-cello>
+                    </x-paragraf-display>
+                </div>
+            </div>
+            @if($user->paid_until)
+            <div class="flex justify-between w-full">
+                <div class="flex justify-start items-center w-full justify-start text-xs">
+                    <x-paragraf-display class="text-xs whitespace-nowrap gap-2">
+                        <x-status-gray>
+                            Opłacono do
+                        </x-status-gray>
+                        <x-status-cello>
+                            {{ $user->paid_until ? $user->paid_until->format('d.m.Y') : '' }}
+                        </x-status-cello>
+                    </x-paragraf-display>
+                </div>
+            </div>
             @endif
 
             <div class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
@@ -46,9 +47,15 @@
             </div>
 
             <div class="flex space-x-3">
+                @if(!request()->routeIs('setting'))
                 <x-button-link-neutral href="{{route('setting.user.show', $user)}}" class="min-h-[38px]">
                     <i class="fa-solid fa-eye"></i>
                 </x-button-link-neutral>
+                @else
+                <x-button-link-neutral href="{{route('team.user.show', $user)}}" class="min-h-[38px]">
+                    <i class="fa-solid fa-eye"></i>
+                </x-button-link-neutral>
+                @endif
             </div>
         </div>
     </div>

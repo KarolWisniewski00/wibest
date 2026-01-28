@@ -3,263 +3,170 @@
     @if ($company)
     <!--SIDE BAR-->
     <x-sidebar-left>
+        @if(isset($filter_user_id) && $filter_user_id)
+        <div
+            class="relative">
+            <div class="p-2 pt-0 text-sm rounded-lg">
+                <div class="flex flex-col gap-4">
+                    <span class="text-gray-900 dark:text-white">👤 Dla zespołu</span>
+                    <label
+                        class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+
+                        <div class="flex items-center gap-2">
+                            <x-user-photo :user="App\Models\User::where('id', $filter_user_id)->first()" />
+                            <x-user-name :user="App\Models\User::where('id', $filter_user_id)->first()" class="flex-wrap" />
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div>
+            @if($startDate != '' || $endDate != '')
+            <div class="p-2 pt-0 text-sm rounded-lg flex flex-col gap-4 flex-wrap">
+                <span class="text-gray-900 dark:text-white">📅 Zakres</span>
+                <x-status-cello>
+                    @if($startDate != '')
+                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y') ?? ''}}
+                    @endif
+                    <span class="px-2">-</span>
+                    @if($endDate != '')
+                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y') ?? ''}}
+                    @endif
+                </x-status-cello>
+            </div>
+            @endif
+        </div>
+        @else
         <x-search-filter />
-        <x-date-filter />
+        <x-filter-date loader="work-session">
+            {{ route('api.v1.rcp.work-session.set.date') }}
+        </x-filter-date>
+        @endif
+        <input type="hidden" id="start_date" value="{{ $startDate }}">
+        <input type="hidden" id="end_date" value="{{ $endDate }}">
     </x-sidebar-left>
     <!--SIDE BAR-->
 
     <!--MAIN-->
     <x-main>
-        <x-RCP.nav />
-        <x-RCP.header>RCP ⏱️</x-RCP.header>
+        <x-RCP.nav :countEvents="$countEvents" />
+        <x-RCP.header>
+            <span>⏱️</span> RCP
+        </x-RCP.header>
         <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
-            {{ $startDate }} - {{ $endDate }}
+            {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
         </x-status-cello>
-        <!--CONTENT-->
-        <x-flex-center class="px-4 pb-4 flex flex-col">
-            <!--MOBILE VIEW-->
-            <div class="relative overflow-x-auto md:shadow sm:rounded-lg w-full">
-                <ul id="list" class="grid w-full gap-y-4 block md:hidden">
-                    <!-- EMPTY PLACE -->
-                    @if ($work_sessions->isEmpty())
-                    <x-empty-place />
-                    @else
-                    <!-- EMPTY PLACE -->
-                    @foreach ($work_sessions as $key => $work_session)
-                    <!-- WORK SESSIONS ELEMENT VIEW -->
-                    <li>
-                        <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                            <div class="flex flex-col w-full gap-4">
-                                <div class="flex justify-between w-full">
-                                    <div class="flex justify-start items-center w-full justify-start">
-                                        <x-RCP.work-session-status :work_session="$work_session" class="text-xl" />
-                                    </div>
-                                </div>
-                                <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
-                                    @if(isset($work_session->eventStart))
-                                    @if($work_session->eventStart->location_id)
-                                    <x-status-green>
-                                        <i class="fa-solid fa-location-dot mx-1"></i>
-                                    </x-status-green>
-                                    @endif
-                                    @endif
-                                    @if(isset($work_session->eventStop))
-                                    @if($work_session->eventStop->location_id)
-                                    <x-status-red>
-                                        <i class="fa-solid fa-location-dot mx-1"></i>
-                                    </x-status-red>
-                                    @endif
-                                    @endif
-                                    @if($work_session->status == 'Praca zakończona')
-                                    @if($work_session->time_in_work == '24:00:00')
-                                    <span title="Automatyczne zakończenie" class="text-red-500">⚠️</span>
-                                    @endif
-                                    {{ $work_session->time_in_work }},
-                                    <span class="text-xs text-gray-400">
-                                        @if ($work_session->eventStart->isSameDay($work_session->eventStop->time))
-                                        {{ $work_session->eventStart->format() }}
-                                        @else
-                                        z {{ $work_session->eventStart->format() }} na {{ $work_session->eventStop->format() }}
-                                        @endif
-                                    </span>
-                                    @endif
-                                </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
-                                    <div class="flex items-center gap-4">
-                                        @if($work_session->user->profile_photo_url)
-                                        <img src="{{ $work_session->user->profile_photo_url }}" alt="{{ $work_session->user->name }}" class="w-10 h-10 rounded-full">
-                                        @else
-                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                            {{ strtoupper(substr($work_session->user->name, 0, 1)) }}
-                                        </div>
-                                        @endif
-                                        <div>
-                                            <div class="flex flex-col justify-center w-fit">
-                                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                                    {{$work_session->user->name}}
-                                                </x-paragraf-display>
-                                                @if($work_session->user->role == 'admin')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Admin
-                                                </span>
-                                                @elseif($work_session->user->role == 'menedżer')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Menedżer
-                                                </span>
-                                                @elseif($work_session->user->role == 'kierownik')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Kierownik
-                                                </span>
-                                                @elseif($work_session->user->role == 'użytkownik')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Użytkownik
-                                                </span>
-                                                @elseif($work_session->user->role == 'właściciel')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                                    Właściciel
-                                                </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-4">
-                                    <x-button-link-neutral href="{{route('rcp.work-session.show', $work_session)}}" class="min-h-[38px]">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </x-button-link-neutral>
-                                    @if($role == 'admin' || $role == 'właściciel')
-                                    @if($work_session->status == 'Praca zakończona')
-                                    <x-button-link-blue href="{{route('rcp.work-session.edit', $work_session)}}" class="min-h-[38px]">
-                                        <i class="fa-solid fa-pen-to-square"></i>
-                                    </x-button-link-blue>
-                                    @endif
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <!-- WORK SESSIONS ELEMENT VIEW -->
-                    @endforeach
-                    @endif
-                </ul>
-                <!-- WORK SESSIONS VIEW -->
+        @php
+        $showTable = true;
+        @endphp
+        @if(session('report_key_rcp'))
+        @php
+        $reportKey = session('report_key_rcp');
+        $report = Cache::get($reportKey);
+        @endphp
 
-                <!-- PC VIEW -->
-                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden md:table">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">
-                                <x-flex-center>
-                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Zdjęcie
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-start">
-                                Imię i Nazwisko
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Status
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Lokalizacja
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Czas w pracy
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Kiedy
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Podgląd
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="work-sessions-body">
-                        @if ($work_sessions->isEmpty())
-                        <tr class="bg-white dark:bg-gray-800">
-                            <td colspan="8" class="px-3 py-2">
-                                <x-empty-place />
-                            </td>
-                        </tr>
-                        @else
-                        @foreach ($work_sessions as $work_session)
-                        <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                            <td class="px-3 py-2">
-                                <x-flex-center>
-                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="{{ $work_session->id }}">
-                                </x-flex-center>
-                            </td>
-                            <td class="px-3 py-2 flex items-center justify-center">
-                                @if($work_session->user->profile_photo_url)
-                                <img src="{{ $work_session->user->profile_photo_url }}" alt="{{ $work_session->user->name }}" class="w-10 h-10 rounded-full">
-                                @else
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                    {{ strtoupper(substr($work_session->user->name, 0, 1)) }}
-                                </div>
-                                @endif
-                            </td>
-                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-                                <div class="flex flex-col justify-center w-fit">
-                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                        {{$work_session->user->name}}
-                                    </x-paragraf-display>
-                                    @if($work_session->user->role == 'admin')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Admin
-                                    </span>
-                                    @elseif($work_session->user->role == 'menedżer')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Menedżer
-                                    </span>
-                                    @elseif($work_session->user->role == 'kierownik')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Kierownik
-                                    </span>
-                                    @elseif($work_session->user->role == 'użytkownik')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Użytkownik
-                                    </span>
-                                    @elseif($work_session->user->role == 'właściciel')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                        Właściciel
-                                    </span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-3 py-2 text-sm ">
-                                <x-RCP.work-session-status :work_session="$work_session" class="text-xs" />
-                            </td>
-                            <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
-                                @if(isset($work_session->eventStart))
-                                @if($work_session->eventStart->location_id)
-                                <x-status-green>
-                                    <i class="fa-solid fa-location-dot mx-1"></i>
-                                </x-status-green>
-                                @endif
-                                @endif
-                                @if(isset($work_session->eventStop))
-                                @if($work_session->eventStop->location_id)
-                                <x-status-red>
-                                    <i class="fa-solid fa-location-dot mx-1"></i>
-                                </x-status-red>
-                                @endif
-                                @endif
-                            </td>
-                            <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
-                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start relative">
-                                    @if($work_session->status == 'Praca zakończona')
-                                    @if($work_session->time_in_work == '24:00:00')
-                                    <span title="Automatyczne zakończenie" class="text-red-500 absolute left-0 -ml-8">⚠️</span>
-                                    @endif
-                                    {{ $work_session->time_in_work }}
-                                    @endif
-                                </x-paragraf-display>
-                            </td>
-                            <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
-                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                    <span class="text-gray-400">
-                                        @if($work_session->status == 'Praca zakończona')
-                                        @if ($work_session->eventStart->isSameDay($work_session->eventStop->time))
-                                        {{ $work_session->eventStart->format() }}
-                                        @else
-                                        z {{ $work_session->eventStart->format() }} - na {{ $work_session->eventStop->format() }}
-                                        @endif
-                                        @endif
-                                    </span>
-                                </x-paragraf-display>
-                            </td>
-                            <x-show-cell href="{{ route('rcp.work-session.show', $work_session) }}" />
-                        </tr>
-                        @endforeach
-                        @endif
-                    </tbody>
-                    <div id="loader" class="text-center py-4 hidden text-gray-700 dark:text-gray-50">Ładowanie...</div>
-                </table>
-                <!-- PC VIEW -->
+        @if($report)
+        @php
+        $showTable = false;
+        @endphp
+        <div id="operation-summary-modal" class="mb-4 mx-4">
+            <div class="relative gap-4 h-full flex flex-col items-start justify-center w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                <x-h1-display class="w-full">
+                    <span>🎯</span> Podsumowanie operacji
+                </x-h1-display>
+                <x-info-span class="-my-2">
+                    Łączna liczba prób {{ $report['total_attempts'] }}
+                </x-info-span>
+                <x-success-span class="-my-2">
+                    Pomyślnie dodano {{ $report['successful'] }}
+                </x-success-span>
+                @if($report['failed_count'] > 0)
+                <x-danger-span class="-my-2">
+                    Nieudane próby {{ $report['failed_count'] }}
+                </x-danger-span>
+                <div class="flex flex-col gap-4 w-full ">
+                    @foreach($report['failed_details'] as $detail)
+                    <label class="gap-4 h-full w-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                        <div class="flex items-center gap-2">
+                            @php
+                            $user = \App\Models\User::where('id', $detail['user_id'])->first();
+                            @endphp
+                            <x-user-photo :user="$user" />
+                            <x-user-name :user="$user" class="flex-wrap" />
+                        </div>
+                        <div class="flex flex-row gap-4 items-center justify-between">
+                            <x-status-cello>
+                                {{ $detail['date'] }}
+                            </x-status-cello>
+                            <x-danger-span class="-my-2">
+                                {{ $detail['reason'] }}
+                            </x-danger-span>
+                        </div>
+                    </label>
+                    @endforeach
+                </div>
+                @endif
             </div>
-        </x-flex-center>
+        </div>
+        @php
+        $reportKey = session('report_key_rcp');
+
+        if ($reportKey) {
+        // 2. Usuwamy powiązany wpis z pamięci podręcznej (Cache)
+        Cache::forget($reportKey);
+
+        // 3. Usuwamy klucz sesji, aby nie odwoływać się do nieistniejącego cache
+        session()->forget('report_key_rcp');
+
+        // Opcjonalnie: Dodaj komunikat flash do wyświetlenia użytkownikowi
+        // session()->flash('success', 'Dane raportu zostały pomyślnie usunięte z pamięci podręcznej.');
+        }
+        @endphp
+        @else
+        {{-- To się pokaże, jeśli Job jeszcze nie skończył, lub jeśli upłynął czas na Cache --}}
+        <div class="mb-4 mx-4">
+            <div class="gap-4 h-full flex flex-col items-start justify-center w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                <x-info-span class="-my-2">
+                    Trwa przetwarzanie danych w tle. Odśwież za chwilę, aby zobaczyć raport.
+                </x-info-span>
+            </div>
+        </div>
+        @endif
+        @endif
+        @if($showTable)
+        <!--CONTENT-->
+        <x-container-content>
+            <!--MOBILE VIEW-->
+            <x-list :items="$work_sessions" emptyMessage="Brak użytkowników do wyświetlenia.">
+                @foreach ($work_sessions as $work_session)
+                <x-card-work-session :work_session="$work_session" />
+                @endforeach
+                <x-loader-work-session-card id="loader-card" />
+            </x-list>
+            <!--MOBILE VIEW-->
+
+            <!--PC VIEW-->
+            <x-table
+                :headers="['Nazwa', 'Status', 'Lokalizacja', 'Ikona', 'Czas Pracy', 'Kiedy', 'Podgląd']"
+                :items="$work_sessions"
+                emptyMessage="Brak użytkowników do wyświetlenia.">
+                @foreach($work_sessions as $work_session)
+                <x-row-work-session :work_session="$work_session" />
+                @endforeach
+                <x-loader-work-session id="loader" />
+            </x-table>
+            <!--PC VIEW-->
+            @if(isset($filter_user_id) && $filter_user_id)
+            <x-loader-script filter_user_id="{{ $filter_user_id }}">
+                {{ route('api.v1.rcp.work-session.get') }}
+            </x-loader-script>
+            @else
+            <x-loader-script>
+                {{ route('api.v1.rcp.work-session.get') }}
+            </x-loader-script>
+            @endif
+        </x-container-content>
+        @endif
         <!--CONTENT-->
         @php
         $file = 'RCP_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
@@ -267,271 +174,6 @@
         <x-download :file="$file">
             {{ route('api.v1.rcp.work-session.export.xlsx') }}
         </x-download>
-        <input type="hidden" id="start_date" value="{{ $startDate }}">
-        <input type="hidden" id="end_date" value="{{ $endDate }}">
-        <script>
-            function formatDateWhen(dateStr) {
-                const date = new Date(dateStr);
-                const options = {
-                    day: '2-digit',
-                    month: '2-digit',
-                    weekday: 'long'
-                };
-                const formattedDate = date.toLocaleDateString('pl-PL', options);
-                const [weekday, rest] = formattedDate.split(', ');
-                return `${rest}, ${weekday}`;
-            }
-            $(document).ready(function() {
-                let page = 2;
-                let loading = false;
-                const $body = $('#work-sessions-body');
-                const $list = $('#list');
-                const $loader = $('#loader');
-                const startDate = $('#start_date').val();
-                const endDate = $('#end_date').val();
-                let resultText = "";
-
-                function loadMoreSessions() {
-                    if (loading) return;
-                    loading = true;
-                    $loader.removeClass('hidden');
-
-                    $.get(`{{ route('api.v1.rcp.work-session.get') }}?page=${page}&start_date=${startDate}&end_date=${endDate}`, function(data) {
-                        data.data.forEach(function(session) {
-                            console.log(session);
-                            if (session.status == 'Praca zakończona') {
-
-                                const start = new Date(session.event_start.time);
-                                const end = new Date(session.event_stop.time);
-
-                                const sameDay = start.toDateString() === end.toDateString();
-
-                                if (sameDay) {
-                                    resultText = formatDateWhen(session.event_start.time);
-                                } else {
-                                    resultText = "z " + formatDateWhen(session.event_start.time) + " - na " + formatDateWhen(session.event_stop.time);
-                                }
-
-                                // wyświetl wynik np. w divie o ID #session-info
-                                $('#session-info').text(resultText);
-
-                            } else {
-                                // jeśli praca nie zakończona, możesz np. wyświetlić "w trakcie"
-                                $('#session-info').text('W trakcie...');
-                            }
-                            const row = `
-                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                <td class="px-3 py-2">
-                                    <x-flex-center>
-                                        <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${session.id}">
-                                    </x-flex-center>
-                                </td>
-                                <td class="px-3 py-2  flex items-center justify-center">
-                                    ${session.user.profile_photo_url
-                                        ? `<img src="${session.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
-                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
-                                    }
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-                                    <div class="flex flex-col justify-center w-fit">
-                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                            ${session.user.name}
-                                        </x-paragraf-display>
-                                        ${session.user.role == 'admin'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Admin
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${session.user.role == 'menedżer'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Menedżer
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${session.user.role == 'kierownik'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Kierownik
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${session.user.role == 'użytkownik'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Użytkownik
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${session.user.role == 'właściciel'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                                Właściciel
-                                            </span>`
-                                        : ``
-                                        }
-                                    </div>
-                                </td>
-                                <td class="px-3 py-2 text-xs">
-                                    ${session.status === 'W trakcie pracy' 
-                                        ? `<x-status-yellow>${session.status}</x-status-yellow>` 
-                                        : session.status === 'Praca zakończona' 
-                                            ? `<x-status-green>${session.status}</x-status-green>` 
-                                            : ''}
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
-                                    ${session.event_start && session.event_start.location_id
-                                    ? `<x-status-green>
-                                        <i class="fa-solid fa-location-dot mx-1"></i>
-                                    </x-status-green>`
-                                    : ''}
-                                    ${session.event_stop && session.event_stop.location_id
-                                    ? `<x-status-red>
-                                        <i class="fa-solid fa-location-dot mx-1"></i>
-                                    </x-status-red>`
-                                    : ''}
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-xl  text-gray-700 dark:text-gray-50">
-                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start relative">
-                                        ${session.status === 'Praca zakończona'
-                                        ?
-                                        `${session.time_in_work}
-                                        ${session.time_in_work == '24:00:00'
-                                        ?
-                                        `<span title="Automatyczne zakończenie" class="text-red-500 absolute left-0 -ml-8">⚠️</span>`
-                                        : ''}`
-                                        : ''}
-                                    </x-paragraf-display>
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
-                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                        <span class="text-gray-400">
-                                        ${resultText ?? '-'}
-                                        </span>
-                                    </x-paragraf-display>
-                                </td>
-                                <x-show-cell href="{{ route('rcp.work-session.show', '') }}/${session.id}" />
-                            </tr>`;
-                            const rowMobile = `
-                            <li>
-                                <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                    <div class="flex flex-col w-full gap-4">
-                                        <div class="flex justify-between w-full">
-                                            <div class="flex justify-start items-center w-full justify-start">
-                                                ${session.status === 'W trakcie pracy' 
-                                                ? `<x-status-yellow class="text-xl">${session.status}</x-status-yellow>` 
-                                                : session.status === 'Praca zakończona' 
-                                                    ? `<x-status-green class="text-xl">${session.status}</x-status-green>` 
-                                                    : ''}
-                                            </div>
-                                        </div>
-                                        ${session.event_start && session.event_start.location_id
-                                        ? `<x-status-green>
-                                            <i class="fa-solid fa-location-dot mx-1"></i>
-                                        </x-status-green>`
-                                        : ''}
-                                        ${session.event_stop && session.event_stop.location_id
-                                        ? `<x-status-red>
-                                            <i class="fa-solid fa-location-dot mx-1"></i>
-                                        </x-status-red>`
-                                        : ''}
-                                        <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
-                                            ${session.status === 'Praca zakończona'
-                                            ?
-                                            `${session.time_in_work == '24:00:00'
-                                            ?
-                                            `<span title="Automatyczne zakończenie" class="text-red-500">⚠️</span>`
-                                            : ''}${session.time_in_work},`
-                                            : ''},
-                                            <span class="text-xs text-gray-400">
-                                                ${resultText ?? '-'}
-                                            </span>
-                                        </div>
-                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
-                                            <div class="flex items-center gap-4">
-                                                ${session.user.profile_photo_url
-                                                    ? `<img src="${session.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
-                                                    : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${session.user.name[0].toUpperCase()}</div>`
-                                                }
-                                                <div>
-                                                    <div class="flex flex-col justify-center w-fit">
-                                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                                            ${session.user.name}
-                                                        </x-paragraf-display>
-                                                        ${session.user.role == 'admin'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Admin
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${session.user.role == 'menedżer'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Menedżer
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${session.user.role == 'kierownik'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Kierownik
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${session.user.role == 'użytkownik'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Użytkownik
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${session.user.role == 'właściciel'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                                                Właściciel
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex space-x-4">
-                                            <x-button-link-neutral href="{{ route('rcp.work-session.show', '') }}/${session.id}" class="min-h-[38px]">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </x-button-link-neutral>
-                                            @if($role == 'admin' || $role == 'właściciel')
-                                            ${session.status === 'W trakcie pracy' 
-                                                ? `` 
-                                                : session.status === 'Praca zakończona' 
-                                                    ? `<x-button-link-blue href="{{ route('rcp.work-session.edit', '') }}/${session.id}" class="min-h-[38px]">
-                                                            <i class="fa-solid fa-pen-to-square"></i>
-                                                        </x-button-link-blue>` 
-                                                    : ''}
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            `;
-                            $list.append(rowMobile);
-                            $body.append(row);
-                        });
-
-                        if (data.next_page_url) {
-                            page++;
-                            loading = false;
-                        } else {
-                            $(window).off('scroll'); // koniec danych
-                        }
-
-                        $loader.addClass('hidden');
-                    });
-                }
-
-                // Event scroll
-                $(window).on('scroll', function() {
-                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-                        loadMoreSessions();
-                    }
-                });
-
-                loadMoreSessions(); // wczytaj pierwszą stronę
-            });
-        </script>
     </x-main>
     <!--MAIN-->
     @else

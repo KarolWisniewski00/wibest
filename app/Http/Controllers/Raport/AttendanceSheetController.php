@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Raport;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DateRequest;
+use App\Livewire\CalendarView;
+use App\Models\WorkBlock;
 use App\Models\WorkSession;
 use App\Repositories\UserRepository;
 use App\Repositories\WorkSessionRepository;
@@ -15,6 +17,7 @@ use App\Services\WorkSessionService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class AttendanceSheetController extends Controller
 {
@@ -58,7 +61,19 @@ class AttendanceSheetController extends Controller
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
         $users = $this->userService->paginatedByRoleAddEwiByFilterDate($request);
-        return response()->json($users);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-attendance', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'data' => $users->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $users->nextPageUrl(),
+        ]);
     }
     /**
      * Ustawia nową datę w filtrze zwraca użytkowników.
@@ -70,7 +85,17 @@ class AttendanceSheetController extends Controller
     {
         $this->filterDateService->initFilterDate($request);
         $users = $this->userService->getByRoleAddEwiByFilterDate($request);
-        return response()->json($users);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-attendance', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'table' => $rows_table,
+            'list' => $rows_list,
+        ]);
     }
     /**
      * Zwraca export do pdfa.
@@ -86,6 +111,7 @@ class AttendanceSheetController extends Controller
         $userRepository = new UserRepository();
         $workSessionRepository = new WorkSessionRepository();
         $leaveService = new LeaveService();
+        $calendar = new CalendarView();
 
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
@@ -114,14 +140,47 @@ class AttendanceSheetController extends Controller
             $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($employees[0]->id, $date);
             $totalDayPlanned = $workSessionRepository->getTotalOfDayPlanned($employees[0]->id, $date);
             $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($employees[0]->id, $date);
+            $totalDayPlannedVar = WorkBlock::where('user_id', $employees[0]->id)
+                ->whereDate('starts_at', Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d'))
+                ->first();
+            $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+            $holidays = $calendar->getPublicHolidays($carbonDate->year);
+            $dateStr = $carbonDate->format('Y-m-d');
+
             $employees[0]->time_in_work_under += $totalDayUnder;
             $employees[0]->time_in_work += $totalDay;
             $employees[0]->time_in_work_extra += $totalDayExtra;
-            $employees[0]->time_in_work_planned += $totalDayPlanned;
-            $datesPlanned[$key] = sprintf('%02dh', floor($totalDayPlanned / 3600));
-            $datesUnder[$key] = sprintf('%02dh', floor($totalDayUnder / 3600));
+            if ($totalDayUnder != 0) {
+                $datesUnder[$key] = sprintf('%02dh %02dmin', floor($totalDayUnder / 3600), floor(($totalDayUnder % 3600) / 60));
+            } else {
+                $datesUnder[$key] = sprintf('%02dh', 0);
+            }
             $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+            // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+            if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                $isHoliday = true; // Nowy Rok
+            } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                $isHoliday = true; // Trzech Króli
+            } else {
+                $isHoliday = $holidays->contains($dateStr);
+            }
 
+            if (!$isHoliday) {
+                if ($employees[0]->working_hours_regular == 'zmienny planing') {
+                    $totalDayPlannedVarBufor = $totalDayPlannedVar->duration_seconds ?? 0;
+                    $employees[0]->time_in_work_planned += $totalDayPlannedVarBufor;
+                    if ($totalDayPlannedVarBufor != 0) {
+                        $datesPlanned[$key] = sprintf('%02dh %02dmin', floor($totalDayPlannedVarBufor / 3600), floor(($totalDayPlannedVarBufor % 3600) / 60));
+                    } else {
+                        $datesPlanned[$key] = sprintf('%02dh', 0);
+                    }
+                } else {
+                    $employees[0]->time_in_work_planned += $totalDayPlanned;
+                    $datesPlanned[$key] = sprintf('%02dh', floor($totalDayPlanned / 3600));
+                }
+            } else {
+                $datesPlanned[$key] = sprintf('%02dh', 0);
+            }
             try {
                 // Pobierz pierwszą i ostatnią godzinę pracy (eventStart i eventStop) dla danego dnia
                 $firstSession = WorkSession::where('user_id', $employees[0]->id)
@@ -138,15 +197,19 @@ class AttendanceSheetController extends Controller
 
                 $startTime = $firstSession && $firstSession->eventStart ? Carbon::parse($firstSession->eventStart->time)->format('H:i') : null;
                 $endTime = $lastSession && $lastSession->eventStop ? Carbon::parse($lastSession->eventStop->time)->format('H:i') : null;
-
-                $datesWork[$key] = ($startTime && $endTime) ? "$startTime - $endTime" : '';
+                if ($startTime != null && $endTime == null) {
+                    $datesWork[$key] = 'ERROR';
+                } else {
+                    $datesWork[$key] = ($startTime && $endTime) ? "$startTime - $endTime" : '';
+                }
             } catch (\Exception $e) {
                 $datesWork[$key] = '';
             }
 
             if ($totalDay != 0) {
                 $hours = floor($totalDay / 3600);
-                $totalDay = sprintf('%02dh', $hours);
+                $min = floor(($totalDay % 3600) / 60);
+                $totalDay = sprintf('%02dh  %02dmin', $hours, $min);
 
                 $datesAll[$key] = $totalDay;
             } else {
@@ -165,7 +228,7 @@ class AttendanceSheetController extends Controller
 
             // 🔹 NOWA CZĘŚĆ — obsługa urlopów
             $isLeaveDay = false;
-            $leaveHours = 0;
+            $leaveSeconds = 0;
 
             foreach ($leaves as $leave) {
                 $leaveStart = Carbon::parse($leave->start_date);
@@ -173,21 +236,34 @@ class AttendanceSheetController extends Controller
 
                 if (Carbon::parse($formattedDate)->betweenIncluded($leaveStart, $leaveEnd)) {
                     $isLeaveDay = true;
-                    $leaveHours += $employees[0]->working_hours_custom ?? 8; // domyślnie 8h, jeśli brak danych
+                    if ($employees[0]->working_hours_regular == 'zmienny planing') {
+                        $totalDayPlannedVarBufor = $totalDayPlannedVar->duration_seconds ?? 0;
+                        if ($totalDayPlannedVarBufor != 0) {
+                            $leaveSeconds += $totalDayPlannedVarBufor;
+                        } else {
+                            $leaveSeconds += 0;
+                        }
+                    } else {
+                        if ($employees[0]->working_hours_custom) {
+                            $leaveSeconds += $employees[0]->working_hours_custom * 60 * 60;
+                        } else {
+                            $leaveSeconds += 0;
+                        }
+                    }
                 }
             }
 
             if ($isLeaveDay) {
-                $datesLeave[$key] = sprintf('%02dh', $leaveHours);
-                $employees[0]->time_in_work_leave += $leaveHours;
-                $employees[0]->time_in_work_total += $leaveHours;
+                $datesLeave[$key] = sprintf('%02dh  %02dmin', floor($leaveSeconds / 3600), floor(($leaveSeconds % 3600) / 60));
+                $employees[0]->time_in_work_leave += $leaveSeconds;
             } else {
                 $datesLeave[$key] = '';
             }
         }
 
         $hours = floor($employees[0]->time_in_work / 3600);
-        $employees[0]->time_in_work_hms = sprintf('%02dh', $hours);
+        $minutes = floor(($employees[0]->time_in_work % 3600) / 60);
+        $employees[0]->time_in_work_hms = sprintf('%02dh %02dmin', $hours, $minutes);
 
         $hoursExtra = floor($employees[0]->time_in_work_extra / 3600);
         $minutesExtra = floor(($employees[0]->time_in_work_extra % 3600) / 60);
@@ -198,8 +274,12 @@ class AttendanceSheetController extends Controller
         $employees[0]->time_in_work_hms_under = sprintf('%02dh %02dmin', $hoursUnder, $minutesUnder);
 
         $hoursPlanned = floor($employees[0]->time_in_work_planned / 3600);
-        $employees[0]->time_in_work_hms_planned = sprintf('%02dh', $hoursPlanned);
-        $employees[0]->time_in_work_hms_leave = sprintf('%02dh', $employees[0]->time_in_work_leave);
+        $minutesPlanned = floor(($employees[0]->time_in_work_planned % 3600) / 60);
+        $employees[0]->time_in_work_hms_planned = sprintf('%02dh %02dmin', $hoursPlanned, $minutesPlanned);
+
+        $hoursLeave = floor($employees[0]->time_in_work_leave / 3600);
+        $minutesLeave = floor(($employees[0]->time_in_work_leave % 3600) / 60);
+        $employees[0]->time_in_work_hms_leave = sprintf('%02dh %02dmin', $hoursLeave, $minutesLeave);
 
         $pdf = Pdf::loadView('exports.attendancesheet', [
             'employee' => $employees[0],

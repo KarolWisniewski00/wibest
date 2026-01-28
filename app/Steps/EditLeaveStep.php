@@ -7,7 +7,7 @@ use Vildanbina\LivewireWizard\Components\Step;
 
 class EditLeaveStep extends Step
 {
-    protected string $view = 'livewire.steps.edit-leave-step';
+    protected string $view = 'livewire.steps.leave-step';
 
     public function mount()
     {
@@ -23,7 +23,7 @@ class EditLeaveStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'clipboard';
     }
     public function validate()
     {
@@ -39,7 +39,7 @@ class EditLeaveStep extends Step
     }
     public function title(): string
     {
-        return __('Wybierz rodzaj wniosku');
+        return __('📋 Wybierz rodzaj wniosku');
     }
 
 }

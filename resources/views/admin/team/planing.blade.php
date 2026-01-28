@@ -4,7 +4,7 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <li>
-            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+            <div class="p-2 text-sm text-blue-300 rounded-lg dark:text-blue-300">
                 Edycja planingu użytkownika.
             </div>
         </li>
@@ -22,7 +22,7 @@
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do profilu
             </x-button-link-back>
             <!--POWRÓT-->
-            <h2 class="text-xl font-semibold dark:text-white mb-4">Edytuj planing Użytkownika</h2>
+            <h2 class="text-xl font-semibold dark:text-white mb-4 text-center">Edytuj planing Użytkownika</h2>
             
             <livewire:planing-wizard userId="{{$user->id}}" />
 

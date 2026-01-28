@@ -27,30 +27,49 @@ class TimeStep extends Step
         $diff = ($to - $from) / 3600;
         $user->working_hours_custom = (int) $diff;
         $user->save();
-        
+
         return redirect()->route($state['route_back'], $user->id)->with('success', 'Operacja zakończona powodzeniem.');
     }
     public function icon(): string
     {
-        return 'check';
+        return 'clock';
     }
     public function validate()
     {
         return [
             [
-                'state.working_hours_from'     => ['required'],
-                'state.working_hours_to'     => ['required'],
+                'state.working_hours_from' => [
+                    'required',
+                    function ($attribute, $value, $fail) {
+                        $from = $this->livewire->state['working_hours_from'];
+                        $to   = $this->livewire->state['working_hours_to'];
+    
+                        if ($from && $to) {
+                            // zamiana "HH:MM" na liczbę minut od 00:00
+                            [$fromHour, $fromMinute] = explode(':', $from);
+                            [$toHour, $toMinute] = explode(':', $to);
+
+                            $fromTotal = ((int)$fromHour) * 60 + ((int)$fromMinute);
+                            $toTotal   = ((int)$toHour) * 60 + ((int)$toMinute);
+
+                            if ($fromTotal > $toTotal) {
+                                $fail('Godzina rozpoczęcia nie może być późniejsza niż godzina zakończenia.');
+                            }
+                        }
+                    },
+                ],
+                'state.working_hours_to' => ['required'],
             ],
             [],
             [
-                'state.working_hours_from'     => __('working_hours_from'),
-                'state.working_hours_to'     => __('working_hours_to'),
+                'state.working_hours_from' => __('working_hours_from'),
+                'state.working_hours_to'   => __('working_hours_to'),
             ],
         ];
     }
+
     public function title(): string
     {
-        return __('Wybierz użytkownika');
+        return __('🕒 Wybierz godziny pracy');
     }
-
 }

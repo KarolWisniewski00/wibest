@@ -14,9 +14,11 @@ class Event extends Model
         'location_id',
         'device',
         'event_type',
+        'status',
         'user_id',
         'company_id',
         'created_user_id',
+        'note',
     ];
 
     public function user()
@@ -46,6 +48,10 @@ class Event extends Model
     public function work_sessions2()
     {
         return $this->hasOne(WorkSession::class, 'event_stop_id');
+    }
+    public function work_sessions3()
+    {
+        return $this->hasMany(WorkSession::class, 'task_id');
     }
     public function isSameDay($event)
     {

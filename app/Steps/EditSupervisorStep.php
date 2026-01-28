@@ -48,11 +48,11 @@ class EditSupervisorStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'user';
     }
 
     public function title(): string
     {
-        return __('Wybierz przełożonego');
+        return __('👤 Wybierz przełożonego');
     }
 }

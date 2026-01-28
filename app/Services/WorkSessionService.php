@@ -22,7 +22,15 @@ class WorkSessionService
         $workSessionRepository = new WorkSessionRepository();
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
-
+        if ($request->filled('start_date')) {
+            $startDate =  $request->start_date;
+        }
+        if ($request->filled('end_date')) {
+            $endDate =  $request->end_date;
+        }
+        if ($request->filled('filter_user_id')) {
+            return $workSessionRepository->paginateByFilterUserIdWithFilterDate(10, $request->filter_user_id, $startDate, $endDate);
+        }
         switch (Auth::user()->role) {
             case 'admin':
                 return $workSessionRepository->paginateByAdminWithFilterDate(10, $startDate, $endDate);
@@ -31,7 +39,7 @@ class WorkSessionService
                 return $workSessionRepository->paginateByAdminWithFilterDate(10, $startDate, $endDate);
                 break;
             case 'menedżer':
-                return $workSessionRepository->paginateByAdminWithFilterDate(10, $startDate, $endDate);
+                return $workSessionRepository->paginateByManagerWithFilterDate(10, $startDate, $endDate);
                 break;
             case 'kierownik':
                 return $workSessionRepository->paginateByUserWithFilterDate(10, $startDate, $endDate);

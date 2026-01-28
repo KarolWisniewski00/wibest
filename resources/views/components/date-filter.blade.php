@@ -131,7 +131,7 @@
                 @if(Str::startsWith(request()->path(), 'dashboard/rcp/work-session'))
 
                 function ajaxFilter() {
-                    
+
                     const $tbody = $('#work-sessions-body');
                     var resultText = "";
 
@@ -277,7 +277,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
-                            
+
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -296,7 +296,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/rcp/event'))
 
                 function ajaxFilter() {
-                    
+
                     const $tbody = $('#work-sessions-body');
                     $.ajax({
                         url: `{{ route('api.v1.rcp.event.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -370,7 +370,7 @@
                             </tr>`;
                                 $tbody.append(row);
                             });
-                            
+
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -389,7 +389,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/leave/single'))
 
                 function ajaxFilter() {
-                    
+
                     const $tbody = $('#work-sessions-body');
                     $.ajax({
                         url: `{{ route('api.v1.leave.single.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -569,7 +569,7 @@
                             </tr>`;
                                 $tbody.append(row);
                             });
-                            
+
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -588,7 +588,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/leave/pending-review'))
 
                 function ajaxFilter() {
-                    
+
                     const $tbody = $('#work-sessions-body');
                     $.ajax({
                         url: `{{ route('api.v1.leave.pending.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
@@ -778,7 +778,7 @@
                             </tr>`;
                                 $tbody.append(row);
                             });
-                            
+
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -797,7 +797,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/calendar/all'))
 
                 function ajaxFilter() {
-                    
+
                     const $tbody = $('#work-sessions-body');
                     const $thead = $('#table-head');
                     $.ajax({
@@ -903,7 +903,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
-                            
+
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -919,10 +919,48 @@
                     });
                     updateShowFilter();
                 }
+                @elseif(Str::startsWith(request()->path(), 'dashboard/calendar/work-schedule'))
+
+                function ajaxFilter() {
+
+                    const $body = $('#body');
+                    const $head = $('#head');
+                    $.ajax({
+                        url: `{{ route('api.v1.calendar.work-schedule.set.date') }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
+                        method: 'get',
+                        success: function(data) {
+                            $body.empty();
+                            $('.date-column').remove();
+                            const start = new Date(rangeStart);
+                            const end = new Date(rangeEnd);
+                            const dates = [];
+
+                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                                const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}`;
+                                dates.push(formattedDate);
+                            }
+
+                            let headHtml = '';
+                            dates.forEach(date => {
+                                headHtml += `<th scope="col" class="px-2 py-2 text-center date-column">${date}</th>`;
+                            });
+                            $head.append(headHtml);
+                            data.table.forEach(function(row) {
+                                $body.append(row);
+                            });
+
+                            $(window).off('scroll');
+                        },
+                        error: function(xhr) {
+                            console.error('Błąd:', xhr.responseText);
+                        }
+                    });
+                    updateShowFilter();
+                }
                 @elseif(Str::startsWith(request()->path(), 'dashboard/raport/time-sheet'))
 
                 function ajaxFilter() {
-                    
+
                     const $tbody = $('#work-sessions-body');
                     const $thead = $('#table-head');
                     $.ajax({
@@ -1069,7 +1107,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
-                            
+
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -1088,7 +1126,7 @@
                 @elseif(Str::startsWith(request()->path(), 'dashboard/raport/attendance-sheet'))
 
                 function ajaxFilter() {
-                    
+
                     const $tbody = $('#work-sessions-body');
                     const $thead = $('#table-head');
                     $.ajax({
@@ -1217,7 +1255,7 @@
                                 </tr>`;
                                 $tbody.append(row);
                             });
-                            
+
                         },
                         error: function(xhr) {
                             $tbody.empty(); // najpierw czyścimy poprzednie wiersze
@@ -1332,8 +1370,8 @@
                     let start = new Date(startInputVal);
                     let end = new Date(endInputVal);
 
-                    start.setHours(0, 0, 0, 0);//zmiana czasu letni/zimowy
-                    end.setHours(23, 59, 59, 999);//zmiana czasu letni/zimowy
+                    start.setHours(0, 0, 0, 0); //zmiana czasu letni/zimowy
+                    end.setHours(23, 59, 59, 999); //zmiana czasu letni/zimowy
 
                     setRange(start, end);
                 } else {

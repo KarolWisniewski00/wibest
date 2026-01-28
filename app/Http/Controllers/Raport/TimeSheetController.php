@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Raport;
 use App\Exports\TimeSheetExport;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DateRequest;
+use App\Livewire\CalendarView;
 use App\Repositories\UserRepository;
 use App\Repositories\WorkSessionRepository;
 use App\Services\FilterDateService;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\View;
 
 class TimeSheetController extends Controller
 {
@@ -31,26 +33,6 @@ class TimeSheetController extends Controller
         $this->userService = $userService;
     }
 
-    public function getPublicHolidays($year)
-    {
-        // Obliczanie Wielkanocy
-        $easter = Carbon::createFromTimestamp(easter_date($year));
-        $holidays = [
-            $easter->copy(),               // Wielkanoc (niedziela)
-            $easter->copy()->addDay(),     // Poniedziałek Wielkanocny
-            Carbon::create($year, 5, 1),   // Święto Pracy
-            Carbon::create($year, 5, 3),   // Święto Konstytucji 3 Maja
-            $easter->copy()->addWeeks(7),  // Zielone Świątki (50 dni po Wielkanocy)
-            $easter->copy()->addDays(60),  // Boże Ciało (60 dni po Wielkanocy)
-            Carbon::create($year, 8, 15),  // Wniebowzięcie NMP + Święto WP
-            Carbon::create($year, 11, 1),  // Wszystkich Świętych
-            Carbon::create($year, 11, 11), // Święto Niepodległości
-            Carbon::create($year, 12, 25), // Boże Narodzenie (1. dzień)
-            Carbon::create($year, 12, 26), // Boże Narodzenie (2. dzień)
-        ];
-
-        return collect($holidays)->map(fn($date) => $date->format('Y-m-d'));
-    }
     /**
      * Wyświetla stronę kalendarza z obecnościami.
      *
@@ -60,7 +42,7 @@ class TimeSheetController extends Controller
     public function index(Request $request): \Illuminate\View\View
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
-        $dates = $this->filterDateService->getRangeDateFilter($request, 'd.m');
+        $dates = $this->filterDateService->getRangeDateFilter($request, 'd.m.y');
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
         $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
@@ -77,7 +59,19 @@ class TimeSheetController extends Controller
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
         $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
-        return response()->json($users);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-raport', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'data' => $users->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $users->nextPageUrl(),
+        ]);
     }
     /**
      * Ustawia nową datę w filtrze zwraca użytkowników.
@@ -89,7 +83,17 @@ class TimeSheetController extends Controller
     {
         $this->filterDateService->initFilterDate($request);
         $users = $this->userService->getByRoleAddDatesByFilterDate($request);
-        return response()->json($users);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-raport', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'table' => $rows_table,
+            'list' => $rows_list,
+        ]);
     }
     /**
      * Zwraca export do Excela.
@@ -115,6 +119,7 @@ class TimeSheetController extends Controller
 
         $filterDateService = new FilterDateService();
         $userRepository = new UserRepository();
+        $calendar = new CalendarView();
         $workSessionRepository = new WorkSessionRepository();
         $employees = $userRepository->getByRequestIds($request->ids);
         $dates = $filterDateService->getRangeDateFilter($request);
@@ -137,18 +142,26 @@ class TimeSheetController extends Controller
         $year = $firstDate->year;
 
         $formattedDates = [];
+        $daysShort = [
+            1 => 'pon',
+            2 => 'wt',
+            3 => 'śr',
+            4 => 'czw',
+            5 => 'pt',
+            6 => 'sob',
+            7 => 'ndz',
+        ];
 
         foreach ($dates as $date) {
             $carbonDate = Carbon::createFromFormat('d.m.Y', $date);
             $formattedDates[] = [
                 'day_number' => $carbonDate->format('d'), // np. "02"
-                'day_name_short' => mb_substr($carbonDate->translatedFormat('l'), 0, 2), // np. "Śr"
+                'day_name_short' => $daysShort[$carbonDate->isoWeekday()],
                 'date' => $carbonDate->format('Y-m-d'), // np. "2025-08-02"
             ];
         }
 
         $year = $year < 100 ? 2000 + $year : $year;
-        $holidays = $this->getPublicHolidays($year);
         $isHoliday = false;
 
         foreach ($employees as $key => $value) {
@@ -160,18 +173,41 @@ class TimeSheetController extends Controller
                 $hasStartEvent2 = $workSessionRepository->hasStartEventForUserOnDate($value->id, \Carbon\Carbon::createFromFormat('d.m.y', \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'))->subDays(1)->format('d.m.y'));
                 $hasStopEvent2 = $workSessionRepository->hasStopEventForUserOnDate($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
                 $leave = $workSessionRepository->hasLeave($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
-                
+                $leaveFirst = $workSessionRepository->getFirstLeave($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
+
+                //if ($user->public_holidays == true) {
+                $carbonDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date['date']);
+                if ($carbonDate->year < 100) {
+                    $carbonDate->year += 2000;
+                }
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
+
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+                //} else {
+                //    $isHoliday = false;
+                //}
+
 
                 if ($leave) {
-                    $userDates[$date['date']] = "W";
+                    $type = $leaveFirst->type;
+                    $short = config('leavetypes.shortType')[$type] ?? null;
+                    $userDates[$date['date']] = $short ?? '';
                 } else if ($hasEvent) {
-                    $userDates[$date['date']] = "O";
+                    $userDates[$date['date']] = "RCP";
                 } else if ($hasStartEvent && $hasStopEvent) {
-                    $userDates[$date['date']] = "O";
+                    $userDates[$date['date']] = "RCP";
                 } else if ($hasStartEvent2 && $hasStopEvent2) {
-                    $userDates[$date['date']] = "O";
+                    $userDates[$date['date']] = "RCP";
                 } else if ($isHoliday == true) {
-                    $userDates[$date['date']] = "Ś";
+                    $userDates[$date['date']] = "ŚUW";
                 } else {
                     $userDates[$date['date']] = "";
                 }

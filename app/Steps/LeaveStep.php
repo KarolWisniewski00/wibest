@@ -20,7 +20,7 @@ class LeaveStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'clipboard';
     }
     public function validate()
     {
@@ -36,7 +36,7 @@ class LeaveStep extends Step
     }
     public function title(): string
     {
-        return __('Wybierz rodzaj wniosku');
+        return __('📋 Wybierz rodzaj wniosku');
     }
 
 }

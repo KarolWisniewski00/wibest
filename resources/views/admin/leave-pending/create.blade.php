@@ -4,9 +4,18 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <li>
-            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
-                Tworzysz wniosek w imieniu użytkownika który będzie odrazu zaakceptowany
+            <div class="p-2 text-sm text-blue-300 rounded-lg dark:text-blue-300">
+                Tworzysz wniosek w imieniu użytkownika
             </div>
+        </li>
+        <li>
+            <livewire:date-start-end-picker />
+        </li>
+        <li>
+            <livewire:leave-picker />
+        </li>
+        <li>
+            <livewire:users-picker />
         </li>
     </x-sidebar-left>
     <!--SIDE BAR-->
@@ -15,7 +24,7 @@
     <x-main>
         <x-leave.nav :role="$role" :leavePending="$leavePending" />
         <!--CONTENT-->
-        <div class="px-4 py-5 sm:px-6 lg:px-8">
+        <div class="p-4">
             <!--POWRÓT-->
             <x-button-link-back href="{{ route('leave.pending.index') }}" class="text-lg mb-4">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do wniosków

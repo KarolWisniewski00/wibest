@@ -4,9 +4,9 @@
         {{ $slot }}
     </x-h1-display>
     <x-flex-center>
-        <x-button-link-green href="{{ route('leave.pending.create') }}" class="text-xs">
+        <x-button-link-green href="{{ route('leave.pending.create') }}" class="flex-wrap text-xs">
             <i class="fa-solid fa-plus mr-2"></i>
-            Złóż wniosek w im. użytkownika
+            <span>Złóż wniosek w im. </span><span>użytkownika</span>
         </x-button-link-green>
     </x-flex-center>
 </x-container-header>

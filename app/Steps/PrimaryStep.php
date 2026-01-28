@@ -15,6 +15,7 @@ class PrimaryStep extends Step
             'email' => $this->model->email,
             'phone' => $this->model->phone,
             'position' => $this->model->position,
+            'gender' => $this->model->gender ?? false,
         ]);
     }
     public function save($state)
@@ -23,6 +24,7 @@ class PrimaryStep extends Step
         $this->model->email = $state['email'];
         $this->model->phone = $state['phone'];
         $this->model->position = $state['position'];
+        $this->model->gender = ($state['gender'] ?? false) ? 'male' : 'female';
     }
     public function validate()
     {
@@ -31,6 +33,7 @@ class PrimaryStep extends Step
                 'state.name'     => ['required'],
                 'state.email'     => ['required'],
                 'state.phone'     => ['required'],
+                'state.gender'   => ['required'],
                 'state.position'     => ['nullable'],
             ],
             [],
@@ -38,16 +41,17 @@ class PrimaryStep extends Step
                 'state.name'     => __('name'),
                 'state.email'     => __('email'),
                 'state.phone'     => __('phone'),
+                'state.gender'     => __('gender'),
                 'state.position'     => __('position'),
             ],
         ];
     }
     public function icon(): string
     {
-        return 'check';
+        return 'clipboard';
     }
     public function title(): string
     {
-        return __('Wprowadź dane podstawowe');
+        return __('📋 Wprowadź dane podstawowe');
     }
 }

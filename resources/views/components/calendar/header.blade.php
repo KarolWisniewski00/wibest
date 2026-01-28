@@ -4,9 +4,11 @@
         {{ $slot }}
     </x-h1-display>
     <x-flex-center>
-        <x-button-link-green href="{{ route('calendar.all.create') }}" class="text-xs">
-            <i class="fa-solid fa-plus mr-2"></i>Nowy urlop planowany
+        @if($role == 'admin' || $role == 'właściciel' || $role == 'menedżer')
+        <x-button-link-green href="{{ route('calendar.work-schedule.create') }}" class="text-xs">
+            <i class="fa-solid fa-plus mr-2"></i>Dodaj grafik pracy
         </x-button-link-green>
+        @endif
     </x-flex-center>
 </x-container-header>
 <!--HEADER-->

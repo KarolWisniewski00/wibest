@@ -4,393 +4,136 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <x-search-filter />
-        <x-date-filter />
+        <x-filter-date loader="event">
+            {{ route('api.v1.rcp.event.set.date') }}
+        </x-filter-date>
+        <input type="hidden" id="start_date" value="{{ $startDate }}">
+        <input type="hidden" id="end_date" value="{{ $endDate }}">
     </x-sidebar-left>
     <!--SIDE BAR-->
 
     <!--MAIN-->
     <x-main>
-        <x-RCP.nav />
-        <x-RCP.header>Zdarzenia 📆</x-RCP.header>
+        <x-RCP.nav :countEvents="$countEvents"/>
+        <x-RCP.header>
+            <span>⏱️</span> Zdarzenia
+        </x-RCP.header>
         <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
-            {{ $startDate }} - {{ $endDate }}
+            {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
         </x-status-cello>
+        @php
+        $showTable = true;
+        @endphp
+        @if(session('report_key_rcp'))
+        @php
+        $reportKey = session('report_key_rcp');
+        $report = Cache::get($reportKey);
+        @endphp
 
-        <!--CONTENT-->
-        <x-flex-center class="px-4 pb-4 flex flex-col">
-            <!--MOBILE VIEW-->
-            <div class="relative overflow-x-auto md:shadow sm:rounded-lg w-full">
-                @if ($company)
-                <ul id="list" class="grid w-full gap-y-4 block md:hidden">
-                    <!-- EMPTY PLACE -->
-                    @if ($events->isEmpty())
-                    <x-empty-place />
-                    @else
-                    <!-- EMPTY PLACE -->
-                    @foreach ($events as $event)
-                    <!-- WORK SESSIONS ELEMENT VIEW -->
-                    <li>
-                        <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                            <div class="flex flex-col w-full gap-4">
-                                <div class="flex justify-between w-full">
-                                    <div class="flex justify-start items-center w-full justify-start">
-                                        @if($event->event_type == 'stop')
-                                        <x-status-red>
-                                            Stop
-                                        </x-status-red>
-                                        @endif
-                                        @if($event->event_type == 'start')
-                                        <x-status-green>
-                                            Start
-                                        </x-status-green>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
-                                    {{ $event->time }}
-                                </div>
-                                <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
-                                    <div class="flex items-center gap-4">
-                                        @if($event->user->profile_photo_url)
-                                        <img src="{{ $event->user->profile_photo_url }}" alt="{{ $event->user->name }}" class="w-10 h-10 rounded-full">
-                                        @else
-                                        <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                            {{ strtoupper(substr($event->user->name, 0, 1)) }}
-                                        </div>
-                                        @endif
-                                        <div>
-                                            <div class="flex flex-col justify-center w-fit">
-                                                <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                                    {{$event->user->name}}
-                                                </x-paragraf-display>
-                                                @if($event->user->role == 'admin')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Admin
-                                                </span>
-                                                @elseif($event->user->role == 'menedżer')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Menedżer
-                                                </span>
-                                                @elseif($event->user->role == 'kierownik')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Kierownik
-                                                </span>
-                                                @elseif($event->user->role == 'użytkownik')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                    Użytkownik
-                                                </span>
-                                                @elseif($event->user->role == 'właściciel')
-                                                <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                                    Właściciel
-                                                </span>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-4">
-                                    <x-button-link-neutral href="{{route('rcp.event.show', $event)}}" class="min-h-[38px]">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </x-button-link-neutral>
-                                </div>
-                            </div>
+        @if($report)
+        @php
+        $showTable = false;
+        @endphp
+        <div id="operation-summary-modal" class="mb-4 mx-4">
+            <div class="relative gap-4 h-full flex flex-col items-start justify-center w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                <x-h1-display class="w-full">
+                    <span>🎯</span> Podsumowanie operacji
+                </x-h1-display>
+                <x-info-span class="-my-2">
+                    Łączna liczba prób {{ $report['total_attempts'] }}
+                </x-info-span>
+                <x-success-span class="-my-2">
+                    Pomyślnie dodano {{ $report['successful'] }}
+                </x-success-span>
+                @if($report['failed_count'] > 0)
+                <x-danger-span class="-my-2">
+                    Nieudane próby {{ $report['failed_count'] }}
+                </x-danger-span>
+                <div class="flex flex-col gap-4 w-full ">
+                    @foreach($report['failed_details'] as $detail)
+                    <label class="gap-4 h-full w-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                        <div class="flex items-center gap-2">
+                            @php
+                            $user = \App\Models\User::where('id', $detail['user_id'])->first();
+                            @endphp
+                            <x-user-photo :user="$user" />
+                            <x-user-name :user="$user" class="flex-wrap" />
                         </div>
-                    </li>
-                    <!-- WORK SESSIONS ELEMENT VIEW -->
+                        <div class="flex flex-row gap-4 items-center justify-between">
+                            <x-status-cello>
+                                {{ $detail['date'] }}
+                            </x-status-cello>
+                            <x-danger-span class="-my-2">
+                                {{ $detail['reason'] }}
+                            </x-danger-span>
+                        </div>
+                    </label>
                     @endforeach
-                    @endif
-                </ul>
-                <!-- WORK SESSIONS VIEW -->
-
-                <!-- PC VIEW -->
-                <table id="table" class="w-full text-sm text-left text-gray-500 dark:text-gray-400 hidden md:table">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">
-                                <x-flex-center>
-                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Zdjęcie
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-start">
-                                Imię i Nazwisko
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Zdarzenie
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Czas
-                            </th>
-                            <th scope="col" class="px-6 py-3 text-center">
-                                Podgląd
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody id="work-sessions-body">
-                        @if ($events->isEmpty())
-                        <tr class="bg-white dark:bg-gray-800">
-                            <td colspan="8" class="px-3 py-2">
-                                <x-empty-place />
-                            </td>
-                        </tr>
-                        @else
-                        @foreach ($events as $event)
-                        <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                            <td class="px-3 py-2">
-                                <x-flex-center>
-                                    <input data-id="{{ $event->id }}" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
-                            </td>
-                            <td class="px-3 py-2 flex items-center justify-center">
-                                @if($event->user->profile_photo_url)
-                                <img src="{{ $event->user->profile_photo_url }}" alt="{{ $event->user->name }}" class="w-10 h-10 rounded-full">
-                                @else
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                    {{ strtoupper(substr($event->user->name, 0, 1)) }}
-                                </div>
-                                @endif
-                            </td>
-                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-                                <div class="flex flex-col justify-center w-fit">
-                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                        {{$event->user->name}}
-                                    </x-paragraf-display>
-                                    @if($event->user->role == 'admin')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Admin
-                                    </span>
-                                    @elseif($event->user->role == 'menedżer')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Menedżer
-                                    </span>
-                                    @elseif($event->user->role == 'kierownik')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Kierownik
-                                    </span>
-                                    @elseif($event->user->role == 'użytkownik')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Użytkownik
-                                    </span>
-                                    @elseif($event->user->role == 'właściciel')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                        Właściciel
-                                    </span>
-                                    @endif
-                                </div>
-                            </td>
-                            <td class="px-3 py-2 text-sm min-w-32">
-                                @if($event->event_type == 'stop')
-                                <x-status-red>
-                                    Stop
-                                </x-status-red>
-                                @endif
-                                @if($event->event_type == 'start')
-                                <x-status-green>
-                                    Start
-                                </x-status-green>
-                                @endif
-                            </td>
-                            <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
-                                {{ $event->time }}
-                            </td>
-                            <x-show-cell href="{{ route('rcp.event.show', $event) }}" />
-                        </tr>
-                        @endforeach
-                        @endif
-                    </tbody>
-                    <div id="loader" class="text-center py-4 hidden text-gray-700 dark:text-gray-50">Ładowanie...</div>
-                </table>
-                <!-- PC VIEW -->
-                @else
-                @include('admin.elements.end_config')
+                </div>
                 @endif
             </div>
-        </x-flex-center>
+        </div>
+        @php
+        $reportKey = session('report_key_rcp');
+
+        if ($reportKey) {
+        // 2. Usuwamy powiązany wpis z pamięci podręcznej (Cache)
+        Cache::forget($reportKey);
+
+        // 3. Usuwamy klucz sesji, aby nie odwoływać się do nieistniejącego cache
+        session()->forget('report_key_rcp');
+
+        // Opcjonalnie: Dodaj komunikat flash do wyświetlenia użytkownikowi
+        // session()->flash('success', 'Dane raportu zostały pomyślnie usunięte z pamięci podręcznej.');
+        }
+        @endphp
+        @else
+        {{-- To się pokaże, jeśli Job jeszcze nie skończył, lub jeśli upłynął czas na Cache --}}
+        <div class="mb-4 mx-4">
+            <div class="gap-4 h-full flex flex-col items-start justify-center w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
+                <x-info-span class="-my-2">
+                    Trwa przetwarzanie danych w tle. Odśwież za chwilę, aby zobaczyć raport.
+                </x-info-span>
+            </div>
+        </div>
+        @endif
+        @endif
+        @if($showTable)
+        <!--CONTENT-->
+        <x-container-content>
+            <!--MOBILE VIEW-->
+            <x-list :items="$events" emptyMessage="Brak użytkowników do wyświetlenia.">
+                <x-loader-event-card />
+                @foreach ($events as $event)
+                <x-card-event :event="$event" />
+                @endforeach
+                <x-loader-event-card id="loader-card" />
+            </x-list>
+            <!--MOBILE VIEW-->
+
+            <!--PC VIEW-->
+            <x-table
+                :headers="['Nazwa', 'Status', 'Zdarzenie', 'Lokalizacja', 'Kiedy', 'Podgląd']"
+                :items="$events"
+                emptyMessage="Brak użytkowników do wyświetlenia.">
+                @foreach($events as $event)
+                <x-row-event :event="$event" />
+                @endforeach
+                <x-loader-event id="loader" />
+            </x-table>
+            <!--PC VIEW-->
+            <x-loader-script>
+                {{ route('api.v1.rcp.event.get') }}
+            </x-loader-script>
+        </x-container-content>
+        @endif
         <!--CONTENT-->
         @php
-        $file = 'Zdarzenia_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
+        $file = 'RCP_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
         @endphp
         <x-download :file="$file">
             {{ route('api.v1.rcp.event.export.xlsx') }}
         </x-download>
-        <input type="hidden" id="start_date" value="{{ $startDate }}">
-        <input type="hidden" id="end_date" value="{{ $endDate }}">
-        <script>
-            $(document).ready(function() {
-                let page = 2;
-                let loading = false;
-                const $body = $('#work-sessions-body');
-                const $list = $('#list');
-                const $loader = $('#loader');
-                const startDate = $('#start_date').val();
-                const endDate = $('#end_date').val();
-
-                function loadMoreSessions() {
-                    if (loading) return;
-                    loading = true;
-                    $loader.removeClass('hidden');
-
-                    $.get(`{{ route('api.v1.rcp.event.get') }}?page=${page}&start_date=${startDate}&end_date=${endDate}`, function(data) {
-                        data.data.forEach(function(event) {
-                            const row = `
-                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                <td class="px-3 py-2">
-                                    <x-flex-center>
-                                        <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${event.id}">
-                                    </x-flex-center>
-                                </td>
-                                <td class="px-3 py-2  flex items-center justify-center">
-                                    ${event.user.profile_photo_url
-                                        ? `<img src="${event.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
-                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${event.user.name[0].toUpperCase()}</div>`
-                                    }
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-                                    <div class="flex flex-col justify-center w-fit">
-                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                            ${event.user.name}
-                                        </x-paragraf-display>
-                                        ${event.user.role == 'admin'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Admin
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${event.user.role == 'menedżer'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Menedżer
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${event.user.role == 'kierownik'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Kierownik
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${event.user.role == 'użytkownik'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Użytkownik
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${event.user.role == 'właściciel'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                                Właściciel
-                                            </span>`
-                                        : ``
-                                        }
-                                    </div>
-                                </td>
-                                <td class="px-3 py-2 text-xs">
-                                    ${event.event_type === 'stop' 
-                                        ? `<x-status-red>${event.event_type}</x-status-red>` 
-                                        : event.event_type === 'start' 
-                                            ? `<x-status-green>${event.event_type}</x-status-green>` 
-                                            : ''}
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-xl min-w-32 text-gray-700 dark:text-gray-50">
-                                    ${event.time ?? '-'}
-                                </td>
-                                <x-show-cell href="{{ route('rcp.event.show', '') }}/${event.id}" />
-                            </tr>`;
-                            const rowMobile = `
-                            <li>
-                                <div class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-                                    <div class="flex flex-col w-full gap-4">
-                                        <div class="flex justify-between w-full">
-                                            <div class="flex justify-start items-center w-full justify-start">
-                                                ${event.event_type === 'stop' 
-                                                ? `<x-status-red>${event.event_type}</x-status-red>` 
-                                                : event.event_type === 'start' 
-                                                    ? `<x-status-green>${event.event_type}</x-status-green>` 
-                                                    : ''}
-                                            </div>
-                                        </div>
-                                        <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
-                                            ${event.time ?? '-'}
-                                        </div>
-                                        <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
-                                            <div class="flex items-center gap-4">
-                                                ${event.user.profile_photo_url
-                                                    ? `<img src="${event.user.profile_photo_url}" class="w-10 h-10 rounded-full">`
-                                                    : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${event.user.name[0].toUpperCase()}</div>`
-                                                }
-                                                <div>
-                                                    <div class="flex flex-col justify-center w-fit">
-                                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                                            ${event.user.name}
-                                                        </x-paragraf-display>
-                                                        ${event.user.role == 'admin'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Admin
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${event.user.role == 'menedżer'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Menedżer
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${event.user.role == 'kierownik'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Kierownik
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${event.user.role == 'użytkownik'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                                Użytkownik
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                        ${event.user.role == 'właściciel'
-                                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                                                Właściciel
-                                                            </span>`
-                                                        : ``
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="flex space-x-4">
-                                            <x-button-link-neutral href="{{ route('rcp.event.show', '') }}/${event.id}" class="min-h-[38px]">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </x-button-link-neutral>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            `;
-                            $list.append(rowMobile);
-                            $body.append(row);
-                        });
-
-                        if (data.next_page_url) {
-                            page++;
-                            loading = false;
-                        } else {
-                            $(window).off('scroll'); // koniec danych
-                        }
-
-                        $loader.addClass('hidden');
-                    });
-                }
-
-                // Event scroll
-                $(window).on('scroll', function() {
-                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-                        loadMoreSessions();
-                    }
-                });
-
-                loadMoreSessions(); // wczytaj pierwszą stronę
-            });
-        </script>
     </x-main>
     <!--MAIN-->
     @else

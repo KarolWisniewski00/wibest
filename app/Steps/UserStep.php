@@ -20,7 +20,7 @@ class UserStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'user';
     }
     public function validate()
     {
@@ -36,7 +36,7 @@ class UserStep extends Step
     }
     public function title(): string
     {
-        return __('Wybierz użytkownika');
+        return __('👤 Wybierz użytkownika');
     }
 
 }

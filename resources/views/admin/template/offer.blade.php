@@ -6,14 +6,24 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oferta</title>
+
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
             margin: 0;
             padding: 0;
             font-size: 10px;
+            color: #000;
         }
 
+        h2 {
+            margin: 4px 0;
+            font-size: 12px;
+        }
+
+        /* ===================== */
+        /* PODSTAWOWE TABELE */
+        /* ===================== */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -24,96 +34,104 @@
             padding: 4px;
             border: 1px solid #ddd;
             text-align: left;
+            vertical-align: top;
         }
 
         th {
             background-color: #f2f2f2;
+            font-weight: bold;
         }
 
-        /* Usunięcie cienia i dodatkowych efektów z ramek tabel */
-        table {
-            border: none;
-            /* Usunięcie domyślnej ramki */
-        }
-
-        td,
-        th {
-            border: 1px solid #ddd;
-            /* Prostokątna ramka bez cienia */
-        }
-
-        /* Styl dla nagłówka faktury */
-        .offer-header {
-            margin-bottom: 4px;
-        }
-
+        /* ===================== */
+        /* HEADER OFERTY */
+        /* ===================== */
         .offer-header span {
             font-weight: bold;
         }
 
-        /* Styl dla podziału */
         .divider {
-            border-bottom: 1px solid #000;
-            margin-top: 8px;
-            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
         }
 
-        /* Styl dla tabeli sprzedawcy i nabywcy */
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-top: 1px solid #e5e7eb;
+        }
+
+
+        /* ===================== */
+        /* UKŁAD SPRZEDAWCA / NABYWCA */
+        /* ===================== */
         .seller-buyer-table {
             width: 100%;
-            margin-top: 8px;
-            /* Dodanie marginesu górnego */
-            border-collapse: collapse;
             border: none;
         }
 
         .seller-buyer-table td {
-            padding: 4px;
-            margin: 0px;
             border: none;
-            box-sizing: border-box;
-            /* Uwzględnij padding w szerokości */
-            vertical-align: top;
-            /* Ustawienie wyrównania do góry */
+            padding: 0;
         }
 
-        .seller,
-        .buyer {
-            width: 50%;
-            /* Szerokość każdego bloku, aby razem wynosiły 100% */
+        /* ===================== */
+        /* KARTY DANYCH */
+        /* ===================== */
+        .card {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f9fafb;
         }
 
-        .seller h2,
-        .buyer h2,
-        .seller p span,
-        .buyer p span {
+        .section {
+            padding: 6px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .label {
+            font-size: 8px;
+            color: #6b7280;
+            margin-bottom: 2px;
+        }
+
+        .value {
+            font-size: 10px;
             font-weight: bold;
-            /* Pogrubienie tekstu */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            word-break: break-all;
         }
 
-        /* Styl dla podsumowania */
+        .icon {
+            margin-right: 4px;
+        }
+
+        /* ===================== */
+        /* PODSUMOWANIE */
+        /* ===================== */
         .summary {
             text-align: right;
-            /* Wyrównanie tekstu do prawej */
-            margin-top: 12px;
-            /* Dodanie marginesu górnego */
-        }
-
-        .summary p {
-            margin: 4px 0;
-            /* Dodanie marginesu górnego i dolnego */
-        }
-
-        /* Styl dla uwag */
-        .notes-section {
             margin-top: 8px;
         }
 
-        /* Styl dla napisu w lewym dolnym rogu */
+        .summary p {
+            margin: 2px 0;
+        }
+
+        /* ===================== */
+        /* STOPKA */
+        /* ===================== */
         .footer-left {
             position: fixed;
             bottom: 8px;
-            left: 0px;
+            left: 8px;
             font-size: 8px;
             color: #555;
         }
@@ -121,97 +139,124 @@
 </head>
 
 <body>
+
     <div class="offer-header">
-        <p><span>Oferta handlowa numer</span>
-        <h2 class="h2">{{ $offer['number'] }}</h2>
-        </p>
+        <p><span>Oferta handlowa numer:</span></p>
+        <h2>{{ $offer['number'] }}</h2>
         <p><span>Data wystawienia:</span> {{ $offer['issue_date'] }}</p>
         <p><span>Termin ważności:</span> {{ $offer['due_date'] }}</p>
     </div>
+
     <div class="divider"></div>
 
+    <!-- SPRZEDAWCA / KLIENT -->
     <table class="seller-buyer-table">
         <tr>
-            <td class="seller">
-                <h2 class="h2">Sprzedawca</h2>
-                <p>{{ $offer['seller']['name'] }}</p>
-                <p>{{ $offer['seller']['address'] }}</p>
-                <p><span>NIP:</span> {{ $offer['seller']['tax_id'] }}</p>
-                @if($offer['seller']['bank'] == '')
-                @else
-                <p><span>Numer konta:</span> {{ $offer['seller']['bank'] }}</p>
-                @endif
+            <td style="width: 50%; padding-right:4px;">
+                <div class="card">
+                    <div class="section">
+                        <div class="label">Nazwa</div>
+                        <div class="value"><span class="icon">🏢</span>Karol Wiśniewski WIBEST</div>
+                    </div>
+                    <div class="section">
+                        <div class="label">Adres</div>
+                        <div class="value"><span class="icon">📍</span>Będzin, ul. Sielecka 63</div>
+                    </div>
+                    <div class="section">
+                        <div class="label">NIP</div>
+                        <div class="value"><span class="icon">🧾</span>8992998536</div>
+                    </div>
+                </div>
             </td>
-            <td class="buyer">
-                <h2 class="h2">Nabywca</h2>
-                <p>{{ $offer['client']['name'] }}</p>
-                <p>{{ $offer['client']['address'] }}</p>
-                <p><span>NIP:</span> {{ $offer['client']['tax_id'] }}</p>
+
+            <td style="width: 50%; padding-left:4px;">
+                <div class="card">
+                    <div class="section">
+                        <div class="label">Nazwa</div>
+                        <div class="value"><span class="icon">🏢</span>{{ $offer['client']['name'] }}</div>
+                    </div>
+                    <div class="section">
+                        <div class="label">Adres</div>
+                        <div class="value"><span class="icon">📍</span>{{ $offer['client']['address'] }}</div>
+                    </div>
+                    <div class="section">
+                        <div class="label">NIP</div>
+                        <div class="value"><span class="icon">🧾</span>{{ $offer['client']['tax_id'] }}</div>
+                    </div>
+                </div>
             </td>
         </tr>
     </table>
+
     <div class="divider"></div>
+
+    <!-- OSOBY KONTAKTOWE -->
     <table class="seller-buyer-table">
         <tr>
-            <td class="seller">
+            <td style="width: 50%; padding-right:4px;">
                 @if(isset($user))
-                <p>Oferta przygotowana przez</p>
-                <p><span>{{ $user->name }}</span>,</p>
-                <p><span style="color: #71717a;">Project Manager</span>,</p>
-                <p><span style="color: #71717a;">{{ $user->email }}</span></p>
+                <div class="card">
+                    <div class="section">
+                        <div class="label">Opiekun</div>
+                        <div class="value"><span class="icon">👤</span>{{ $user->name }}</div>
+                    </div>
+                    <div class="section">
+                        <div class="label">Email</div>
+                        <div class="value"><span class="icon">📧</span>{{ $user->email }}</div>
+                    </div>
+                </div>
                 @endif
             </td>
-            <td class="buyer">
+
+            <td style="width: 50%; padding-left:4px;">
                 @if($offer['client']['buyer_person_name'] && $offer['client']['buyer_person_email'])
-                <p>Oferta przygotowana dla</p>
-                <p><span>{{ $offer['client']['buyer_person_name'] }}</span>,</p>
-                <p><span style="color: #71717a;">{{ $offer['client']['buyer_person_email'] }}</span></p>
+                <div class="card">
+                    <div class="section">
+                        <div class="label">Osoba kontaktowa</div>
+                        <div class="value"><span class="icon">👤</span>{{ $offer['client']['buyer_person_name'] }}</div>
+                    </div>
+                    <div class="section">
+                        <div class="label">Email</div>
+                        <div class="value"><span class="icon">📧</span>{{ $offer['client']['buyer_person_email'] }}</div>
+                    </div>
+                </div>
                 @endif
             </td>
         </tr>
     </table>
+
     <div class="divider"></div>
-    <table class="seller-buyer-table">
-        <tr>
-            <td class="seller">
-                <p><span>{{ $offer['project_id']->name }}</span>,</p>
-                @if($offer['project_id']->production_domain != ' ')
-                <p><span style="color: #71717a;">{{ $offer['project_id']->production_domain }}</span>,</p>
-                @else
-                <p><span style="color: #71717a;">{{ $offer['project_id']->sandbox_domain }}</span>,</p>
-                @endif
-            </td>
-            <td class="buyer">
-                <p>Zakres prac</p>
-                <p><span>{{ $offer['project_scope'] }}</span>,</p>
-            </td>
-        </tr>
-    </table>
+
+    <!-- POZYCJE -->
     <h2>Pozycje</h2>
+
     <table>
         <thead>
             <tr>
                 <th>Lp.</th>
-                <th>Nazwa usługi lub towaru</th>
+                <th>Nazwa</th>
                 <th>Ilość</th>
                 <th>Cena netto</th>
-                <th>Wartość netto</th>
+                <th>Netto</th>
                 <th>Rabat</th>
-                <th>Cena po rabacie</th>
-                <th>Stawka VAT</th>
+                <th>Po rabacie</th>
+                <th>VAT</th>
                 <th>Kwota VAT</th>
-                <th>Wartość brutto</th>
+                <th>Brutto</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($offer['items'] as $key => $item)
             <tr>
-                <td>{{$key + 1}}.</td>
-                <td>{{ $item['name'] }}<br><span style="color: #71717a;">{{ $item['service']->description ?? '' }}</span></td>
+                <td>{{ $key + 1 }}</td>
+                <td>
+                    {{ $item['name'] }}<br>
+                    <span style="color:#71717a;">{{ $item['service']->description ?? '' }}</span>
+                </td>
                 <td>{{ $item['quantity'] }} {{ $item['unit'] }}</td>
                 <td>{{ number_format($item['unit_price'], 2) }} PLN</td>
                 <td>{{ number_format($item['subtotal'], 2) }} PLN</td>
-                <td>{{ number_format($item['discount'], 0) }} %</td>
+                <td>{{ $item['discount'] }}%</td>
                 <td>{{ number_format($item['price_after_discount'], 2) }} PLN</td>
                 <td>{{ $item['vat_rate'] }}</td>
                 <td>{{ $item['vat_amount'] }}</td>
@@ -222,22 +267,23 @@
     </table>
 
     <div class="summary">
-        <h2 class="h2">Podsumowanie</h2>
+        <h2>Podsumowanie</h2>
         <p>Razem netto: {{ $offer['subtotal'] }} PLN</p>
-        <p>VAT: {{ $offer['vat'] }}</p>
-        <p>Razem brutto: {{ $offer['total'] }} PLN</p>
+        <p>VAT: {{ $offer['vat'] }} PLN</p>
+        <p><strong>Razem brutto: {{ $offer['total'] }} PLN</strong></p>
     </div>
+
     <div class="summary">
-        <h2 class="h2">Słownie</h2>
+        <h2>Słownie</h2>
         <p>{{ $offer['total_in_words'] }}</p>
     </div>
-    @if($offer['notes'] != null)
+
+    @if($offer['notes'])
     <div class="divider"></div>
-    <h2 class="h2">Uwagi</h2>
-    <p>{{$offer['notes']}}</p>
+    <h2>Uwagi</h2>
+    <p>{{ $offer['notes'] }}</p>
     @endif
 
-    <!-- Napis w lewym dolnym rogu -->
     <div class="footer-left">
         Oferta wystawiona w wibest.pl
     </div>

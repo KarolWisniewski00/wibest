@@ -8,7 +8,7 @@
             <span>🏢</span> Moja firma
         </x-setting.header>
         <!--CONTENT-->
-        <x-container-content-form class="pt-0"> 
+        <x-container-content-form class="pt-0">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <x-container-gray>
                     <!--Nazwa-->
@@ -17,11 +17,10 @@
                             Nazwa
                         </x-text-cell-label>
                         <x-text-cell-value>
-                            <x-label-link-company
-                                href="{{route('setting.client.show', $client)}}"
-                                class="flex justify-center items-center font-semibold text-2xl uppercase tracking-widest">
+                            <x-text-cell-span style="word-break: break-all;">
+                                <span class="text-2xl">🏢</span>
                                 {{ $client->name }}
-                            </x-label-link-company>
+                            </x-text-cell-span>
                         </x-text-cell-value>
                     </x-text-cell>
                     <!--Nazwa-->
@@ -32,7 +31,7 @@
                             Adres
                         </x-text-cell-label>
                         <x-text-cell-value>
-                            <x-text-cell-span>
+                            <x-text-cell-span style="word-break: break-all;">
                                 <span class="text-2xl">📍</span>
                                 {{ $client->adress }}
                             </x-text-cell-span>
@@ -68,28 +67,85 @@
                         </x-text-cell-value>
                     </x-text-cell>
                     <!--Ilość użytkowników-->
+                    <!--Ilość wysłanych wiadomości-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Ilość wysłanych wiadomości
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📩</span>
+                                {{ $msg->count() }}
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Ilość wysłanych wiadomości-->
+                    <!--Zużycie SMS-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Zużycie SMS
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📱</span>
+                                {{ $msg->sum('price') ?? 0 }} PLN
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Zużycie SMS-->
                 </x-container-gray>
-                <div class="max-h-64 overflow-y-auto md:col-span-2 rounded-lg border-2 border-gray-50 dark:border-gray-700 snap-y snap-mandatory p-4 md:p-0">
-                    <!--MOBILE VIEW-->
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
+                <h1 class="text-2xl font-medium text-gray-700 dark:text-gray-100">
+                    <span>👤</span> Użytkownicy
+                </h1>
+                <x-container-scroll class="md:col-span-2">
+                    <!-- MOBILE VIEW -->
                     <x-list :items="$users" emptyMessage="Brak użytkowników do wyświetlenia.">
                         @foreach ($users as $user)
-                        <x-card-user :user="$user" />
+                        <x-card-user-setting :user="$user" />
                         @endforeach
                     </x-list>
-                    <!--MOBILE VIEW-->
 
-                    <!--PC VIEW-->
+                    <!-- PC VIEW -->
                     <x-table
-                        :headers="['Firma', 'Nazwa', 'Informacje', 'Podgląd']"
+                        :headers="['Nazwa', 'Data dołączenia', 'Opłacone do', 'Podgląd']"
                         :items="$users"
+                        :checkBox="false"
                         emptyMessage="Brak użytkowników do wyświetlenia.">
                         @foreach($users as $user)
-                        <x-row-user :user="$user" />
+                        <x-row-user-setting :user="$user" />
                         @endforeach
                     </x-table>
-                    </table>
-                    <!--PC VIEW-->
-                </div>
+                </x-container-scroll>
+                @endif
+                @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
+                <h1 class="text-2xl font-medium text-gray-700 dark:text-gray-100">
+                    <span>📩</span> 10 ostatnich wysłanych wiadomości
+                </h1>
+                @else
+                <h1 class="text-2xl font-medium text-gray-700 dark:text-gray-100">
+                    <span>📩</span> 10 twoich ostatnich wysłanych wiadomości
+                </h1>
+                @endif
+                <x-container-scroll class="md:col-span-2">
+                    <!-- MOBILE VIEW -->
+                    <x-list :items="$msg_paginate" emptyMessage="Brak wiadomości do wyświetlenia.">
+                        @foreach ($msg_paginate as $m)
+                        <x-card-msg-setting :msg="$m" />
+                        @endforeach
+                    </x-list>
+
+                    <!-- PC VIEW -->
+                    <x-table
+                        :headers="['Nazwa', 'Typ', 'Odbiorca', 'Tytuł', 'Treść', 'Status', 'Cena', 'Kiedy wysłano']"
+                        :items="$msg_paginate"
+                        :checkBox="false"
+                        emptyMessage="Brak wiadomości do wyświetlenia.">
+                        @foreach($msg_paginate as $m)
+                        <x-row-msg-setting :msg="$m" />
+                        @endforeach
+                    </x-table>
+                </x-container-scroll>
             </div>
 
             <!--PRZYCISKI-->
@@ -108,9 +164,6 @@
 
             <x-label class="py-2 mt-4">
                 Utworzono {{ $client->created_at }}
-            </x-label>
-            <x-label class="py-2">
-                Utoworzono przez {{ $client->created_user->name }}
             </x-label>
             <x-label class="py-2">
                 Ostatnia aktualizacja {{ $client->updated_at }}

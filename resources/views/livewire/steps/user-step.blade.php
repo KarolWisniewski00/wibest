@@ -1,56 +1,74 @@
 <div>
     @php
-    $users = $this->getUsers()
+    $users = $this->getUsers();
+    $this->getUsersChecked();
+    $userCount = $users->count(); // Dodanie zmiennej z liczbą użytkowników
     @endphp
     <div>
         <div class="mb-4" id="user">
-            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Użytkownik</h3>
-            <ul class="grid w-full gap-4 md:grid-cols-3">
-                @foreach ($users as $user)
-                <li>
-                    <input name="user_id" wire:model="state.user_id" type="radio" id="user-{{ $user->id }}" value="{{ $user->id }}" class="hidden peer">
-                    <label for="user-{{ $user->id }}" class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-300 dark:peer-checked:border-green-300 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
-                        <div class="flex items-center gap-4">
-                            @if($user->profile_photo_url)
-                            <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
-                            @else
-                            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                {{ strtoupper(substr($user->name, 0, 1)) }}
+            <x-label-form value="👤 Wybierz użytkownika" />
+            @if ($users->isEmpty())
+            <x-empty-place />
+            @endif
+
+            <div
+                x-data="{
+                    showAll: false,
+                    limit: 3,
+                    userCount: {{ $userCount }}, // Przekazanie liczby użytkowników do Alpine
+                    updateLimit() {
+                        this.limit = window.matchMedia('(min-width: 768px)').matches ? 9 : 3;
+                    },
+                    get canShowMore() { // Obliczana właściwość do dynamicznego porównania
+                        return this.userCount > this.limit;
+                    }
+                }"
+                x-init="updateLimit(); window.addEventListener('resize', updateLimit)"
+                class="relative">
+
+                <ul class="grid w-full gap-4 md:grid-cols-3">
+
+                    @foreach ($users as $index => $user)
+                    <li x-show="showAll || {{ $index }} < limit">
+                        <input name="user_id"
+                            wire:model.live="state.user_id"
+                            type="radio"
+                            id="user-{{ $user->id }}"
+                            value="{{ $user->id }}"
+                            class="hidden peer">
+
+                        <label for="user-{{ $user->id }}"
+                            class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-300 dark:peer-checked:border-green-300 hover:text-gray-600 dark:peer-checked:text-gray-300 peer-checked:text-gray-600 hover:bg-gray-50 dark:text-gray-400 dark:bg-gray-800 dark:hover:bg-gray-700">
+                            <div class="flex items-center gap-2">
+                                <x-user-photo :user="$user" />
+                                <x-user-name :user="$user" />
                             </div>
-                            @endif
-                            <div>
-                                <div class="text-lg font-semibold mb-1">{{ $user->name }}</div>
-                                <div class="text-sm text-gray-400">
-                                    @switch($user->role)
-                                    @case('admin')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Admin</span>
-                                    @break
-                                    @case('menedżer')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Menedżer</span>
-                                    @break
-                                    @case('kierownik')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Kierownik
-                                    </span>
-                                    @break
-                                    @case('użytkownik')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Użytkownik
-                                    </span>
-                                    @break
-                                    @case('właściciel')
-                                    <span class="px-3 py-1 rounded-full text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">Właściciel</span>
-                                    @break
-                                    @endswitch
-                                </div>
-                            </div>
-                        </div>
-                    </label>
-                </li>
-                @endforeach
-            </ul>
-            <p class="text-red-500 text-sm mt-1 dark:text-red-400">{{ $message ?? '' }}</p>
+                        </label>
+                    </li>
+                    @endforeach
+
+                </ul>
+
+                @if ($userCount > 3) {{-- Warunek Blade do optymalizacji renderowania --}}
+
+                    {{-- Gradient --}}
+                    <div x-show="!showAll && canShowMore"
+                        class="pointer-events-none absolute bottom-[62px] left-0 w-full h-24 bg-gradient-to-t from-white dark:from-gray-800/70 to-transparent">
+                    </div>
+
+                    {{-- Przycisk pokaż więcej --}}
+                    <div class="flex items-center justify-center w-full">
+                        <x-button-back x-show="!showAll && canShowMore"
+                            type="button"
+                            class="mt-4 text-lg w-full md:w-fit flex items-center justify-center"
+                            @click="showAll = true">
+                            Pokaż więcej
+                        </x-button-back>
+                    </div>
+
+                @endif
+
+            </div>
         </div>
     </div>
-
 </div>

@@ -45,7 +45,7 @@
     'delegacja' => '✈️',
     ];
     @endphp
-<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 dark:border-gray-700 shadow fixed w-full z-10">
+<nav x-data="{ open: false }" class="bg-white dark:bg-gray-800 dark:border-gray-700 shadow fixed w-full" style="z-index: 200;">
     <!-- Primary Navigation Menu -->
     <div class="w-full">
         <div class="flex justify-between h-20">
@@ -65,11 +65,9 @@
                     <x-nav-link href="{{ route('team.user.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
                         <i class="fa-solid fa-users mr-2"></i>Zespół
                     </x-nav-link>
-                    @if($role != 'użytkownik')
-                    <x-nav-link href="{{ route('calendar.all.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
-                        <i class="fa-solid fa-calendar-days mr-2"></i>Urlopy planowane
+                    <x-nav-link href="{{ route('calendar.work-schedule.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
+                        <i class="fa-solid fa-calendar-days mr-2"></i>Planing
                     </x-nav-link>
-                    @endif
                     <x-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
                         <i class="fa-solid fa-inbox mr-2"></i>Wnioski
                     </x-nav-link>
@@ -304,11 +302,9 @@
             <x-responsive-nav-link href="{{ route('team.user.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/team')">
                 <i class="fa-solid fa-users mr-2"></i>Zespół
             </x-responsive-nav-link>
-            @if($role != 'użytkownik')
-            <x-responsive-nav-link href="{{ route('calendar.all.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
-                <i class="fa-solid fa-calendar-days mr-2"></i>Urlopy planowane
+            <x-responsive-nav-link href="{{ route('calendar.work-schedule.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/calendar')">
+                <i class="fa-solid fa-calendar-days mr-2"></i>Planing
             </x-responsive-nav-link>
-            @endif
             <x-responsive-nav-link href="{{ route('leave.single.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/leave')">
                 <i class="fa-solid fa-inbox mr-2"></i>Wnioski
             </x-responsive-nav-link>

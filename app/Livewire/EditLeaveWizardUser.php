@@ -13,6 +13,7 @@ use App\Steps\EditUserStepPending;
 use Illuminate\Support\Facades\Auth;
 use Vildanbina\LivewireWizard\WizardComponent;
 use Livewire\Attributes\On;
+
 class EditLeaveWizardUser extends WizardComponent
 {
     public Leave $leave;
@@ -35,19 +36,24 @@ class EditLeaveWizardUser extends WizardComponent
             'end_time'   => $this->leave->end_date,
             'leave_id'   => $leaveId,
         ]);
+        $this->getUsersChecked();
+        $this->getLeaveChecked();
+        $this->getDateStartEndChecked();
+        $this->setStep(2);
     }
-    #[On('selectDate')]
-    public function handleCalendarDateSelected($selectedDate, $typeTime = 'start_time')
+    #[On('dateRangeSelected')]
+    public function handleCalendarDateSelected(array $dates)
     {
-        if ($typeTime === 'start_time') {
-            $this->mergeState([
-                'start_time' => $selectedDate,
-            ]);
-        } else {
-            $this->mergeState([
-                'end_time' => $selectedDate,
-            ]);
-        }
+        $startDate = $dates['startDate'] ?? null;
+        $endDate = $dates['endDate'] ?? null;
+
+        $this->mergeState([
+            'start_time' => $startDate,
+            'end_time' => $endDate,
+        ]);
+
+        $this->getLeaveChecked();
+        $this->getDateStartEndChecked();
     }
     public function model(): Leave
     {
@@ -56,7 +62,27 @@ class EditLeaveWizardUser extends WizardComponent
     public function getUsers()
     {
         $userRepository = new UserRepository();
-        return $userRepository->getByAdminWithoutLogged();
+        if (Auth::user()->role == 'menedżer') {
+            return $userRepository->getByManager();
+        }
+        return $userRepository->getByAdmin();
     }
-
+    public function getUsersChecked()
+    {
+        $state = $this->getState();
+        $this->dispatch('user-selected', user_ids: [$state['user_id']]);
+    }
+    public function getLeaveChecked()
+    {
+        $state = $this->getState();
+        $this->dispatch('leave-selected', data: [$state['type'], $state['start_time'] ?? '', $state['end_time'] ?? '']);
+    }
+    public function getDateStartEndChecked()
+    {
+        $state = $this->getState();
+        $this->dispatch(
+            'date-start-end-selected',
+            data: [$state['start_time'] ?? '', $state['end_time'] ?? ''],
+        );
+    }
 }

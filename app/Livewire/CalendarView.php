@@ -27,6 +27,7 @@ class CalendarView extends Component
             Carbon::create($year, 8, 15),  // Wniebowzięcie NMP + Święto WP
             Carbon::create($year, 11, 1),  // Wszystkich Świętych
             Carbon::create($year, 11, 11), // Święto Niepodległości
+            Carbon::create($year, 12, 24),
             Carbon::create($year, 12, 25), // Boże Narodzenie (1. dzień)
             Carbon::create($year, 12, 26), // Boże Narodzenie (2. dzień)
         ];
@@ -113,7 +114,7 @@ class CalendarView extends Component
                     'isHoliday' => $isHoliday,
                     'rcp' => $rcp,
                 ];
-            }else {
+            } else {
                 $dates[] = [
                     'date' => $date,
                     'leave' => null,

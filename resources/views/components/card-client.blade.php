@@ -5,19 +5,43 @@
                 text-gray-500 bg-white border-2 border-gray-200 rounded-lg
                 hover:text-gray-600 hover:bg-gray-50
                 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-        <div class="flex flex-col w-full gap-3">
-            <p class="text-start font-semibold text-gray-900 dark:text-gray-50">
-                <x-label-link-company href="{{route('setting.client.show', $client)}}">
-                    {{ $client->name }}
-                </x-label-link-company>
-            </p>
-
+        <div class="flex flex-col w-full gap-3 text-start">
             <x-paragraf-display class="text-xs">
-                {{ $client->adress }}
+                <x-status-gray>
+                    <span>🏢</span>{{ $client->name }}
+                </x-status-gray>
             </x-paragraf-display>
 
             <x-paragraf-display class="text-xs">
-                {{ $client->vat_number }}
+                <x-status-gray>
+                    <span>📍</span>{{ $client->adress }}
+                </x-status-gray>
+            </x-paragraf-display>
+
+            <x-paragraf-display class="text-xs">
+                <x-status-gray>
+                    <span>🧾</span>{{ $client->vat_number }}
+                </x-status-gray>
+            </x-paragraf-display>
+
+            <x-paragraf-display class="text-xs">
+                @if($client->getUsersCount() != 0)
+                <x-status-gray>
+                    <span>👤</span> {{ $client->getUsersCount() }}
+                </x-status-gray>
+                @endif
+            </x-paragraf-display>
+
+            <x-paragraf-display class="text-xs">
+                <x-status-gray>
+                    <span>📩</span> {{ $client->msg->count() }}
+                </x-status-gray>
+            </x-paragraf-display>
+
+            <x-paragraf-display class="text-xs">
+                <x-status-gray>
+                    <span>📱</span> {{ $client->msg->sum('price') ?? 0 }} PLN
+                </x-status-gray>
             </x-paragraf-display>
 
             <div class="flex space-x-3">

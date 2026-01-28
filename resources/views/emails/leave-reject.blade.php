@@ -155,7 +155,7 @@
         </div>
 
         <div class="header">
-            <a href="{{route('login.google')}}"
+            <a href="{{route('login')}}"
                 style="text-align: center; display: inline-flex; align-items: center; padding: 0.5rem 1rem; background-color: #000; color: #fff; border: none; border-radius: 0.375rem; font-weight: bold; text-transform: uppercase; text-decoration: none; transition: background-color 0.15s ease-in-out;"
                 onmouseover="this.style.backgroundColor='#333'"
                 onmouseout="this.style.backgroundColor='#000'"

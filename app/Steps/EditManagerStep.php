@@ -7,7 +7,7 @@ use Vildanbina\LivewireWizard\Components\Step;
 
 class EditManagerStep extends Step
 {
-    protected string $view = 'livewire.steps.edit-manager-step';
+    protected string $view = 'livewire.steps.manager-step';
 
     public function mount()
     {
@@ -23,7 +23,7 @@ class EditManagerStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'user';
     }
     public function validate()
     {
@@ -39,7 +39,7 @@ class EditManagerStep extends Step
     }
     public function title(): string
     {
-        return __('Wybierz przełożonego');
+        return __('👤 Wybierz przełożonego');
     }
 
 }

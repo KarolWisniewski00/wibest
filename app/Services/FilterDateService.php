@@ -46,7 +46,7 @@ class FilterDateService
     {
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
-
+        
         $dates = [];
         $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
         $endDateCarbon = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);

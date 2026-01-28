@@ -9,7 +9,7 @@ use Vildanbina\LivewireWizard\Components\Step;
 
 class EditUserRcpStep extends Step
 {
-    protected string $view = 'livewire.steps.edit-user-step';
+    protected string $view = 'livewire.steps.user-step';
     
     public function mount()
     {
@@ -34,7 +34,7 @@ class EditUserRcpStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'user';
     }
     public function validate()
     {
@@ -50,7 +50,7 @@ class EditUserRcpStep extends Step
     }
     public function title(): string
     {
-        return __('Wybierz użytkownika');
+        return __('👤 Wybierz użytkownika');
     }
 
 }

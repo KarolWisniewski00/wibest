@@ -1,10 +1,7 @@
 <div>
     <div>
         <div class="mb-4" id="days">
-            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Wybierz godziny pracy</h3>
-            <label for="end_time_clock" class="my-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                ⏱️Wybierz godzinę rozpoczęcia
-            </label>
+            <x-label-form value="⏱️ Wybierz godzinę rozpoczęcia" />
             <div class="relative mb-4 border-gray-300">
                 <input
                     type="time"
@@ -19,9 +16,7 @@
                     <i class="fa-regular fa-clock"></i>
                 </span>
             </div>
-            <label for="end_time_clock" class="my-4 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                ⏱️Wybierz godzinę zakończenia
-            </label>
+            <x-label-form value="⏱️ Wybierz godzinę zakończenia" />
             <div class="relative mb-4 border-gray-300">
                 <input
                     type="time"

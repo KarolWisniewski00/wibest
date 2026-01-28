@@ -9,7 +9,4 @@
         </x-button-link-green>
     </x-flex-center>
 </x-container-header>
-<x-label class="px-4 invisible h-0 md:h-auto md:visible md:pb-4" id="selected-count">
-    0 zaznaczonych
-</x-label>
 <!--HEADER-->

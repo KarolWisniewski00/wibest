@@ -1,7 +1,5 @@
 <?php
 
-use App\Http\Controllers\Calendar\CalendarController;
-use App\Http\Controllers\Calendar\LeaveCalendarController;
 use App\Http\Controllers\Calendar\WorkScheduleController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
@@ -9,16 +7,13 @@ use App\Http\Controllers\CostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\TSI\InvoiceController;
-use App\Http\Controllers\Leave\LeaveGroupController;
-use App\Http\Controllers\Leave\LeaveLimitController;
 use App\Http\Controllers\Leave\LeavePendingReviewController;
 use App\Http\Controllers\Leave\LeaveSingleController;
-use App\Http\Controllers\TSI\OfferController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\Raport\AttendanceSheetController;
 use App\Http\Controllers\Raport\TimeSheetController;
-use App\Http\Controllers\RaportController;
 use App\Http\Controllers\RCP\EventController;
 use App\Http\Controllers\RCP\WorkSessionController as RCPWorkSessionController;
 use App\Http\Controllers\RCP\RCPController;
@@ -27,9 +22,7 @@ use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Team\InvitationController;
 use App\Http\Controllers\Team\UserController as TeamUserController;
-use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\WorkSessionController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
 
 //NOT LOGGED IN
 Route::get('/', function () {
@@ -111,10 +105,10 @@ Route::prefix('api')->group(function () {
             });
         });
         Route::prefix('calendar')->group(function () {
-            Route::prefix('all')->group(function () {
-                Route::get('/', [CalendarController::class, 'get'])->name('api.v1.calendar.all.get');
-                Route::get('set-date/', [CalendarController::class, 'setDate'])->name('api.v1.calendar.all.set.date');
-                Route::post('/export-xlsx', [CalendarController::class, 'exportXlsx'])->name('api.v1.calendar.all.export.xlsx');
+            Route::prefix('work-schedule')->group(function () {
+                Route::get('/', [WorkScheduleController::class, 'get'])->name('api.v1.calendar.work-schedule.get');
+                Route::get('set-date/', [WorkScheduleController::class, 'setDate'])->name('api.v1.calendar.work-schedule.set.date');
+                Route::post('/export-xlsx', [WorkScheduleController::class, 'exportXlsx'])->name('api.v1.calendar.work-schedule.export.xlsx');
             });
         });
         Route::prefix('leave')->group(function () {
@@ -153,6 +147,7 @@ Route::middleware([
                 Route::get('show/{user}', [TeamUserController::class, 'show'])->name('team.user.show');
                 Route::get('edit/{user}', [TeamUserController::class, 'edit'])->name('team.user.edit');
                 Route::get('planing/{user}', [TeamUserController::class, 'planing'])->name('team.user.planing');
+                Route::get('config_planing/{user}', [TeamUserController::class, 'config'])->name('team.user.config_planing');
                 Route::put('update_planing/{user}', [TeamUserController::class, 'update_planing'])->name('team.user.update_planing');
                 Route::get('restart/{user}', [TeamUserController::class, 'restart'])->name('team.user.restart');
                 Route::put('update/{user}', [TeamUserController::class, 'update'])->name('team.user.update');
@@ -167,30 +162,18 @@ Route::middleware([
 
         // CALENDAR ------------------------------------------------------------------------------
         Route::prefix('calendar')->group(function () {
-            Route::prefix('all')->group(function () {
-                Route::get('/', [CalendarController::class, 'index'])->name('calendar.all.index');
-                Route::get('/create', [CalendarController::class, 'create'])->name('calendar.all.create');
-                Route::post('/store', [CalendarController::class, 'store'])->name('calendar.all.store');
-                Route::get('/edit/{user}/{date}', [CalendarController::class, 'edit'])->name('calendar.all.edit');
-                Route::post('/update/{plannedLeave}', [CalendarController::class, 'update'])->name('calendar.all.update');
-                Route::delete('/delete/{plannedLeave}', [CalendarController::class, 'delete'])->name('calendar.all.delete');
-            });
-
             Route::prefix('work-schedule')->group(function () {
                 Route::get('/', [WorkScheduleController::class, 'index'])->name('calendar.work-schedule.index');
-            });
-
-            Route::prefix('leave-application')->group(function () {
-                Route::get('/', [LeaveCalendarController::class, 'index'])->name('calendar.leave-application.index');
+                Route::get('/create', [WorkScheduleController::class, 'create'])->name('calendar.work-schedule.create');
+                Route::get('/create/{user}/{date}', [WorkScheduleController::class, 'createUser'])->name('calendar.work-schedule.create.user');
+                Route::get('/edit/{work_block}', [WorkScheduleController::class, 'edit'])->name('calendar.work-schedule.edit');
+                Route::delete('/edit/{work_block}', [WorkScheduleController::class, 'delete'])->name('calendar.work-schedule.delete');
+                Route::get('/clear', [WorkScheduleController::class, 'clear'])->name('calendar.work-schedule.clear');
             });
         });
 
         // LEAVE APPLICATIONS --------------------------------------------------------------------
         Route::prefix('leave')->group(function () {
-            Route::prefix('group')->group(function () {
-                Route::get('/', [LeaveGroupController::class, 'index'])->name('leave.group.index');
-            });
-
             Route::prefix('single')->group(function () {
                 Route::get('/', [LeaveSingleController::class, 'index'])->name('leave.single.index');
                 Route::get('/create', [LeaveSingleController::class, 'create'])->name('leave.single.create');
@@ -202,13 +185,11 @@ Route::middleware([
                 Route::get('/', [LeavePendingReviewController::class, 'index'])->name('leave.pending.index');
                 Route::get('/create', [LeavePendingReviewController::class, 'create'])->name('leave.pending.create');
                 Route::get('/edit/{leave}', [LeavePendingReviewController::class, 'edit'])->name('leave.pending.edit');
+                Route::delete('/delete/{leave}', [LeavePendingReviewController::class, 'delete'])->name('leave.pending.delete');
+                Route::get('/toggle/{leave}', [LeavePendingReviewController::class, 'toggle'])->name('leave.pending.toggle');
                 Route::get('accept/{leave}', [LeavePendingReviewController::class, 'accept'])->name('leave.pending.accept');
                 Route::get('reject/{leave}', [LeavePendingReviewController::class, 'reject'])->name('leave.pending.reject');
                 Route::get('cancel/{leave}', [LeavePendingReviewController::class, 'cancel'])->name('leave.pending.cancel');
-            });
-
-            Route::prefix('limit')->group(function () {
-                Route::get('/', [LeaveLimitController::class, 'index'])->name('leave.limit.index');
             });
         });
 
@@ -217,10 +198,13 @@ Route::middleware([
             Route::prefix('work-session')->group(function () {
                 Route::get('/', [RCPController::class, 'index'])->name('rcp.work-session.index');
                 Route::get('/create', [RCPController::class, 'create'])->name('rcp.work-session.create');
+                Route::get('/create/{user}/{date}', [RCPController::class, 'createUser'])->name('rcp.work-session.create.user');
                 Route::get('/create-note/{work_session}', [RCPController::class, 'createNote'])->name('rcp.work-session.create.note');
                 Route::post('/store', [RCPController::class, 'store'])->name('rcp.work-session.store');
                 Route::post('/store-note/{work_session}', [RCPController::class, 'storeNote'])->name('rcp.work-session.store.note');
+                Route::post('/store-task/{work_session}', [RCPController::class, 'storeTask'])->name('rcp.work-session.store.task');
                 Route::get('/start/plus/{work_session}', [RCPController::class, 'startPlus'])->name('rcp.work-session.start.plus');
+                Route::get('/start/plus/fix/{work_session}', [RCPController::class, 'startPlusFix'])->name('rcp.work-session.start.plus.fix');
                 Route::get('/stop/minus/{work_session}', [RCPController::class, 'stopMinus'])->name('rcp.work-session.stop.minus');
                 Route::get('/edit/{work_session}', [RCPController::class, 'edit'])->name('rcp.work-session.edit');
                 Route::get('/edit-note/{work_session}', [RCPController::class, 'editNote'])->name('rcp.work-session.edit.note');
@@ -234,6 +218,8 @@ Route::middleware([
                 Route::get('/', [EventController::class, 'index'])->name('rcp.event.index');
                 Route::get('/show/{event}', [EventController::class, 'show'])->name('rcp.event.show');
                 Route::delete('/delete/{event}', [EventController::class, 'delete'])->name('rcp.event.delete');
+                Route::get('accept/{event}', [EventController::class, 'accept'])->name('rcp.event.accept');
+                Route::get('reject/{event}', [EventController::class, 'reject'])->name('rcp.event.reject');
             });
         });
 
@@ -316,6 +302,8 @@ Route::middleware([
                 Route::put('update-company/{user}', [UserController::class, 'updateCompany'])->name('setting.user.update-company');
                 Route::get('show/{user}', [UserController::class, 'show'])->name('setting.user.show');
                 Route::delete('delete/{user}', [UserController::class, 'delete'])->name('setting.user.delete');
+                Route::get('config_planing/{user}', [UserController::class, 'config'])->name('setting.user.config_planing');
+                Route::put('update_planing/{user}', [UserController::class, 'update_planing'])->name('setting.user.update_planing');
             });
         });
 
@@ -350,13 +338,13 @@ Route::middleware([
         });
 
         Route::prefix('offer')->group(function () {
-            Route::redirect('/', '/dashboard/setting/offer')->name('offer');
-            Route::redirect('create/{project}', '/dashboard/setting/offer/create/{project}')->name('offer.create.project');
-            Route::redirect('store', '/dashboard/setting/offer/store')->name('offer.store');
-            Route::redirect('show/{offer}', '/dashboard/setting/offer/show/{offer}')->name('offer.show');
-            Route::redirect('edit/{offer}', '/dashboard/setting/offer/edit/{offer}')->name('offer.edit');
-            Route::redirect('update/{offer}', '/dashboard/setting/offer/update/{offer}')->name('offer.update');
-            Route::redirect('delete/{offer}', '/dashboard/setting/offer/delete/{offer}')->name('offer.delete');
+            //Route::redirect('/', '/dashboard/setting/offer')->name('offer');
+            //Route::redirect('create/{project}', '/dashboard/setting/offer/create/{project}')->name('offer.create.project');
+            //Route::redirect('store', '/dashboard/setting/offer/store')->name('offer.store');
+            //Route::redirect('show/{offer}', '/dashboard/setting/offer/show/{offer}')->name('offer.show');
+            //Route::redirect('edit/{offer}', '/dashboard/setting/offer/edit/{offer}')->name('offer.edit');
+            //Route::redirect('update/{offer}', '/dashboard/setting/offer/update/{offer}')->name('offer.update');
+            //Route::redirect('delete/{offer}', '/dashboard/setting/offer/delete/{offer}')->name('offer.delete');
 
             Route::redirect('now', '/dashboard/setting/offer/now')->name('offer.now');
             Route::redirect('last', '/dashboard/setting/offer/last')->name('offer.last');
@@ -377,7 +365,27 @@ Route::middleware([
             Route::redirect('delete/{client}', '/dashboard/setting/client/delete/{client}')->name('client.delete');
         });
 
-
+        Route::prefix('calendar')->group(function () {
+            Route::prefix('all')->group(function () {
+                Route::redirect('/', '/dashboard/calendar/work-schedule')->name('calendar.all.index');
+                Route::redirect('/create', '/dashboard/calendar/work-schedule')->name('calendar.all.create');
+                Route::redirect('/store', '/dashboard/calendar/work-schedule')->name('calendar.all.store');
+                Route::redirect('/edit/{user}/{date}', '/dashboard/calendar/work-schedule')->name('calendar.all.edit');
+                Route::redirect('/update/{plannedLeave}', '/dashboard/calendar/work-schedule')->name('calendar.all.update');
+                Route::redirect('/delete/{plannedLeave}', '/dashboard/calendar/work-schedule')->name('calendar.all.delete');
+            });
+            Route::prefix('leave-application')->group(function () {
+                Route::redirect('/', '/dashboard/calendar/work-schedule')->name('calendar.leave-application.index');
+            });
+        });
+        Route::prefix('leave')->group(function () {
+            Route::prefix('limit')->group(function () {
+                Route::redirect('/', '/dashboard/leave/single')->name('leave.limit.index');
+            });
+            Route::prefix('group')->group(function () {
+                Route::redirect('/', '/dashboard/leave/single')->name('leave.group.index');
+            });
+        });
 
         Route::prefix('project')->group(function () {
             Route::get('/', [ProjectController::class, 'index'])->name('project');
@@ -448,3 +456,13 @@ Route::middleware([
 //Przekierowania ustawione dla wystawiania faktur (bo kiedys zmieniałem z fakturowni na rcp) a żeby teraz wystawić fakture trzeba błędy notfound ogarnąć
 //REDIRECTS ---------------------------------------------------------------------------
 Route::get('api-search-gus-old/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.search.gus'); //TSI
+
+//todo
+//poprawić kolorystykę ogólną
+//poprawić marginesy i ramki wygladu kalendarza dark i light
+//zrobić spójne inputy
+//spolszyć walidacje logowanie i formularze krokowe
+//liczenie dni urlopowych
+//poprawić przyciski powrót następny zapisz w formularzach krokowych ring active focus
+//poprawić kolorystykę rcp kalendarz i podgląd po lewej
+//dodać możliwość mierzenia czasu pracy przy winosku praca zdalna i delegacja

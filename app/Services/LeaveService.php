@@ -27,7 +27,7 @@ class LeaveService
         return $leaveRepository->paginateByUserId(10, $startDate, $endDate);
     }
     /**
-     * Zwraca wnioski dla menadżera w zakresie dat.
+     * Zwraca wnioski dla menedżera w zakresie dat.
      * 
      * @param Request $request
      * @return \Illuminate\Pagination\LengthAwarePaginator
@@ -41,7 +41,7 @@ class LeaveService
         return $leaveRepository->paginateByManagerId(10, $startDate, $endDate);
     }
     /**
-     * Zwraca wnioski dla menadżera w stronie głównej
+     * Zwraca wnioski dla menedżera w stronie głównej
      * 
      * @param Request $request
      * @return \Illuminate\Database\Eloquent\Collection
@@ -93,7 +93,7 @@ class LeaveService
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
 
-        return $leaveRepository->getByUserId($startDate, $endDate, $user_id);
+        return $leaveRepository->getByUserId($startDate, $endDate, $user_id, $request);
     }
     public function getByUserIdWithCutMonth(Request $request,  ?string $user_id = null)
     {
@@ -107,7 +107,7 @@ class LeaveService
         return $leaveRepository->getByUserIdWithCutMonth($startDate, $endDate, $user_id);
     }
     /**
-     * Zwraca wnioski dla menadżera w zakresie dat.
+     * Zwraca wnioski dla menedżera w zakresie dat.
      * 
      * @param Request $request
      */
@@ -117,7 +117,7 @@ class LeaveService
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
 
-        return $leaveRepository->getByManagerId($startDate, $endDate);
+        return $leaveRepository->getByManagerId($startDate, $endDate, $request);
     }
     public function getPlannedByUserAndDate(User $user, $date)
     {

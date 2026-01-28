@@ -6,8 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
+    <title>WIBEST RCP</title>
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -201,14 +200,14 @@
                 // Funkcja do aktualizacji daty
                 updateTodayDate() {
                     const self = this;
-                    const days = ["Nie", "Pon", "Wto", "Śro", "Czw", "Pią", "Sob"];
+                    const days = ["Ndz", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
                     const daysWidget = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
                     const months = ["sty", "lut", "mar", "kwi", "maj", "cze", "lip", "sie", "wrz", "paź", "lis", "gru"];
                     const monthsWidget = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
                     const today = new Date();
                     const formattedDateWidget = `${daysWidget[today.getDay()]} ${today.getDate()} ${monthsWidget[today.getMonth()]} ${today.getFullYear()}`;
                     const formattedDate = `${days[today.getDay()]} ${today.getDate()} ${months[today.getMonth()]}`;
-                    $('#dateWidget').text(formattedDateWidget);
+                    $('.dateWidget').text(formattedDateWidget);
                     $('#date').text(formattedDate);
                 }
 

@@ -13,30 +13,32 @@
         <x-container-content>
             <!--MOBILE VIEW-->
             <x-list :items="$users" emptyMessage="Brak użytkowników do wyświetlenia.">
+                <x-loader-user-card />
                 @foreach ($users as $user)
                 <x-card-user :user="$user" />
                 @endforeach
+                <x-loader-user-card id="loader-card" />
             </x-list>
             <!--MOBILE VIEW-->
 
             <!--PC VIEW-->
             <x-table
-                :headers="['Firma', 'Nazwa', 'Informacje', 'Podgląd']"
+                :headers="['Firma', 'Nazwa', 'Data dołączenia', 'Opłacone do', 'Podgląd']"
                 :items="$users"
+                :checkBox="false"
                 emptyMessage="Brak użytkowników do wyświetlenia.">
                 @foreach($users as $user)
                 <x-row-user :user="$user" />
                 @endforeach
+                <x-loader-user id="loader" />
             </x-table>
-            <x-loader />
-            </table>
             <!--PC VIEW-->
             <x-loader-script>
                 {{ route('api.v1.setting.user.get') }}
             </x-loader-script>
         </x-container-content>
         <!--CONTENT-->
-        <x-download-only-counting/>
+        <x-download-only-counting />
     </x-main-no-filter>
     <!--MAIN-->
     @else

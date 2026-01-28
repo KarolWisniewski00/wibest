@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCompanyRequest;
 use App\Http\Requests\UpdateCompanyRequest;
 use App\Models\Company;
 use App\Models\Invitation;
+use App\Models\SentMessage;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -19,7 +20,14 @@ class SettingController extends Controller
         $users = User::where('company_id', $this->get_company_id())->get();
         $client = Company::where('id', $this->get_company_id())->first();
         $user_id = auth()->id();
-        return view('admin.setting.index', compact('users', 'client'));
+        $user = User::where('id', $user_id)->first();
+        $msg = SentMessage::where('company_id', $this->get_company_id())->orderByDesc('created_at')->get();
+        if ($user->role == 'admin' || $user->role == 'menedżer' || $user->role == 'właściciel')
+            $msg_paginate = SentMessage::where('company_id', $this->get_company_id())->orderByDesc('created_at')->paginate(10);
+        else {
+            $msg_paginate = SentMessage::where('company_id', $this->get_company_id())->where('user_id', $user_id)->orderByDesc('created_at')->paginate(10);
+        }
+        return view('admin.setting.index', compact('users', 'client', 'msg', 'msg_paginate'));
     }
 
     /**
@@ -40,21 +48,20 @@ class SettingController extends Controller
         $isExist = Company::where('vat_number', $request->vat_number)->first();
         if ($isExist) {
             $isSend = Invitation::where('user_id', $user->id)->where('company_id', $isExist->id)->first();
-            if($isSend){
+            if ($isSend) {
                 return redirect()->route('setting')
                     ->with('fail', 'Firma o podanym numerze NIP już istnieje')
                     ->with('success', 'Oczekiwanie na akceptację');
-            }else{
-                            Invitation::create([
-                'user_id' => $user->id,
-                'company_id' => $isExist->id,
-                'status' => 'oczekujący',
-            ]);
-            return redirect()->route('setting')
-                ->with('fail', 'Firma o podanym numerze NIP już istnieje')
-                ->with('success', 'Wysłano zaproszenie, po zaakceptowaniu automatycznie twoje konto dołączy do firmy');
+            } else {
+                Invitation::create([
+                    'user_id' => $user->id,
+                    'company_id' => $isExist->id,
+                    'status' => 'oczekujący',
+                ]);
+                return redirect()->route('setting')
+                    ->with('fail', 'Firma o podanym numerze NIP już istnieje')
+                    ->with('success', 'Wysłano zaproszenie, po zaakceptowaniu automatycznie twoje konto dołączy do firmy');
             }
-
         }
         // Tworzenie nowej firmy
         $res = Company::create([
@@ -136,7 +143,8 @@ class SettingController extends Controller
 
         return redirect()->route('setting')->with('success', 'Odrzucono zaproszenie.');
     }
-    public function disconnect(User $user){
+    public function disconnect(User $user)
+    {
         $user->company_id = null;
         $user->role = null;
         $user->save();

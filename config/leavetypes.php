@@ -1,0 +1,57 @@
+<?php
+
+return [
+
+    'shortType' => [
+        'wolne za pracę w święto' => 'WPS',
+        'zwolnienie lekarskie' => 'ZL',
+        'urlop wypoczynkowy' => 'UW',
+        'urlop planowany' => 'UP',
+        'urlop rodzicielski' => 'UR',
+        'wolne za nadgodziny' => 'WN',
+        'wolne za święto w sobotę' => 'WSS',
+        'urlop bezpłatny' => 'UB',
+        'wolne z tytułu 5-dniowego tygodnia pracy' => 'WT5',
+        'zwolnienie lekarsie - opieka' => 'ZLO',
+        'urlop okolicznościowy' => 'UO',
+        'urlop wypoczynkowy "na żądanie"' => 'UWZ',
+        'oddanie krwi' => 'OK',
+        'urlop ojcowski' => 'UOJC',
+        'urlop macieżyński' => 'UM',
+        'świadczenie rehabilitacyjne' => 'SR',
+        'opieka' => 'OP',
+        'świadek w sądzie' => 'SWS',
+        'praca zdalna' => 'PZ',
+        'kwarantanna' => 'KW',
+        'kwarantanna z pracą zdalną' => 'KWZPZ',
+        'delegacja' => 'DEL',
+        'święto' => 'ŚUW'
+    ],
+
+    'icons' => [
+        'wolne za pracę w święto' => '🕊️',
+        'zwolnienie lekarskie' => '🤒',
+        'urlop wypoczynkowy' => '🏖️',
+        'urlop planowany' => '🏖️',
+        'urlop rodzicielski' => '👶',
+        'wolne za nadgodziny' => '⏰',
+        'wolne za święto w sobotę' => '🗓️',
+        'urlop bezpłatny' => '💸',
+        'wolne z tytułu 5-dniowego tygodnia pracy' => '📆',
+        'zwolnienie lekarsie - opieka' => '🧑‍⚕️',
+        'urlop okolicznościowy' => '🎉',
+        'urlop wypoczynkowy "na żądanie"' => '📢',
+        'oddanie krwi' => '🩸',
+        'urlop ojcowski' => '👨‍👧',
+        'urlop macieżyński' => '🤱',
+        'świadczenie rehabilitacyjne' => '🦾',
+        'opieka' => '🧑‍🍼',
+        'świadek w sądzie' => '⚖️',
+        'praca zdalna' => '💻',
+        'kwarantanna' => '🦠',
+        'kwarantanna z pracą zdalną' => '🏠💻',
+        'delegacja' => '✈️',
+        'święto' => '🎌',
+    ],
+
+];

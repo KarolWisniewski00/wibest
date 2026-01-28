@@ -2,7 +2,7 @@
 
     <div class="mb-4">
         <div id="manager">
-            <h3 class="mb-4 text-lg font-medium text-gray-900 dark:text-white">Wybierz rolę</h3>
+            <x-label-form value="🏷️ Wybierz Rolę" />
             <ul class="grid w-full gap-4 sm:grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
                 <li>
                     <input name="role" wire:model="state.role" type="radio" id="role-admin" value="admin" class="hidden peer">

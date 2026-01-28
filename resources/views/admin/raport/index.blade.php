@@ -4,314 +4,46 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <x-search-filter />
-        <x-date-filter />
+        <x-filter-date>
+            {{ route('api.v1.raport.time-sheet.set.date') }}
+        </x-filter-date>
+        <input type="hidden" id="start_date" value="{{ $startDate }}">
+        <input type="hidden" id="end_date" value="{{ $endDate }}">
     </x-sidebar-left>
     <!--SIDE BAR-->
     <x-main>
         <x-raport.nav />
         <!--HEADER-->
         <x-raport.header>
-            Lista obecności🧍🧍‍♀️
+            <span>🙋🏻‍♂️</span> Lista obecności
         </x-raport.header>
         <!--HEADER-->
         <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
-            {{ $startDate }} - {{ $endDate }}
+            {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
         </x-status-cello>
 
-        <x-flex-center class="px-4 pb-4 flex flex-col">
-            <div class="relative overflow-x-auto md:shadow rounded-lg w-full">
-
-                <table id="table" class="w-full text-sm text-center text-gray-500 dark:text-gray-400 table">
-                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
-                        <tr id="table-head">
-                            <th scope="col" class="px-2 py-3 hidden md:table-cell">
-                                <x-flex-center>
-                                    <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
-                            </th>
-                            <th scope="col" class="px-2 py-3">
-                                Zdjęcie
-                            </th>
-                            <th scope="col" class="px-2 py-3 text-left">
-                                Imię i Nazwisko
-                            </th>
-                            @foreach ($dates as $date)
-                            <th scope="col" class="px-2 py-3 date-column">
-                                {{ $date }}
-                            </th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody id="work-sessions-body">
-                        @foreach ($users as $user)
-                        <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-                            <td class="px-2 py-2 hidden md:table-cell">
-                                <x-flex-center>
-                                    <input data-id="{{$user->id}}" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                                </x-flex-center>
-                            </td>
-                            <td class="px-3 py-2 flex items-center justify-center">
-                                @if($user->profile_photo_url)
-                                <img src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" class="w-10 h-10 rounded-full">
-                                @else
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                                    {{ strtoupper(substr($user->name, 0, 1)) }}
-                                </div>
-                                @endif
-                            </td>
-                            <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-                                <div class="flex flex-col justify-center w-fit">
-                                    <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                        {{$user->name}}
-                                    </x-paragraf-display>
-                                    @if($user->role == 'admin')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Admin
-                                    </span>
-                                    @elseif($user->role == 'menedżer')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Menedżer
-                                    </span>
-                                    @elseif($user->role == 'kierownik')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Kierownik
-                                    </span>
-                                    @elseif($user->role == 'użytkownik')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                        Użytkownik
-                                    </span>
-                                    @elseif($user->role == 'właściciel')
-                                    <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                        Właściciel
-                                    </span>
-                                    @endif
-                                </div>
-                            </td>
-                            @php
-                            $shortType = ['wolne za pracę w święto' => 'WPS',
-                            'zwolnienie lekarskie' => 'ZL',
-                            'urlop wypoczynkowy' => 'UW',
-                            'urlop rodzicielski' => 'UR',
-                            'wolne za nadgodziny' => 'WN',
-                            'wolne za święto w sobotę' => 'WSS',
-                            'urlop bezpłatny' => 'UB',
-                            'wolne z tytułu 5-dniowego tygodnia pracy' => 'WT5',
-                            'zwolnienie lekarsie - opieka' => 'ZLO',
-                            'urlop okolicznościowy' => 'UO',
-                            'urlop wypoczynkowy "na żądanie"' => 'UWZ',
-                            'oddanie krwi' => 'OK',
-                            'urlop ojcowski' => 'UOJC',
-                            'urlop macieżyński' => 'UM',
-                            'świadczenie rehabilitacyjne' => 'SR',
-                            'opieka' => 'OP',
-                            'świadek w sądzie' => 'SWS',
-                            'praca zdalna' => 'PZ',
-                            'kwarantanna' => 'KW',
-                            'kwarantanna z pracą zdalną' => 'KWZPZ',
-                            'delegacja' => 'DEL'
-                            ]
-                            @endphp
-                            @foreach ($user->dates as $date)
-                            @if ($date == 1)
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
-                                <i class="fa-solid fa-sun"></i>
-                            </td>
-                            @elseif($date == 0.5)
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-200 dark:bg-green-200 border-x border-gray-200 dark:border-gray-700">
-                                <i class="fa-solid fa-moon"></i>
-                            </td>
-                            @elseif($date == 1.5)
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
-                            </td>
-                            @elseif($date == 'in_progress')
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
-                                <i class="fa-solid fa-briefcase"></i>
-                            </td>
-                            @elseif($date != null)
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700">
-                                {{ $shortType[$date] }}
-                            </td>
-                            @else
-                            <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
-                            </td>
-                            @endif
-                            @endforeach
-                        </tr>
-                        @endforeach
-                    </tbody>
-                    <div id="loader" class="text-center py-4 hidden text-gray-700 dark:text-gray-50">Ładowanie...</div>
-                </table>
-            </div>
-        </x-flex-center>
-        @php
-        $file = 'raport_lista_obecnosci_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
-        @endphp
-        <x-download-pdf-check :file="$file">
-            {{ route('api.v1.raport.time-sheet.export.xlsx') }}
-        </x-download-pdf-check>
-        <input type="hidden" id="start_date" value="{{ $startDate }}">
-        <input type="hidden" id="end_date" value="{{ $endDate }}">
-        <script>
-            $(document).ready(function() {
-                let page = 2;
-                let loading = false;
-                const $body = $('#work-sessions-body');
-                const $list = $('#list');
-                const $loader = $('#loader');
-                const startDate = $('#start_date').val();
-                const endDate = $('#end_date').val();
-
-                function loadMoreSessions() {
-                    if (loading) return;
-                    loading = true;
-                    $loader.removeClass('hidden');
-
-                    $.get(`{{ route('api.v1.raport.time-sheet.get') }}?page=${page}&start_date=${startDate}&end_date=${endDate}`, function(data) {
-                        data.data.forEach(function(user) {
-                            let cells = '';
-                            const start = new Date(startDate);
-                            const end = new Date(endDate);
-                            const dates = [];
-                            const shortType = {
-                                'wolne za pracę w święto': 'WPS',
-                                'zwolnienie lekarskie': 'ZL',
-                                'urlop wypoczynkowy': 'UW',
-                                'urlop rodzicielski': 'UR',
-                                'wolne za nadgodziny': 'WN',
-                                'wolne za święto w sobotę': 'WSS',
-                                'urlop bezpłatny': 'UB',
-                                'wolne z tytułu 5-dniowego tygodnia pracy': 'WT5',
-                                'zwolnienie lekarsie - opieka': 'ZLO',
-                                'urlop okolicznościowy': 'UO',
-                                'urlop wypoczynkowy "na żądanie"': 'UWZ',
-                                'oddanie krwi': 'OK',
-                                'urlop ojcowski': 'UOJC',
-                                'urlop macieżyński': 'UM',
-                                'świadczenie rehabilitacyjne': 'SR',
-                                'opieka': 'OP',
-                                'świadek w sądzie': 'SWS',
-                                'praca zdalna': 'PZ',
-                                'kwarantanna': 'KW',
-                                'kwarantanna z pracą zdalną': 'KWZPZ',
-                                'delegacja': 'DEL'
-                            };
-
-                            // Generate list of dates from start to end
-                            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                                const formattedDate = `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear().toString().slice(-2)}`; // Format date as DD.MM.YY
-                                dates.push(formattedDate);
-                            }
-
-                            // Iterate through the generated dates and check user.dates
-                            dates.forEach(date => {
-                                console.log(date, user.dates[date]);
-                                if (user.dates[date] == 1) {
-                                    cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg text-gray-700 dark:text-gray-900 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
-                                        <i class="fa-solid fa-sun"></i>
-                                    </td>`;
-                                } else if (user.dates[date] == 0.5) {
-                                    cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-green-200 dark:bg-green-200 border-x border-gray-200 dark:border-gray-700">
-                                        <i class="fa-solid fa-moon"></i>
-                                    </td>`;
-                                } else if (user.dates[date] == 1.5) {
-                                    cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300 dark:bg-green-300 border-x border-gray-200 dark:border-gray-700">
-                                    </td>`;
-                                } else if (user.dates[date] == 'in_progress') {
-                                    cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-yellow-300 border-x border-gray-200 dark:border-gray-700">
-                                        <i class="fa-solid fa-briefcase"></i>
-                                    </td>`;
-                                } else if (user.dates[date] != null && user.dates[date] != 0) {
-                                    cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-900 bg-pink-300 dark:bg-pink-300 border-x border-gray-200 dark:border-gray-700">
-                                        ${shortType[user.dates[date]]}
-                                    </td>`;
-                                } else {
-                                    cells += `
-                                    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 border-x border-gray-200 dark:border-gray-700">
-                                    </td>`;
-                                }
-                            });
-
-                            const row = `
-                            <tr class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-                                <td class="px-2 py-2 hidden md:table-cell">
-                                    <x-flex-center>
-                                        <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="${user.id}">
-                                    </x-flex-center>
-                                </td>
-                                <td class="px-3 py-2  flex items-center justify-center">
-                                    ${user.profile_photo_url
-                                        ? `<img src="${user.profile_photo_url}" class="w-10 h-10 rounded-full">`
-                                        : `<div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">${user.name[0].toUpperCase()}</div>`
-                                    }
-                                </td>
-                                <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-                                    <div class="flex flex-col justify-center w-fit">
-                                        <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                            ${user.name}
-                                        </x-paragraf-display>
-                                        ${user.role == 'admin'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Admin
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${user.role == 'menedżer'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Menedżer
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${user.role == 'kierownik'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Kierownik
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${user.role == 'użytkownik'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                                Użytkownik
-                                            </span>`
-                                        : ``
-                                        }
-                                        ${user.role == 'właściciel'
-                                        ? ` <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                                Właściciel
-                                            </span>`
-                                        : ``
-                                        }
-                                    </div>
-                                </td>
-                                ${cells}
-                            </tr>`;
-                            $body.append(row);
-                        });
-
-                        if (data.next_page_url) {
-                            page++;
-                            loading = false;
-                        } else {
-                            $(window).off('scroll'); // koniec danych
-                        }
-
-                        $loader.addClass('hidden');
-                    });
-                }
-
-                // Event scroll
-                $(window).on('scroll', function() {
-                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
-                        loadMoreSessions();
-                    }
-                });
-
-                loadMoreSessions(); // wczytaj pierwszą stronę
-            });
-        </script>
+        <x-container-content-calendar class="rounded-lg">
+            <!--PC VIEW-->
+            <x-table-calendar
+                :headers="array_merge(['Nazwa'], $dates)"
+                :items="$users"
+                emptyMessage="Brak użytkowników do wyświetlenia.">
+                @foreach($users as $user)
+                <x-row-raport :user="$user" />
+                @endforeach
+                <x-loader-calendar id="loader" />
+            </x-table-calendar>
+            <!--PC VIEW-->
+            @php
+            $file = 'raport_lista_obecnosci_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
+            @endphp
+            <x-download-pdf-check :file="$file">
+                {{ route('api.v1.raport.time-sheet.export.xlsx') }}
+            </x-download-pdf-check>
+            <x-loader-script>
+                {{ route('api.v1.raport.time-sheet.get') }}
+            </x-loader-script>
+        </x-container-content-calendar>
     </x-main>
     @else
     @include('admin.elements.end_config')

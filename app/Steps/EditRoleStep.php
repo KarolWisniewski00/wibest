@@ -23,7 +23,7 @@ class EditRoleStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'tag';
     }
     public function validate()
     {
@@ -39,6 +39,6 @@ class EditRoleStep extends Step
     }
     public function title(): string
     {
-        return __('Wybierz rolę');
+        return __('🏷️ Wybierz Rolę');
     }
 }

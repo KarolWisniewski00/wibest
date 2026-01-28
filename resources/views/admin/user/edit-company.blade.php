@@ -53,7 +53,7 @@
                         peer-checked:after:border-white
                         after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white
                         after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300"></div>
+                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300 cursor-pointer"></div>
                         <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Resetuj urlopy planowane
                         </span>
@@ -67,7 +67,7 @@
                         peer-checked:after:border-white
                         after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white
                         after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300"></div>
+                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300 cursor-pointer"></div>
                         <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Resetuj wnioski
                         </span>
@@ -81,7 +81,7 @@
                         peer-checked:after:border-white
                         after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white
                         after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300"></div>
+                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300 cursor-pointer"></div>
                         <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Resetuj RCP
                         </span>
@@ -95,7 +95,7 @@
                         peer-checked:after:border-white
                         after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white
                         after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300"></div>
+                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300 cursor-pointer"></div>
                         <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                             Resetuj planing
                         </span>

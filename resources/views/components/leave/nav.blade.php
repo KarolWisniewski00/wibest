@@ -12,9 +12,13 @@
             :active="Str::startsWith(request()->path(), 'dashboard/leave/pending-review')">
             Do rozpatrzenia
             @if($leavePending > 0)
-            <span class="ml-2 text-white bg-red-500 dark:bg-red-700 rounded-full w-6 h-6 flex items-center justify-center text-[11px] font-semibold mx-auto">
-                {{ $leavePending }}
-            </span>
+            <div class="ml-2 relative flex size-6 items-center justify-center">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-rose-300 opacity-75"></span>
+
+                <div class="relative inline-flex size-6 rounded-full bg-rose-300 text-gray-900 dark:bg-rose-300 flex items-center justify-center text-[11px] font-semibold">
+                    {{ $leavePending }}
+                </div>
+            </div>
             @endif
         </x-nav-link>
         @endif

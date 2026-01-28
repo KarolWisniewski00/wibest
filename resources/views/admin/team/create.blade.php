@@ -4,7 +4,7 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <li>
-            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
+            <div class="p-2 text-sm text-blue-300 rounded-lg dark:text-blue-300">
                 Tworzysz nowego użytkownika.
             </div>
         </li>

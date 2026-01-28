@@ -8,6 +8,7 @@ use App\Models\Leave;
 use App\Services\FilterDateService;
 use App\Services\LeaveService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 
 class LeaveSingleController extends Controller
 {
@@ -85,7 +86,21 @@ class LeaveSingleController extends Controller
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
         $leaves = $this->leaveService->paginateByUserId($request);
-        return response()->json($leaves);
+
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($leaves as $leave) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-leave', ['leave' => $leave])->render());
+            array_push($rows_list, View::make('components.card-leave', ['leave' => $leave])->render());
+        }
+
+        return response()->json([
+            'data' => $leaves->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $leaves->nextPageUrl(),
+        ]);
     }
     /**
      * Ustawia nową datę w filtrze zwraca wnioski.
@@ -97,6 +112,18 @@ class LeaveSingleController extends Controller
     {
         $this->filterDateService->initFilterDate($request);
         $leaves = $this->leaveService->getByUserId($request);
-        return response()->json($leaves);
+
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($leaves as $leave) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-leave', ['leave' => $leave])->render());
+            array_push($rows_list, View::make('components.card-leave', ['leave' => $leave])->render());
+        }
+
+        return response()->json([
+            'table' => $rows_table,
+            'list' => $rows_list,
+        ]);
     }
 }

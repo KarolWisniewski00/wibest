@@ -20,11 +20,10 @@
                             Nazwa
                         </x-text-cell-label>
                         <x-text-cell-value>
-                            <x-label-link-company
-                                href="{{route('setting.client.show', $client)}}"
-                                class="flex justify-center items-center font-semibold text-2xl uppercase tracking-widest">
+                            <x-text-cell-span style="word-break: break-all;">
+                                <span class="text-2xl">🏢</span>
                                 {{ $client->name }}
-                            </x-label-link-company>
+                            </x-text-cell-span>
                         </x-text-cell-value>
                     </x-text-cell>
                     <!--Nazwa-->
@@ -71,6 +70,32 @@
                         </x-text-cell-value>
                     </x-text-cell>
                     <!--Ilość użytkowników-->
+                    <!--Ilość wysłanych wiadomości-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Ilość wysłanych wiadomości
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📩</span>
+                                {{ $msg->count() }}
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Ilość wysłanych wiadomości-->
+                    <!--Zużycie SMS-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Zużycie SMS
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📱</span>
+                                {{ $msg->sum('price') ?? 0 }} PLN
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Zużycie SMS-->
                 </x-container-gray>
                 <x-container-header class="px-0 grid gap-2 md:flex md:gap-0 md:justify-between md:col-span-2">
                     <x-h1-display>
@@ -82,7 +107,7 @@
                         </x-button-link-green>
                     </x-flex-center>
                 </x-container-header>
-                <div class="max-h-64 overflow-y-auto md:col-span-2 rounded-lg border-2 border-gray-50 dark:border-gray-700 snap-y snap-mandatory p-4 md:p-0">
+                <x-container-scroll class="md:col-span-2">
                     <!--MOBILE VIEW-->
                     <x-list :items="$users" emptyMessage="Brak użytkowników do wyświetlenia.">
                         @foreach ($users as $user)
@@ -93,8 +118,9 @@
 
                     <!--PC VIEW-->
                     <x-table
-                        :headers="['Firma', 'Nazwa','Informacje', 'Podgląd']"
+                        :headers="['Firma', 'Nazwa', 'Data dołączenia', 'Opłacone do', 'Podgląd']"
                         :items="$users"
+                        :checkBox="false"
                         emptyMessage="Brak użytkowników do wyświetlenia.">
                         @foreach($users as $user)
                         <x-row-user :user="$user" />
@@ -102,7 +128,31 @@
                     </x-table>
                     </table>
                     <!--PC VIEW-->
-                </div>
+                </x-container-scroll>
+                <x-container-header class="px-0 grid gap-2 md:flex md:gap-0 md:justify-between md:col-span-2">
+                    <x-h1-display>
+                        <span>📩</span> 10 twoich ostatnich wysłanych wiadomości
+                    </x-h1-display>
+                </x-container-header>
+                <x-container-scroll class="md:col-span-2">
+                    <!-- MOBILE VIEW -->
+                    <x-list :items="$msg_paginate" emptyMessage="Brak wiadomości do wyświetlenia.">
+                        @foreach ($msg_paginate as $m)
+                        <x-card-msg-setting :msg="$m" />
+                        @endforeach
+                    </x-list>
+
+                    <!-- PC VIEW -->
+                    <x-table
+                        :headers="['Nazwa', 'Typ', 'Odbiorca', 'Tytuł', 'Treść', 'Status', 'Cena', 'Kiedy wysłano']"
+                        :items="$msg_paginate"
+                        :checkBox="false"
+                        emptyMessage="Brak wiadomości do wyświetlenia.">
+                        @foreach($msg_paginate as $m)
+                        <x-row-msg-setting :msg="$m" />
+                        @endforeach
+                    </x-table>
+                </x-container-scroll>
             </div>
 
             <!--PRZYCISKI-->

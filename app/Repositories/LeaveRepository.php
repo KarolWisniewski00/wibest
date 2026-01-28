@@ -98,9 +98,19 @@ class LeaveRepository
      */
     public function paginateByManagerId(int $perPage, ?string $startDate = null, ?string $endDate = null)
     {
-        $query = Leave::with('user')
-            ->where('manager_id', Auth::id())
-            ->orderByRaw("FIELD(status, 'zaakceptowane', 'oczekujące') DESC");
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'właściciel') {
+            $query = Leave::with('user')
+                ->where('company_id', Auth::user()->company_id);
+        } elseif (Auth::user()->role == 'menedżer') {
+            $query = Leave::with('user')
+                ->where('company_id', Auth::user()->company_id)
+                ->whereHas('user', function ($q) {
+                    $q->where('supervisor_id', Auth::user()->supervisor_id);
+                });
+        } else {
+            $query = Leave::with('user')
+                ->where('manager_id', Auth::id());
+        }
         if ($startDate) {
             $query->whereDate('start_date', '>=', Carbon::parse($startDate));
         }
@@ -133,12 +143,9 @@ class LeaveRepository
     /**
      * Zwraca wnioski dla użytkownika w zakresie dat.
      *
-     * @param string|null $startDate
-     * @param string|null $endDate
-     * @param string|null $user_id
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getByUserId(?string $startDate = null, ?string $endDate = null, ?string $user_id = null)
+    public function getByUserId(?string $startDate = null, ?string $endDate = null, ?string $user_id = null, $request = null)
     {
         if (is_null($user_id)) {
             $user_id = Auth::id();
@@ -151,6 +158,15 @@ class LeaveRepository
         if ($endDate) {
             $query->whereDate('start_date', '<=', Carbon::parse($endDate));
         }
+        // Filtrowanie po nazwie użytkownika, jeśli request istnieje i zawiera 'search'
+        if ($request && $request->filled('search')) {
+            $search = $request->input('search');
+
+            // Użycie whereHas do filtrowania na podstawie kolumny w powiązanym modelu (User)
+            $query->whereHas('manager', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+        }
         return $query->orderBy('start_date', 'desc')->get();
     }
     public function getByUserIdWithCutMonth(?string $startDate = null, ?string $endDate = null, ?string $user_id = null)
@@ -159,7 +175,9 @@ class LeaveRepository
             $user_id = Auth::id();
         }
 
-        $query = Leave::with('manager')->where('user_id', $user_id);
+        $query = Leave::with('manager')
+            ->where('user_id', $user_id)
+            ->whereIn('status', ['zaakceptowane', 'zrealizowane']);
 
         if ($startDate && $endDate) {
             // Szukamy urlopów, które nachodzą na zakres dat
@@ -178,19 +196,38 @@ class LeaveRepository
     /**
      * Zwraca wnioski do rozpatrzenia dla użytkownika w zakresie dat.
      *
-     * @param string|null $startDate
-     * @param string|null $endDate
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
-    public function getByManagerId(?string $startDate = null, ?string $endDate = null)
+    public function getByManagerId(?string $startDate = null, ?string $endDate = null, $request = null)
     {
-        $query = Leave::with('user')->where('manager_id', Auth::id())->orderByRaw("FIELD(status, 'zaakceptowane', 'oczekujące') DESC");
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'właściciel') {
+            $query = Leave::with('user')
+                ->where('company_id', Auth::user()->company_id);
+        } elseif (Auth::user()->role == 'menedżer') {
+            $query = Leave::with('user')
+                ->where('company_id', Auth::user()->company_id)
+                ->whereHas('user', function ($q) {
+                    $q->where('supervisor_id', Auth::user()->supervisor_id);
+                });
+        } else {
+            $query = Leave::with('user')
+                ->where('manager_id', Auth::id());
+        }
         if ($startDate) {
             $query->whereDate('start_date', '>=', Carbon::parse($startDate));
         }
 
         if ($endDate) {
             $query->whereDate('start_date', '<=', Carbon::parse($endDate));
+        }
+        // Filtrowanie po nazwie użytkownika, jeśli request istnieje i zawiera 'search'
+        if ($request && $request->filled('search')) {
+            $search = $request->input('search');
+
+            // Użycie whereHas do filtrowania na podstawie kolumny w powiązanym modelu (User)
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
         }
         return $query->orderBy('start_date', 'desc')->get();
     }

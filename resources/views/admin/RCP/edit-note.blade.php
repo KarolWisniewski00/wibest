@@ -4,8 +4,8 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <li>
-            <div class="p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400" role="alert">
-                Tworzysz notatkę do elementu RCP
+            <div class="p-2 text-sm text-blue-300 rounded-lg dark:text-blue-300">
+                Edytujesz notatkę do elementu RCP
             </div>
         </li>
     </x-sidebar-left>
@@ -13,14 +13,14 @@
 
     <!--MAIN-->
     <x-main>
-        <x-RCP.nav />
+        <x-RCP.nav :countEvents="$countEvents"/>
         <!--CONTENT-->
-        <div class="px-4 py-5 sm:px-6 lg:px-8">
+        <div class="p-4">
             <!--POWRÓT-->
             <x-button-link-back href="{{ route('rcp.work-session.show', $work_session) }}" class="text-lg mb-4">
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
             </x-button-link-back>
-            <h2 class="text-xl font-semibold dark:text-white mb-4">Nowa notatka RCP</h2>
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-50 mb-4 text-center">Edycja notatki RCP</h2>
             <!--POWRÓT-->
             <form id="myForm" method="POST" action="{{ route('rcp.work-session.update.note', $work_session) }}" class="space-y-4">
                 @csrf

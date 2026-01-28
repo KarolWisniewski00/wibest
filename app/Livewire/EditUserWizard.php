@@ -32,6 +32,7 @@ class EditUserWizard extends WizardComponent
             'phone' => $this->user->phone,
             'position' => $this->user->position,
             'role' => $this->user->role,
+            'gender' => $this->user->gender === 'male',
             'supervisor_id' => $this->user->supervisor_id,
             'user_id' => $userId,
             'route_back'   => $routeBack,

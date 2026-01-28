@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\Repositories\LeaveRepository;
+use App\Livewire\CalendarView;
+use App\Models\WorkBlock;
 use App\Repositories\WorkSessionRepository;
 use App\Repositories\UserRepository;
 use Carbon\Carbon;
@@ -46,33 +47,34 @@ class UserService
     /**
      * Zwraca użytkowników w zależności od roli zalogowanego użytkownika.
      *
+     * @param \Illuminate\Http\Request|null $request
      * @return \Illuminate\Support\Collection
      */
-    public function getByRole(): \Illuminate\Support\Collection
+    public function getByRole(?\Illuminate\Http\Request $request = null): \Illuminate\Support\Collection
     {
         $userRepository = new UserRepository();
 
         switch (Auth::user()->role) {
             case 'admin':
-                return $userRepository->getByAdmin();
+                return $userRepository->getByAdmin($request);
                 break;
             case 'menedżer':
-                return $userRepository->getByManager();
+                return $userRepository->getByManager($request);
                 break;
             case 'kierownik':
-                return $userRepository->getByUser();
+                return $userRepository->getByUser($request);
                 break;
             case 'użytkownik':
-                return $userRepository->getByUser();
+                return $userRepository->getByUser($request);
                 break;
             case 'właściciel':
-                return $userRepository->getByAdmin();
+                return $userRepository->getByAdmin($request);
                 break;
             default:
-                return $userRepository->getByUser();
+                return $userRepository->getByUser($request);
                 break;
         }
-        return $userRepository->getByUser();
+        return $userRepository->getByUser($request);
     }
     /**
      * Zwraca użytkowników z datami w zależności od roli zalogowanego użytkownika.
@@ -84,11 +86,13 @@ class UserService
     {
         $filterDateService = new FilterDateService();
         $workSessionRepository = new WorkSessionRepository();
+        $calendar = new CalendarView();
         $dates = $filterDateService->getRangeDateFilter($request);
         $users = $this->paginatedByRole();
 
         foreach ($users as &$user) {
             $userDates = [];
+            $userObjs = [];
             foreach ($dates as $date) {
                 $hasEvent = $workSessionRepository->hasEventForUserOnDate($user->id, $date);
                 $hasStartEvent = $workSessionRepository->hasStartEventForUserOnDate($user->id, $date);
@@ -98,22 +102,58 @@ class UserService
                 $status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
                 $leave = $workSessionRepository->hasLeave($user->id, $date);
                 $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
+                $work_obj = $workSessionRepository->getFirstRcp($user->id, $date);
+                $work_obj_last = $workSessionRepository->getLastRcp($user->id, $date);
+
+                if ($work_obj && $work_obj_last) {
+                    if ($work_obj->id != $work_obj_last->id) {
+                        $work_obj->eventStop = $work_obj_last->eventStop;
+                        $work_obj->multi = true;
+                    } else {
+                        $work_obj->false = true;
+                    }
+                }
+
+                //if ($user->public_holidays == true) {
+                $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
+
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+                //} else {
+                //    $isHoliday = false;
+                //}
 
                 if ($status) {
-                    $userDates[$date] = "in_progress";
+                    $userDates[$date] = "progress";
+                    $userObjs[$date] = $work_obj;
                 } else if ($leave) {
-                    $userDates[$date] = $leaveFirst->type;
+                    $userDates[$date] = 'leave';
+                    $userObjs[$date] = $leaveFirst;
                 } else if ($hasEvent) {
-                    $userDates[$date] = 1;
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
                 } else if ($hasStartEvent && $hasStopEvent) {
-                    $userDates[$date] = 0.5;
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
                 } else if ($hasStartEvent2 && $hasStopEvent2) {
-                    $userDates[$date] = 0.5;
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
+                } else if ($isHoliday) {
+                    $userDates[$date] = "holiday";
                 } else if (!$hasEvent) {
-                    $userDates[$date] = 0;
+                    $userDates[$date] = null;
                 }
             }
             $user->dates = $userDates;
+            $user->objs = $userObjs;
         }
         return $users;
     }
@@ -123,30 +163,59 @@ class UserService
      * @param Request $request
      * @return \Illuminate\Pagination\LengthAwarePaginator
      */
-    public function paginatedByRoleAddDatesAndLeavesByFilterDate(Request $request): \Illuminate\Pagination\LengthAwarePaginator
+    public function paginatedByRoleAddDatesAndPlaningByFilterDate(Request $request): \Illuminate\Pagination\LengthAwarePaginator
     {
         $filterDateService = new FilterDateService();
+        $userRepository = new UserRepository();
         $workSessionRepository = new WorkSessionRepository();
-        $leaveRepository = new LeaveRepository();
+        $calendar = new CalendarView();
         $dates = $filterDateService->getRangeDateFilter($request);
         $users = $this->paginatedByRole();
 
         foreach ($users as &$user) {
             $userDates = [];
+            $userObjs = [];
             foreach ($dates as $date) {
-                $status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
-                $leave = $leaveRepository->hasPlannedLeaveToday($user->id, $date);
+                //$status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
+                $static = $userRepository->hasPlannedToday($user->id, $date);
+                $work = $userRepository->hasPlannedTodayWork($user->id, $date);
+                $work_obj = $userRepository->getPlannedTodayWork($user->id, $date);
+                $leave = $workSessionRepository->hasLeave($user->id, $date);
+                $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
 
+                //if ($user->public_holidays == true) {
+                $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
 
-                if ($status) {
-                    $userDates[$date] = "in_progress";
-                } elseif ($leave) {
-                    $userDates[$date] = "planned_leave";
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+                //} else {
+                //    $isHoliday = false;
+                //}
+
+                if ($leave) {
+                    $userDates[$date] = 'leave';
+                    $userObjs[$date] = $leaveFirst;
+                } elseif ($work) {
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
+                } elseif ($static) {
+                    $userDates[$date] = "static";
+                } else if ($isHoliday) {
+                    $userDates[$date] = "holiday";
                 } else {
                     $userDates[$date] = null;
                 }
             }
             $user->dates = $userDates;
+            $user->objs = $userObjs;
         }
         return $users;
     }
@@ -156,30 +225,59 @@ class UserService
      * @param Request $request
      * @return \Illuminate\Support\Collection
      */
-    public function getByRoleAddDatesAndLeavesByFilterDate(Request $request): \Illuminate\Support\Collection
+    public function getByRoleAddDatesAndPlaningByFilterDate(Request $request): \Illuminate\Support\Collection
     {
         $filterDateService = new FilterDateService();
+        $userRepository = new UserRepository();
         $workSessionRepository = new WorkSessionRepository();
-        $leaveRepository = new LeaveRepository();
+        $calendar = new CalendarView();
         $dates = $filterDateService->getRangeDateFilter($request);
-        $users = $this->getByRole();
+        $users = $this->getByRole($request);
 
         foreach ($users as &$user) {
             $userDates = [];
+            $userObjs = [];
             foreach ($dates as $date) {
-                $status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
-                $leave = $leaveRepository->hasPlannedLeaveToday($user->id, $date);
+                //$status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
+                $static = $userRepository->hasPlannedToday($user->id, $date);
+                $work = $userRepository->hasPlannedTodayWork($user->id, $date);
+                $work_obj = $userRepository->getPlannedTodayWork($user->id, $date);
+                $leave = $workSessionRepository->hasLeave($user->id, $date);
+                $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
 
+                //if ($user->public_holidays == true) {
+                $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
 
-                if ($status) {
-                    $userDates[$date] = "in_progress";
-                } elseif ($leave) {
-                    $userDates[$date] = "planned_leave";
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+                //} else {
+                //    $isHoliday = false;
+                //}
+
+                if ($leave) {
+                    $userDates[$date] = 'leave';
+                    $userObjs[$date] = $leaveFirst;
+                } elseif ($work) {
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
+                } elseif ($static) {
+                    $userDates[$date] = "static";
+                } else if ($isHoliday) {
+                    $userDates[$date] = "holiday";
                 } else {
                     $userDates[$date] = null;
                 }
             }
             $user->dates = $userDates;
+            $user->objs = $userObjs;
         }
         return $users;
     }
@@ -194,6 +292,7 @@ class UserService
         $filterDateService = new FilterDateService();
         $workSessionRepository = new WorkSessionRepository();
         $leaveService = new LeaveService();
+        $calendar = new CalendarView();
         $dates = $filterDateService->getRangeDateFilter($request);
         $users = $this->paginatedByRole();
 
@@ -203,8 +302,13 @@ class UserService
             $user->time_in_work_extra = 0;
             $user->time_in_work_under = 0;
             $user->time_in_work_planned = 0;
+            $user->time_in_work_planned_var = 0;
             $user->time_in_work_leave = 0;
+            $user->time_in_work_leave_minutes = 0;
+            $user->time_in_work_leave_seconds = 0;
             $user->time_in_work_total = 0;
+            $user->time_in_work_total_minutes = 0;
+            $user->time_in_work_total_seconds = 0;
             $user->time_in_work_hms = '';
             $user->time_in_work_hms_extra = '';
             $user->time_in_work_hms_under = '';
@@ -216,47 +320,207 @@ class UserService
                 $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
                 $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($user->id, $date);
                 $totalDayPlanned = $workSessionRepository->getTotalOfDayPlanned($user->id, $date);
+                $totalDayPlannedVar = WorkBlock::where('user_id', $user->id)
+                    ->whereDate('starts_at', Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d'))
+                    ->first();
+
+
+                $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
+
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+
+                if (!$isHoliday) {
+                    $user->time_in_work_planned += $totalDayPlanned;
+                    $user->time_in_work_planned_var += $totalDayPlannedVar->duration_seconds ?? 0;
+                }
                 $user->time_in_work += $totalDay;
-                $user->time_in_work_extra += $totalDayExtra;
+                if ($user->overtime) {
+                    if ($totalDayExtra > ($user->overtime_threshold * 60)) {
+                        if ($user->overtime_task) {
+                            if ($user->overtime_accept) {
+                                $totalDayExtraWithTaskAccepted = $workSessionRepository->getTotalOfDayExtraWithTaskAccepted($user->id, $date);
+                                $user->time_in_work_extra += $totalDayExtraWithTaskAccepted;
+                                $user->time_in_work -= $totalDayExtra;
+                                $user->time_in_work += $totalDayExtraWithTaskAccepted;
+                            } else {
+                                $totalDayExtraWithTask = $workSessionRepository->getTotalOfDayExtraWithTask($user->id, $date);
+                                $user->time_in_work_extra += $totalDayExtraWithTask;
+                                $user->time_in_work -= $totalDayExtra;
+                                $user->time_in_work += $totalDayExtraWithTask;
+                            }
+                        } else {
+                            $user->time_in_work_extra += $totalDayExtra;
+                        }
+                    } else {
+                        $user->time_in_work_extra += 0;
+                        $user->time_in_work -= $totalDayExtra;
+                    }
+                }
                 $user->time_in_work_under += $totalDayUnder;
-                $user->time_in_work_planned += $totalDayPlanned;
             }
-            foreach ($leaves as $leave) {
-                $targetStartDate = Carbon::parse($leave->start_date);
-                $targetEndDate = Carbon::parse($leave->end_date);
-                $rageStartDate = Carbon::parse($request->session()->get('start_date'));
-                $rageEndDate = Carbon::parse($request->session()->get('end_date'));
+            if ($user->working_hours_regular == 'stały planing') {
 
-                // Ustal daty "efektywne" – przycięte do zakresu, jeśli potrzeba
-                $effectiveStartDate = $targetStartDate->lessThan($rageStartDate) ? $rageStartDate : $targetStartDate;
-                $effectiveEndDate = $targetEndDate->greaterThan($rageEndDate) ? $rageEndDate : $targetEndDate;
+                $daysMap = [
+                    'poniedziałek' => 1,
+                    'wtorek' => 2,
+                    'środa' => 3,
+                    'czwartek' => 4,
+                    'piątek' => 5,
+                    'sobota' => 6,
+                    'niedziela' => 7,
+                ];
 
-                // Oblicz liczbę dni
-                $leaveDays = $effectiveStartDate->diffInDays($effectiveEndDate) + 1;
+                $startWorkDay = $daysMap[$user->working_hours_start_day];
+                $endWorkDay   = $daysMap[$user->working_hours_stop_day];
 
-                $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
-                $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
-                $user->time_in_work_hms_leave = sprintf('%02dh', $user->time_in_work_leave);
+                foreach ($leaves as $leave) {
+                    $targetStartDate = Carbon::parse($leave->start_date);
+                    $targetEndDate   = Carbon::parse($leave->end_date);
+                    $rangeStartDate  = Carbon::parse($request->session()->get('start_date'));
+                    $rangeEndDate    = Carbon::parse($request->session()->get('end_date'));
+
+                    // Przycięcie do zakresu
+                    $effectiveStartDate = $targetStartDate->lessThan($rangeStartDate) ? $rangeStartDate : $targetStartDate;
+                    $effectiveEndDate   = $targetEndDate->greaterThan($rangeEndDate) ? $rangeEndDate : $targetEndDate;
+
+                    $leaveDays = 0;
+                    $currentDate = $effectiveStartDate->copy();
+
+                    while ($currentDate->lte($effectiveEndDate)) {
+                        $dayOfWeek = $currentDate->dayOfWeekIso; // 1 (pon) – 7 (nd)
+
+                        if ($dayOfWeek >= $startWorkDay && $dayOfWeek <= $endWorkDay) {
+                            $leaveDays++;
+                        }
+
+                        $carbonDate = $currentDate->copy();
+                        $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                        $dateStr = $carbonDate->format('Y-m-d');
+
+                        // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                        if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                            $isHoliday = true; // Nowy Rok
+                        } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                            $isHoliday = true; // Trzech Króli
+                        } else {
+                            $isHoliday = $holidays->contains($dateStr);
+                        }
+                        if ($isHoliday) {
+                            $leaveDays--;
+                        }
+
+                        $currentDate->addDay();
+                    }
+
+                    $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
+                    $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
+                    $user->time_in_work_hms_leave = sprintf('%02dh 00min 00s', $user->time_in_work_leave);
+                }
+
+                $hours = floor($user->time_in_work / 3600);
+                $minutes = floor(($user->time_in_work % 3600) / 60);
+                $seconds = $user->time_in_work % 60;
+                $user->time_in_work_total += $hours;
+                $user->time_in_work_total_minutes += $minutes;
+                $user->time_in_work_total_seconds += $seconds;
+                $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
+
+                $hoursExtra = floor($user->time_in_work_extra / 3600);
+                $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
+                $secondsExtra = $user->time_in_work_extra % 60;
+                $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+
+                $hoursUnder = floor($user->time_in_work_under / 3600);
+                $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
+                $secondsUnder = $user->time_in_work_under % 60;
+                $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+
+                $hoursPlanned = floor($user->time_in_work_planned / 3600);
+                $user->time_in_work_hms_planned = sprintf('%02dh 00min 00s', $hoursPlanned);
+                $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
             }
-            $hours = floor($user->time_in_work / 3600);
-            $minutes = floor(($user->time_in_work % 3600) / 60);
-            $seconds = $user->time_in_work % 60;
-            $user->time_in_work_total += floor($user->time_in_work / 3600);
-            $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
 
-            $hoursExtra = floor($user->time_in_work_extra / 3600);
-            $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
-            $secondsExtra = $user->time_in_work_extra % 60;
-            $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+            if ($user->working_hours_regular == 'zmienny planing') {
+                foreach ($leaves as $leave) {
+                    $targetStartDate = Carbon::parse($leave->start_date);
+                    $targetEndDate = Carbon::parse($leave->end_date);
+                    $rageStartDate = Carbon::parse($request->session()->get('start_date'));
+                    $rageEndDate = Carbon::parse($request->session()->get('end_date'));
 
-            $hoursUnder = floor($user->time_in_work_under / 3600);
-            $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
-            $secondsUnder = $user->time_in_work_under % 60;
-            $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+                    // Ustal daty "efektywne" – przycięte do zakresu, jeśli potrzeba
+                    $effectiveStartDate = $targetStartDate->lessThan($rageStartDate) ? $rageStartDate : $targetStartDate;
+                    $effectiveEndDate = $targetEndDate->greaterThan($rageEndDate) ? $rageEndDate : $targetEndDate;
 
-            $hoursPlanned = floor($user->time_in_work_planned / 3600);
-            $user->time_in_work_hms_planned = sprintf('%02dh', $hoursPlanned);
-            $user->time_in_work_hms_total = sprintf('%02dh', $user->time_in_work_total);
+                    // Oblicz liczbę dni
+                    $startDate = $effectiveStartDate->startOfDay();
+                    $endDate   = $effectiveEndDate->endOfDay();
+
+                    $currentDate = $startDate->copy();
+                    $working_days = 0;
+                    $non_working_days = 0;
+                    $has_working_day = false;
+
+                    while ($currentDate->lte($endDate)) {
+
+                        // sprawdzamy czy w danym dniu istnieje jakikolwiek workBlock
+                        $hasWorkBlock = WorkBlock::where('user_id', $leave->user_id)
+                            ->whereDate('starts_at', $currentDate)
+                            ->exists();
+                        $getWorkBlock = WorkBlock::where('user_id', $leave->user_id)
+                            ->whereDate('starts_at', $currentDate)
+                            ->first();
+
+                        if ($hasWorkBlock) {
+                            $working_days++;
+                            $user->time_in_work_leave += floor($getWorkBlock->duration_seconds / 3600);
+                            $user->time_in_work_leave_minutes += floor(($getWorkBlock->duration_seconds % 3600) / 60);
+                            $user->time_in_work_leave_seconds += $getWorkBlock->duration_seconds % 60;
+                            $user->time_in_work_total += floor($getWorkBlock->duration_seconds / 3600);
+                            $user->time_in_work_total_minutes += floor(($getWorkBlock->duration_seconds % 3600) / 60);
+                            $user->time_in_work_total_seconds += $getWorkBlock->duration_seconds % 60;
+                        } else {
+                            $non_working_days++;
+                        }
+                        $currentDate->addDay();
+                    }
+
+                    $user->time_in_work_hms_leave = sprintf('%02dh %02dmin %02ds', $user->time_in_work_leave, $user->time_in_work_leave_minutes, $user->time_in_work_leave_seconds);
+                }
+
+                $hours = floor($user->time_in_work / 3600);
+                $minutes = floor(($user->time_in_work % 3600) / 60);
+                $seconds = $user->time_in_work % 60;
+                $user->time_in_work_total += $hours;
+                $user->time_in_work_total_minutes += $minutes;
+                $user->time_in_work_total_seconds += $seconds;
+                $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
+
+                $hoursExtra = floor($user->time_in_work_extra / 3600);
+                $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
+                $secondsExtra = $user->time_in_work_extra % 60;
+                $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+
+                $hoursUnder = floor($user->time_in_work_under / 3600);
+                $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
+                $secondsUnder = $user->time_in_work_under % 60;
+                $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+
+                $user->time_in_work_hms_planned = '00h';
+                $hoursPlanned = floor($user->time_in_work_planned_var / 3600);
+                $minutesPlanned = floor(($user->time_in_work_planned_var % 3600) / 60);
+                $secondsPlanned = $user->time_in_work_planned_var % 60;
+                $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
+                $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
+            }
         }
         return $users;
     }
@@ -270,8 +534,9 @@ class UserService
         $filterDateService = new FilterDateService();
         $workSessionRepository = new WorkSessionRepository();
         $leaveService = new LeaveService();
+        $calendar = new CalendarView();
         $dates = $filterDateService->getRangeDateFilter($request);
-        $users = $this->getByRole();
+        $users = $this->getByRole($request);
 
         foreach ($users as &$user) {
             $leaves = $leaveService->getByUserIdWithCutMonth($request, $user->id);
@@ -279,8 +544,13 @@ class UserService
             $user->time_in_work_extra = 0;
             $user->time_in_work_under = 0;
             $user->time_in_work_planned = 0;
+            $user->time_in_work_planned_var = 0;
             $user->time_in_work_leave = 0;
+            $user->time_in_work_leave_minutes = 0;
+            $user->time_in_work_leave_seconds = 0;
             $user->time_in_work_total = 0;
+            $user->time_in_work_total_minutes = 0;
+            $user->time_in_work_total_seconds = 0;
             $user->time_in_work_hms = '';
             $user->time_in_work_hms_extra = '';
             $user->time_in_work_hms_under = '';
@@ -292,47 +562,200 @@ class UserService
                 $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
                 $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($user->id, $date);
                 $totalDayPlanned = $workSessionRepository->getTotalOfDayPlanned($user->id, $date);
+                $totalDayPlannedVar = WorkBlock::where('user_id', $user->id)
+                    ->whereDate('starts_at', Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d'))
+                    ->first();
+
+                $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
+
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+
+                if (!$isHoliday) {
+                    $user->time_in_work_planned += $totalDayPlanned;
+                    $user->time_in_work_planned_var += $totalDayPlannedVar->duration_seconds ?? 0;
+                }
                 $user->time_in_work += $totalDay;
-                $user->time_in_work_extra += $totalDayExtra;
+                if ($user->overtime) {
+                    if ($totalDayExtra > ($user->overtime_threshold * 60)) {
+                        if ($user->overtime_task) {
+                            if ($user->overtime_accept) {
+                                $totalDayExtraWithTaskAccepted = $workSessionRepository->getTotalOfDayExtraWithTaskAccepted($user->id, $date);
+                                $user->time_in_work_extra += $totalDayExtraWithTaskAccepted;
+                                $user->time_in_work -= $totalDayExtra;
+                                $user->time_in_work += $totalDayExtraWithTaskAccepted;
+                            } else {
+                                $totalDayExtraWithTask = $workSessionRepository->getTotalOfDayExtraWithTask($user->id, $date);
+                                $user->time_in_work_extra += $totalDayExtraWithTask;
+                                $user->time_in_work -= $totalDayExtra;
+                                $user->time_in_work += $totalDayExtraWithTask;
+                            }
+                        } else {
+                            $user->time_in_work_extra += $totalDayExtra;
+                        }
+                    } else {
+                        $user->time_in_work_extra += 0;
+                        $user->time_in_work -= $totalDayExtra;
+                    }
+                }
                 $user->time_in_work_under += $totalDayUnder;
-                $user->time_in_work_planned += $totalDayPlanned;
             }
-            foreach ($leaves as $leave) {
-                $targetStartDate = Carbon::parse($leave->start_date);
-                $targetEndDate = Carbon::parse($leave->end_date);
-                $rageStartDate = Carbon::parse($request->session()->get('start_date'));
-                $rageEndDate = Carbon::parse($request->session()->get('end_date'));
+            if ($user->working_hours_regular == 'stały planing') {
 
-                // Ustal daty "efektywne" – przycięte do zakresu, jeśli potrzeba
-                $effectiveStartDate = $targetStartDate->lessThan($rageStartDate) ? $rageStartDate : $targetStartDate;
-                $effectiveEndDate = $targetEndDate->greaterThan($rageEndDate) ? $rageEndDate : $targetEndDate;
+                $daysMap = [
+                    'poniedziałek' => 1,
+                    'wtorek' => 2,
+                    'środa' => 3,
+                    'czwartek' => 4,
+                    'piątek' => 5,
+                    'sobota' => 6,
+                    'niedziela' => 7,
+                ];
 
-                // Oblicz liczbę dni
-                $leaveDays = $effectiveStartDate->diffInDays($effectiveEndDate) + 1;
+                $startWorkDay = $daysMap[$user->working_hours_start_day];
+                $endWorkDay   = $daysMap[$user->working_hours_stop_day];
 
-                $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
-                $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
-                $user->time_in_work_hms_leave = sprintf('%02dh', $user->time_in_work_leave);
+                foreach ($leaves as $leave) {
+                    $targetStartDate = Carbon::parse($leave->start_date);
+                    $targetEndDate   = Carbon::parse($leave->end_date);
+                    $rangeStartDate  = Carbon::parse($request->session()->get('start_date'));
+                    $rangeEndDate    = Carbon::parse($request->session()->get('end_date'));
+
+                    // Przycięcie do zakresu
+                    $effectiveStartDate = $targetStartDate->lessThan($rangeStartDate) ? $rangeStartDate : $targetStartDate;
+                    $effectiveEndDate   = $targetEndDate->greaterThan($rangeEndDate) ? $rangeEndDate : $targetEndDate;
+
+                    $leaveDays = 0;
+                    $currentDate = $effectiveStartDate->copy();
+
+                    while ($currentDate->lte($effectiveEndDate)) {
+                        $dayOfWeek = $currentDate->dayOfWeekIso; // 1 (pon) – 7 (nd)
+
+                        if ($dayOfWeek >= $startWorkDay && $dayOfWeek <= $endWorkDay) {
+                            $leaveDays++;
+                        }
+
+                        $carbonDate = $currentDate->copy();
+                        $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                        $dateStr = $carbonDate->format('Y-m-d');
+
+                        // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                        if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                            $isHoliday = true; // Nowy Rok
+                        } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                            $isHoliday = true; // Trzech Króli
+                        } else {
+                            $isHoliday = $holidays->contains($dateStr);
+                        }
+                        if ($isHoliday) {
+                            $leaveDays--;
+                        }
+
+                        $currentDate->addDay();
+                    }
+
+                    $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
+                    $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
+                    $user->time_in_work_hms_leave = sprintf('%02dh 00min 00s', $user->time_in_work_leave);
+                }
+
+                $hours = floor($user->time_in_work / 3600);
+                $minutes = floor(($user->time_in_work % 3600) / 60);
+                $seconds = $user->time_in_work % 60;
+                $user->time_in_work_total += $hours;
+                $user->time_in_work_total_minutes += $minutes;
+                $user->time_in_work_total_seconds += $seconds;
+                $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
+
+                $hoursExtra = floor($user->time_in_work_extra / 3600);
+                $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
+                $secondsExtra = $user->time_in_work_extra % 60;
+                $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+
+                $hoursUnder = floor($user->time_in_work_under / 3600);
+                $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
+                $secondsUnder = $user->time_in_work_under % 60;
+                $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+
+                $hoursPlanned = floor($user->time_in_work_planned / 3600);
+                $user->time_in_work_hms_planned = sprintf('%02dh 00min 00s', $hoursPlanned);
+                $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
             }
-            $hours = floor($user->time_in_work / 3600);
-            $minutes = floor(($user->time_in_work % 3600) / 60);
-            $seconds = $user->time_in_work % 60;
-            $user->time_in_work_total += floor($user->time_in_work / 3600);
-            $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
 
-            $hoursExtra = floor($user->time_in_work_extra / 3600);
-            $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
-            $secondsExtra = $user->time_in_work_extra % 60;
-            $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+            if ($user->working_hours_regular == 'zmienny planing') {
+                foreach ($leaves as $leave) {
+                    $targetStartDate = Carbon::parse($leave->start_date);
+                    $targetEndDate = Carbon::parse($leave->end_date);
+                    $rageStartDate = Carbon::parse($request->session()->get('start_date'));
+                    $rageEndDate = Carbon::parse($request->session()->get('end_date'));
 
-            $hoursUnder = floor($user->time_in_work_under / 3600);
-            $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
-            $secondsUnder = $user->time_in_work_under % 60;
-            $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+                    // Ustal daty "efektywne" – przycięte do zakresu, jeśli potrzeba
+                    $effectiveStartDate = $targetStartDate->lessThan($rageStartDate) ? $rageStartDate : $targetStartDate;
+                    $effectiveEndDate = $targetEndDate->greaterThan($rageEndDate) ? $rageEndDate : $targetEndDate;
 
-            $hoursPlanned = floor($user->time_in_work_planned / 3600);
-            $user->time_in_work_hms_planned = sprintf('%02dh', $hoursPlanned);
-            $user->time_in_work_hms_total = sprintf('%02dh', $user->time_in_work_total);
+                    // Oblicz liczbę dni
+                    $startDate = $effectiveStartDate->startOfDay();
+                    $endDate   = $effectiveEndDate->endOfDay();
+
+                    $currentDate = $startDate->copy();
+                    $working_days = 0;
+                    $non_working_days = 0;
+                    $has_working_day = false;
+
+                    while ($currentDate->lte($endDate)) {
+
+                        // sprawdzamy czy w danym dniu istnieje jakikolwiek workBlock
+                        $hasWorkBlock = WorkBlock::where('user_id', $leave->user_id)
+                            ->whereDate('starts_at', $currentDate)
+                            ->exists();
+                        $getWorkBlock = WorkBlock::where('user_id', $leave->user_id)
+                            ->whereDate('starts_at', $currentDate)
+                            ->first();
+
+                        if ($hasWorkBlock) {
+                            $working_days++;
+                            $user->time_in_work_leave += floor($getWorkBlock->duration_seconds / 3600);
+                            $user->time_in_work_leave_minutes += floor(($getWorkBlock->duration_seconds % 3600) / 60);
+                            $user->time_in_work_leave_seconds += $getWorkBlock->duration_seconds % 60;
+                            $user->time_in_work_total += floor($getWorkBlock->duration_seconds / 3600);
+                            $user->time_in_work_total_minutes += floor(($getWorkBlock->duration_seconds % 3600) / 60);
+                            $user->time_in_work_total_seconds += $getWorkBlock->duration_seconds % 60;
+                        } else {
+                            $non_working_days++;
+                        }
+                        $currentDate->addDay();
+                    }
+                    $user->time_in_work_hms_leave = sprintf('%02dh %02dmin %02ds', $user->time_in_work_leave, $user->time_in_work_leave_minutes, $user->time_in_work_leave_seconds);
+                }
+
+                $hours = floor($user->time_in_work / 3600);
+                $minutes = floor(($user->time_in_work % 3600) / 60);
+                $seconds = $user->time_in_work % 60;
+                $user->time_in_work_total += $hours;
+                $user->time_in_work_total_minutes += $minutes;
+                $user->time_in_work_total_seconds += $seconds;
+                $user->time_in_work_hms = sprintf('%02dh %02dmin %02ds', $hours, $minutes, $seconds);
+
+                $hoursExtra = floor($user->time_in_work_extra / 3600);
+                $minutesExtra = floor(($user->time_in_work_extra % 3600) / 60);
+                $secondsExtra = $user->time_in_work_extra % 60;
+                $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
+
+                $user->time_in_work_hms_planned = '00h';
+                $hoursPlanned = floor($user->time_in_work_planned_var / 3600);
+                $minutesPlanned = floor(($user->time_in_work_planned_var % 3600) / 60);
+                $secondsPlanned = $user->time_in_work_planned_var % 60;
+                $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
+                $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
+            }
         }
         return $users;
     }
@@ -346,12 +769,14 @@ class UserService
     {
         $filterDateService = new FilterDateService();
         $workSessionRepository = new WorkSessionRepository();
+        $calendar = new CalendarView();
         $dates = $filterDateService->getRangeDateFilter($request);
-        $users = $this->getByRole();
+        $users = $this->getByRole($request);
 
 
         foreach ($users as &$user) {
             $userDates = [];
+            $userObjs = [];
             foreach ($dates as $date) {
                 $hasEvent = $workSessionRepository->hasEventForUserOnDate($user->id, $date);
                 $hasStartEvent = $workSessionRepository->hasStartEventForUserOnDate($user->id, $date);
@@ -361,22 +786,57 @@ class UserService
                 $status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
                 $leave = $workSessionRepository->hasLeave($user->id, $date);
                 $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
+                $work_obj = $workSessionRepository->getFirstRcp($user->id, $date);
+                $work_obj_last = $workSessionRepository->getLastRcp($user->id, $date);
+
+                if ($work_obj && $work_obj_last) {
+                    if ($work_obj->id != $work_obj_last->id) {
+                        $work_obj->eventStop = $work_obj_last->eventStop;
+                        $work_obj->multi = true;
+                    } else {
+                        $work_obj->false = true;
+                    }
+                }
+                //if ($user->public_holidays == true) {
+                $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
+
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+                //} else {
+                //    $isHoliday = false;
+                //}
 
                 if ($status) {
-                    $userDates[$date] = "in_progress";
+                    $userDates[$date] = "progress";
+                    $userObjs[$date] = $work_obj;
                 } else if ($leave) {
-                    $userDates[$date] = $leaveFirst->type;
+                    $userDates[$date] = 'leave';
+                    $userObjs[$date] = $leaveFirst;
                 } else if ($hasEvent) {
-                    $userDates[$date] = 1;
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
                 } else if ($hasStartEvent && $hasStopEvent) {
-                    $userDates[$date] = 0.5;
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
                 } else if ($hasStartEvent2 && $hasStopEvent2) {
-                    $userDates[$date] = 0.5;
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
+                } else if ($isHoliday) {
+                    $userDates[$date] = "holiday";
                 } else if (!$hasEvent) {
-                    $userDates[$date] = 0;
+                    $userDates[$date] = null;
                 }
             }
             $user->dates = $userDates;
+            $user->objs = $userObjs;
         }
         return $users;
     }
@@ -447,5 +907,16 @@ class UserService
     {
         $userRepository = new UserRepository();
         return $userRepository->getByAdmin();
+    }
+    /**
+     * Zwraca użytkowników.
+     *
+     * @param Request $request
+     * @return \Illuminate\Support\Collection
+     */
+    public function getUsersFromCompanyWorkBlock(): \Illuminate\Support\Collection
+    {
+        $userRepository = new UserRepository();
+        return $userRepository->getByAdminWorkBlock();
     }
 }

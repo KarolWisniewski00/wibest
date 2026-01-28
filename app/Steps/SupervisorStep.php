@@ -34,6 +34,7 @@ class SupervisorStep extends Step
         $user->email = $state['email'];
         $user->phone = $state['phone'];
         $user->position = $state['position'];
+        $user->gender = ($state['gender'] ?? false) ? 'male' : 'female';
         $user->role = $state['role'];
         $user->assigned_at = now();
         $user->supervisor_id = $state['supervisor_id'];
@@ -63,11 +64,11 @@ class SupervisorStep extends Step
     }
     public function icon(): string
     {
-        return 'check';
+        return 'user';
     }
 
     public function title(): string
     {
-        return __('Wybierz przełożonego');
+        return __('👤 Wybierz przełożonego');
     }
 }

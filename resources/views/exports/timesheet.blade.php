@@ -98,11 +98,24 @@
         </tbody>
     </table>
 
+    @php
+    $usedShorts = collect($employees)
+    ->pluck('dates') // tablice dat pracowników
+    ->flatMap(fn($d) => $d) // spłaszcz
+    ->filter() // usuń puste
+    ->unique() // unikalne
+    ->values();
+    @endphp
 
     {{-- Legenda --}}
     <p class="legend">
-        <strong>Legenda:</strong>
-        O - obecność, W - wniosek
+        <strong>Legenda:</strong><br>
+        RCP – Rejestracja czasu pracy,<br>
+        @foreach(config('leavetypes.shortType') as $name => $short)
+        @if($usedShorts->contains($short))
+        {{ $short }} – {{ ucfirst($name) }}<br>
+        @endif
+        @endforeach
     </p>
 </body>
 

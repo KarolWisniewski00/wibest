@@ -4,7 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="max-image-preview:large" />
+    <meta name="twitter:card" content="summary" />
+    <meta property="og:locale" content="pl_PL" />
+    <meta name="author" content="Karol Wiśniewski">
+    <meta http-equiv="X-Ua-Compatible" content="IE=edge">
+    <meta property="og:site_name" content="WIBEST RCP – Mierz czas pracy dokładnie" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://wibest.pl" />
     <title>WIBEST RCP – Mierz czas pracy dokładnie</title>
+    <meta property="og:title" content="WIBEST RCP – Mierz czas pracy dokładnie" />
+    <meta name="twitter:title" content="WIBEST RCP – Mierz czas pracy dokładnie" />
+    <meta name="description" content="Aplikacja do mierzenia czasu pracy WIBEST.">
+    <meta property="og:description" content="Aplikacja do mierzenia czasu pracy WIBEST." />
+    <meta name="twitter:description" content="Aplikacja do mierzenia czasu pracy WIBEST." />
+    <meta name="description" content="Aplikacja do mierzenia czasu pracy WIBEST.">
+    <meta name="keywords" content="aplikacja do mierzenia czasu, Aplikacja do mierzenia czasu na komputerze, rcp online, rcp online aplikacja">
     <script src="https://kit.fontawesome.com/e37acf9c2e.js" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=Raleway:wght@500;700;900&display=swap" rel="stylesheet">

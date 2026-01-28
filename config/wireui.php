@@ -91,7 +91,7 @@ return [
             'alias' => 'error',
         ],
         'errors' => [
-            'class' => Components\Errors::class,
+            'class' => App\View\Components\MyErrors::class,
             'alias' => 'errors',
         ],
         'inputs.maskable' => [
@@ -106,9 +106,9 @@ return [
             'class' => Components\Inputs\CurrencyInput::class,
             'alias' => 'inputs.currency',
         ],
-        'inputs.number' => [
-            'class' => Components\Inputs\NumberInput::class,
-            'alias' => 'inputs.number',
+        'number' => [
+            'class' => App\View\Components\MyNumber::class,
+            'alias' => 'number',
         ],
         'inputs.password' => [
             'class' => Components\Inputs\PasswordInput::class,

@@ -16,27 +16,28 @@
                 @foreach ($companies as $client)
                 <x-card-client :client="$client" />
                 @endforeach
+                <x-loader-client-card id="loader-card" />
             </x-list>
             <!--MOBILE VIEW-->
 
             <!--PC VIEW-->
             <x-table
-                :headers="['Nazwa', 'Adres', 'NIP', 'Użytkownicy', 'Podgląd']"
+                :headers="['Nazwa', 'Adres', 'NIP', 'Użytkownicy', 'Wysłanych wiadomości', 'Zużycie SMS', 'Podgląd']"
                 :items="$companies"
+                :checkBox="false"
                 emptyMessage="Brak klientów do wyświetlenia.">
                 @foreach($companies as $client)
                 <x-row-client :client="$client" />
                 @endforeach
+                <x-loader-client id="loader" />
             </x-table>
-            <x-loader />
-            </table>
             <!--PC VIEW-->
             <x-loader-script>
                 {{ route('api.v1.setting.client.get') }}
             </x-loader-script>
         </x-container-content>
         <!--CONTENT-->
-        <x-download-only-counting/>
+        <x-download-only-counting />
     </x-main-no-filter>
     <!--MAIN-->
     @else
