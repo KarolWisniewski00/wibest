@@ -74,7 +74,7 @@ class OfferController extends Controller
         $set_client = $user->setting_client;
         $invoice = Invoice::where('id', 61)->first();
         $create_client = Client::where('id', $project->client_id)->first();
-        return view('admin.offer.create', compact('create_client','project','user','invoice','clients', 'offerNumber', 'company', 'services', 'products', 'set_client'));
+        return view('admin.offer.create', compact('create_client', 'project', 'user', 'invoice', 'clients', 'offerNumber', 'company', 'services', 'products', 'set_client'));
     }
 
     /**
@@ -188,8 +188,7 @@ class OfferController extends Controller
     {
         $offer_obj = $offer;
 
-        $offerItems = $this->get_offer_items_by_offer_id($offer_obj->id);
-        return view('admin.offer.show', compact('offer', 'offer_obj', 'offerItems'));
+        return view('admin.offer.show', compact('offer', 'offer_obj'));
     }
 
     /**
@@ -201,6 +200,8 @@ class OfferController extends Controller
         $items = OfferItem::where('offer_id', $offer_obj->id)->get();
 
         $offer = $this->get_offer_data_from_obj($offer_obj, $items);
+        $offer['issue_date'] = Carbon::parse($offer_obj->issue_date)->format('d.m.Y');
+        $offer['due_date']   = Carbon::parse($offer_obj->due_date)->format('d.m.Y');
         $user = User::where('id', $offer_obj->user_id)->first();
         return view('admin.template.offer', compact('offer', 'user'));
     }
@@ -217,7 +218,12 @@ class OfferController extends Controller
         // Generowanie PDF
         //$offerNumber = str_replace([' ', '/'], '-', $offer_obj->number);
         //$user = User::where('id', $offer_obj->user_id)->first();
-        $pdf = PDF::loadView('admin.template.offer2');
+
+        $offer = $this->get_offer_data_from_obj($offer_obj, $items);
+        $offer['issue_date'] = Carbon::parse($offer_obj->issue_date)->format('d.m.Y');
+        $offer['due_date']   = Carbon::parse($offer_obj->due_date)->format('d.m.Y');
+        $user = User::where('id', $offer_obj->user_id)->first();
+        $pdf = PDF::loadView('admin.template.offer', compact('offer', 'user'));
 
         // Pobranie pliku PDF
         return $pdf->download('oferta.pdf');

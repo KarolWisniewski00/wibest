@@ -18,7 +18,7 @@ class UserRepository
     {
         return User::where('company_id', Auth::user()->company_id)
             ->where('role', '!=', null)
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca użytkowników dla menadżera.
@@ -30,7 +30,7 @@ class UserRepository
         return User::where('company_id', Auth::user()->company_id)
             ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
             ->where('supervisor_id', '=', Auth::user()->supervisor_id)
-            ->paginate(10);
+            ->paginate(3);
     }
 
     /**
@@ -42,7 +42,7 @@ class UserRepository
     {
         return User::where('company_id', Auth::user()->company_id)
             ->where('id', Auth::id())
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca użytkowników dla admina.

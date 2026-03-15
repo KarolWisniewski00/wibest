@@ -25,7 +25,6 @@
         <x-container-content>
             <!--MOBILE VIEW-->
             <x-list :items="$leaves" emptyMessage="Brak użytkowników do wyświetlenia.">
-                <x-loader-leave-pending-card />
                 @foreach ($leaves as $leave)
                 <x-card-leave-pending :leave="$leave" />
                 @endforeach

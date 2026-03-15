@@ -29,29 +29,29 @@ class WorkSessionService
             $endDate =  $request->end_date;
         }
         if ($request->filled('filter_user_id')) {
-            return $workSessionRepository->paginateByFilterUserIdWithFilterDate(10, $request->filter_user_id, $startDate, $endDate);
+            return $workSessionRepository->paginateByFilterUserIdWithFilterDate(3, $request->filter_user_id, $startDate, $endDate);
         }
         switch (Auth::user()->role) {
             case 'admin':
-                return $workSessionRepository->paginateByAdminWithFilterDate(10, $startDate, $endDate);
+                return $workSessionRepository->paginateByAdminWithFilterDate(3, $startDate, $endDate);
                 break;
             case 'właściciel':
-                return $workSessionRepository->paginateByAdminWithFilterDate(10, $startDate, $endDate);
+                return $workSessionRepository->paginateByAdminWithFilterDate(3, $startDate, $endDate);
                 break;
             case 'menedżer':
-                return $workSessionRepository->paginateByManagerWithFilterDate(10, $startDate, $endDate);
+                return $workSessionRepository->paginateByManagerWithFilterDate(3, $startDate, $endDate);
                 break;
             case 'kierownik':
-                return $workSessionRepository->paginateByUserWithFilterDate(10, $startDate, $endDate);
+                return $workSessionRepository->paginateByUserWithFilterDate(3, $startDate, $endDate);
                 break;
             case 'użytkownik':
-                return $workSessionRepository->paginateByUserWithFilterDate(10, $startDate, $endDate);
+                return $workSessionRepository->paginateByUserWithFilterDate(3, $startDate, $endDate);
                 break;
             default:
-                return $workSessionRepository->paginateByUserWithFilterDate(10, $startDate, $endDate);
+                return $workSessionRepository->paginateByUserWithFilterDate(3, $startDate, $endDate);
                 break;
         }
-        return $workSessionRepository->paginateByUserWithFilterDate(10, $startDate, $endDate);
+        return $workSessionRepository->paginateByUserWithFilterDate(3, $startDate, $endDate);
     }
     /**
      * Tworzy sesję pracy z wydarzeniami.

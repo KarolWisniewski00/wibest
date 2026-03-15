@@ -39,7 +39,7 @@ class EventController extends Controller
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
 
-        $events = $this->eventRepository->getEventsForCurrentUserPaginated(10, $startDate, $endDate);
+        $events = $this->eventRepository->getEventsForCurrentUserPaginated(3, $startDate, $endDate);
         $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
         return view('admin.events.index', compact('events', 'startDate', 'endDate', 'countEvents'));
     }
@@ -63,7 +63,7 @@ class EventController extends Controller
     }
     public function get(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 3);
 
         $query = Event::with('user')
             ->select('events.*')

@@ -40,9 +40,9 @@
             <x-download-pdf-check :file="$file">
                 {{ route('api.v1.raport.time-sheet.export.xlsx') }}
             </x-download-pdf-check>
-            <x-loader-script>
+            <x-loader-script-calendar>
                 {{ route('api.v1.raport.time-sheet.get') }}
-            </x-loader-script>
+            </x-loader-script-calendar>
         </x-container-content-calendar>
     </x-main>
     @else

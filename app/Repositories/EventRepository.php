@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 
 class EventRepository
 {
-    public function getEventsForCurrentUserPaginated(int $perPage = 10, ?string $startDate = null, ?string $endDate = null)
+    public function getEventsForCurrentUserPaginated(int $perPage = 3, ?string $startDate = null, ?string $endDate = null)
     {
         if ($this->isAdmin()) {
             return $this->getAllCompanyEventsWithDateRange($perPage, $startDate, $endDate);

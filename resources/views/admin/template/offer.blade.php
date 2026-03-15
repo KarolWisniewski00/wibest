@@ -3,290 +3,244 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oferta</title>
-
+    <title>Oferta wdrożenia systemu ewidencji czasu pracy</title>
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            margin: 0;
-            padding: 0;
-            font-size: 10px;
-            color: #000;
+        * {
+            font-family: DejaVu Sans, sans-serif !important;
+            color: #111827;
+        }
+
+        h1,
+        h2,
+        h3 {
+            margin: 0 0 10px 0;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #111827;
+            text-align: center;
         }
 
         h2 {
-            margin: 4px 0;
-            font-size: 12px;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+            color: #111827;
+            margin-bottom: 8px;
         }
 
-        /* ===================== */
-        /* PODSTAWOWE TABELE */
-        /* ===================== */
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        h3 {
+            font-size: 1.1rem;
+            color: #111827;
         }
 
-        th,
-        td {
-            padding: 4px;
-            border: 1px solid #ddd;
-            text-align: left;
-            vertical-align: top;
+        p {
+            margin: 0 0 10px 0;
+            line-height: 1.5;
         }
 
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
+        .text-gray {
+            color: #374151;
         }
 
-        /* ===================== */
-        /* HEADER OFERTY */
-        /* ===================== */
-        .offer-header span {
-            font-weight: bold;
-        }
-
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 12px 0;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: "";
-            flex: 1;
-            border-top: 1px solid #e5e7eb;
-        }
-
-
-        /* ===================== */
-        /* UKŁAD SPRZEDAWCA / NABYWCA */
-        /* ===================== */
-        .seller-buyer-table {
-            width: 100%;
-            border: none;
-        }
-
-        .seller-buyer-table td {
-            border: none;
-            padding: 0;
-        }
-
-        /* ===================== */
-        /* KARTY DANYCH */
-        /* ===================== */
-        .card {
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: #f9fafb;
-        }
-
-        .section {
-            padding: 6px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .section:last-child {
-            border-bottom: none;
-        }
-
-        .label {
-            font-size: 8px;
+        .text-gray-light {
             color: #6b7280;
-            margin-bottom: 2px;
+            font-size: 0.9rem;
         }
 
-        .value {
-            font-size: 10px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            word-break: break-all;
+        .text-sm {
+            font-size: 0.9rem;
         }
 
-        .icon {
-            margin-right: 4px;
+        .card {
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            background-color: #f3f4f6;
+            padding: 16px;
         }
 
-        /* ===================== */
-        /* PODSUMOWANIE */
-        /* ===================== */
-        .summary {
-            text-align: right;
-            margin-top: 8px;
+        .card ul {
+            margin: 0;
+            padding: 0;
+            padding-left: 16px;
         }
 
-        .summary p {
-            margin: 2px 0;
+        .grid-3 {
+            display: flex;
+            gap: 16px;
         }
 
-        /* ===================== */
-        /* STOPKA */
-        /* ===================== */
-        .footer-left {
-            position: fixed;
-            bottom: 8px;
-            left: 8px;
-            font-size: 8px;
-            color: #555;
+        .grid-3 .card {
+            flex: 1;
+        }
+
+        ol {
+            margin: 8px 0 0 20px;
+        }
+
+        strong {
+            font-weight: 600;
+        }
+
+        .mt-10 {
+            margin-top: 40px;
+        }
+
+        .mb-2 {
+            margin-bottom: 8px;
+        }
+
+        .mb-4 {
+            margin-bottom: 16px;
+        }
+
+        .mb-6 {
+            margin-bottom: 24px;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="offer-header">
-        <p><span>Oferta handlowa numer:</span></p>
-        <h2>{{ $offer['number'] }}</h2>
-        <p><span>Data wystawienia:</span> {{ $offer['issue_date'] }}</p>
-        <p><span>Termin ważności:</span> {{ $offer['due_date'] }}</p>
-    </div>
+    <h1 class="mb-4">Oferta wdrożenia systemu ewidencji czasu pracy</h1>
 
-    <div class="divider"></div>
+    <!-- Sekcja A – pełny wygląd już zrobiony -->
 
-    <!-- SPRZEDAWCA / KLIENT -->
-    <table class="seller-buyer-table">
-        <tr>
-            <td style="width: 50%; padding-right:4px;">
-                <div class="card">
-                    <div class="section">
-                        <div class="label">Nazwa</div>
-                        <div class="value"><span class="icon">🏢</span>Karol Wiśniewski WIBEST</div>
-                    </div>
-                    <div class="section">
-                        <div class="label">Adres</div>
-                        <div class="value"><span class="icon">📍</span>Będzin, ul. Sielecka 63</div>
-                    </div>
-                    <div class="section">
-                        <div class="label">NIP</div>
-                        <div class="value"><span class="icon">🧾</span>8992998536</div>
-                    </div>
-                </div>
-            </td>
+    <section class="mb-4">
+        <h2>Jak my zrozumieliśmy Twoją sytuację?</h2>
+        <p class="text-gray-light">Analiza sytuacji</p>
 
-            <td style="width: 50%; padding-left:4px;">
-                <div class="card">
-                    <div class="section">
-                        <div class="label">Nazwa</div>
-                        <div class="value"><span class="icon">🏢</span>{{ $offer['client']['name'] }}</div>
-                    </div>
-                    <div class="section">
-                        <div class="label">Adres</div>
-                        <div class="value"><span class="icon">📍</span>{{ $offer['client']['address'] }}</div>
-                    </div>
-                    <div class="section">
-                        <div class="label">NIP</div>
-                        <div class="value"><span class="icon">🧾</span>{{ $offer['client']['tax_id'] }}</div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    </table>
+        <div class="card">
+            <p class="text-gray">Na podstawie rozmowy zidentyfikowaliśmy potrzebę uporządkowania ewidencji czasu pracy
+                pracowników realizujących pracę w terenie.</p>
+            <p class="text-gray">Aktualnie czas pracy rejestrowany jest ręcznie, co utrudnia bieżącą kontrolę godzin,
+                nadgodzin oraz nieobecności i generuje dodatkową pracę administracyjną.</p>
+            <p class="text-gray">Brak jednego, centralnego systemu powoduje opóźnienia w przygotowaniu raportów
+                oraz zwiększa ryzyko błędów w rozliczeniach.</p>
+            <p class="text-gray">Celem wdrożenia systemu jest uzyskanie pełnej kontroli nad czasem pracy,
+                automatyzacja raportowania oraz uproszczenie codziennej pracy zespołu.</p>
+        </div>
+    </section>
 
-    <div class="divider"></div>
+    <!-- Zakres wdrożenia -->
+    <section class="">
+        <h2 class="mb-2">Zakres wdrożenia systemu</h2>
+        <p class="text-gray-light mb-2">W ramach wdrożenia udostępniamy kompletny system do ewidencji czasu pracy,
+            który porządkuje czas pracy pracowników i eliminuje ręczne rozliczenia.</p>
 
-    <!-- OSOBY KONTAKTOWE -->
-    <table class="seller-buyer-table">
-        <tr>
-            <td style="width: 50%; padding-right:4px;">
-                @if(isset($user))
-                <div class="card">
-                    <div class="section">
-                        <div class="label">Opiekun</div>
-                        <div class="value"><span class="icon">👤</span>{{ $user->name }}</div>
-                    </div>
-                    <div class="section">
-                        <div class="label">Email</div>
-                        <div class="value"><span class="icon">📧</span>{{ $user->email }}</div>
-                    </div>
-                </div>
-                @endif
-            </td>
+        <div class="card mb-2">
+            <ul>
+                <li>Rejestrowanie czasu pracy w czasie rzeczywistym (start / stop)</li>
+                <li>Obsługa wielu rozpoczęć i zakończeń pracy w ciągu dnia</li>
+                <li>Rejestracja lokalizacji przy rozpoczęciu i zakończeniu pracy</li>
+                <li>Automatyczne powiadomienia SMS (m.in. nadgodziny, podsumowanie dnia)</li>
+                <li>Ewidencja nadgodzin wraz z przypisaniem zadań i opcją akceptacji</li>
+                <li>Obsługa urlopów, zwolnień lekarskich oraz innych nieobecności</li>
+                <li>Blokada błędnych i podwójnych zgłoszeń czasu lub nieobecności</li>
+                <li>Planowanie pracy w oparciu o grafiki stałe i zmienne</li>
+                <li>Dostęp do danych z telefonu i komputera w czasie rzeczywistym</li>
+                <li>Raport listy obecności oraz ewidencja czasu pracy</li>
+            </ul>
+        </div>
+        <p class="text-gray-light">System udostępniany jest w jednej, ustandaryzowanej wersji dla wszystkich klientów.
+            Indywidualne rozszerzenia funkcjonalne mogą pojawić się w kolejnych etapach rozwoju systemu.</p>
+    </section>
 
-            <td style="width: 50%; padding-left:4px;">
-                @if($offer['client']['buyer_person_name'] && $offer['client']['buyer_person_email'])
-                <div class="card">
-                    <div class="section">
-                        <div class="label">Osoba kontaktowa</div>
-                        <div class="value"><span class="icon">👤</span>{{ $offer['client']['buyer_person_name'] }}</div>
-                    </div>
-                    <div class="section">
-                        <div class="label">Email</div>
-                        <div class="value"><span class="icon">📧</span>{{ $offer['client']['buyer_person_email'] }}</div>
-                    </div>
-                </div>
-                @endif
-            </td>
-        </tr>
-    </table>
+    <!-- Jak działa system -->
+    <section class="mt-10">
+        <h2>Jak działa system na co dzień?</h2>
+        <p class="text-gray-light">System został zaprojektowany tak, aby był prosty w codziennym użytkowaniu
+            i nie wymagał długiego wdrożenia pracowników.</p>
 
-    <div class="divider"></div>
+        <table>
+            <tbody>
+                <tr>
+                    <td style="width:33%;">
+                        <div class="card">
+                            <p class="text-gray-light">Codzienna praca</p>
+                            <h3>Rejestracja czasu pracy</h3>
+                            <p class="text-gray text-sm">Pracownik rozpoczyna i kończy pracę jednym kliknięciem w aplikacji
+                                (start / stop). System obsługuje przerwy oraz pracę w terenie.</p>
+                        </div>
+                    </td>
+                    <td style="width:33%;">
+                        <div class="card">
+                            <p class="text-gray-light">Automatycznie</p>
+                            <h3>Zbieranie danych pracowników</h3>
+                            <p class="text-gray text-sm">Wszystkie dane zapisywane są automatycznie w systemie
+                                i dostępne w czasie rzeczywistym z dowolnego urządzenia.</p>
+                        </div>
+                    </td>
+                    <td style="width:33%;">
+                        <div class="card">
+                            <p class="text-gray-light">Dla zarządzających</p>
+                            <h3>Raporty i kontrola</h3>
+                            <p class="text-gray text-sm">Osoby zarządzające mają dostęp do czytelnych raportów czasu pracy,
+                                nadgodzin oraz nieobecności — bez ręcznego przepisywania danych.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 
-    <!-- POZYCJE -->
-    <h2>Pozycje</h2>
+    <!-- Cena -->
+    <section class="mt-10">
+        <h2>Cena</h2>
+        <div class="card">
 
-    <table>
-        <thead>
-            <tr>
-                <th>Lp.</th>
-                <th>Nazwa</th>
-                <th>Ilość</th>
-                <th>Cena netto</th>
-                <th>Netto</th>
-                <th>Rabat</th>
-                <th>Po rabacie</th>
-                <th>VAT</th>
-                <th>Kwota VAT</th>
-                <th>Brutto</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($offer['items'] as $key => $item)
-            <tr>
-                <td>{{ $key + 1 }}</td>
-                <td>
-                    {{ $item['name'] }}<br>
-                    <span style="color:#71717a;">{{ $item['service']->description ?? '' }}</span>
-                </td>
-                <td>{{ $item['quantity'] }} {{ $item['unit'] }}</td>
-                <td>{{ number_format($item['unit_price'], 2) }} PLN</td>
-                <td>{{ number_format($item['subtotal'], 2) }} PLN</td>
-                <td>{{ $item['discount'] }}%</td>
-                <td>{{ number_format($item['price_after_discount'], 2) }} PLN</td>
-                <td>{{ $item['vat_rate'] }}</td>
-                <td>{{ $item['vat_amount'] }}</td>
-                <td>{{ number_format($item['total'], 2) }} PLN</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+            <!-- Opis -->
+            <div>
+                <p class="text-gray">Liczba użytkowników systemu: <span style=" color: #111827;">15 osób</span></p>
+                <p class="text-gray">Cena za użytkownika: <span style=" color: #111827;">10 zł netto / miesiąc</span></p>
+            </div>
 
-    <div class="summary">
-        <h2>Podsumowanie</h2>
-        <p>Razem netto: {{ $offer['subtotal'] }} PLN</p>
-        <p>VAT: {{ $offer['vat'] }} PLN</p>
-        <p><strong>Razem brutto: {{ $offer['total'] }} PLN</strong></p>
-    </div>
+            <!-- Cena -->
+            <div style="text-align: right; white-space: nowrap;">
+                <p class="text-gray-light text-sm">Łączna cena</p>
+                <h3 style="font-size: 1.25rem; color: #111827;">
+                    150 zł netto / miesiąc
+                </h3>
+            </div>
 
-    <div class="summary">
-        <h2>Słownie</h2>
-        <p>{{ $offer['total_in_words'] }}</p>
-    </div>
+        </div>
 
-    @if($offer['notes'])
-    <div class="divider"></div>
-    <h2>Uwagi</h2>
-    <p>{{ $offer['notes'] }}</p>
-    @endif
+    </section>
 
-    <div class="footer-left">
-        Oferta wystawiona w wibest.pl
-    </div>
+    <!-- Kolejne kroki -->
+    <section class="mt-10">
+        <h2>Kolejne kroki</h2>
+        <table>
+            <tbody>
+                <tr>
+                    <td style="width:33%;">
+                        <div class="card">
+                            <p class="text-gray-light">Etap 1</p>
+                            <h3>Decyzja</h3>
+                            <p class="text-gray text-sm">Akceptacja niniejszej oferty / złożenie zamówienia.</p>
+                        </div>
+                    </td>
+                    <td style="width:33%;">
+                        <div class="card">
+                            <p class="text-gray-light">Etap 2</p>
+                            <h3>Formalności</h3>
+                            <p class="text-gray text-sm">Zawarcie umowy lub akceptacja regulaminu oraz realizacja płatności.</p>
+                        </div>
+                    </td>
+                    <td style="width:33%;">
+                        <div class="card">
+                            <p class="text-gray-light">Etap 3</p>
+                            <h3>Wdrożenie</h3>
+                            <p class="text-gray text-sm">Aktywacja konta, konfiguracja użytkowników.</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
 
 </body>
 

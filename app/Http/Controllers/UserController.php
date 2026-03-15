@@ -33,7 +33,7 @@ class UserController extends Controller
         $users = User::with('company')
             ->orderByRaw('ISNULL(company_id) DESC') // najpierw NULL-e
             ->orderBy('created_at', 'desc')         // potem najnowsze
-            ->paginate(10);
+            ->paginate(3);
 
         return view('admin.user.index', [
             'users' => $users,
@@ -44,7 +44,7 @@ class UserController extends Controller
         $users = User::with('company')
             ->orderByRaw('ISNULL(company_id) DESC') // najpierw NULL-e
             ->orderBy('created_at', 'desc')         // potem najnowsze
-            ->paginate(10);
+            ->paginate(3);
 
         $rows_table = [];
         $rows_list = [];

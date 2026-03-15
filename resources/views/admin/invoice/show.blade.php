@@ -1,7 +1,6 @@
 <x-app-layout>
     <div class="py-12 pt-48">
         @include('admin.elements.alerts')
-        <x-old-school-nav></x-old-school-nav>
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!--WIDGET TASK-->
             <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow sm:rounded-lg">

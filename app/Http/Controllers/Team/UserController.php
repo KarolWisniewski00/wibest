@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Team;
 use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordMail;
+use App\Models\Leave;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Repositories\InvitationRepository;
 use App\Repositories\CompanyRepository;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -36,32 +38,12 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 3);
         $userId = Auth::id();
         $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
-        if ($user->role === 'admin') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        } else if ($user->role === 'menedżer') {
-            $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'kierownik') {
-            $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik'])
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'użytkownik') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '=', 'użytkownik')
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'właściciel') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        } else {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        }
+        $query = User::where('company_id', $companyId)
+            ->where('role', '!=', null);
         $users = $query->paginate($perPage);
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         $userCount =  $this->userRepository->countByCompanyId($companyId);
@@ -78,7 +60,44 @@ class UserController extends Controller
     {
         $companyId = $this->companyRepository->getCompanyId();
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
-        return view('admin.team.user', compact('user', 'invitations'));
+        //Wykorzystane wnioski
+        $yearStart = Carbon::now()->startOfYear();
+        $yearEnd = Carbon::now()->endOfYear();
+
+        $leaves = Leave::selectRaw("
+        type,
+        status,
+        SUM(days) as days,
+        SUM(working_days) as working_days,
+        SUM(non_working_days) as non_working_days
+    ")
+            ->where('user_id', $user->id)
+            ->where('start_date', '<=', $yearEnd)
+            ->where('end_date', '>=', $yearStart)
+            ->whereIn('status', ['zaakceptowane', 'zrealizowane'])
+            ->groupBy('type', 'status')
+            ->get();
+
+        $leaves_used = $leaves->groupBy('type')->map(function ($items) {
+
+            $accepted = $items->firstWhere('status', 'zaakceptowane');
+            $realized = $items->firstWhere('status', 'zrealizowane');
+
+            return [
+                'zaakceptowane' => [
+                    'days' => $accepted->days ?? 0,
+                    'working_days' => $accepted->working_days ?? 0,
+                    'non_working_days' => $accepted->non_working_days ?? 0,
+                ],
+                'zrealizowane' => [
+                    'days' => $realized->days ?? 0,
+                    'working_days' => $realized->working_days ?? 0,
+                    'non_working_days' => $realized->non_working_days ?? 0,
+                ],
+            ];
+        });
+
+        return view('admin.team.user', compact('user', 'invitations', 'leaves_used'));
     }
     public function restart(User $user)
     {
@@ -96,32 +115,11 @@ class UserController extends Controller
 
     public function get(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 3);
         $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
-        if ($user->role === 'admin') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        } else if ($user->role === 'menedżer') {
-            $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'kierownik') {
-            $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik'])
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'użytkownik') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '=', 'użytkownik')
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'właściciel') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        } else {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        }
-
+        $query = User::where('company_id', $companyId)
+            ->where('role', '!=', null);
         $users = $query->paginate($perPage);
 
         $rows_table = [];
@@ -149,29 +147,8 @@ class UserController extends Controller
         $request->session()->put('role_filter', $request->input('role_filter'));
         $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
-        if ($user->role === 'admin') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        } else if ($user->role === 'menedżer') {
-            $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik', 'menedżer'])
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'kierownik') {
-            $query = User::where('company_id', $companyId)
-                ->whereIn('role', ['kierownik', 'użytkownik'])
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'użytkownik') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '=', 'użytkownik')
-                ->where('supervisor_id', '=', $user->supervisor_id);
-        } else if ($user->role === 'właściciel') {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        } else {
-            $query = User::where('company_id', $companyId)
-                ->where('role', '!=', null);
-        }
-
+        $query = User::where('company_id', $companyId)
+            ->where('role', '!=', null);
         if ($request->filled('role_filter')) {
             $query->whereIn('role', $request->input('role_filter'));
         }

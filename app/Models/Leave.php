@@ -79,7 +79,6 @@ class Leave extends Model
         // Jest to kluczowy krok, aby nie modyfikować oryginalnej daty
         $currentDate = $startDate->copy();
 
-
         // 3. Pętla while
         // Pętla wykonuje się dopóki bieżąca data jest mniejsza lub równa dacie końcowej
         while ($currentDate->lte($endDate)) {
@@ -113,11 +112,15 @@ class Leave extends Model
 
         // 🚨 Uruchamia logikę ZARAZ PO POBRANIU modelu z bazy
         static::retrieved(function ($leave) {
+            if (!$leave->user_id) {
+                return;
+            }
+
             $isBlocked = $leave->isBlocked();
             if ($isBlocked) {
                 if ($leave->status == 'odblokowane' || $leave->status == 'oczekujące' || $leave->status == 'anulowane' || $leave->status == 'odrzucone') {
-                $leave->status = 'zablokowane';
-                $leave->save();
+                    $leave->status = 'zablokowane';
+                    $leave->save();
                 }
             } else {
                 if ($leave->status == 'zablokowane') {

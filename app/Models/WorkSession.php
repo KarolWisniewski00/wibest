@@ -77,7 +77,6 @@ class WorkSession extends Model
                 $seconds_calc = 0;
             }
         }
-
         //STAŁY PLANING
         if ($this->user->working_hours_regular == 'stały planing') {
             $daysOfWeek = [
@@ -162,6 +161,11 @@ class WorkSession extends Model
 
             // CASE 2 — cała sesja po limicie
             elseif ($seconds_in_work_before >= $seconds_planned) {
+                $task = true;
+            }
+
+            // CASE 3 - ta sesja dłuższa niż plan
+            elseif ($seconds_calc >= $seconds_planned) {
                 $task = true;
             }
         }

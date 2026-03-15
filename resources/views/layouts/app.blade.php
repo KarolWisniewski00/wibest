@@ -127,6 +127,16 @@
                     $('#stopButtonWidget').removeClass('hidden');
                     $('#startButton').addClass('hidden');
                     $('#stopButton').removeClass('hidden');
+
+                    $('#loaderTimerWidget').addClass('hidden');
+                    $('#loaderLocationWidget').addClass('hidden');
+                    $('#locationWidget').removeClass('hidden');
+                    $('#loaderClockWidget').addClass('hidden');
+                    $('#timerWidget').removeClass('hidden');
+
+                    $('#loaderTimer').addClass('hidden');
+                    $('#loaderClock').addClass('hidden');
+                    $('#timer').removeClass('hidden');
                 }
 
                 // Funkcja do pobierania sesji pracy
@@ -148,7 +158,19 @@
                                 self.counting();
                             }
                         },
-                        error: function(xhr, status, error) {}
+                        error: function(xhr, status, error) {
+                            $('#startButtonWidget').removeClass('hidden');
+                            $('#loaderTimerWidget').addClass('hidden');
+                            $('#loaderLocationWidget').addClass('hidden');
+                            $('#locationWidget').removeClass('hidden');
+                            $('#loaderClockWidget').addClass('hidden');
+                            $('#timerWidget').removeClass('hidden');
+
+                            $('#startButton').removeClass('hidden');
+                            $('#loaderTimer').addClass('hidden');
+                            $('#loaderClock').addClass('hidden');
+                            $('#timer').removeClass('hidden');
+                        }
                     });
                 }
 
@@ -167,11 +189,32 @@
                         },
                         dataType: 'json',
                         success: function(response) {
-                            console.log(self.workStart + '/' + self.userId)
                             self.session_id = response.work_session_id;
-                            console.log(response)
+                            toastr.success('Rozpoczęto pracę');
+                            self.counting();
+                            $('#loaderTimerWidget').addClass('hidden');
+                            $('#loaderTimer').addClass('hidden');
                         },
-                        error: function(xhr, status, error) {}
+                        error: function(xhr, status, error) {
+                            toastr.error('Błąd podczas rozpoczęcia pracy');
+                            clearInterval(self.timerInterval);
+                            self.timerInterval = null;
+                            self.elapsedSeconds = 0;
+                            $('#startButtonWidget').addClass('hidden');
+                            $('#stopButtonWidget').addClass('hidden');
+                            $('#startButton').addClass('hidden');
+                            $('#stopButton').addClass('hidden');
+
+                            $('#loaderTimerWidget').removeClass('hidden');
+                            $('#loaderLocationWidget').removeClass('hidden');
+                            $('#locationWidget').addClass('hidden');
+                            $('#loaderClockWidget').removeClass('hidden');
+                            $('#timerWidget').addClass('hidden');
+
+                            $('#loaderTimer').removeClass('hidden');
+                            $('#loaderClock').removeClass('hidden');
+                            $('#timer').addClass('hidden');
+                        }
                     });
                 }
 
@@ -190,10 +233,22 @@
                         },
                         dataType: 'json',
                         success: function(response) {
-                            console.log(self.workStop + '/' + self.session_id)
-                            console.log(response)
+                            toastr.success('Zakończono pracę');
+                            clearInterval(self.timerInterval);
+                            self.elapsedSeconds = 0;
+                            $('#timerWidget').text(self.formatTime(self.elapsedSeconds));
+                            $('#stopButtonWidget').addClass('hidden');
+                            $('#startButtonWidget').removeClass('hidden');
+                            $('#loaderTimerWidget').addClass('hidden');
+
+                            $('#timer').text(self.formatTime(self.elapsedSeconds));
+                            $('#stopButton').addClass('hidden');
+                            $('#startButton').removeClass('hidden');
+                            $('#loaderTimer').addClass('hidden');
                         },
-                        error: function(xhr, status, error) {}
+                        error: function(xhr, status, error) {
+                            toastr.error('Błąd podczas zakończenia pracy');
+                        }
                     });
                 }
 
@@ -209,6 +264,8 @@
                     const formattedDate = `${days[today.getDay()]} ${today.getDate()} ${months[today.getMonth()]}`;
                     $('.dateWidget').text(formattedDateWidget);
                     $('#date').text(formattedDate);
+                    $('#loaderDateWidget').addClass('hidden');
+                    $('#loaderDate').addClass('hidden');
                 }
 
                 // Funkcja do formatowania czasu
@@ -224,22 +281,12 @@
                 startTimer() {
                     const self = this;
                     self.ajaxStart();
-                    self.counting();
                 }
 
                 // Funka do zakończenia liczenia czasu
                 stopTimer() {
                     const self = this;
                     self.ajaxStop();
-                    clearInterval(self.timerInterval);
-                    self.elapsedSeconds = 0;
-                    $('#timerWidget').text(self.formatTime(self.elapsedSeconds));
-                    $('#stopButtonWidget').addClass('hidden');
-                    $('#startButtonWidget').removeClass('hidden');
-
-                    $('#timer').text(self.formatTime(self.elapsedSeconds));
-                    $('#stopButton').addClass('hidden');
-                    $('#startButton').removeClass('hidden');
                 }
 
                 // Funkcja do uruchomienia
@@ -249,11 +296,19 @@
                     self.updateWidgetWorkSession();
 
                     $('#startButton, #startButtonWidget').click(async function() {
+                        $('#startButtonWidget').addClass('hidden');
+                        $('#startButton').addClass('hidden');
+                        $('#loaderTimerWidget').removeClass('hidden');
+                        $('#loaderTimer').removeClass('hidden');
                         await getLocation();
                         self.startTimer();
                     });
 
                     $('#stopButton, #stopButtonWidget').click(async function() {
+                        $('#stopButtonWidget').addClass('hidden');
+                        $('#stopButton').addClass('hidden');
+                        $('#loaderTimerWidget').removeClass('hidden');
+                        $('#loaderTimer').removeClass('hidden');
                         await getLocation();
                         self.stopTimer();
                     });

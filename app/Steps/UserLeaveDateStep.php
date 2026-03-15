@@ -84,6 +84,7 @@ class UserLeaveDateStep extends Step
                     if ($isHoliday) {
                         $nonWorkingDays++;
                     } else {
+                        $allDayshasWorkBlock = true;
                         $workingDays++;
                     }
                 } else {
@@ -102,6 +103,7 @@ class UserLeaveDateStep extends Step
                 }
             }
         }
+
 
         if (!$allDayshasWorkBlock) {
             $status = 'oczekujące';

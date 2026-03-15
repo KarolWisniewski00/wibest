@@ -4,9 +4,10 @@
 'emptyMessage' => 'Brak danych do wyświetlenia.',
 'checkBox' => true,
 'radio' => false,
+'showMobile' => false, // nowa zmienna
 ])
 
-<table id="table" class="w-full text-sm text-left text-gray-900 dark:text-gray-400 hidden md:table">
+<table id="table" class="w-full text-sm text-left text-gray-900 dark:text-gray-400 {{ $showMobile ? 'table-auto md:table' : 'hidden md:table' }}">
     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
         <tr>
             @if($checkBox)

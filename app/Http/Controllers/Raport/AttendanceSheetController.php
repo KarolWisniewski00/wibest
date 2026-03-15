@@ -149,7 +149,7 @@ class AttendanceSheetController extends Controller
 
             $employees[0]->time_in_work_under += $totalDayUnder;
             $employees[0]->time_in_work += $totalDay;
-            $employees[0]->time_in_work_extra += $totalDayExtra;
+            //$employees[0]->time_in_work_extra += $totalDayExtra;
             if ($totalDayUnder != 0) {
                 $datesUnder[$key] = sprintf('%02dh %02dmin', floor($totalDayUnder / 3600), floor(($totalDayUnder % 3600) / 60));
             } else {
@@ -177,6 +177,7 @@ class AttendanceSheetController extends Controller
                 } else {
                     $employees[0]->time_in_work_planned += $totalDayPlanned;
                     $datesPlanned[$key] = sprintf('%02dh', floor($totalDayPlanned / 3600));
+                    $totalDayPlannedVarBufor = $totalDayPlanned;
                 }
             } else {
                 $datesPlanned[$key] = sprintf('%02dh', 0);
@@ -205,8 +206,35 @@ class AttendanceSheetController extends Controller
             } catch (\Exception $e) {
                 $datesWork[$key] = '';
             }
+            //liczenie nadgodzin i zadań w rekordzie
+            if ($employees[0]->overtime) {
+                if ($totalDayExtra > ($employees[0]->overtime_threshold * 60)) {
+                    if ($employees[0]->overtime_task) {
+                        if ($employees[0]->overtime_accept) {
+                            $totalDayExtraWithTaskAccepted = $workSessionRepository->getTotalOfDayExtraWithTaskAccepted($employees[0]->id, $date);
+                            $employees[0]->time_in_work_extra += $totalDayExtraWithTaskAccepted;
+                            $employees[0]->time_in_work -= $totalDayExtra;
+                            $employees[0]->time_in_work += $totalDayExtraWithTaskAccepted;
+                        } else {
+                            $totalDayExtraWithTask = $workSessionRepository->getTotalOfDayExtraWithTask($employees[0]->id, $date);
+                            $employees[0]->time_in_work_extra += $totalDayExtraWithTask;
+                            $employees[0]->time_in_work -= $totalDayExtra;
+                            $employees[0]->time_in_work += $totalDayExtraWithTask;
+                        }
+                    } else {
+                        $employees[0]->time_in_work_extra += $totalDayExtra;
+                    }
+                } else {
+                    $totalDayExtra = 0;
+                }
+            }
 
             if ($totalDay != 0) {
+                if ($totalDayExtra == 0 && $totalDayUnder == 0 ) {
+                    $employees[0]->time_in_work -= $totalDay;
+                    $totalDay = $totalDayPlannedVarBufor;
+                    $employees[0]->time_in_work += $totalDay;
+                }
                 $hours = floor($totalDay / 3600);
                 $min = floor(($totalDay % 3600) / 60);
                 $totalDay = sprintf('%02dh  %02dmin', $hours, $min);
@@ -217,9 +245,14 @@ class AttendanceSheetController extends Controller
             }
 
             if ($totalDayExtra != 0) {
+                //zmiana jednostki
                 $hours = floor($totalDayExtra / 3600);
                 $minutes = floor(($totalDayExtra % 3600) / 60);
-                $totalDayExtra = sprintf('%02dh %02dmin', $hours, $minutes);
+                if ($totalDayExtra == 0) {
+                    $totalDayExtra = '';
+                } else {
+                    $totalDayExtra = sprintf('%02dh  %02dmin', $hours, $minutes);
+                }
 
                 $datesExtra[$key] = $totalDayExtra;
             } else {

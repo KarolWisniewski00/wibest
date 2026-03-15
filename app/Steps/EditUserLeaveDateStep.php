@@ -85,6 +85,7 @@ class EditUserLeaveDateStep extends Step
                     if ($isHoliday) {
                         $nonWorkingDays++;
                     } else {
+                        $allDayshasWorkBlock = true;
                         $workingDays++;
                     }
                 } else {

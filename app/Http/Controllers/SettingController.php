@@ -23,9 +23,9 @@ class SettingController extends Controller
         $user = User::where('id', $user_id)->first();
         $msg = SentMessage::where('company_id', $this->get_company_id())->orderByDesc('created_at')->get();
         if ($user->role == 'admin' || $user->role == 'menedżer' || $user->role == 'właściciel')
-            $msg_paginate = SentMessage::where('company_id', $this->get_company_id())->orderByDesc('created_at')->paginate(10);
+            $msg_paginate = SentMessage::where('company_id', $this->get_company_id())->orderByDesc('created_at')->paginate(3);
         else {
-            $msg_paginate = SentMessage::where('company_id', $this->get_company_id())->where('user_id', $user_id)->orderByDesc('created_at')->paginate(10);
+            $msg_paginate = SentMessage::where('company_id', $this->get_company_id())->where('user_id', $user_id)->orderByDesc('created_at')->paginate(3);
         }
         return view('admin.setting.index', compact('users', 'client', 'msg', 'msg_paginate'));
     }

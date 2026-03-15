@@ -24,7 +24,7 @@ class LeaveService
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
 
-        return $leaveRepository->paginateByUserId(10, $startDate, $endDate);
+        return $leaveRepository->paginateByUserId(3, $startDate, $endDate);
     }
     /**
      * Zwraca wnioski dla menedżera w zakresie dat.
@@ -38,7 +38,7 @@ class LeaveService
         $startDate = $request->session()->get('start_date');
         $endDate = $request->session()->get('end_date');
 
-        return $leaveRepository->paginateByManagerId(10, $startDate, $endDate);
+        return $leaveRepository->paginateByManagerId(3, $startDate, $endDate);
     }
     /**
      * Zwraca wnioski dla menedżera w stronie głównej

@@ -370,7 +370,7 @@
                 @if($user->working_hours_regular == 'stały planing')
                 @if($user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
                 @php
-                $colSpan = 'col-span-2';
+                $colSpan = 'md:col-span-2';
                 @endphp
                 <x-container-gray>
                     <x-text-cell>
@@ -420,7 +420,7 @@
                 </x-container-gray>
                 @else
                 @php
-                $colSpan = 'col-span-2';
+                $colSpan = 'md:col-span-2';
                 @endphp
                 <x-container-gray>
                     <x-text-cell>
@@ -561,12 +561,102 @@
                 @endif
             </div>
             <!--PRZYCISKI-->
+            @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel' || $user->id == auth()->user()->id)
+            <!--HEADER-->
+            <div class="flex flex-col w-full md:pt-4">
+                <x-h1-display class="text-center md:text-start my-4 md:my-0">
+                    📝 Wykorzystane wnioski {{ \Carbon\Carbon::now()->year }}
+                </x-h1-display>
+            </div>
+            <!--HEADER-->
+            <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-4 md:py-4 w-full">
+                @php
+                $leaves_counter = 0;
+                @endphp
+                @foreach($leaves_used as $type => $leave)
+                @if($leave['zrealizowane']['days'] != 0 ||
+                $leave['zrealizowane']['working_days'] != 0 ||
+                $leave['zrealizowane']['non_working_days'] != 0 ||
+                $leave['zaakceptowane']['days'] != 0 ||
+                $leave['zaakceptowane']['working_days'] != 0 ||
+                $leave['zaakceptowane']['non_working_days'] != 0 )
+                @php
+                $leaves_counter++;
+                @endphp
+                <x-widget-display-nav class="w-full">
+                    <div class="flex flex-col w-full md:pt-4 md:px-4">
+                        <div>
+                            <div class="flex flex-col items-center justify-center h-full w-full">
+                                <span class="text-lg md:text-xl">
+                                    {{ config('leavetypes.icons.' . $type, '') }}
+                                </span>
+                                <x-label-pink class="mt-1">
+                                    {{ config('leavetypes.shortType.' . $type, '') }}
+                                </x-label-pink>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex flex-col items-center justify-center gap-2 mt-2 my-auto">
+                                <x-paragraf-display class="text-xs whitespace-nowrap font-semibold w-fit text-start relative">
+                                    {{ $type }}
+                                </x-paragraf-display>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex flex-col items-center justify-center gap-2 mt-2 my-auto">
+                                <x-paragraf-display class="pb-2 border-b border-gray-300 dark:border-gray-600 text-xs whitespace-nowrap flex flex-row gap-2">
+                                    <x-status-green>
+                                        Zrealizowane
+                                    </x-status-green>
+                                    <x-status-cello>
+                                        {{ $leave['zrealizowane']['days'] }} dni
+                                    </x-status-cello>
+                                    <x-status-orange>
+                                        {{ $leave['zrealizowane']['working_days'] }} robocze
+                                    </x-status-orange>
+                                    <x-status-green>
+                                        {{ $leave['zrealizowane']['non_working_days'] }} wolne
+                                    </x-status-green>
+                                </x-paragraf-display>
+                                <x-paragraf-display class="text-xs whitespace-nowrap flex flex-row gap-2 opacity-25">
+                                    <x-status-green>
+                                        Zaakceptowane
+                                    </x-status-green>
+                                    <x-status-cello>
+                                        {{ $leave['zaakceptowane']['days'] }} dni
+                                    </x-status-cello>
+                                    <x-status-orange>
+                                        {{ $leave['zaakceptowane']['working_days'] }} robocze
+                                    </x-status-orange>
+                                    <x-status-green>
+                                        {{ $leave['zaakceptowane']['non_working_days'] }} wolne
+                                    </x-status-green>
+                                </x-paragraf-display>
+                            </div>
+                        </div>
+                    </div>
+                </x-widget-display-nav>
+                @endif
+                @endforeach
+                @if($leaves_counter == 0)
+                <x-widget-display-nav class="w-full col-span-4">
+                    <x-empty-place />
+                </x-widget-display-nav>
+                @endif
+            </div>
+            <!--HEADER-->
+            <div class="flex flex-col w-full md:pt-4">
+                <x-h1-display class="text-center md:text-start my-4 md:my-0">
+                    📅 Kalendarz
+                </x-h1-display>
+            </div>
+            <!--HEADER-->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
                 <div class="md:col-span-2 md:-m-4">
                     <livewire:calendar-view userId="{{$user->id}}" />
                 </div>
             </div>
-
+            @endif
             <x-label class="py-2 mt-4">
                 Utworzono {{ $user->created_at }}
             </x-label>

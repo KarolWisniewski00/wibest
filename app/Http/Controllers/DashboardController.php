@@ -4,14 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Livewire\Calendar;
 use App\Models\Event;
+use App\Models\Leave;
 use App\Models\User;
 use App\Models\WorkBlock;
 use App\Models\WorkSession;
 use App\Repositories\WorkSessionRepository;
 use App\Services\LeaveService;
+use App\Services\SmsApi;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
@@ -71,7 +74,44 @@ class DashboardController extends Controller
             }
         }
 
-        return view('dashboard', compact('task', 'work_session'));
+        //Wykorzystane wnioski
+        $yearStart = Carbon::now()->startOfYear();
+        $yearEnd = Carbon::now()->endOfYear();
+
+        $leaves = Leave::selectRaw("
+        type,
+        status,
+        SUM(days) as days,
+        SUM(working_days) as working_days,
+        SUM(non_working_days) as non_working_days
+    ")
+            ->where('user_id', Auth::id())
+            ->where('start_date', '<=', $yearEnd)
+            ->where('end_date', '>=', $yearStart)
+            ->whereIn('status', ['zaakceptowane', 'zrealizowane'])
+            ->groupBy('type', 'status')
+            ->get();
+
+        $leaves_used = $leaves->groupBy('type')->map(function ($items) {
+
+            $accepted = $items->firstWhere('status', 'zaakceptowane');
+            $realized = $items->firstWhere('status', 'zrealizowane');
+
+            return [
+                'zaakceptowane' => [
+                    'days' => $accepted->days ?? 0,
+                    'working_days' => $accepted->working_days ?? 0,
+                    'non_working_days' => $accepted->non_working_days ?? 0,
+                ],
+                'zrealizowane' => [
+                    'days' => $realized->days ?? 0,
+                    'working_days' => $realized->working_days ?? 0,
+                    'non_working_days' => $realized->non_working_days ?? 0,
+                ],
+            ];
+        });
+        $user = Auth::user();
+        return view('dashboard', compact('task', 'work_session', 'leaves_used', 'user'));
     }
 
     public function version()

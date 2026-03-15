@@ -28,6 +28,7 @@
                 :headers="['Nazwa', 'Zaplanowany czas pracy', 'Wnioski + Czas pracy', 'Czas pracy', 'Nadgodziny', 'Brak normy', 'Wnioski']"
                 :items="$users"
                 :radio="true"
+                :showMobile="true"
                 emptyMessage="Brak użytkowników do wyświetlenia.">
                 @foreach($users as $user)
                 <x-row-attendance :user="$user" />

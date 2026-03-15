@@ -20,7 +20,7 @@ class ClientController extends Controller
     public function index()
     {
         $companies = Company::orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
 
         foreach ($companies as $key => $company) {
             $company->msg = SentMessage::where('company_id', $company->id)->orderByDesc('created_at')->get();
@@ -32,7 +32,7 @@ class ClientController extends Controller
     public function get(Request $request)
     {
         $clients = Company::orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
 
         $rows_table = [];
         $rows_list = [];
@@ -57,7 +57,7 @@ class ClientController extends Controller
     {
         $users = User::where('company_id', $client->id)->get();
         $msg = SentMessage::where('company_id', $client->id)->orderByDesc('created_at')->get();
-        $msg_paginate = SentMessage::where('company_id', $client->id)->orderByDesc('created_at')->paginate(10);
+        $msg_paginate = SentMessage::where('company_id', $client->id)->orderByDesc('created_at')->paginate(3);
         return view('admin.client.show', compact('client', 'users', 'msg', 'msg_paginate'));
     }
 

@@ -320,7 +320,7 @@ class RCPController extends Controller
     }
     public function get(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 3);
 
 
         if ($request->filled('filter_user_id')) {

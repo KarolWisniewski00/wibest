@@ -187,9 +187,9 @@
                 <x-loader-planing id="loader" />
             </x-table-calendar>
             <!--PC VIEW-->
-            <x-loader-script>
+            <x-loader-script-calendar>
                 {{ route('api.v1.calendar.work-schedule.get') }}
-            </x-loader-script>
+            </x-loader-script-calendar>
         </x-container-content-calendar>
         @endif
     </x-main>

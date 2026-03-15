@@ -6,7 +6,7 @@
         /* Wysokość A4 w pikselach */
         background-color: white;
         /* Białe tło, jak kartka papieru */
-        margin: 20px auto;
+        margin: auto;
         /* Środek strony z marginesem */
         padding: 40px;
         /* Wewnętrzny margines (odstęp od krawędzi) */

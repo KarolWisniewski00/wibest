@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Leave;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DateRequest;
+use App\Livewire\CalendarView;
 use App\Mail\LeaveMailAccept;
 use App\Mail\LeaveMailReject;
 use App\Mail\LeaveMailCancel;
 use App\Models\Leave;
 use App\Models\SentMessage;
 use App\Models\WorkBlock;
+use App\Repositories\WorkSessionRepository;
 use App\Services\FilterDateService;
 use App\Services\LeaveService;
 use App\Services\SmsApi;
@@ -104,17 +106,28 @@ class LeavePendingReviewController extends Controller
      */
     public function accept(Leave $leave): \Illuminate\Http\RedirectResponse
     {
+        $startDate = Carbon::parse($leave->start_date)->startOfDay();
+        $endDate   = Carbon::parse($leave->end_date)->endOfDay();
+
+        $currentDate = $startDate->copy();
+        $working_days = 0;
+        $non_working_days = 0;
+        $has_working_day = false;
+
+        $calendar = new CalendarView();
+
         if ($leave->user->working_hours_regular == 'zmienny planing') {
-
-            $startDate = Carbon::parse($leave->start_date)->startOfDay();
-            $endDate   = Carbon::parse($leave->end_date)->endOfDay();
-
-            $currentDate = $startDate->copy();
-            $working_days = 0;
-            $non_working_days = 0;
-            $has_working_day = false;
-
             while ($currentDate->lte($endDate)) {
+                $holidays = $calendar->getPublicHolidays($currentDate->year);
+                $dateStr = $currentDate->format('Y-m-d');
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($currentDate->month == 1 && $currentDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($currentDate->month == 1 && $currentDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
 
                 // sprawdzamy czy w danym dniu istnieje jakikolwiek workBlock
                 $hasWorkBlock = WorkBlock::where('user_id', $leave->user_id)
@@ -122,21 +135,54 @@ class LeavePendingReviewController extends Controller
                     ->exists();
 
                 if ($hasWorkBlock) {
-                    $has_working_day = true;
-                    $working_days++;
-                }else{
+                    if ($isHoliday) {
+                        $non_working_days++;
+                    } else {
+                        $has_working_day = true;
+                        $working_days++;
+                    }
+                } else {
                     $non_working_days++;
                 }
-                
+
 
                 $currentDate->addDay();
             }
-            if(!$has_working_day){
+            if (!$has_working_day) {
                 return redirect()->route('leave.pending.index')->with('fail', 'Brak zaplanowanej pracy');
-            }else{
+            } else {
                 $leave->working_days = $working_days;
                 $leave->non_working_days = $non_working_days;
             }
+        } else if ($leave->user->working_hours_regular == 'stały planing') {
+            while ($currentDate->lte($endDate)) {
+                $holidays = $calendar->getPublicHolidays($currentDate->year);
+                $dateStr = $currentDate->format('Y-m-d');
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($currentDate->month == 1 && $currentDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($currentDate->month == 1 && $currentDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+
+                // sprawdzamy czy w danym dniu istnieje jakikolwiek workBlock
+                $wsr = new WorkSessionRepository();
+                $planned = $wsr->getTotalOfDayPlanned($leave->user_id, $currentDate->format('d.m.y'));
+                if ($planned > 0) {
+                    if ($isHoliday) {
+                        $non_working_days++;
+                    } else {
+                        $working_days++;
+                    }
+                } else {
+                    $non_working_days++;
+                }
+                $currentDate->addDay();
+            }
+            $leave->working_days = $working_days;
+            $leave->non_working_days = $non_working_days;
         }
         $leave->status = 'zaakceptowane';
         $leave->save();

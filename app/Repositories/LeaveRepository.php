@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 
 class LeaveRepository
 {
-    public function getPaginatedForCurrentUser(int $perPage = 10, ?string $startDate = null, ?string $endDate = null)
+    public function getPaginatedForCurrentUser(int $perPage = 3, ?string $startDate = null, ?string $endDate = null)
     {
         if ($this->isAdmin()) {
             return $this->getAllForCompanyPaginated($perPage, $startDate, $endDate);

@@ -122,17 +122,11 @@
 
 <body>
     <div class="invoice-header">
-        @if($invoice['invoice_type'] == 'faktura')
-        <p><span>Faktura numer</span><h2 class="h2">{{ $invoice['number'] }}</h2></p>
-        @elseif($invoice['invoice_type'] == 'faktura sprzedażowa')
-        <p><span>Faktura numer</span><h2 class="h2">{{ $invoice['number'] }}</h2></p>
-        @else
-        <p><span>Faktura pro-forma numer</span><h2 class="h2">{{ $invoice['number'] }}</h2></p>
-        @endif
-        <p><span>Data wystawienia:</span> {{ $invoice['issue_date'] }}</p>
-        <p><span>Data sprzedaży:</span> {{ $invoice['sale_date'] }}</p>
-        <p><span>Termin płatności:</span> {{ $invoice['due_date'] }}</p>
-        <p><span>Płatność:</span> {{ $invoice['payment_method'] }}</p>
+        <p><span>Faktura numer</span><h2 class="h2">1/03/2026</h2></p>
+        <p><span>Data wystawienia:</span> 2026-03-11</p>
+        <p><span>Data sprzedaży:</span> 2026-03-11</p>
+        <p><span>Termin płatności:</span> 2026-03-18</p>
+        <p><span>Płatność:</span> przelew</p>
     </div>
     <div class="divider"></div>
 
@@ -140,19 +134,16 @@
         <tr>
             <td class="seller">
                 <h2 class="h2">Sprzedawca</h2>
-                <p>{{ $invoice['seller']['name'] }}</p>
-                <p>{{ $invoice['seller']['address'] }}</p>
-                <p><span>NIP:</span> {{ $invoice['seller']['tax_id'] }}</p>
-                @if($invoice['seller']['bank'] == '')
-                @else
-                <p><span>Numer konta:</span> {{ $invoice['seller']['bank'] }}</p>
-                @endif
+                <p>Karol Wiśniewski WIBEST</p>
+                <p>Sielecka 63, 42-500, Będzin</p>
+                <p><span>NIP:</span> 8992998536</p>
+                <p><span>Numer konta:</span> 65 1050 1227 1000 0090 8643 8406</p>
             </td>
             <td class="buyer">
                 <h2 class="h2">Nabywca</h2>
-                <p>{{ $invoice['client']['name'] }}</p>
-                <p>{{ $invoice['client']['address'] }}</p>
-                <p><span>NIP:</span> {{ $invoice['client']['tax_id'] }}</p>
+                <p>Fox II. Sklep z art. skórzanymi i obuwiem. Guziak W.</p>
+                <p>Krupówki 25, 34-500 Zakopane, woj. małopolskie</p>
+                <p><span>NIP:</span> 7361185964</p>
             </td>
         </tr>
     </table>
@@ -172,36 +163,32 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($invoice['items'] as $key => $item)
             <tr>
-                <td>{{$key + 1}}.</td>
-                <td>{{ $item['name'] }}</td>
-                <td>{{ $item['quantity'] }} {{ $item['unit'] }}</td>
-                <td>{{ number_format($item['unit_price'], 2) }} PLN</td>
-                <td>{{ number_format($item['subtotal'], 2) }} PLN</td>
-                <td>{{ $item['vat_rate'] }} %</td>
-                <td>{{ $item['vat_amount'] }} PLN</td>
-                <td>{{ number_format($item['total'], 2) }} PLN</td>
+                <td>1.</td>
+                <td>Usługa informatyczna</td>
+                <td>1 szt</td>
+                <td>2571.00 PLN</td>
+                <td>2571.00 PLN</td>
+                <td>0 %</td>
+                <td>0.00 PLN</td>
+                <td>2571.00 PLN</td>
             </tr>
-            @endforeach
         </tbody>
     </table>
 
     <div class="summary">
         <h2 class="h2">Podsumowanie</h2>
-        <p>Razem netto: {{ $invoice['subtotal'] }} PLN</p>
-        <p>VAT: {{ $invoice['vat'] }} PLN</p>
-        <p>Razem brutto: {{ $invoice['total'] }} PLN</p>
+        <p>Razem netto: 2571.00 PLN</p>
+        <p>VAT: 0.00 PLN</p>
+        <p>Razem brutto: 2571.00 PLN</p>
     </div>
     <div class="summary">
         <h2 class="h2">Słownie</h2>
-        <p>{{ $invoice['total_in_words'] }}</p>
+        <p>dwa tysiące pięćset siedemdziesiąt jeden złotych 00/100</p>
     </div>
-    @if($invoice['notes'] != null)
     <div class="divider"></div>
     <h2 class="h2">Uwagi</h2>
-    <p>{{$invoice['notes']}}</p>
-    @endif
+    <p>Produkcja strony WWW obuwiepremium.pl i obuwie-premium.pl<br>+ aktualizacja i zmiany na stronie</p>
 
     <!-- Napis w lewym dolnym rogu -->
     <div class="footer-left">

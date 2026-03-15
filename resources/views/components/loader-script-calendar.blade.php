@@ -61,9 +61,6 @@
                 if (data.next_page_url) {
                     page++;
                     loading = false;
-                    if (isWindowScrollable()) {} else {
-                        loadMoreSessions();
-                    }
                 } else {
                     $(window).off('scroll'); // koniec danych
                     $loader.addClass('hidden');
@@ -71,18 +68,11 @@
                 }
             });
         }
-
-        function isWindowScrollable() {
-            return document.documentElement.scrollHeight > window.innerHeight;
-        }
-
-        // Event scroll
-        $(window).on('scroll', function() {
-            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+        $('#max-h-js').on('scroll', function() {
+            if ($('#max-h-js').scrollTop() + $('#max-h-js').height() >= $('#max-h-js').height() - 100) {
                 loadMoreSessions();
             }
         });
-
         loadMoreSessions(); // wczytaj pierwszą stronę
     });
 </script>

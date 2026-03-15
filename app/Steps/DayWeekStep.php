@@ -19,8 +19,30 @@ class DayWeekStep extends Step
     public function save($state)
     {
         $user = User::findOrFail($state['user_id']);
+
         $user->working_hours_start_day = $state['working_hours_start_day'];
         $user->working_hours_stop_day = $state['working_hours_stop_day'];
+
+        $days = [
+            'poniedziałek' => 'working_mon',
+            'wtorek' => 'working_tue',
+            'środa' => 'working_wed',
+            'czwartek' => 'working_thu',
+            'piątek' => 'working_fri',
+            'sobota' => 'working_sat',
+            'niedziela' => 'working_sun',
+        ];
+
+        $dayKeys = array_keys($days);
+
+        $startIndex = array_search($state['working_hours_start_day'], $dayKeys);
+        $endIndex = array_search($state['working_hours_stop_day'], $dayKeys);
+
+        foreach ($days as $dayName => $column) {
+            $index = array_search($dayName, $dayKeys);
+            $user->$column = $index >= $startIndex && $index <= $endIndex;
+        }
+
         $user->save();
     }
     public function icon(): string

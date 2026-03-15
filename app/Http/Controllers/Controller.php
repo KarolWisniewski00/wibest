@@ -119,14 +119,14 @@ class Controller extends BaseController
         return Event::where('company_id', $this->get_company_id())
             ->where('user_id', auth()->id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->paginate(10);
+            ->paginate(3);
     }
     public function get_work_sessions_logged_user()
     {
         return WorkSession::where('company_id', $this->get_company_id())
             ->where('user_id', auth()->id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->paginate(10);
+            ->paginate(3);
     }
     public function get_work_sessions_logged_user_by_get()
     {
@@ -150,7 +150,7 @@ class Controller extends BaseController
     {
         return Invoice::where('company_id', $this->get_company_id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->take(3)                       // Pobranie tylko pierwszych 3 rekordów
             ->get();
     }
     /**
@@ -160,7 +160,7 @@ class Controller extends BaseController
     {
         return WorkSession::where('company_id', $this->get_company_id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->take(3)                       // Pobranie tylko pierwszych 3 rekordów
             ->get();
     }
     /**
@@ -170,7 +170,7 @@ class Controller extends BaseController
     {
         return Client::where('company_id', $this->get_company_id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->take(3)                       // Pobranie tylko pierwszych 3 rekordów
             ->get();
     }
     /**
@@ -189,13 +189,13 @@ class Controller extends BaseController
     {
         return WorkSession::where('company_id', $this->get_company_id())
             ->orderBy('created_at', 'desc')  // Sortowanie malejąco
-            ->paginate(10);
+            ->paginate(3);
     }
     public function get_all_events()
     {
         return Event::where('company_id', $this->get_company_id())
             ->orderBy('created_at', 'desc')  // Sortowanie malejąco
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca wszystkich klientów
@@ -214,7 +214,7 @@ class Controller extends BaseController
         return Invoice::where('company_id', $this->get_company_id())
             ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca historię czasu pracy domyślnie
@@ -240,7 +240,7 @@ class Controller extends BaseController
     {
         return Client::where('company_id', $this->get_company_id())
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
 
     public function get_projects()
@@ -256,7 +256,7 @@ class Controller extends BaseController
     {
         return Offer::where('company_id', $this->get_company_id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->take(3)                       // Pobranie tylko pierwszych 3 rekordów
             ->get();
     }
     /**
@@ -276,7 +276,7 @@ class Controller extends BaseController
         return Offer::where('company_id', $this->get_company_id())
             ->orderBy('issue_date', 'desc')  // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca sugestie faktur, ostatnio aktualizowane
@@ -285,7 +285,7 @@ class Controller extends BaseController
     {
         return Cost::where('company_id', $this->get_company_id())
             ->orderBy('updated_at', 'desc')  // Sortowanie malejąco
-            ->take(10)                       // Pobranie tylko pierwszych 10 rekordów
+            ->take(3)                       // Pobranie tylko pierwszych 3 rekordów
             ->get();
     }
     /**
@@ -305,7 +305,7 @@ class Controller extends BaseController
         return Cost::where('company_id', $this->get_company_id())
             ->orderBy('due_date', 'desc')  // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca faktury za pomocą miesiąca i roku
@@ -317,7 +317,7 @@ class Controller extends BaseController
             ->whereYear('issue_date', $currentYear)    // Tylko bieżący rok
             ->orderBy('issue_date', 'desc')            // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca historię czasu pracy za pomocą miesiąca i roku
@@ -329,7 +329,7 @@ class Controller extends BaseController
             ->whereYear('start_time', $currentYear)    // Tylko bieżący rok
             ->orderBy('start_time', 'desc')            // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca oferty za pomocą miesiąca i roku
@@ -341,7 +341,7 @@ class Controller extends BaseController
             ->whereYear('issue_date', $currentYear)    // Tylko bieżący rok
             ->orderBy('issue_date', 'desc')            // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca faktury za pomocą miesiąca i roku
@@ -353,7 +353,7 @@ class Controller extends BaseController
             ->whereYear('due_date', $currentYear)    // Tylko bieżący rok
             ->orderBy('issue_date', 'desc')            // Sortowanie malejąco
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(3);
     }
     /**
      * Zwraca faktury po nazwie
@@ -368,7 +368,7 @@ class Controller extends BaseController
                     });
             })
             ->orderBy('created_at', 'desc')
-            ->take(10) // Pobranie maksymalnie 10 wyników
+            ->take(3) // Pobranie maksymalnie 3 wyników
             ->get();
     }
     /**
@@ -384,7 +384,7 @@ class Controller extends BaseController
                     });
             })
             ->orderBy('created_at', 'desc')
-            ->take(10) // Pobranie maksymalnie 10 wyników
+            ->take(3) // Pobranie maksymalnie 3 wyników
             ->get();
     }
     /**
@@ -397,7 +397,7 @@ class Controller extends BaseController
                 $q->where('name', 'like', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
-            ->take(10) // Pobranie maksymalnie 10 wyników
+            ->take(3) // Pobranie maksymalnie 3 wyników
             ->get();
     }
     /**
@@ -410,7 +410,7 @@ class Controller extends BaseController
                 $q->where('number', 'like', "%{$query}%");
             })
             ->orderBy('created_at', 'desc')
-            ->take(10) // Pobranie maksymalnie 10 wyników
+            ->take(3) // Pobranie maksymalnie 3 wyników
             ->get();
     }
     /**

@@ -7,6 +7,7 @@ use App\Http\Requests\WorkSessionRequest;
 use App\Jobs\SendDelayed;
 use App\Jobs\SendNow;
 use App\Models\Event;
+use App\Models\Leave;
 use App\Models\Location;
 use App\Models\User;
 use App\Models\WorkBlock;
@@ -22,6 +23,35 @@ class WorkSessionController extends Controller
     {
         $now = Carbon::now();
         Carbon::setLocale('pl');
+
+        $isLeave = Leave::where('user_id', $user_id)
+            ->whereDate('start_date', '<=', $now)
+            ->whereDate('end_date', '>=', $now)
+            ->whereIn('status', ['zaakceptowane', 'zrealizowane'])
+            ->exists();
+        
+        if($isLeave){
+            return response()->json([
+                'message' => 'Praca nie może zostać rozpoczęta ponieważ jest już wniosek',
+                'work_session_id' => '',
+                'work_session_status' => '',
+                'work_session_start_time' => '',
+            ], 400);
+        }
+
+        $latestWorkSession = WorkSession::where('user_id', $user_id)
+            ->where('status', 'W trakcie pracy')
+            ->with('eventStart')
+            ->orderByDesc(Event::select('time')->whereColumn('events.id', 'work_sessions.event_start_id'))
+            ->first();
+        if ($latestWorkSession) {
+            return response()->json([
+                'message' => 'Praca została już rozpoczęta',
+                'work_session_id' => intval($latestWorkSession->id),
+                'work_session_status' => $latestWorkSession->status,
+                'work_session_start_time' => optional($latestWorkSession->eventStart)->time,
+            ], 400);
+        }
         if ($request->input('lat') == '' || $request->input('lon') == '') {
         } else {
             try {
