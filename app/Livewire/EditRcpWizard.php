@@ -108,7 +108,7 @@ class EditRcpWizard extends WizardComponent
 
         $this->dispatch(
             'time-and-type-selected',
-            data: [$state['start_time_clock'], $state['end_time_clock'], $night, $startDate],
+            data: [$state['start_time_clock'], $state['end_time_clock'], $night, $startDate, $state['user_id'], $state['work_session_id']],
             rcp: true,
         );
     }

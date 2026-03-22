@@ -4,29 +4,29 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <x-search-filter />
-        <x-filter-date loader="event">
-            {{ route('api.v1.rcp.event.set.date') }}
+        <x-filter-date loader="planing-smart">
+            {{ route('api.v1.calendar.work-smart.set.date') }}
         </x-filter-date>
         <input type="hidden" id="start_date" value="{{ $startDate }}">
         <input type="hidden" id="end_date" value="{{ $endDate }}">
     </x-sidebar-left>
     <!--SIDE BAR-->
-
-    <!--MAIN-->
     <x-main>
-        <x-RCP.nav :countEvents="$countEvents" />
-        <x-RCP.header>
-            <span>⏱️</span> Zdarzenia
-        </x-RCP.header>
+        <x-calendar.nav />
+        <!--HEADER-->
+        <x-calendar.header>
+            <span>📅</span> Uproszczony
+        </x-calendar.header>
+        <!--HEADER-->
         <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
             {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
         </x-status-cello>
         @php
         $showTable = true;
         @endphp
-        @if(session('report_key_rcp'))
+        @if(session('report_key'))
         @php
-        $reportKey = session('report_key_rcp');
+        $reportKey = session('report_key');
         $report = Cache::get($reportKey);
         @endphp
 
@@ -74,14 +74,14 @@
             </div>
         </div>
         @php
-        $reportKey = session('report_key_rcp');
+        $reportKey = session('report_key');
 
         if ($reportKey) {
         // 2. Usuwamy powiązany wpis z pamięci podręcznej (Cache)
         Cache::forget($reportKey);
 
         // 3. Usuwamy klucz sesji, aby nie odwoływać się do nieistniejącego cache
-        session()->forget('report_key_rcp');
+        session()->forget('report_key');
 
         // Opcjonalnie: Dodaj komunikat flash do wyświetlenia użytkownikowi
         // session()->flash('success', 'Dane raportu zostały pomyślnie usunięte z pamięci podręcznej.');
@@ -99,43 +99,25 @@
         @endif
         @endif
         @if($showTable)
-        <!--CONTENT-->
-        <x-container-content>
-            <!--MOBILE VIEW-->
-            <x-list :items="$events" emptyMessage="Brak użytkowników do wyświetlenia.">
-                <x-loader-event-card />
-                @foreach ($events as $event)
-                <x-card-event :event="$event" />
-                @endforeach
-                <x-loader-event-card id="loader-card" />
-            </x-list>
-            <!--MOBILE VIEW-->
-
+        <x-container-content-calendar class="rounded-lg">
             <!--PC VIEW-->
-            <x-table
-                :headers="['Nazwa', 'Status', 'Zdarzenie', 'Lokalizacja', 'Kiedy', 'Podgląd']"
-                :items="$events"
-                emptyMessage="Brak użytkowników do wyświetlenia.">
-                @foreach($events as $event)
-                <x-row-event :event="$event" />
+            <x-table-calendar-smart
+                :headers="array_merge(['Nazwa'], $dates)"
+                :items="$users"
+                emptyMessage="Brak użytkowników do wyświetlenia."
+                :checkBox="false">
+                @foreach($users as $user)
+                <x-row-planing-smart :user="$user" />
                 @endforeach
-                <x-loader-event id="loader" />
-            </x-table>
+                <x-loader-planing-smart id="loader" />
+            </x-table-calendar-smart>
             <!--PC VIEW-->
             <x-loader-script>
-                {{ route('api.v1.rcp.event.get') }}
+                {{ route('api.v1.calendar.work-smart.get') }}
             </x-loader-script>
-        </x-container-content>
+        </x-container-content-calendar>
         @endif
-        <!--CONTENT-->
-        @php
-        $file = 'RCP_' . str_replace(' ', '_', $company->name) . '_' . date('d_m_Y', strtotime($startDate)) . '_' . date('d_m_Y', strtotime($endDate));
-        @endphp
-        <x-download :file="$file">
-            {{ route('api.v1.rcp.event.export.xlsx') }}
-        </x-download>
     </x-main>
-    <!--MAIN-->
     @else
     @include('admin.elements.end_config')
     @endif

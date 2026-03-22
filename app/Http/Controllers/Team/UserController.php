@@ -6,6 +6,7 @@ use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordMail;
 use App\Models\Leave;
+use App\Models\SentMessage;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use App\Repositories\InvitationRepository;
@@ -96,8 +97,9 @@ class UserController extends Controller
                 ],
             ];
         });
+        $msg = SentMessage::where('user_id', $user->id)->orderByDesc('created_at')->get();
 
-        return view('admin.team.user', compact('user', 'invitations', 'leaves_used'));
+        return view('admin.team.user', compact('user', 'invitations', 'leaves_used', 'msg'));
     }
     public function restart(User $user)
     {

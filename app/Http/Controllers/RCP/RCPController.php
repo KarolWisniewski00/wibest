@@ -7,12 +7,14 @@ use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreWorkSessionRequest;
+use App\Livewire\CalendarView;
 use App\Mail\RcpMailTask;
 use App\Models\Event;
 use App\Models\SentMessage;
 use App\Models\User;
 use App\Models\WorkBlock;
 use App\Repositories\EventRepository;
+use App\Repositories\WorkSessionRepository;
 use App\Services\FilterDateService;
 use App\Services\UserService;
 use App\Services\WorkSessionService;
@@ -137,7 +139,7 @@ class RCPController extends Controller
             'event_type' => 'task',
             'status' => $status,
             'note' => $request->content,
-            'user_id' => Auth::id(),
+            'user_id' => $work_session->user->id,
             'company_id' => $this->get_company_id_by_user_id(Auth::id()),
             'created_user_id' => Auth::id(),
         ]);
@@ -228,10 +230,49 @@ class RCPController extends Controller
         $task = null;
         $task = $work_session->getAlertTask();
 
+        $workSessionRepository = new WorkSessionRepository();
+        $under = '';
+        $user = $work_session->user;
+
+        $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($work_session->user->id, Carbon::parse($work_session->eventStart->time)->format('d.m.y'));
+        if ($totalDayUnder != 0) {
+            $under = 'under';
+        }
+        //liczenie nadgodzin i zadań w rekordzie
+        $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, Carbon::parse($work_session->eventStart->time)->format('d.m.y'));
+        $extra = '';
+        if ($user->overtime) {
+            if ($totalDayExtra > ($user->overtime_threshold * 60)) {
+                if ($user->overtime_task) {
+                    if ($user->overtime_accept) {
+                        $totalDayExtraWithTaskAccepted = $workSessionRepository->getTotalOfDayExtraWithTaskAccepted($user->id, Carbon::parse($work_session->eventStart->time)->format('d.m.y'));
+                        if ($totalDayExtraWithTaskAccepted == 0) {
+                            $extra = 'extra';
+                        } else {
+                            $extra = 'task';
+                        }
+                    } else {
+                        $totalDayExtraWithTask = $workSessionRepository->getTotalOfDayExtraWithTask($user->id, Carbon::parse($work_session->eventStart->time)->format('d.m.y'));
+                        if ($totalDayExtraWithTask == 0) {
+                            $extra = 'extra';
+                        } else {
+                            $extra = 'task';
+                        }
+                    }
+                } else {
+                    $user->time_in_work_extra += $totalDayExtra;
+                    $extra = 'extra';
+                }
+            } else {
+                $totalDayExtra = 0;
+                $extra = '';
+            }
+        }
+
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
         $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
-        return view('admin.rcp.show', compact('work_session', 'task', 'countEvents'));
+        return view('admin.rcp.show', compact('work_session', 'task', 'countEvents', 'under', 'extra'));
     }
     /**
      * przesuwa stop, do startu dodaje liczbe godzin.
@@ -284,6 +325,45 @@ class RCPController extends Controller
         $work_session->time_in_work = $timeInWork;
         $work_session->save();
         return redirect()->route('rcp.work-session.show', $work_session)->with('success', 'Operacja się powiodła.');
+    }
+    public function stop(WorkSession $work_session)
+    {
+        $start = Carbon::parse($work_session->eventStart->time);
+        $now = Carbon::now();
+
+        // policz różnicę w sekundach
+        $seconds = $start->diffInSeconds($now);
+
+        // limit do 24h (86400 sekund)
+        $seconds = min($seconds, 86400);
+
+        // ustaw stop = start + max 24h (jeśli przekroczono)
+        $stop = $seconds === 86400 ? $start->copy()->addSeconds(86400) : $now;
+
+        // zapisz stop
+        $eventStop = Event::create([
+            'time' => $stop,
+            'location_id' => null,
+            'device' => '',
+            'event_type' => 'stop',
+            'user_id' => $work_session->user_id,
+            'company_id' => $work_session->company_id,
+            'created_user_id' => Auth::id(),
+        ]);
+
+        // zapisz czas pracy
+        $save_time_in_work = gmdate('H:i:s', $seconds);
+        if($save_time_in_work == '00:00:00'){
+            $save_time_in_work = '24:00:00';
+        }
+        $work_session->time_in_work = $save_time_in_work;
+        $work_session->event_stop_id = $eventStop->id;
+        $work_session->status = 'Praca zakończona';
+        $work_session->save();
+
+        return redirect()
+            ->route('rcp.work-session.show', $work_session)
+            ->with('success', 'Operacja się powiodła.');
     }
     /**
      * Usuwa sesję pracy wraz z powiązanymi eventami i lokalizacjami eventów.
@@ -471,5 +551,104 @@ class RCPController extends Controller
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
         $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
         return view('admin.rcp.create', compact('date_str', 'user', 'users', 'userId', 'countEvents'));
+    }
+    public function fix(WorkSession $work_session)
+    {
+        $workSessionRepository = new WorkSessionRepository();
+        $calendar = new CalendarView();
+
+        if ($work_session->user->working_hours_regular == 'zmienny planing') {
+            //zamień dzień rozpoczęcia na carbon
+            $carbonDate = Carbon::parse($work_session->eventStart->time);
+            //pobierasz holidays
+            $holidays = $calendar->getPublicHolidays($carbonDate->year);
+            //zmieniasz date na string do mapy holidays
+            $dateStr = $carbonDate->format('Y-m-d');
+            //pobierasz planing zmienny
+            $totalDayPlannedVar = WorkBlock::where('user_id', $work_session->user->id)
+                ->whereDate('starts_at', $carbonDate->toDateString())
+                ->first();
+
+            //sprawdzasz czy dziś święto
+            if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                $isHoliday = true; // Nowy Rok
+            } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                $isHoliday = true; // Trzech Króli
+            } else {
+                $isHoliday = $holidays->contains($dateStr);
+            }
+
+            if (!$isHoliday) {
+                //jeśli nie ma święta
+                $totalDayPlannedVarBufor = $totalDayPlannedVar->duration_seconds ?? 0;
+                if ($totalDayPlannedVarBufor != 0) {
+                    //jeśli jest praca pobierz planing i zapisz według planingu
+                    $newStart = Carbon::parse($totalDayPlannedVar->starts_at);
+                    $newStop = Carbon::parse($totalDayPlannedVar->ends_at);
+                    $work_session->eventStart->time = $newStart->format('Y-m-d H:i:s');
+                    $work_session->eventStop->time  = $newStop->format('Y-m-d H:i:s');
+                    $work_session->eventStart->save();
+                    $work_session->eventStop->save();
+
+                    $work_session->time_in_work = gmdate('H:i:s', $totalDayPlannedVarBufor);
+                    $work_session->save();
+                    return redirect()->route('raport.time-sheet.index')->with('success', 'Operacja zakończona powodzeniem.');
+                } else {
+                    return redirect()->route('raport.time-sheet.index')->with('fail', 'Brak zaplanowanej pracy.');
+                }
+            } else {
+                return redirect()->route('raport.time-sheet.index')->with('fail', 'Święto.');
+            }
+        } else {
+            //zamień dzień rozpoczęcia na carbon
+            $carbonDate = Carbon::parse($work_session->eventStart->time);
+            //pobierasz holidays
+            $holidays = $calendar->getPublicHolidays($carbonDate->year);
+            //zmieniasz date na string do mapy holidays
+            $dateStr = $carbonDate->format('Y-m-d');
+            //pobierasz planing
+            $totalDayPlanned = $workSessionRepository->getTotalOfDayPlanned($work_session->user->id, $carbonDate->format('d.m.y'));
+
+            //sprawdzasz czy dziś święto
+            if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                $isHoliday = true; // Nowy Rok
+            } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                $isHoliday = true; // Trzech Króli
+            } else {
+                $isHoliday = $holidays->contains($dateStr);
+            }
+
+            if (!$isHoliday) {
+                //jeśli nie ma święta
+                $totalDayPlannedVarBufor = $totalDayPlanned ?? 0;
+                if ($totalDayPlannedVarBufor != 0) {
+                    //jeśli jest praca pobierz planing i zapisz według planingu
+                    $originalDate = Carbon::parse($work_session->eventStart->time);
+
+                    $from = $work_session->user->working_hours_from;
+                    $to   = $work_session->user->working_hours_to;
+
+                    $newStart = $originalDate->copy()->setTime($from->hour, $from->minute, $from->second);
+                    $newStop  = $originalDate->copy()->setTime($to->hour, $to->minute, $to->second);
+
+                    $work_session->eventStart->time = $newStart->format('Y-m-d H:i:s');
+                    $work_session->eventStop->time  = $newStop->format('Y-m-d H:i:s');
+
+                    $work_session->eventStart->save();
+                    $work_session->eventStop->save();
+
+                    $timeInWork = Carbon::parse($work_session->eventStart->time)->diff(Carbon::parse($newStop))->format('%H:%I:%S');
+                    $work_session->time_in_work = $timeInWork;
+                    $work_session->save();
+
+                    return redirect()->back()->with('success', 'Operacja zakończona powodzeniem.');
+                } else {
+                    return redirect()->back()->with('fail', 'Brak zaplanowanej pracy.');
+                }
+            } else {
+                return redirect()->back()->with('fail', 'Święto.');
+            }
+        }
+        return redirect()->back()->with('success', 'Nieznany błąd.');
     }
 }

@@ -105,6 +105,37 @@
                 </div>
             </div>
             @endif
+            @if($work_session->user->overtime_task)
+            @if($work_session->getAlertTask() && $work_session->task_id != null)
+            <div class="flex justify-between w-full">
+                <div class="flex justify-start items-center w-full justify-start">
+                    @if($work_session->task->status != null)
+                    @if($work_session->task->status == 'oczekujące')
+                    <x-status-yellow class="text-xs">
+                        {{ $work_session->task->status }}
+                    </x-status-yellow>
+                    @elseif($work_session->task->status == 'zaakceptowane')
+                    <x-status-green class="text-xs">
+                        {{ $work_session->task->status }}
+                    </x-status-green>
+                    @elseif($work_session->task->status == 'odrzucone')
+                    <x-status-red class="text-xs">
+                        {{ $work_session->task->status }}
+                    </x-status-red>
+                    @endif
+                    @endif
+                </div>
+            </div>
+            <div class="flex flex-col justify-start items-start w-fit gap-2">
+                <x-status-gray class="text-xs">
+                    🎯 Zadanie
+                </x-status-gray>
+                <div class="text-gray-600 dark:text-gray-300 text-xs tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 gap-2 flex flex-col justify-center items-center text-center">
+                    {!! $work_session->task->note !!}
+                </div>
+            </div>
+            @endif
+            @endif
             <div class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
                 <x-user-photo :user="$work_session->user" />
                 <x-user-name :user="$work_session->user" />

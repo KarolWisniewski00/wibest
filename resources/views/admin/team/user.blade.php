@@ -1,57 +1,6 @@
 <x-app-layout class="flex">
     @include('admin.elements.alerts')
     @if ($company)
-    @php
-    $shortType = ['wolne za pracę w święto' => 'WPS',
-    'zwolnienie lekarskie' => 'ZL',
-    'urlop wypoczynkowy' => 'UW',
-    'urlop planowany' => 'UP',
-    'urlop rodzicielski' => 'UR',
-    'wolne za nadgodziny' => 'WN',
-    'wolne za święto w sobotę' => 'WSS',
-    'urlop bezpłatny' => 'UB',
-    'wolne z tytułu 5-dniowego tygodnia pracy' => 'WT5',
-    'zwolnienie lekarsie - opieka' => 'ZLO',
-    'urlop okolicznościowy' => 'UO',
-    'urlop wypoczynkowy "na żądanie"' => 'UWZ',
-    'oddanie krwi' => 'OK',
-    'urlop ojcowski' => 'UOJC',
-    'urlop macieżyński' => 'UM',
-    'świadczenie rehabilitacyjne' => 'SR',
-    'opieka' => 'OP',
-    'świadek w sądzie' => 'SWS',
-    'praca zdalna' => 'PZ',
-    'kwarantanna' => 'KW',
-    'kwarantanna z pracą zdalną' => 'KWZPZ',
-    'delegacja' => 'DEL',
-    'święto' => 'ŚUW'
-    ];
-    $icons = [
-    'wolne za pracę w święto' => '🕊️',
-    'zwolnienie lekarskie' => '🤒',
-    'urlop wypoczynkowy' => '🏖️',
-    'urlop planowany' => '🏖️',
-    'urlop rodzicielski' => '👶',
-    'wolne za nadgodziny' => '⏰',
-    'wolne za święto w sobotę' => '🗓️',
-    'urlop bezpłatny' => '💸',
-    'wolne z tytułu 5-dniowego tygodnia pracy' => '📆',
-    'zwolnienie lekarsie - opieka' => '🧑‍⚕️',
-    'urlop okolicznościowy' => '🎉',
-    'urlop wypoczynkowy "na żądanie"' => '📢',
-    'oddanie krwi' => '🩸',
-    'urlop ojcowski' => '👨‍👧',
-    'urlop macieżyński' => '🤱',
-    'świadczenie rehabilitacyjne' => '🦾',
-    'opieka' => '🧑‍🍼',
-    'świadek w sądzie' => '⚖️',
-    'praca zdalna' => '💻',
-    'kwarantanna' => '🦠',
-    'kwarantanna z pracą zdalną' => '🏠💻',
-    'delegacja' => '✈️',
-    'święto' => '🎌',
-    ];
-    @endphp
     <!--SIDE BAR-->
     <x-sidebar-left>
         <li>
@@ -152,6 +101,32 @@
                     </x-text-cell>
                     @endif
                     <!--Logowanie przez Google-->
+                    <!--Ilość wysłanych wiadomości-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Ilość wysłanych wiadomości
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📩</span>
+                                {{ $msg->count() }}
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Ilość wysłanych wiadomości-->
+                    <!--Zużycie SMS-->
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Zużycie SMS
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span>
+                                <span class="text-2xl">📱</span>
+                                {{ $msg->sum('price') ?? 0 }} PLN
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    <!--Zużycie SMS-->
                 </x-container-gray>
 
                 @if($user->supervisor || $user->position || $user->assigned_at)

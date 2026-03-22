@@ -13,7 +13,6 @@
         <x-container-content>
             <!--MOBILE VIEW-->
             <x-list :items="$users" emptyMessage="Brak użytkowników do wyświetlenia.">
-                <x-loader-user-card />
                 @foreach ($users as $user)
                 <x-card-user :user="$user" />
                 @endforeach

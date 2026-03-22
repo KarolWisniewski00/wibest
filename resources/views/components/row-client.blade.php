@@ -27,18 +27,24 @@
 
     <td class="px-2 py-2">
         <x-paragraf-display class="text-xs">
-            @if($client->getUsersCount() != 0)
             <x-status-gray>
+                @if($client->getUsersCount() != 0)
                 <span>👤</span> {{ $client->getUsersCount() }}
+                @else
+                <span>👤</span> 0
+                @endif
             </x-status-gray>
-            @endif
         </x-paragraf-display>
     </td>
 
     <td class="px-2 py-2">
         <x-paragraf-display class="text-xs">
             <x-status-gray>
+                @if($client->msg != null)
                 <span>📩</span> {{ $client->msg->count() }}
+                @else
+                <span>📩</span> 0
+                @endif
             </x-status-gray>
         </x-paragraf-display>
     </td>
@@ -46,7 +52,11 @@
     <td class="px-2 py-2">
         <x-paragraf-display class="text-xs">
             <x-status-gray>
+                @if($client->msg != null)
                 <span>📱</span> {{ $client->msg->sum('price') ?? 0 }} PLN
+                @else
+                <span>📱</span> 0
+                @endif
             </x-status-gray>
         </x-paragraf-display>
     </td>

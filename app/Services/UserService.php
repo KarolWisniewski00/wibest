@@ -7,6 +7,7 @@ use App\Models\WorkBlock;
 use App\Repositories\WorkSessionRepository;
 use App\Repositories\UserRepository;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -104,6 +105,60 @@ class UserService
                 $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
                 $work_obj = $workSessionRepository->getFirstRcp($user->id, $date);
                 $work_obj_last = $workSessionRepository->getLastRcp($user->id, $date);
+
+                if ($work_obj) {
+                    //brak normy
+                    $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($user->id, $date);
+                    if ($totalDayUnder != 0) {
+                        $work_obj->under = 'under';
+                    }
+                    //liczenie nadgodzin i zadań w rekordzie
+                    $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
+                    $work_obj->extra = '';
+                    if ($user->overtime) {
+                        if ($totalDayExtra > ($user->overtime_threshold * 60)) {
+                            if ($user->overtime_task) {
+                                if ($user->overtime_accept) {
+                                    $totalDayExtraWithTaskAccepted = $workSessionRepository->getTotalOfDayExtraWithTaskAccepted($user->id, $date);
+                                    if ($totalDayExtraWithTaskAccepted == 0) {
+                                        $work_obj->extra = 'extra';
+                                    } else {
+                                        $work_obj->extra = 'task';
+                                    }
+                                } else {
+                                    $totalDayExtraWithTask = $workSessionRepository->getTotalOfDayExtraWithTask($user->id, $date);
+                                    if ($totalDayExtraWithTask == 0) {
+                                        $work_obj->extra = 'extra';
+                                    } else {
+                                        $work_obj->extra = 'task';
+                                    }
+                                }
+                            } else {
+                                $user->time_in_work_extra += $totalDayExtra;
+                                $work_obj->extra = 'extra';
+                            }
+                        } else {
+                            $totalDayExtra = 0;
+                            $work_obj->extra = '';
+                        }
+                    }
+
+                    //zmiana nocna
+                    try {
+                        $start = Carbon::parse($work_obj->eventStart->time);
+                        $stop  = Carbon::parse($work_obj->eventStop->time);
+
+                        if ($start->isSameDay($stop)) {
+                            $work_obj->type = 'day';
+                        } else {
+                            $work_obj->type = 'night';
+                        }
+                    } catch (Exception) {
+                        $work_obj->type = 'day';
+                    }
+                }
+
+
 
                 if ($work_obj && $work_obj_last) {
                     if ($work_obj->id != $work_obj_last->id) {
@@ -788,6 +843,58 @@ class UserService
                 $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
                 $work_obj = $workSessionRepository->getFirstRcp($user->id, $date);
                 $work_obj_last = $workSessionRepository->getLastRcp($user->id, $date);
+
+                if ($work_obj) {
+                    //brak normy
+                    $totalDayUnder = $workSessionRepository->getTotalOfDayUnder($user->id, $date);
+                    if ($totalDayUnder != 0) {
+                        $work_obj->under = 'under';
+                    }
+                    //liczenie nadgodzin i zadań w rekordzie
+                    $totalDayExtra = $workSessionRepository->getTotalOfDayExtra($user->id, $date);
+                    $work_obj->extra = '';
+                    if ($user->overtime) {
+                        if ($totalDayExtra > ($user->overtime_threshold * 60)) {
+                            if ($user->overtime_task) {
+                                if ($user->overtime_accept) {
+                                    $totalDayExtraWithTaskAccepted = $workSessionRepository->getTotalOfDayExtraWithTaskAccepted($user->id, $date);
+                                    if ($totalDayExtraWithTaskAccepted == 0) {
+                                        $work_obj->extra = 'extra';
+                                    } else {
+                                        $work_obj->extra = 'task';
+                                    }
+                                } else {
+                                    $totalDayExtraWithTask = $workSessionRepository->getTotalOfDayExtraWithTask($user->id, $date);
+                                    if ($totalDayExtraWithTask == 0) {
+                                        $work_obj->extra = 'extra';
+                                    } else {
+                                        $work_obj->extra = 'task';
+                                    }
+                                }
+                            } else {
+                                $user->time_in_work_extra += $totalDayExtra;
+                                $work_obj->extra = 'extra';
+                            }
+                        } else {
+                            $totalDayExtra = 0;
+                            $work_obj->extra = '';
+                        }
+                    }
+
+                    //zmiana nocna
+                    try {
+                        $start = Carbon::parse($work_obj->eventStart->time);
+                        $stop  = Carbon::parse($work_obj->eventStop->time);
+
+                        if ($start->isSameDay($stop)) {
+                            $work_obj->type = 'day';
+                        } else {
+                            $work_obj->type = 'night';
+                        }
+                    } catch (Exception) {
+                        $work_obj->type = 'day';
+                    }
+                }
 
                 if ($work_obj && $work_obj_last) {
                     if ($work_obj->id != $work_obj_last->id) {

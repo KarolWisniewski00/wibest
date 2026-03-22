@@ -49,6 +49,16 @@ class TimeSheetController extends Controller
 
         return view('admin.raport.index', compact('dates', 'startDate', 'endDate', 'users'));
     }
+    public function smart(Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $dates = $this->filterDateService->getRangeDateFilter($request, 'd.m.y');
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
+
+        return view('admin.raport.smart', compact('dates', 'startDate', 'endDate', 'users'));
+    }
     /**
      * Zwraca użytkowników dla paginated infinite scroll.
      *
@@ -73,6 +83,24 @@ class TimeSheetController extends Controller
             'next_page_url' => $users->nextPageUrl(),
         ]);
     }
+    public function getSmart(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-raport-smart', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'data' => $users->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $users->nextPageUrl(),
+        ]);
+    }
     /**
      * Ustawia nową datę w filtrze zwraca użytkowników.
      *
@@ -88,6 +116,22 @@ class TimeSheetController extends Controller
         foreach ($users as $user) {
             // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
             array_push($rows_table, View::make('components.row-raport', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'table' => $rows_table,
+            'list' => $rows_list,
+        ]);
+    }
+    public function setDateSmart(DateRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $users = $this->userService->getByRoleAddDatesByFilterDate($request);
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-raport-smart', ['user' => $user])->render());
         }
 
         return response()->json([

@@ -59,6 +59,11 @@
         </x-status-red>
         @endif
         @endif
+        @if($event->event_type == 'task')
+        <div class="text-gray-600 dark:text-gray-300 text-xs tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 gap-2 flex flex-col justify-center items-center text-center">
+            {!! $event->note !!}
+        </div>
+        @endif
     </td>
     <td class="px-3 py-2 font-semibold text-xl text-gray-700 dark:text-gray-50">
         <div class="flex flex-col items-center justify-center gap-2 my-auto">

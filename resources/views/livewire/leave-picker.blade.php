@@ -55,7 +55,7 @@
         <span class="text-gray-900 dark:text-white">📋 Podgląd</span>
         <div class="h-[180px] flex flex-col items-center justify-center text-center 
                             w-full bg-pink-200 dark:bg-pink-400/60
-                            rounded-2xl p-3 transition-colors duration-200 
+                            rounded-2xl p-2 transition-colors duration-200 
                             hover:bg-pink-300 dark:hover:bg-pink-500/70">
 
             <!-- Ikona i label -->
@@ -97,7 +97,7 @@
             </div>
 
             <!-- Opis -->
-            <p class="mt-2 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
+            <p class="text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
                 WNIOSEK
             </p>
 

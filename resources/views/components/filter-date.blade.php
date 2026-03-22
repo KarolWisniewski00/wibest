@@ -1,6 +1,19 @@
 @props([
 'loader' => 'calendar',
 ])
+@if($loader == 'calendar-smart')
+@php
+$smart = true;
+@endphp
+@elseif($loader == 'planing-smart')
+@php
+$smart = true;
+@endphp
+@else
+@php
+$smart = false;
+@endphp
+@endif
 <!-- Ukryte pole na wybrane daty -->
 <li>
     <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
@@ -177,6 +190,10 @@
                                 <x-loader-attendance />
                                 @elseif($loader == 'planing')
                                 <x-loader-planing />
+                                @elseif($loader == 'calendar-smart')
+                                <x-loader-calendar-smart />
+                                @elseif($loader == 'planing-smart')
+                                <x-loader-planing-smart />
                                 @endif
                                 `);
                             $list.append(`
@@ -258,7 +275,7 @@
                             }
                             headHtml += `
                                     <th scope="col" 
-                                        class="px-2 py-2 text-center date-column ${shadeClass} ${shadeClassToday} min-w-40">
+                                        class="px-2 py-2 text-center date-column ${shadeClass} ${shadeClassToday} @if($smart == false) min-w-40 @endif">
                                         <div>${dayOfWeek}</div>
                                         <div>${dayMonth}</div>
                                     </th>
@@ -366,6 +383,10 @@
                                 <x-loader-attendance />
                                 @elseif($loader == 'planing')
                                 <x-loader-planing />
+                                @elseif($loader == 'calendar-smart')
+                                <x-loader-calendar-smart />
+                                @elseif($loader == 'planing-smart')
+                                <x-loader-planing-smart />
                                 @endif
                                 `);
                             $list.append(`

@@ -6,6 +6,7 @@ use App\Models\Company;
 use App\Models\Invitation;
 use App\Models\Leave;
 use App\Models\PlannedLeave;
+use App\Models\SentMessage;
 use App\Models\User;
 use App\Models\WorkSession;
 use App\Repositories\CompanyRepository;
@@ -64,7 +65,8 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load('company');
-        return view('admin.user.show', compact('user'));
+        $msg = SentMessage::where('user_id', $user->id)->orderByDesc('created_at')->get();
+        return view('admin.user.show', compact('user', 'msg'));
     }
     public function delete(User $user)
     {

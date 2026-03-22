@@ -3,7 +3,7 @@
     <td class="px-2 py-2 text-start">
         <x-paragraf-display class=" text-xs whitespace-nowrap">
             <x-status-gray>
-                <span>🏢</span>@if($user->company) {{ $user->company->name }} @endif
+                @if($user->company)<span>🏢</span> {{ $user->company->name }} @endif
             </x-status-gray>
         </x-paragraf-display>
     </td>

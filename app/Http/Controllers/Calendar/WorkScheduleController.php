@@ -50,6 +50,16 @@ class WorkScheduleController extends Controller
 
         return view('admin.planing.index', compact('dates', 'startDate', 'endDate', 'users'));
     }
+    public function smart(Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $dates = $this->filterDateService->getRangeDateFilter($request, 'd.m.y');
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $users = $this->userService->paginatedByRoleAddDatesAndPlaningByFilterDate($request);
+
+        return view('admin.planing.smart', compact('dates', 'startDate', 'endDate', 'users'));
+    }
     /**
      * Zwraca użytkowników dla paginated infinite scroll.
      *
@@ -75,6 +85,25 @@ class WorkScheduleController extends Controller
             'next_page_url' => $users->nextPageUrl(),
         ]);
     }
+    public function getSmart(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $users = $this->userService->paginatedByRoleAddDatesAndPlaningByFilterDate($request);
+
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-planing-smart', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'data' => $users->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $users->nextPageUrl(),
+        ]);
+    }
     /**
      * Ustawia nową datę w filtrze zwraca urlop planowany.
      *
@@ -91,6 +120,23 @@ class WorkScheduleController extends Controller
         foreach ($users as $user) {
             // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
             array_push($rows_table, View::make('components.row-planing', ['user' => $user])->render());
+        }
+
+        return response()->json([
+            'table' => $rows_table,
+            'list' => $rows_list,
+        ]);
+    }
+    public function setDateSmart(DateRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $users = $this->userService->getByRoleAddDatesAndPlaningByFilterDate($request);
+
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($users as $user) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-planing-smart', ['user' => $user])->render());
         }
 
         return response()->json([

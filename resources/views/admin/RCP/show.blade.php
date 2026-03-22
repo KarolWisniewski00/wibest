@@ -218,6 +218,40 @@
                         </x-text-cell-value>
                     </x-text-cell>
                     <!--Użytkownik-->
+                    @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
+                    @if($under != '' || $extra != '')
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Popraw czas względem planingu
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span class="gap-2 w-full">
+                                <div class="flex flex-col items-start w-full justify-start gap-2">
+                                    <x-button-link-neutral class="text-lg w-full" href="{{ route('rcp.work-session.fix', $work_session) }}">
+                                        <i class="fa-solid fa-hammer mr-2"></i>Popraw czas
+                                    </x-button-link-neutral>
+                                </div>
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    @endif
+                    @if($work_session->eventStop == null && $work_session->status == 'W trakcie pracy')
+                    <x-text-cell>
+                        <x-text-cell-label>
+                            Zakończ prace
+                        </x-text-cell-label>
+                        <x-text-cell-value>
+                            <x-text-cell-span class="gap-2 w-full">
+                                <div class="flex flex-col items-start w-full justify-start gap-2">
+                                    <x-button-link-red class="text-lg w-full" href="{{ route('rcp.work-session.stop', $work_session) }}">
+                                        <i class="fa-solid fa-stop mr-2"></i>stop
+                                    </x-button-link-red>
+                                </div>
+                            </x-text-cell-span>
+                        </x-text-cell-value>
+                    </x-text-cell>
+                    @endif
+                    @endif
                     <!-- Przesuń czas -->
                     @if(($work_session->eventStop == null && $work_session->status == 'W trakcie pracy') || ($work_session->eventStop != null && $work_session->status == 'Praca zakończona'))
                     @if($work_session->user->working_hours_regular == 'stały planing')

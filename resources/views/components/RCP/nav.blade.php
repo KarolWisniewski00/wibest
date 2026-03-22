@@ -4,7 +4,7 @@
         <x-nav-link class="h-full text-center"
             href="{{ route('rcp.work-session.index') }}"
             :active="Str::startsWith(request()->path(), 'dashboard/rcp/work-session')">
-            Rejestacja czasu pracy
+            RCP
         </x-nav-link>
         <x-nav-link class="h-full text-center"
             href="{{ route('rcp.event.index') }}"
@@ -19,6 +19,11 @@
                 </div>
             </div>
             @endif
+        </x-nav-link>
+        <x-nav-link class="h-full text-center"
+            href="{{ route('rcp.location.index') }}"
+            :active="Str::startsWith(request()->path(), 'dashboard/rcp/location')">
+            Lokalizacje
         </x-nav-link>
     </nav>
 </div>

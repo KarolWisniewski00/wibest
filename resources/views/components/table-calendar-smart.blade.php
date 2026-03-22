@@ -64,7 +64,7 @@
                 $shadeClass = $shadeClassToday;
                 }
                 @endphp
-                <th scope="col" class="px-2 py-2 text-center date-column {{ $shadeClass }} {{ $shadeClassToday }} min-w-40">
+                <th scope="col" class="px-2 py-2 text-center date-column {{ $shadeClass }} {{ $shadeClassToday }}">
                     <div>{{ $dayOfWeek }}</div>
                     <div>{{ $dayMonth }}</div>
                 </th>

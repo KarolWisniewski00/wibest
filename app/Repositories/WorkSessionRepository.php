@@ -747,4 +747,75 @@ class WorkSessionRepository
 
         return 0;
     }
+    public function getTotalOfDayPlannedNew(int $userId, string $date): int
+    {
+        $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
+
+        $user = User::findOrFail($userId);
+        if ($user->working_hours_regular == 'zmienny planing') {
+            $workBlock = WorkBlock::where('user_id', $userId)
+                ->where('company_id', $user->company_id)
+                ->whereDate('starts_at', $formattedDate)
+                ->first();
+            if ($workBlock && $workBlock->duration_seconds) {
+                $workingSeconds = (int)$workBlock->duration_seconds;
+            } else {
+                $workingSeconds = 0;
+            }
+        } else {
+            if (!$user->working_hours_custom) {
+                return 0;
+            }
+            $daysOfWeek = [
+                'monday' => 'poniedziałek',
+                'tuesday' => 'wtorek',
+                'wednesday' => 'środa',
+                'thursday' => 'czwartek',
+                'friday' => 'piątek',
+                'saturday' => 'sobota',
+                'sunday' => 'niedziela',
+            ];
+            // Pobranie dnia tygodnia po angielsku
+            $dayEnglish = strtolower(Carbon::createFromFormat('d.m.y', $date)->format('l')); // np. 'monday'
+
+            // Zamiana na polski
+            $dayPolish = $daysOfWeek[$dayEnglish];
+            $startDay = $user->working_hours_start_day; // np. "poniedziałek"
+            $stopDay  = $user->working_hours_stop_day;  // np. "piątek"
+
+            // Mapowanie dni tygodnia na liczby (poniedziałek = 0)
+            $daysMap = [
+                'poniedziałek' => 0,
+                'wtorek'      => 1,
+                'środa'       => 2,
+                'czwartek'    => 3,
+                'piątek'      => 4,
+                'sobota'      => 5,
+                'niedziela'   => 6,
+            ];
+
+            // Zamiana na liczby
+            $dayNum   = $daysMap[$dayPolish];
+            $startNum = $daysMap[$startDay];
+            $stopNum  = $daysMap[$stopDay];
+
+            // Sprawdzenie, czy dzień jest w przedziale
+            $inRange = false;
+
+            if ($startNum <= $stopNum) {
+                // np. poniedziałek - piątek
+                $inRange = ($dayNum >= $startNum && $dayNum <= $stopNum);
+            } else {
+                // np. piątek - wtorek (cykliczne)
+                $inRange = ($dayNum >= $startNum || $dayNum <= $stopNum);
+            }
+
+            if ($inRange) {
+                $workingSeconds = (int)$user->working_hours_custom * 3600;
+            } else {
+                $workingSeconds = 0;
+            }
+        }
+        return $workingSeconds;
+    }
 }

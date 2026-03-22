@@ -8,23 +8,14 @@
                     <div class="h-4 rounded-full bg-gray-200 dark:bg-gray-700 w-24"></div>
                 </div>
             </div>
-            <div class="flex flex-row gap-2">
-                <div class="h-4 rounded-lg bg-gray-200 dark:bg-gray-700 w-20"></div>
-            </div>
 
             <div class="flex flex-row gap-2">
-                
-                <div class="flex flex-col items-center justify-center gap-2">
-                    <div class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                    <div class="w-10 h-4 rounded-full bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                </div>
-                <div class="flex flex-col items-center justify-center gap-2">
-                    <div class="w-20 h-4 rounded-full bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                    <div class="w-10 h-4 rounded-full bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                </div>
                 <div class="flex flex-row items-center justify-center">
                     <div class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                </div>
+                <div class="flex flex-col items-center justify-center gap-2">
                     <div class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                    <div class="w-10 h-4 rounded-full bg-gray-200 dark:bg-gray-700 mx-1"></div>
                 </div>
             </div>
 
@@ -40,7 +31,6 @@
             {{-- Przyciski (Edit i Cancel) --}}
             <div class="flex space-x-4">
                 <div class="min-h-[38px] w-[54px] rounded-lg bg-gray-200 dark:bg-gray-700"></div>
-                <div class="min-h-[38px] w-[52px] rounded-lg bg-gray-200 dark:bg-gray-700"></div>
             </div>
         </div>
     </div>

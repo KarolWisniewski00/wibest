@@ -1,55 +1,4 @@
 @props(['user'])
-@php
-$shortType = ['wolne za pracę w święto' => 'WPS',
-'zwolnienie lekarskie' => 'ZL',
-'urlop wypoczynkowy' => 'UW',
-'urlop planowany' => 'UP',
-'urlop rodzicielski' => 'UR',
-'wolne za nadgodziny' => 'WN',
-'wolne za święto w sobotę' => 'WSS',
-'urlop bezpłatny' => 'UB',
-'wolne z tytułu 5-dniowego tygodnia pracy' => 'WT5',
-'zwolnienie lekarsie - opieka' => 'ZLO',
-'urlop okolicznościowy' => 'UO',
-'urlop wypoczynkowy "na żądanie"' => 'UWZ',
-'oddanie krwi' => 'OK',
-'urlop ojcowski' => 'UOJC',
-'urlop macieżyński' => 'UM',
-'świadczenie rehabilitacyjne' => 'SR',
-'opieka' => 'OP',
-'świadek w sądzie' => 'SWS',
-'praca zdalna' => 'PZ',
-'kwarantanna' => 'KW',
-'kwarantanna z pracą zdalną' => 'KWZPZ',
-'delegacja' => 'DEL',
-'święto' => 'ŚUW'
-];
-$icons = [
-'wolne za pracę w święto' => '🕊️',
-'zwolnienie lekarskie' => '🤒',
-'urlop wypoczynkowy' => '🏖️',
-'urlop planowany' => '🏖️',
-'urlop rodzicielski' => '👶',
-'wolne za nadgodziny' => '⏰',
-'wolne za święto w sobotę' => '🗓️',
-'urlop bezpłatny' => '💸',
-'wolne z tytułu 5-dniowego tygodnia pracy' => '📆',
-'zwolnienie lekarsie - opieka' => '🧑‍⚕️',
-'urlop okolicznościowy' => '🎉',
-'urlop wypoczynkowy "na żądanie"' => '📢',
-'oddanie krwi' => '🩸',
-'urlop ojcowski' => '👨‍👧',
-'urlop macieżyński' => '🤱',
-'świadczenie rehabilitacyjne' => '🦾',
-'opieka' => '🧑‍🍼',
-'świadek w sądzie' => '⚖️',
-'praca zdalna' => '💻',
-'kwarantanna' => '🦠',
-'kwarantanna z pracą zdalną' => '🏠💻',
-'delegacja' => '✈️',
-'święto' => '🎌',
-];
-@endphp
 <tr class="snap-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
 
     <td class="px-2 py-2 sticky md:left-0 md:z-20 bg-white dark:bg-gray-800">
@@ -94,7 +43,7 @@ $icons = [
             $nextEnd = $nextObj ? \Carbon\Carbon::parse($nextObj->end_date)->format('H:i') : null;
             }
 
-            if($currentStatus != 'work'){
+                        if($currentStatus != 'work' || $currentObj && $currentObj->type && $currentObj->type == 'night'){
             if ($nextStatus === $currentStatus && $nextStart === $currentStart && $nextEnd === $currentEnd) {
             $span++;
             } else {
@@ -114,7 +63,7 @@ $icons = [
                 class="px-2 py-2 font-semibold text-lg text-gray-900 dark:text-gray-900 border-x border-gray-200 dark:border-gray-700">
 
                 <a href="@if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel') {{route('calendar.work-schedule.edit', $user->objs[$keys[$i]] )}} @endif" class="h-[180px] flex flex-col items-center justify-center text-center 
-                            w-full rounded-2xl p-3
+                            w-full rounded-2xl p-2
                             @if($user->objs[$keys[$i]]->type == 'night')
                                 bg-violet-400 dark:bg-violet-500
                                 hover:bg-violet-300 dark:hover:bg-violet-400
@@ -164,8 +113,8 @@ $icons = [
                     </div>
 
                     <!-- Opis -->
-                    <p class="mt-1 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
-                        Zmienny planing
+                    <p class="text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
+                        {{ gmdate('H:i:s', $user->objs[$keys[$i]]->duration_seconds) }}
                     </p>
 
                 </a>
@@ -177,15 +126,15 @@ $icons = [
 
                 <a href="@if($user->role == 'admin' || $user->role == 'właściciel' || $user->role == 'menedżer') {{route('leave.pending.edit', $currentObj)}} @else {{route('leave.single.edit', $currentObj)}} @endif" class="h-[180px] flex flex-col items-center justify-center text-center 
                             w-full bg-pink-200 dark:bg-pink-400/60
-                            rounded-2xl p-3 transition-colors duration-200 
+                            rounded-2xl p-2 transition-colors duration-200 
                             hover:bg-pink-300 dark:hover:bg-pink-500/70">
 
                     <!-- Ikona i label -->
                     <div class="flex flex-col items-center justify-center h-full w-fit">
-                        <span class="text-2xl">{{ $icons[$currentObj->type] ?? '' }}</span>
+                        <span class="text-2xl">{{ config('leavetypes.icons.' . $currentObj->type, '') }}</span>
                         <span class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
                                     bg-pink-300 text-gray-900 uppercase tracking-widest">
-                            {{ $shortType[$currentObj->type] ?? '' }}
+                            {{ config('leavetypes.shortType.' . $currentObj->type, '') }}
                         </span>
                     </div>
 
@@ -224,7 +173,7 @@ $icons = [
 
                 <a href="@if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel') {{ route('team.user.planing', $user) }} @endif"
                     class="h-[180px] flex flex-col items-center justify-center text-center w-full
-                        bg-blue-200 dark:bg-blue-400/70 rounded-2xl p-3
+                        bg-blue-200 dark:bg-blue-400/70 rounded-2xl p-2
                         transition-colors duration-200 hover:bg-blue-300 dark:hover:bg-blue-500/80">
 
                     <!-- Ikona i etykieta -->
@@ -263,7 +212,14 @@ $icons = [
 
                     <!-- Opis -->
                     <p class="mt-2 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
-                        Stały planing
+                        @php
+                        $start = \Carbon\Carbon::parse($user->working_hours_from);
+                        $end = \Carbon\Carbon::parse($user->working_hours_to);
+
+                        $seconds = $start->diffInSeconds($end);
+                        @endphp
+
+                        {{ sprintf('%02d:%02d:%02d', floor($seconds/3600), floor(($seconds%3600)/60), $seconds%60) }}
                     </p>
 
                 </a>
@@ -275,7 +231,7 @@ $icons = [
 
                 <div class="h-[180px] flex flex-col items-center justify-center text-center 
                             w-full bg-rose-200 dark:bg-rose-400/60
-                            rounded-2xl p-3 transition-colors duration-200 
+                            rounded-2xl p-2 transition-colors duration-200 
                             hover:bg-rose-300 dark:hover:bg-rose-500/70">
 
                     <!-- Ikona i label -->
@@ -348,7 +304,7 @@ $icons = [
                     </div>
 
                     <!-- Opis -->
-                    <p class="mt-1 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
+                    <p class="text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
                         Zmienny planing
                     </p>
                 </a>
@@ -359,7 +315,7 @@ $icons = [
                 @else
                 @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                 <a href="{{ route('team.user.config_planing', $user->id) }}" class="flex flex-col items-center justify-center text-center 
-                            w-full rounded-2xl p-3 h-[180px] 
+                            w-full rounded-2xl p-2 h-[180px] 
                             bg-yellow-300 dark:bg-yellow-400
                             transition-colors duration-200 
                             hover:bg-yellow-400 dark:hover:bg-yellow-500">
@@ -387,14 +343,14 @@ $icons = [
                     </div>
 
                     <!-- Opis -->
-                    <p class="mt-1 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
+                    <p class="text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
                         ALERT
                     </p>
 
                 </a>
                 @else
                 <div class="flex flex-col items-center justify-center text-center 
-                            w-full h-[180px]  rounded-2xl p-3
+                            w-full h-[180px]  rounded-2xl p-2
                             bg-yellow-300 dark:bg-yellow-400
                             transition-colors duration-200 
                             hover:bg-yellow-400 dark:hover:bg-yellow-500">
@@ -422,7 +378,7 @@ $icons = [
                     </div>
 
                     <!-- Opis -->
-                    <p class="mt-1 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
+                    <p class="text-[0.7rem] font-semibold text-gray-800 dark:text-gray-900 tracking-wide uppercase">
                         ALERT
                     </p>
 

@@ -1,5 +1,12 @@
 @props(['work_session'])
-<tr class="snap-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+<tr class="snap-center bg-white dark:bg-gray-800 
+border-b border-gray-200 dark:border-gray-700 
+@if($work_session->user->overtime_task)
+@if($work_session->getAlertTask() && $work_session->task_id != null)
+border-none
+@endif
+@endif
+text-center">
     <td class="px-3 py-2">
         <x-flex-center>
             <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="{{ $work_session->id }}">
@@ -130,3 +137,46 @@
     </td>
     <x-show-cell href="{{ route('rcp.work-session.show', $work_session) }}" />
 </tr>
+@if($work_session->user->overtime_task)
+@if($work_session->getAlertTask() && $work_session->task_id != null)
+<tr class="snap-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+    <td class="px-3 py-2">
+    </td>
+    <td class="px-3 py-2">
+    </td>
+    <td class="px-3 py-2">
+        @if($work_session->task->status != null)
+        @if($work_session->task->status == 'oczekujące')
+        <x-status-yellow class="text-xs">
+            {{ $work_session->task->status }}
+        </x-status-yellow>
+        @elseif($work_session->task->status == 'zaakceptowane')
+        <x-status-green class="text-xs">
+            {{ $work_session->task->status }}
+        </x-status-green>
+        @elseif($work_session->task->status == 'odrzucone')
+        <x-status-red class="text-xs">
+            {{ $work_session->task->status }}
+        </x-status-red>
+        @endif
+        @endif
+    </td>
+    <td class="px-3 py-2">
+    </td>
+    <td class="px-3 py-2">
+        <x-status-gray class="text-xs">
+            🎯 Zadanie
+        </x-status-gray>
+    </td>
+    <td class="px-3 py-2">
+        <div class="text-gray-600 dark:text-gray-300 text-xs tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 gap-2 flex flex-col justify-center items-center text-center">
+            {!! $work_session->task->note !!}
+        </div>
+    </td>
+    <td class="px-3 py-2">
+    </td>
+    <td class="px-3 py-2">
+    </td>
+</tr>
+@endif
+@endif

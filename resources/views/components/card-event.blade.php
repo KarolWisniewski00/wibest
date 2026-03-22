@@ -5,58 +5,80 @@
             <div class="flex justify-between w-full">
                 <div class="flex justify-start items-center w-full justify-start">
                     @if($event->event_type == 'stop')
-                    <x-status-red>
-                        Stop
+                    <x-status-red class="text-xs">
+                        🔴 Stop
                     </x-status-red>
                     @endif
                     @if($event->event_type == 'start')
-                    <x-status-green>
-                        Start
+                    <x-status-green class="text-xs">
+                        🟢 Start
                     </x-status-green>
                     @endif
-                </div>
-            </div>
-            <div class="text-start  text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 text-xl">
-                {{ $event->time }}
-            </div>
-            <div class="text-sm text-gray-700 dark:text-gray-400 flex w-full  justify-start">
-                <div class="flex items-center gap-4">
-                    @if($event->user->profile_photo_url)
-                    <img src="{{ $event->user->profile_photo_url }}" alt="{{ $event->user->name }}" class="w-10 h-10 rounded-full">
-                    @else
-                    <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-700">
-                        {{ strtoupper(substr($event->user->name, 0, 1)) }}
-                    </div>
+                    @if($event->event_type == 'task')
+                    <x-status-gray class="text-xs">
+                        🎯 Zadanie
+                    </x-status-gray>
+                    @if($event->status == 'oczekujące')
+                    <x-status-yellow class="ms-2 text-xs">
+                        {{ $event->status }}
+                    </x-status-yellow>
+                    @elseif($event->status == 'zaakceptowane')
+                    <x-status-green class="ms-2 text-xs">
+                        {{ $event->status }}
+                    </x-status-green>
+                    @elseif($event->status == 'odrzucone')
+                    <x-status-red class="ms-2 text-xs">
+                        {{ $event->status }}
+                    </x-status-red>
                     @endif
-                    <div>
-                        <div class="flex flex-col justify-center w-fit">
-                            <x-paragraf-display class="font-semibold mb-1 w-fit text-start">
-                                {{$event->user->name}}
-                            </x-paragraf-display>
-                            @if($event->user->role == 'admin')
-                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-green-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-green-200 dark:hover:bg-green-400 focus:bg-green-200 dark:focus:bg-green-300 active:bg-green-200 dark:active:bg-green-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Admin
-                            </span>
-                            @elseif($event->user->role == 'menedżer')
-                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-blue-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-blue-200 dark:hover:bg-blue-400 focus:bg-blue-200 dark:focus:bg-blue-300 active:bg-blue-200 dark:active:bg-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Menedżer
-                            </span>
-                            @elseif($event->user->role == 'kierownik')
-                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-yellow-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-yellow-200 dark:hover:bg-yellow-400 focus:bg-yellow-200 dark:focus:bg-yellow-300 active:bg-yellow-200 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Kierownik
-                            </span>
-                            @elseif($event->user->role == 'użytkownik')
-                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-gray-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-gray-200 dark:hover:bg-gray-400 focus:bg-gray-200 dark:focus:bg-gray-300 active:bg-gray-200 dark:active:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                                Użytkownik
-                            </span>
-                            @elseif($event->user->role == 'właściciel')
-                            <span class="px-3 py-1 rounded-full w-fit text-sm font-semibold bg-rose-300 text-gray-900 font-semibold uppercase tracking-widest hover:bg-rose-200 dark:hover:bg-rose-400 focus:bg-rose-200 dark:focus:bg-rose-300 active:bg-rose-200 dark:active:bg-rose-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-rose-800 transition ease-in-out duration-150">
-                                Właściciel
-                            </span>
-                            @endif
-                        </div>
-                    </div>
+                    @endif
                 </div>
+            </div>
+            @if($event->event_type == 'task')
+            <div class="flex flex-row items-start justify-start gap-2 my-auto">
+                <div class="text-gray-600 dark:text-gray-300 text-xs tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 gap-2 flex flex-col justify-center items-center text-center">
+                    {!! $event->note !!}
+                </div>
+            </div>
+            @endif
+            <div class="flex flex-row items-start justify-start gap-2 my-auto">
+                @if(($event->event_type == 'start' || $event->event_type == 'stop') && $event->location_id)
+                <div class="flex flex-col items-center justify-center gap-2 my-auto">
+                    @if($event->event_type == 'start')
+                    @if($event->location_id)
+                    <x-status-green>
+                        <i class="fa-solid fa-location-dot mx-1"></i>
+                    </x-status-green>
+                    @endif
+                    @endif
+                    @if($event->event_type == 'stop')
+                    @if($event->location_id)
+                    <x-status-red>
+                        <i class="fa-solid fa-location-dot mx-1"></i>
+                    </x-status-red>
+                    @endif
+                    @endif
+                </div>
+                @endif
+                <div class="flex flex-col items-start justify-start gap-2 my-auto">
+                    <x-paragraf-display class="text-xs whitespace-nowrap font-semibold w-fit text-start relative">
+                        <x-status-dark>
+                            {{\Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->time)->format('H:i:s')}}
+                        </x-status-dark>
+                    </x-paragraf-display>
+                    <x-paragraf-display class="text-xs whitespace-nowrap">
+                        <x-status-cello>
+                            @php
+                            \Carbon\Carbon::setLocale('pl');
+                            @endphp
+                            {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->time)->format('d.m') }}, {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->time)->translatedFormat('l') }}
+                        </x-status-cello>
+                    </x-paragraf-display>
+                </div>
+            </div>
+            <div class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
+                <x-user-photo :user="$event->user" />
+                <x-user-name :user="$event->user" />
             </div>
             <div class="flex space-x-4">
                 <x-button-link-neutral href="{{route('rcp.event.show', $event)}}" class="min-h-[38px]">

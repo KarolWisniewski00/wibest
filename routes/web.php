@@ -15,6 +15,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\Raport\AttendanceSheetController;
 use App\Http\Controllers\Raport\TimeSheetController;
 use App\Http\Controllers\RCP\EventController;
+use App\Http\Controllers\RCP\LocationController;
 use App\Http\Controllers\RCP\WorkSessionController as RCPWorkSessionController;
 use App\Http\Controllers\RCP\RCPController;
 use App\Http\Controllers\ServiceController;
@@ -98,6 +99,10 @@ Route::prefix('api')->group(function () {
                 Route::get('set-date/', [TimeSheetController::class, 'setDate'])->name('api.v1.raport.time-sheet.set.date');
                 Route::post('/export-xlsx', [TimeSheetController::class, 'exportPdf'])->name('api.v1.raport.time-sheet.export.xlsx');
             });
+            Route::prefix('time-smart')->group(function () {
+                Route::get('/', [TimeSheetController::class, 'getSmart'])->name('api.v1.raport.time-smart.get');
+                Route::get('set-date/', [TimeSheetController::class, 'setDateSmart'])->name('api.v1.raport.time-smart.set.date');
+            });
             Route::prefix('attendance-sheet')->group(function () {
                 Route::get('/', [AttendanceSheetController::class, 'get'])->name('api.v1.raport.attendance-sheet.get');
                 Route::get('set-date/', [AttendanceSheetController::class, 'setDate'])->name('api.v1.raport.attendance-sheet.set.date');
@@ -109,6 +114,10 @@ Route::prefix('api')->group(function () {
                 Route::get('/', [WorkScheduleController::class, 'get'])->name('api.v1.calendar.work-schedule.get');
                 Route::get('set-date/', [WorkScheduleController::class, 'setDate'])->name('api.v1.calendar.work-schedule.set.date');
                 Route::post('/export-xlsx', [WorkScheduleController::class, 'exportXlsx'])->name('api.v1.calendar.work-schedule.export.xlsx');
+            });
+            Route::prefix('work-smart')->group(function () {
+                Route::get('/', [WorkScheduleController::class, 'getSmart'])->name('api.v1.calendar.work-smart.get');
+                Route::get('set-date/', [WorkScheduleController::class, 'setDateSmart'])->name('api.v1.calendar.work-smart.set.date');
             });
         });
         Route::prefix('leave')->group(function () {
@@ -170,6 +179,9 @@ Route::middleware([
                 Route::delete('/edit/{work_block}', [WorkScheduleController::class, 'delete'])->name('calendar.work-schedule.delete');
                 Route::get('/clear', [WorkScheduleController::class, 'clear'])->name('calendar.work-schedule.clear');
             });
+            Route::prefix('work-smart')->group(function () {
+                Route::get('/', [WorkScheduleController::class, 'smart'])->name('calendar.work-smart.index');
+            });
         });
 
         // LEAVE APPLICATIONS --------------------------------------------------------------------
@@ -211,6 +223,8 @@ Route::middleware([
                 Route::put('/update/{work_session}', [RCPController::class, 'update'])->name('rcp.work-session.update');
                 Route::put('/update-note/{work_session}', [RCPController::class, 'updateNote'])->name('rcp.work-session.update.note');
                 Route::get('/show/{work_session}', [RCPController::class, 'show'])->name('rcp.work-session.show');
+                Route::get('/fix/{work_session}', [RCPController::class, 'fix'])->name('rcp.work-session.fix');
+                Route::get('/stop/{work_session}', [RCPController::class, 'stop'])->name('rcp.work-session.stop');
                 Route::delete('/delete/{work_session}', [RCPController::class, 'delete'])->name('rcp.work-session.delete');
             });
 
@@ -221,12 +235,18 @@ Route::middleware([
                 Route::get('accept/{event}', [EventController::class, 'accept'])->name('rcp.event.accept');
                 Route::get('reject/{event}', [EventController::class, 'reject'])->name('rcp.event.reject');
             });
+            Route::prefix('location')->group(function () {
+                Route::get('/', [LocationController::class, 'index'])->name('rcp.location.index');
+            });
         });
 
         // RAPORTS -------------------------------------------------------------------------------
         Route::prefix('raport')->group(function () {
             Route::prefix('time-sheet')->group(function () {
                 Route::get('/', [TimeSheetController::class, 'index'])->name('raport.time-sheet.index');
+            });
+            Route::prefix('time-smart')->group(function () {
+                Route::get('/', [TimeSheetController::class, 'smart'])->name('raport.time-smart.index');
             });
 
             Route::prefix('attendance-sheet')->group(function () {
