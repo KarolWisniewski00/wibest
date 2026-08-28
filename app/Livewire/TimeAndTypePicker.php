@@ -2,12 +2,10 @@
 
 namespace App\Livewire;
 
-use App\Models\User;
 use App\Models\WorkSession;
 use App\Repositories\WorkSessionRepository;
-use Carbon\Carbon;
 use Livewire\Component;
-use Livewire\Attributes\On;
+use Exception;
 
 class TimeAndTypePicker extends Component
 {
@@ -26,20 +24,24 @@ class TimeAndTypePicker extends Component
     public function time_and_type_selected($data, $rcp = false)
     {
         $this->start_time_clock = $data[0];
-        $this->end_time_clock = $data[1];
-        $this->night = $data[2];
-        if (isset($data[3]) && $data[3]) {
-            $this->start_time_date = $data[3];
-        }
-        if ($rcp) {
-            $wsr = new WorkSessionRepository();
-            $this->rcp = $rcp;
-            try {
-                $this->planned_seconds = $wsr->getTotalOfDayPlannedNew($data[4], \Carbon\Carbon::parse($data[3])->format('d.m.y'));
-                $this->work_session = WorkSession::where('id', $data[5])->first();
-            } catch (\Throwable $th) {
-                $this->planned_seconds = null;
+        try {
+            $this->end_time_clock = $data[1];
+            $this->night = $data[2];
+            if (isset($data[3]) && $data[3]) {
+                $this->start_time_date = $data[3];
             }
+            if ($rcp) {
+                $wsr = new WorkSessionRepository();
+                $this->rcp = $rcp;
+                try {
+                    $this->planned_seconds = $wsr->getTotalOfDayPlannedNew($data[4], \Carbon\Carbon::parse($data[3])->format('d.m.y'));
+                    $this->work_session = WorkSession::where('id', $data[5])->first();
+                } catch (\Throwable $th) {
+                    $this->planned_seconds = null;
+                }
+            }
+        } catch (Exception) {
+            $this->rcp = $rcp;
         }
     }
 

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Builder;
 
 class User extends Authenticatable
 {
@@ -34,14 +35,10 @@ class User extends Authenticatable
         'password',
 
         'company_id',
-        'setting_format',
-        'setting_client',
+        'role',
         'position',
 
         'supervisor_id',
-        'paid_until',
-        'assigned_at',
-        'contract_type',
 
         'working_hours_regular',
         'working_hours_custom',
@@ -49,12 +46,15 @@ class User extends Authenticatable
         'working_hours_to',
         'working_hours_start_day',
         'working_hours_stop_day',
+
         'gender',
+
         'overtime',
         'overtime_threshold',
         'overtime_task',
         'overtime_accept',
         'public_holidays',
+
         'working_mon',
         'working_tue',
         'working_wed',
@@ -151,7 +151,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Event::class);
     }
-
+    public function blogs()
+    {
+        return $this->hasMany(Post::class);
+    }
     /**
      * Hierarchia użytkowników
      */
@@ -740,6 +743,9 @@ class User extends Authenticatable
                     if ($starts >= 2) {
                         $message = $message . ' Wielokrotny odczyt x' . $starts;
                     }
+                    if ($events->isNotEmpty()) {
+                        $start = Carbon::parse($events->first()->time);
+                    }
                 } elseif ($starts === $stops && $lastEvent && $lastEvent->event_type === 'stop') {
                     // 🟠 Zakończył pracę w dzień wolny
                     $stop = Carbon::parse($lastEvent->time);
@@ -786,6 +792,10 @@ class User extends Authenticatable
 
                     //$workedTime = gmdate('H:i:s', $totalSeconds);
                     $workedTime = null;
+                    if ($events->isNotEmpty()) {
+                        $start = Carbon::parse($events->first()->time);
+                    }
+
                     $message = 'Dzień wolny, ale w trakcie pracy. Wielokrotny odczyt x' . $starts + 1;
                 } else {
                     // 🔹 Brak aktywnej pracy, ale był start (dziwne przypadki)
@@ -850,5 +860,26 @@ class User extends Authenticatable
         }
 
         return $status;
+    }
+    public function companyHistory()
+    {
+        return $this->hasMany(UserCompanyHistory::class);
+    }
+    protected static function booted()
+    {
+        static::addGlobalScope('order', function ($query) {
+            $query->orderBy('name');
+        });
+        static::addGlobalScope('no_crm', function (Builder $builder) {
+            $builder->where('role', '!=', 'CRM');
+        });
+    }
+    public function crmEntries()
+    {
+        return $this->hasMany(Crm::class);
+    }
+    public function leaveBalances()
+    {
+        return $this->hasMany(LeaveBalance::class);
     }
 }

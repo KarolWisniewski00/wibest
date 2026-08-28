@@ -22,7 +22,7 @@
 
             <!--PC VIEW-->
             <x-table
-                :headers="['Firma', 'Nazwa', 'Data dołączenia', 'Opłacone do', 'Podgląd']"
+                :headers="['Firma', 'Nazwa', 'Podgląd']"
                 :items="$users"
                 :checkBox="false"
                 emptyMessage="Brak użytkowników do wyświetlenia.">

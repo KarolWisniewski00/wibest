@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 class Event extends Model
 {
     use HasFactory;
+    use LogsActivity;
 
+    protected static $logAll = true;
+    protected static $logOnlyDirty = true;
+    protected static $submitEmptyLogs = false;
     protected $fillable = [
         'time',
         'location_id',
@@ -20,7 +25,13 @@ class Event extends Model
         'created_user_id',
         'note',
     ];
-
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll() // albo konkretne pola
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
     public function user()
     {
         return $this->belongsTo(User::class)->withDefault([

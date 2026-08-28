@@ -152,40 +152,54 @@ class UserLeaveDateStep extends Step
                 'price'      => 0.00,
             ]);
         }
-        $sms_api = new SmsApi();
-        $phone_validated = $sms_api->normalizePhoneNumber($leave->user->phone);
+        if ($leave->user->sms) {
+            $sms_api = new SmsApi();
+            $phone_validated = $sms_api->normalizePhoneNumber($leave->user->phone);
 
-        $message = 'Złożono nowy wniosek w twoim imieniu
+            $message = 'Złożono nowy wniosek w twoim imieniu
 ' . $state['type'] . '
 ' . $leave->manager->name . '
 ' . $startDate->format('d.m.Y') . ' - ' . $endDate->format('d.m.Y') . '
 
 wibest.pl/login';
 
-        try {
-            $smsResult = $sms_api->sendSms($phone_validated, $message);
-            // 2. Analiza wyniku zwróconego przez sendSms()
-            if ($smsResult['success'] === true) {
-                // Odpowiedź API znajduje się w kluczu 'data'
-                $responseData = $smsResult['data'];
+            try {
+                $smsResult = $sms_api->sendSms($phone_validated, $message);
+                // 2. Analiza wyniku zwróconego przez sendSms()
+                if ($smsResult['success'] === true) {
+                    // Odpowiedź API znajduje się w kluczu 'data'
+                    $responseData = $smsResult['data'];
 
-                // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
-                if (isset($responseData['list'][0])) {
-                    $messageData = $responseData['list'][0];
+                    // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
+                    if (isset($responseData['list'][0])) {
+                        $messageData = $responseData['list'][0];
 
-                    // Użycie danych z API do zapisu
-                    SentMessage::create([
-                        'type'       => 'sms',
-                        'recipient'  => $phone_validated,
-                        'user_id'    => $leave->user_id,
-                        'company_id' => $leave->company_id,
-                        'subject'    => 'Wnioski',
-                        'body'       => 'Złożenie wniosku w imieniu użytkownika przez ' . $leave->manager->name,
-                        'status'     => $messageData['status'] ?? 'SENT',
-                        'price'      => $messageData['points'] ?? 0.00,
-                    ]);
+                        // Użycie danych z API do zapisu
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->user_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Złożenie wniosku w imieniu użytkownika przez ' . $leave->manager->name,
+                            'status'     => $messageData['status'] ?? 'SENT',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    } else {
+                        // Logowanie: Success=true, ale brak danych wiadomości w liście
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->user_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Złożenie wniosku w imieniu użytkownika przez ' . $leave->manager->name,
+                            'status'     => 'UNKNOW',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    }
                 } else {
-                    // Logowanie: Success=true, ale brak danych wiadomości w liście
+                    // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
                     SentMessage::create([
                         'type'       => 'sms',
                         'recipient'  => $phone_validated,
@@ -193,12 +207,13 @@ wibest.pl/login';
                         'company_id' => $leave->company_id,
                         'subject'    => 'Wnioski',
                         'body'       => 'Złożenie wniosku w imieniu użytkownika przez ' . $leave->manager->name,
-                        'status'     => 'UNKNOW',
+                        'status'     => 'FAILED',
                         'price'      => $messageData['points'] ?? 0.00,
                     ]);
+
+                    // finalStatus pozostaje 'API_FAILED'
                 }
-            } else {
-                // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
+            } catch (Exception) {
                 SentMessage::create([
                     'type'       => 'sms',
                     'recipient'  => $phone_validated,
@@ -209,20 +224,7 @@ wibest.pl/login';
                     'status'     => 'FAILED',
                     'price'      => $messageData['points'] ?? 0.00,
                 ]);
-
-                // finalStatus pozostaje 'API_FAILED'
             }
-        } catch (Exception) {
-            SentMessage::create([
-                'type'       => 'sms',
-                'recipient'  => $phone_validated,
-                'user_id'    => $leave->user_id,
-                'company_id' => $leave->company_id,
-                'subject'    => 'Wnioski',
-                'body'       => 'Złożenie wniosku w imieniu użytkownika przez ' . $leave->manager->name,
-                'status'     => 'FAILED',
-                'price'      => $messageData['points'] ?? 0.00,
-            ]);
         }
         if (!$allDayshasWorkBlock) {
             return redirect()->route('leave.pending.index')->with('success', 'Operacja zakończona powodzeniem.')->with('warning', 'Aby móc zaakceptować wniosek, użytkownik musi mieć zaplanowany grafik w tym czasie.');

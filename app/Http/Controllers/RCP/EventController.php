@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\Activitylog\Models\Activity;
 
 class EventController extends Controller
 {
@@ -50,7 +51,14 @@ class EventController extends Controller
         $endDate = $request->session()->get('end_date');
 
         $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
-        return view('admin.events.show', compact('event', 'countEvents'));
+
+        $logs = Activity::where('subject_type', Event::class)
+            ->where('subject_id', $event->id)
+            ->with('causer')
+            ->latest()
+            ->get();
+
+        return view('admin.events.show', compact('logs', 'event', 'countEvents'));
     }
 
     public function delete(Event $event)

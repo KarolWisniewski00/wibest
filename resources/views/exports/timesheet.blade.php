@@ -77,34 +77,36 @@
         <thead>
             <th style="font-size: 9px; padding: 2px; margin: 0; width:10%;">Imię i nazwisko</th>
             @foreach($dates as $date)
-            <th style="font-size: 9px; padding: 0px; line-height: 1.2; margin: 0;">
-                {{ $date['day_number'] }}<br>{{ $date['day_name_short'] }}
-            </th>
+                <th style="font-size: 9px; padding: 0px; line-height: 1.2; margin: 0;">
+                    {{ $date['day_number'] }}<br>{{ $date['day_name_short'] }}
+                </th>
             @endforeach
         </thead>
         <tbody>
             @foreach($employees as $employee)
-            <tr>
-                <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">{{ $employee->name }}</td>
-                @foreach($dates as $date)
-                <td style="font-size: 9px; padding: 2px; margin: 0;">
-                    @if(isset($employee->dates[$date['date']]))
-                    {{$employee->dates[$date['date']]}}
-                    @endif
-                </td>
-                @endforeach
-            </tr>
+                <tr>
+                    <td style="white-space: nowrap; font-size: 9px; padding: 2px; margin: 0; width:10%;">
+                        {{ Str::limit($employee->name, 17, '...') }}</td>
+                    @foreach($dates as $date)
+                        <td style="font-size: 9px; padding: 2px; margin: 0;">
+                            @if(isset($employee->dates[$date['date']]))
+                                {{$employee->dates[$date['date']]}}
+                            @endif
+                        </td>
+                    @endforeach
+                </tr>
             @endforeach
         </tbody>
     </table>
 
     @php
-    $usedShorts = collect($employees)
-    ->pluck('dates') // tablice dat pracowników
-    ->flatMap(fn($d) => $d) // spłaszcz
-    ->filter() // usuń puste
-    ->unique() // unikalne
-    ->values();
+        $usedShorts = collect($employees)
+            ->pluck('dates')
+            ->flatten()   // zamiast flatMap
+            ->filter()
+            ->map(fn($v) => trim($v))
+            ->unique()
+            ->values();
     @endphp
 
     {{-- Legenda --}}
@@ -112,9 +114,9 @@
         <strong>Legenda:</strong><br>
         RCP – Rejestracja czasu pracy,<br>
         @foreach(config('leavetypes.shortType') as $name => $short)
-        @if($usedShorts->contains($short))
-        {{ $short }} – {{ ucfirst($name) }}<br>
-        @endif
+            @if($usedShorts->contains($short))
+                {{ $short }} – {{ ucfirst($name) }}<br>
+            @endif
         @endforeach
     </p>
 </body>

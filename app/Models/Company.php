@@ -15,6 +15,9 @@ class Company extends Model
         'adress',
         'bank',
         'vat_number', // Numer VAT firmy
+        'created_user_id',
+        'sms_price',
+        'user_price',
     ];
 
     /**
@@ -36,7 +39,7 @@ class Company extends Model
         }
 
         // Policz użytkowników powiązanych z firmą
-        return User::where('company_id', $this->id)->count() ?? 0;
+        return User::withoutGlobalScope('no_crm')->where('company_id', $this->id)->count() ?? 0;
     }
     /**
      * Definiuje relację jeden-do-wielu (firma -> faktury).
@@ -100,5 +103,13 @@ class Company extends Model
     public function workBlocks()
     {
         return $this->hasMany(WorkBlock::class);
+    }
+    public function userHistory()
+    {
+        return $this->hasMany(UserCompanyHistory::class);
+    }
+    public function crmEntries()
+    {
+        return $this->hasMany(Crm::class);
     }
 }

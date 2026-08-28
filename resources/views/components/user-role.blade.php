@@ -18,6 +18,10 @@
 <x-label-rose>
     Właściciel
 </x-label-rose>
+@elseif($user->role == 'CRM')
+<x-label-rose>
+    CRM
+</x-label-rose>
 @else
 <x-label-violet>
     Brak Roli

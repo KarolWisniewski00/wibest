@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\View;
+use Spatie\Activitylog\Models\Activity;
 
 class RCPController extends Controller
 {
@@ -228,7 +229,10 @@ class RCPController extends Controller
     public function show(Request $request, WorkSession $work_session): \Illuminate\View\View
     {
         $task = null;
-        $task = $work_session->getAlertTask();
+        try {
+            $task = $work_session->getAlertTask();
+        } catch (Exception) {
+        }
 
         $workSessionRepository = new WorkSessionRepository();
         $under = '';
@@ -272,7 +276,36 @@ class RCPController extends Controller
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
         $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
-        return view('admin.rcp.show', compact('work_session', 'task', 'countEvents', 'under', 'extra'));
+
+        $logs = Activity::where(function ($query) use ($work_session) {
+            $query->where('subject_type', WorkSession::class)
+                ->where('subject_id', $work_session->id);
+
+            if ($work_session->event_start_id) {
+                $query->orWhere(function ($q) use ($work_session) {
+                    $q->where('subject_type', Event::class)
+                        ->where('subject_id', $work_session->event_start_id);
+                });
+            }
+
+            if ($work_session->event_stop_id) {
+                $query->orWhere(function ($q) use ($work_session) {
+                    $q->where('subject_type', Event::class)
+                        ->where('subject_id', $work_session->event_stop_id);
+                });
+            }
+            if ($work_session->task_id) {
+                $query->orWhere(function ($q) use ($work_session) {
+                    $q->where('subject_type', Event::class)
+                        ->where('subject_id', $work_session->task_id);
+                });
+            }
+        })
+            ->with('causer')
+            ->latest()
+            ->get();
+
+        return view('admin.rcp.show', compact('logs', 'work_session', 'task', 'countEvents', 'under', 'extra'));
     }
     /**
      * przesuwa stop, do startu dodaje liczbe godzin.
@@ -353,7 +386,7 @@ class RCPController extends Controller
 
         // zapisz czas pracy
         $save_time_in_work = gmdate('H:i:s', $seconds);
-        if($save_time_in_work == '00:00:00'){
+        if ($save_time_in_work == '00:00:00') {
             $save_time_in_work = '24:00:00';
         }
         $work_session->time_in_work = $save_time_in_work;
@@ -649,6 +682,27 @@ class RCPController extends Controller
                 return redirect()->back()->with('fail', 'Święto.');
             }
         }
-        return redirect()->back()->with('success', 'Nieznany błąd.');
+        return redirect()->back()->with('fail', 'Nieznany błąd.');
+    }
+    public function updateStart(Request $request, WorkSession $work_session)
+    {
+        $work_session->eventStart->time =
+            \Carbon\Carbon::parse($request->editing_start_time)
+            ->format('Y-m-d H:i:s');
+
+        $work_session->eventStart->save();
+
+        return redirect()
+            ->route('rcp.work-session.show', $work_session)
+            ->with('success', 'Czas rozpoczęcia sesji pracy został zaktualizowany.');
+    }
+    public function createStart(Request $request): \Illuminate\View\View
+    {
+        $userId = Auth::id();
+        $users = $this->userService->getUsersFromCompany();
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
+        return view('admin.rcp.create-start', compact('users', 'userId', 'countEvents'));
     }
 }

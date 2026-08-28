@@ -18,7 +18,9 @@
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://kit.fontawesome.com/e37acf9c2e.js" crossorigin="anonymous"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <!-- <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script> -->
 
     <wireui:scripts />
@@ -28,6 +30,12 @@
 
     <!-- Styles -->
     @livewireStyles
+
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 
     <!-- CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
@@ -49,7 +57,7 @@
     </div>
     <input type="hidden" id="work_start" value="{{ route('api.work.start', '') }}">
     <input type="hidden" id="work_stop" value="{{ route('api.work.stop', '') }}">
-    <input type="hidden" id="work_sessions" value="{{ route('api.work.session', ['','']) }}">
+    <input type="hidden" id="work_sessions" value="{{ route('api.work.session', ['', '']) }}">
     <input type="hidden" id="user_id" value="{{ $user_id }}">
     <input type="hidden" id="company_id" value="{{ $company_id }}">
     <input type="hidden" id="work_sessions_logged_user" value="{{ $work_sessions_logged_user }}">
@@ -57,7 +65,7 @@
     <input type="hidden" id="lat" value="">
     <input type="hidden" id="lon" value="">
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             function getLocation() {
                 return new Promise((resolve) => {
                     if (navigator.geolocation) {
@@ -121,6 +129,7 @@
                 }
                 // Funkcja do liczenia czasu
                 counting() {
+                    $('#clock_info').text("Obliczanie czasu pracy...");
                     const self = this;
                     self.timerInterval = setInterval(() => {
                         self.elapsedSeconds++;
@@ -141,16 +150,19 @@
                     $('#loaderTimer').addClass('hidden');
                     $('#loaderClock').addClass('hidden');
                     $('#timer').removeClass('hidden');
+                    $('#clock_info').text("");
                 }
 
                 // Funkcja do pobierania sesji pracy
                 updateWidgetWorkSession() {
+                    $('#clock_info').text("Ładowanie obecnej sesji pracy...");
                     const self = this;
                     $.ajax({
                         url: self.workSessions + '/' + self.userId,
                         type: 'GET',
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
+                            $('#clock_info').text("");
                             if (response.message === 'W trakcie pracy') {
                                 self.session_id = response.work_session_id;
                                 self.session_status = response.work_session_status;
@@ -162,7 +174,8 @@
                                 self.counting();
                             }
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
+                            $('#clock_info').text("");
                             $('#startButtonWidget').removeClass('hidden');
                             $('#loaderTimerWidget').addClass('hidden');
                             $('#loaderLocationWidget').addClass('hidden');
@@ -192,14 +205,19 @@
                             lon: lon
                         },
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
                             self.session_id = response.work_session_id;
                             toastr.success('Rozpoczęto pracę');
                             self.counting();
+                            let height = $('#totalDay').height();
+                            $('#loaderTotalDay').height(height);
+                            $('#loaderTotalDay').removeClass('hidden');
+                            $('#totalDay').addClass('hidden');
                             $('#loaderTimerWidget').addClass('hidden');
                             $('#loaderTimer').addClass('hidden');
+                            $('#clock_info').text("");
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             toastr.error('Błąd podczas rozpoczęcia pracy');
                             clearInterval(self.timerInterval);
                             self.timerInterval = null;
@@ -218,6 +236,7 @@
                             $('#loaderTimer').removeClass('hidden');
                             $('#loaderClock').removeClass('hidden');
                             $('#timer').addClass('hidden');
+                            $('#clock_info').text("Błąd podczas rozpoczęcia pracy");
                         }
                     });
                 }
@@ -236,8 +255,12 @@
                             lon: lon
                         },
                         dataType: 'json',
-                        success: function(response) {
+                        success: function (response) {
                             toastr.success('Zakończono pracę');
+                            let height = $('#totalDay').height();
+                            $('#loaderTotalDay').height(height);
+                            $('#loaderTotalDay').removeClass('hidden');
+                            $('#totalDay').addClass('hidden');
                             clearInterval(self.timerInterval);
                             self.elapsedSeconds = 0;
                             $('#timerWidget').text(self.formatTime(self.elapsedSeconds));
@@ -249,9 +272,11 @@
                             $('#stopButton').addClass('hidden');
                             $('#startButton').removeClass('hidden');
                             $('#loaderTimer').addClass('hidden');
+                            $('#clock_info').text("");
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             toastr.error('Błąd podczas zakończenia pracy');
+                            $('#clock_info').text("Błąd podczas zakończenia pracy");
                         }
                     });
                 }
@@ -299,7 +324,8 @@
                     self.updateTodayDate();
                     self.updateWidgetWorkSession();
 
-                    $('#startButton, #startButtonWidget').click(async function() {
+                    $('#startButton, #startButtonWidget').click(async function () {
+                        $('#clock_info').text("Wysyłanie danych rozpoczęcia pracy...");
                         $('#startButtonWidget').addClass('hidden');
                         $('#startButton').addClass('hidden');
                         $('#loaderTimerWidget').removeClass('hidden');
@@ -308,7 +334,8 @@
                         self.startTimer();
                     });
 
-                    $('#stopButton, #stopButtonWidget').click(async function() {
+                    $('#stopButton, #stopButtonWidget').click(async function () {
+                        $('#clock_info').text("Wysyłanie danych zakończenia pracy...");
                         $('#stopButtonWidget').addClass('hidden');
                         $('#stopButton').addClass('hidden');
                         $('#loaderTimerWidget').removeClass('hidden');

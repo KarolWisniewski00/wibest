@@ -66,17 +66,17 @@ class LeaveDateStep extends Step
             // Sprawdzamy, czy użytkownik pracuje w ten dzień (zgodnie z kolumną boolean)
             if ($userWorkingDays[$dayOfWeekIndex] == true) {
                 //if ($user->public_holidays == true) {
-                    $holidays = $calendar->getPublicHolidays($date->year);
-                    $dateStr = $date->format('Y-m-d');
+                $holidays = $calendar->getPublicHolidays($date->year);
+                $dateStr = $date->format('Y-m-d');
 
-                    // Sprawdzenie czy to Nowy Rok lub Trzech Króli
-                    if ($date->month == 1 && $date->day == 1) {
-                        $isHoliday = true; // Nowy Rok
-                    } elseif ($date->month == 1 && $date->day == 6) {
-                        $isHoliday = true; // Trzech Króli
-                    } else {
-                        $isHoliday = $holidays->contains($dateStr);
-                    }
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($date->month == 1 && $date->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($date->month == 1 && $date->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
                 //} else {
                 //    $isHoliday = false;
                 //}
@@ -138,40 +138,54 @@ class LeaveDateStep extends Step
                 'price'      => 0.00,
             ]);
         }
-        $sms_api = new SmsApi();
-        $phone_validated = $sms_api->normalizePhoneNumber($leave->manager->phone);
+        if ($leave->manager->sms) {
+            $sms_api = new SmsApi();
+            $phone_validated = $sms_api->normalizePhoneNumber($leave->manager->phone);
 
-        $message = 'Złożono nowy wniosek
+            $message = 'Złożono nowy wniosek
 ' . $state['type'] . '
 ' . $leave->user->name . '
 ' . $startDate->format('d.m.Y') . ' - ' . $endDate->format('d.m.Y') . '
 
 wibest.pl/login';
 
-        try {
-            $smsResult = $sms_api->sendSms($phone_validated, $message);
-            // 2. Analiza wyniku zwróconego przez sendSms()
-            if ($smsResult['success'] === true) {
-                // Odpowiedź API znajduje się w kluczu 'data'
-                $responseData = $smsResult['data'];
+            try {
+                $smsResult = $sms_api->sendSms($phone_validated, $message);
+                // 2. Analiza wyniku zwróconego przez sendSms()
+                if ($smsResult['success'] === true) {
+                    // Odpowiedź API znajduje się w kluczu 'data'
+                    $responseData = $smsResult['data'];
 
-                // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
-                if (isset($responseData['list'][0])) {
-                    $messageData = $responseData['list'][0];
+                    // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
+                    if (isset($responseData['list'][0])) {
+                        $messageData = $responseData['list'][0];
 
-                    // Użycie danych z API do zapisu
-                    SentMessage::create([
-                        'type'       => 'sms',
-                        'recipient'  => $phone_validated,
-                        'user_id'    => $leave->manager_id,
-                        'company_id' => $leave->company_id,
-                        'subject'    => 'Wnioski',
-                        'body'       => 'Złożenie wniosku przez użytkownika ' . $leave->user->name,
-                        'status'     => $messageData['status'] ?? 'SENT',
-                        'price'      => $messageData['points'] ?? 0.00,
-                    ]);
+                        // Użycie danych z API do zapisu
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->manager_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Złożenie wniosku przez użytkownika ' . $leave->user->name,
+                            'status'     => $messageData['status'] ?? 'SENT',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    } else {
+                        // Logowanie: Success=true, ale brak danych wiadomości w liście
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->manager_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Złożenie wniosku przez użytkownika ' . $leave->user->name,
+                            'status'     => 'UNKNOW',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    }
                 } else {
-                    // Logowanie: Success=true, ale brak danych wiadomości w liście
+                    // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
                     SentMessage::create([
                         'type'       => 'sms',
                         'recipient'  => $phone_validated,
@@ -179,12 +193,13 @@ wibest.pl/login';
                         'company_id' => $leave->company_id,
                         'subject'    => 'Wnioski',
                         'body'       => 'Złożenie wniosku przez użytkownika ' . $leave->user->name,
-                        'status'     => 'UNKNOW',
+                        'status'     => 'FAILED',
                         'price'      => $messageData['points'] ?? 0.00,
                     ]);
+
+                    // finalStatus pozostaje 'API_FAILED'
                 }
-            } else {
-                // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
+            } catch (Exception) {
                 SentMessage::create([
                     'type'       => 'sms',
                     'recipient'  => $phone_validated,
@@ -195,20 +210,7 @@ wibest.pl/login';
                     'status'     => 'FAILED',
                     'price'      => $messageData['points'] ?? 0.00,
                 ]);
-
-                // finalStatus pozostaje 'API_FAILED'
             }
-        } catch (Exception) {
-            SentMessage::create([
-                'type'       => 'sms',
-                'recipient'  => $phone_validated,
-                'user_id'    => $leave->manager_id,
-                'company_id' => $leave->company_id,
-                'subject'    => 'Wnioski',
-                'body'       => 'Złożenie wniosku przez użytkownika ' . $leave->user->name,
-                'status'     => 'FAILED',
-                'price'      => $messageData['points'] ?? 0.00,
-            ]);
         }
 
         return redirect()->route('leave.single.index')->with('success', 'Operacja zakończona powodzeniem.');

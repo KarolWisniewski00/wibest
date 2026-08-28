@@ -1,55 +1,4 @@
 <div>
-    @php
-    $shortType = ['wolne za pracę w święto' => 'WPS',
-    'zwolnienie lekarskie' => 'ZL',
-    'urlop wypoczynkowy' => 'UW',
-    'urlop planowany' => 'UP',
-    'urlop rodzicielski' => 'UR',
-    'wolne za nadgodziny' => 'WN',
-    'wolne za święto w sobotę' => 'WSS',
-    'urlop bezpłatny' => 'UB',
-    'wolne z tytułu 5-dniowego tygodnia pracy' => 'WT5',
-    'zwolnienie lekarsie - opieka' => 'ZLO',
-    'urlop okolicznościowy' => 'UO',
-    'urlop wypoczynkowy "na żądanie"' => 'UWZ',
-    'oddanie krwi' => 'OK',
-    'urlop ojcowski' => 'UOJC',
-    'urlop macieżyński' => 'UM',
-    'świadczenie rehabilitacyjne' => 'SR',
-    'opieka' => 'OP',
-    'świadek w sądzie' => 'SWS',
-    'praca zdalna' => 'PZ',
-    'kwarantanna' => 'KW',
-    'kwarantanna z pracą zdalną' => 'KWZPZ',
-    'delegacja' => 'DEL',
-    'święto' => 'ŚUW'
-    ];
-    $icons = [
-    'wolne za pracę w święto' => '🕊️',
-    'zwolnienie lekarskie' => '🤒',
-    'urlop wypoczynkowy' => '🏖️',
-    'urlop planowany' => '🏖️',
-    'urlop rodzicielski' => '👶',
-    'wolne za nadgodziny' => '⏰',
-    'wolne za święto w sobotę' => '🗓️',
-    'urlop bezpłatny' => '💸',
-    'wolne z tytułu 5-dniowego tygodnia pracy' => '📆',
-    'zwolnienie lekarsie - opieka' => '🧑‍⚕️',
-    'urlop okolicznościowy' => '🎉',
-    'urlop wypoczynkowy "na żądanie"' => '📢',
-    'oddanie krwi' => '🩸',
-    'urlop ojcowski' => '👨‍👧',
-    'urlop macieżyński' => '🤱',
-    'świadczenie rehabilitacyjne' => '🦾',
-    'opieka' => '🧑‍🍼',
-    'świadek w sądzie' => '⚖️',
-    'praca zdalna' => '💻',
-    'kwarantanna' => '🦠',
-    'kwarantanna z pracą zdalną' => '🏠💻',
-    'delegacja' => '✈️',
-    'święto' => '🎌',
-    ];
-    @endphp
     @if($type != '')
     <div class="p-2 pt-0 text-sm rounded-lg flex flex-col gap-4">
         <span class="text-gray-900 dark:text-white">📋 Podgląd</span>
@@ -60,10 +9,10 @@
 
             <!-- Ikona i label -->
             <div class="flex flex-col items-center justify-center h-full w-fit">
-                <span class="text-2xl">{{ $icons[$type] ?? '' }}</span>
+                <span class="text-2xl">{{ config('leavetypes.icons.' . $type, '') ?? '' }}</span>
                 <span class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
                                     bg-pink-300 text-gray-900 uppercase tracking-widest">
-                    {{ $shortType[$type] ?? '' }}
+                    {{ config('leavetypes.shortType.' . $type, '') }}
                 </span>
             </div>
 

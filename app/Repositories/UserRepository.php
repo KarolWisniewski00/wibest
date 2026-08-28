@@ -211,7 +211,7 @@ class UserRepository
 
         // Konwersja daty do formatu Carbon
         $carbonDate = Carbon::createFromFormat('d.m.y', $date);
-        $dayName = strtolower($carbonDate->translatedFormat('l')); // np. monday, tuesday, etc.
+        $dayNamePl = strtolower($carbonDate->translatedFormat('l')); // np. monday, tuesday, etc.
 
         // Mapowanie dni tygodnia PL → EN (bo Carbon używa angielskich nazw)
         $daysMap = [
@@ -227,9 +227,13 @@ class UserRepository
         $startDay = $daysMap[strtolower($user->working_hours_start_day)] ?? null;
         $stopDay  = $daysMap[strtolower($user->working_hours_stop_day)] ?? null;
 
+
+
         if (!$startDay || !$stopDay) {
             return false;
         }
+
+        $dayName = $daysMap[$dayNamePl] ?? null;
 
         // Sprawdzenie, czy dany dzień tygodnia mieści się w zakresie pracy użytkownika
         $weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];

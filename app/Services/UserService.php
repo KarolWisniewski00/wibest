@@ -261,10 +261,10 @@ class UserService
                 } elseif ($work) {
                     $userDates[$date] = "work";
                     $userObjs[$date] = $work_obj;
-                } elseif ($static) {
-                    $userDates[$date] = "static";
-                } else if ($isHoliday) {
+                } elseif ($isHoliday) {
                     $userDates[$date] = "holiday";
+                } else if ($static) {
+                    $userDates[$date] = "static";
                 } else {
                     $userDates[$date] = null;
                 }
@@ -352,7 +352,27 @@ class UserService
         $users = $this->paginatedByRole();
 
         foreach ($users as &$user) {
+            //Pobiera wnioski
             $leaves = $leaveService->getByUserIdWithCutMonth($request, $user->id);
+
+            //Zmienna dla grupowania
+            $leaveTimes = [];
+
+            //Grupurje wnioski
+            foreach ($leaves as $leave) {
+                $type = $leave->type;
+
+                if (!isset($leaveTimes[$type])) {
+                    $leaveTimes[$type] = [
+                        'hours' => 0,
+                        'minutes' => 0,
+                        'seconds' => 0,
+                        'hms' => '',
+                        'type' => $type,
+                    ];
+                }
+            }
+
             $user->time_in_work = 0;
             $user->time_in_work_extra = 0;
             $user->time_in_work_under = 0;
@@ -479,6 +499,14 @@ class UserService
                     $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
                     $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
                     $user->time_in_work_hms_leave = sprintf('%02dh 00min 00s', $user->time_in_work_leave);
+
+                    //rozpisz na kategorie wniosków
+                    foreach ($leaveTimes as $type => &$time) {
+                        if ($leave->type == $type) {
+                            $time['hours'] += $leaveDays * $user->working_hours_custom;
+                            $time['hms'] = sprintf('%02dh 00min 00s', $time['hours']);
+                        }
+                    }
                 }
 
                 $hours = floor($user->time_in_work / 3600);
@@ -502,6 +530,8 @@ class UserService
                 $hoursPlanned = floor($user->time_in_work_planned / 3600);
                 $user->time_in_work_hms_planned = sprintf('%02dh 00min 00s', $hoursPlanned);
                 $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
+
+                $user->leave_times_by_type = $leaveTimes;
             }
 
             if ($user->working_hours_regular == 'zmienny planing') {
@@ -542,6 +572,14 @@ class UserService
                             $user->time_in_work_total += floor($getWorkBlock->duration_seconds / 3600);
                             $user->time_in_work_total_minutes += floor(($getWorkBlock->duration_seconds % 3600) / 60);
                             $user->time_in_work_total_seconds += $getWorkBlock->duration_seconds % 60;
+
+                            foreach ($leaveTimes as $type => &$time) {
+                                if ($leave->type == $type) {
+                                    $time['hours'] += floor($getWorkBlock->duration_seconds / 3600);
+                                    $time['minutes'] += floor(($getWorkBlock->duration_seconds % 3600) / 60);
+                                    $time['seconds'] += $getWorkBlock->duration_seconds % 60;
+                                }
+                            }
                         } else {
                             $non_working_days++;
                         }
@@ -549,6 +587,13 @@ class UserService
                     }
 
                     $user->time_in_work_hms_leave = sprintf('%02dh %02dmin %02ds', $user->time_in_work_leave, $user->time_in_work_leave_minutes, $user->time_in_work_leave_seconds);
+
+                    //rozpisz na kategorie wniosków
+                    foreach ($leaveTimes as $type => &$time) {
+                        if ($leave->type == $type) {
+                            $time['hms'] = sprintf('%02dh %02dmin %02ds', $time['hours'], $time['minutes'], $time['seconds']);
+                        }
+                    }
                 }
 
                 $hours = floor($user->time_in_work / 3600);
@@ -575,6 +620,8 @@ class UserService
                 $secondsPlanned = $user->time_in_work_planned_var % 60;
                 $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
                 $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
+
+                $user->leave_times_by_type = $leaveTimes;
             }
         }
         return $users;
@@ -594,7 +641,26 @@ class UserService
         $users = $this->getByRole($request);
 
         foreach ($users as &$user) {
+            //Pobiera wnioski
             $leaves = $leaveService->getByUserIdWithCutMonth($request, $user->id);
+
+            //Zmienna dla grupowania
+            $leaveTimes = [];
+
+            //Grupurje wnioski
+            foreach ($leaves as $leave) {
+                $type = $leave->type;
+
+                if (!isset($leaveTimes[$type])) {
+                    $leaveTimes[$type] = [
+                        'hours' => 0,
+                        'minutes' => 0,
+                        'seconds' => 0,
+                        'hms' => '',
+                        'type' => $type,
+                    ];
+                }
+            }
             $user->time_in_work = 0;
             $user->time_in_work_extra = 0;
             $user->time_in_work_under = 0;
@@ -720,6 +786,14 @@ class UserService
                     $user->time_in_work_leave += $leaveDays * $user->working_hours_custom;
                     $user->time_in_work_total += $leaveDays * $user->working_hours_custom;
                     $user->time_in_work_hms_leave = sprintf('%02dh 00min 00s', $user->time_in_work_leave);
+
+                    //rozpisz na kategorie wniosków
+                    foreach ($leaveTimes as $type => &$time) {
+                        if ($leave->type == $type) {
+                            $time['hours'] += $leaveDays * $user->working_hours_custom;
+                            $time['hms'] = sprintf('%02dh 00min 00s', $user->time_in_work_leave);
+                        }
+                    }
                 }
 
                 $hours = floor($user->time_in_work / 3600);
@@ -743,6 +817,8 @@ class UserService
                 $hoursPlanned = floor($user->time_in_work_planned / 3600);
                 $user->time_in_work_hms_planned = sprintf('%02dh 00min 00s', $hoursPlanned);
                 $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
+
+                $user->leave_times_by_type = $leaveTimes;
             }
 
             if ($user->working_hours_regular == 'zmienny planing') {
@@ -789,6 +865,15 @@ class UserService
                         $currentDate->addDay();
                     }
                     $user->time_in_work_hms_leave = sprintf('%02dh %02dmin %02ds', $user->time_in_work_leave, $user->time_in_work_leave_minutes, $user->time_in_work_leave_seconds);
+                    //rozpisz na kategorie wniosków
+                    foreach ($leaveTimes as $type => &$time) {
+                        if ($leave->type == $type) {
+                            $time['hours'] += floor($getWorkBlock->duration_seconds / 3600);
+                            $time['minutes'] += floor(($getWorkBlock->duration_seconds % 3600) / 60);
+                            $time['seconds'] += $getWorkBlock->duration_seconds % 60;
+                            $time['hms'] = sprintf('%02dh %02dmin %02ds', $user->time_in_work_leave, $user->time_in_work_leave_minutes, $user->time_in_work_leave_seconds);
+                        }
+                    }
                 }
 
                 $hours = floor($user->time_in_work / 3600);
@@ -804,12 +889,19 @@ class UserService
                 $secondsExtra = $user->time_in_work_extra % 60;
                 $user->time_in_work_hms_extra = sprintf('%02dh %02dmin %02ds', $hoursExtra, $minutesExtra, $secondsExtra);
 
+                $hoursUnder = floor($user->time_in_work_under / 3600);
+                $minutesUnder = floor(($user->time_in_work_under % 3600) / 60);
+                $secondsUnder = $user->time_in_work_under % 60;
+                $user->time_in_work_hms_under = sprintf('%02dh %02dmin %02ds', $hoursUnder, $minutesUnder, $secondsUnder);
+
                 $user->time_in_work_hms_planned = '00h';
                 $hoursPlanned = floor($user->time_in_work_planned_var / 3600);
                 $minutesPlanned = floor(($user->time_in_work_planned_var % 3600) / 60);
                 $secondsPlanned = $user->time_in_work_planned_var % 60;
                 $user->time_in_work_hms_planned = sprintf('%02dh %02dmin %02ds', $hoursPlanned, $minutesPlanned, $secondsPlanned);
                 $user->time_in_work_hms_total = sprintf('%02dh %02dmin %02ds', $user->time_in_work_total, $user->time_in_work_total_minutes, $user->time_in_work_total_seconds);
+
+                $user->leave_times_by_type = $leaveTimes;
             }
         }
         return $users;

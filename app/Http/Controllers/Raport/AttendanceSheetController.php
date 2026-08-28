@@ -97,13 +97,7 @@ class AttendanceSheetController extends Controller
             'list' => $rows_list,
         ]);
     }
-    /**
-     * Zwraca export do pdfa.
-     *
-     * @param Request $request
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
-     */
-    public function exportPdf(Request $request): \Symfony\Component\HttpFoundation\Response
+    public function exportExcel(Request $request)
     {
         setlocale(LC_TIME, 'pl_PL.UTF-8');
         \Carbon\Carbon::setLocale('pl');
@@ -230,7 +224,7 @@ class AttendanceSheetController extends Controller
             }
 
             if ($totalDay != 0) {
-                if ($totalDayExtra == 0 && $totalDayUnder == 0 ) {
+                if ($totalDayExtra == 0 && $totalDayUnder == 0) {
                     $employees[0]->time_in_work -= $totalDay;
                     $totalDay = $totalDayPlannedVarBufor;
                     $employees[0]->time_in_work += $totalDay;
@@ -314,7 +308,14 @@ class AttendanceSheetController extends Controller
         $minutesLeave = floor(($employees[0]->time_in_work_leave % 3600) / 60);
         $employees[0]->time_in_work_hms_leave = sprintf('%02dh %02dmin', $hoursLeave, $minutesLeave);
 
-        $pdf = Pdf::loadView('exports.attendancesheet', [
+
+        if($request->has('excel')){
+            $rows = $request->excel;
+        }else{
+            $rows = null;
+        }
+
+        return [
             'employee' => $employees[0],
             'dates' => $dates,
             'datesAll' => $datesAll,
@@ -325,14 +326,47 @@ class AttendanceSheetController extends Controller
             'datesWork' => $datesWork,
             'startDate' => $startDate,
             'endDate' => $endDate,
-        ])
-            ->setPaper('a4', 'landscape')
-            ->setOptions([
-                'defaultFont' => 'DejaVu Sans', // obsługuje polskie znaki
-                'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => true,
-            ]);
-
+            'rows' => $rows,
+        ];
+    }
+    /**
+     * Zwraca export do pdfa.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function exportPdf(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+        if ($request->has('excel')) {
+            $pdf = Pdf::loadView('exports.excel', $this->exportExcel($request))
+                ->setPaper('a4', 'landscape')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans', // obsługuje polskie znaki
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                ]);
+        } else {
+            $pdf = Pdf::loadView('exports.attendancesheet', $this->exportExcel($request))
+                ->setPaper('a4', 'landscape')
+                ->setOptions([
+                    'defaultFont' => 'DejaVu Sans', // obsługuje polskie znaki
+                    'isHtml5ParserEnabled' => true,
+                    'isRemoteEnabled' => true,
+                ]);
+        }
         return $pdf->download('eksport_dziennika_obecności.pdf');
+    }
+    public function excel(Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        $users = $this->userService->paginatedByRoleAddEwiByFilterDate($request);
+        $user = $users[0];
+        $request->merge([
+            'ids' => [$request->ids]
+        ]);
+        $excel = $this->exportExcel($request);
+        return view('admin.attendance.excel',  compact('startDate', 'endDate', 'user', 'excel'));
     }
 }

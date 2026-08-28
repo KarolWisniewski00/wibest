@@ -1,11 +1,17 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Calendar\WorkScheduleController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\CostController;
+use App\Http\Controllers\CrmController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoogleController;
+use App\Http\Controllers\Leave\LeaveBalanceController;
+use App\Http\Controllers\SmsController;
 use App\Http\Controllers\TSI\InvoiceController;
 use App\Http\Controllers\Leave\LeavePendingReviewController;
 use App\Http\Controllers\Leave\LeaveSingleController;
@@ -18,6 +24,7 @@ use App\Http\Controllers\RCP\EventController;
 use App\Http\Controllers\RCP\LocationController;
 use App\Http\Controllers\RCP\WorkSessionController as RCPWorkSessionController;
 use App\Http\Controllers\RCP\RCPController;
+use App\Http\Controllers\SeoController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
@@ -41,28 +48,49 @@ use Illuminate\Support\Facades\Route;
 //NOT LOGGED IN
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
+
+Route::get('funkcje', function () {
+    return view('function');
+})->name('function');
+
+Route::get('o-nas', function () {
+    return view('about');
+})->name('about');
+
+Route::get('blog', function () {
+    return view('blog');
+})->name('blog');
+
+Route::get('blog/{slug}', function ($slug) {
+    return view('blog_show', compact('slug'));
+})->name('blog.show');
+
+Route::get('kontakt', function () {
+    return view('contact');
+})->name('contact');
+
+Route::post('/kontakt', [ContactController::class, 'send'])
+    ->name('contact.send');
 
 Route::get('/login/google', [GoogleController::class, 'redirect'])->name('login.google');
 Route::get('/login/google/callback', [GoogleController::class, 'callback']);
 
 Route::prefix('api')->group(function () {
 
-    Route::prefix('work')->group(function () {
-        Route::get('/start/{user_id}', [RCPWorkSessionController::class, 'startWork'])->name('api.work.start');
-        Route::get('/stop/{id}', [RCPWorkSessionController::class, 'stopWork'])->name('api.work.stop');
-        Route::get('/session/{user_id}', [RCPWorkSessionController::class, 'getWorkSession'])->name('api.work.session');
-    });
-    Route::prefix('invoice')->group(function () {
-        Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
-    });
-    Route::prefix('offer')->group(function () {
-        Route::get('/{year}', [OfferController::class, 'value'])->name('api.offer.value');
-    });
-
-
     //API -----------------------------------------------------------------
     Route::prefix('v1')->group(function () {
+        Route::prefix('work')->group(function () {
+            Route::get('/start/{user_id}', [RCPWorkSessionController::class, 'startWork'])->name('api.work.start');
+            Route::get('/stop/{id}', [RCPWorkSessionController::class, 'stopWork'])->name('api.work.stop');
+            Route::get('/session/{user_id}', [RCPWorkSessionController::class, 'getWorkSession'])->name('api.work.session');
+        });
+        Route::prefix('invoice')->group(function () {
+            Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
+        });
+        Route::prefix('offer')->group(function () {
+            Route::get('/{year}', [OfferController::class, 'value'])->name('api.offer.value');
+        });
         Route::prefix('search')->group(function () {
             Route::get('/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.v1.search.gus'); //TSI
         });
@@ -86,11 +114,21 @@ Route::prefix('api')->group(function () {
             });
         });
         Route::prefix('setting')->group(function () {
+            Route::prefix('sms')->group(function () {
+                Route::get('stats', [SmsController::class, 'smsStats'])->name('api.v1.setting.sms.stats');
+            });
+            Route::prefix('crm')->group(function () {
+                Route::get('/', [CrmController::class, 'get'])->name('api.v1.setting.crm.get');
+            });
             Route::prefix('client')->group(function () {
                 Route::get('/', [ClientController::class, 'get'])->name('api.v1.setting.client.get');
+                Route::get('sms-stats/{client}', [ClientController::class, 'smsStats'])->name('api.v1.setting.client.sms.stats');
+                Route::get('user-stats/{client}', [ClientController::class, 'userStats'])->name('api.v1.setting.client.user.stats');
+                Route::get('users/{client}', [ClientController::class, 'users'])->name('api.v1.setting.client.users');
             });
             Route::prefix('user')->group(function () {
                 Route::get('/', [UserController::class, 'get'])->name('api.v1.setting.user.get');
+                Route::get('stats', [SettingController::class, 'userStats'])->name('api.v1.setting.user.stats');
             });
         });
         Route::prefix('raport')->group(function () {
@@ -129,6 +167,10 @@ Route::prefix('api')->group(function () {
                 Route::get('/', [LeavePendingReviewController::class, 'get'])->name('api.v1.leave.pending.get');
                 Route::get('set-date/', [LeavePendingReviewController::class, 'setDate'])->name('api.v1.leave.pending.set.date');
             });
+            Route::prefix('balance')->group(function () {
+                Route::get('/', [LeaveBalanceController::class, 'get'])->name('api.v1.leave.balance.get');
+                Route::get('set-balance/', [LeaveBalanceController::class, 'setDate'])->name('api.v1.leave.balance.set.date');
+            });
         });
     });
     //API -----------------------------------------------------------------
@@ -156,8 +198,10 @@ Route::middleware([
                 Route::get('show/{user}', [TeamUserController::class, 'show'])->name('team.user.show');
                 Route::get('edit/{user}', [TeamUserController::class, 'edit'])->name('team.user.edit');
                 Route::get('planing/{user}', [TeamUserController::class, 'planing'])->name('team.user.planing');
-                Route::get('config_planing/{user}', [TeamUserController::class, 'config'])->name('team.user.config_planing');
+                Route::get('config_planing/{user}', [TeamUserController::class, 'config_planing'])->name('team.user.config_planing');
                 Route::put('update_planing/{user}', [TeamUserController::class, 'update_planing'])->name('team.user.update_planing');
+                Route::get('config_sms/{user}', [TeamUserController::class, 'config_sms'])->name('team.user.config_sms');
+                Route::put('update_sms/{user}', [TeamUserController::class, 'update_sms'])->name('team.user.update_sms');
                 Route::get('restart/{user}', [TeamUserController::class, 'restart'])->name('team.user.restart');
                 Route::put('update/{user}', [TeamUserController::class, 'update'])->name('team.user.update');
                 Route::post('disconnect/{user}', [TeamUserController::class, 'disconnect'])->name('team.user.disconnect');
@@ -196,12 +240,20 @@ Route::middleware([
             Route::prefix('pending-review')->group(function () {
                 Route::get('/', [LeavePendingReviewController::class, 'index'])->name('leave.pending.index');
                 Route::get('/create', [LeavePendingReviewController::class, 'create'])->name('leave.pending.create');
+                Route::get('/refill/{leave}', [LeavePendingReviewController::class, 'refill'])->name('leave.pending.refill');
                 Route::get('/edit/{leave}', [LeavePendingReviewController::class, 'edit'])->name('leave.pending.edit');
                 Route::delete('/delete/{leave}', [LeavePendingReviewController::class, 'delete'])->name('leave.pending.delete');
                 Route::get('/toggle/{leave}', [LeavePendingReviewController::class, 'toggle'])->name('leave.pending.toggle');
                 Route::get('accept/{leave}', [LeavePendingReviewController::class, 'accept'])->name('leave.pending.accept');
                 Route::get('reject/{leave}', [LeavePendingReviewController::class, 'reject'])->name('leave.pending.reject');
                 Route::get('cancel/{leave}', [LeavePendingReviewController::class, 'cancel'])->name('leave.pending.cancel');
+            });
+            Route::prefix('balance')->group(function () {
+                Route::get('/', [LeaveBalanceController::class, 'index'])->name('leave.balance.index');
+                Route::get('/store', [LeaveBalanceController::class, 'store'])->name('leave.balance.store');
+                Route::get('/edit/{leave}', [LeaveBalanceController::class, 'edit'])->name('leave.balance.edit');
+                Route::put('/update/{leave}', [LeaveBalanceController::class, 'update'])->name('leave.balance.update');
+                Route::delete('/delete/{leave}', [LeaveBalanceController::class, 'delete'])->name('leave.balance.delete');
             });
         });
 
@@ -212,6 +264,7 @@ Route::middleware([
                 Route::get('/create', [RCPController::class, 'create'])->name('rcp.work-session.create');
                 Route::get('/create/{user}/{date}', [RCPController::class, 'createUser'])->name('rcp.work-session.create.user');
                 Route::get('/create-note/{work_session}', [RCPController::class, 'createNote'])->name('rcp.work-session.create.note');
+                Route::get('/create-start', [RCPController::class, 'createStart'])->name('rcp.work-session.create.start');
                 Route::post('/store', [RCPController::class, 'store'])->name('rcp.work-session.store');
                 Route::post('/store-note/{work_session}', [RCPController::class, 'storeNote'])->name('rcp.work-session.store.note');
                 Route::post('/store-task/{work_session}', [RCPController::class, 'storeTask'])->name('rcp.work-session.store.task');
@@ -225,6 +278,7 @@ Route::middleware([
                 Route::get('/show/{work_session}', [RCPController::class, 'show'])->name('rcp.work-session.show');
                 Route::get('/fix/{work_session}', [RCPController::class, 'fix'])->name('rcp.work-session.fix');
                 Route::get('/stop/{work_session}', [RCPController::class, 'stop'])->name('rcp.work-session.stop');
+                Route::put('/update-start/{work_session}', [RCPController::class, 'updateStart'])->name('rcp.work-session.update.start');
                 Route::delete('/delete/{work_session}', [RCPController::class, 'delete'])->name('rcp.work-session.delete');
             });
 
@@ -251,6 +305,7 @@ Route::middleware([
 
             Route::prefix('attendance-sheet')->group(function () {
                 Route::get('/', [AttendanceSheetController::class, 'index'])->name('raport.attendance-sheet.index');
+                Route::post('excel', [AttendanceSheetController::class, 'excel'])->name('raport.attendance-sheet.excel');
             });
         });
 
@@ -261,7 +316,6 @@ Route::middleware([
             Route::post('store', [SettingController::class, 'store'])->name('setting.store');
             Route::get('edit/{company}', [SettingController::class, 'edit'])->name('setting.edit');
             Route::put('update/{company}', [SettingController::class, 'update'])->name('setting.update');
-            Route::get('disconnect/{user}', [SettingController::class, 'disconnect'])->name('setting.user.disconnect');
             Route::get('invitations/accept/{id}', [SettingController::class, 'acceptInvitation'])->name('setting.user.invitations.accept');
             Route::get('invitations/reject/{id}', [SettingController::class, 'rejectInvitation'])->name('setting.user.invitations.reject');
 
@@ -303,7 +357,24 @@ Route::middleware([
                 Route::get('download/{offer}', [OfferController::class, 'download'])->name('setting.offer.download');
                 Route::get('store/from/{offer}', [OfferController::class, 'store_from'])->name('setting.offer.store.from');
             });
-
+            Route::prefix('sms')->group(function () {
+                Route::get('/', [SmsController::class, 'index'])->name('setting.sms');
+            });
+            Route::prefix('blog')->group(function () {
+                Route::get('/', [BlogController::class, 'index'])->name('setting.blog');
+                Route::get('create', [BlogController::class, 'create'])->name('setting.blog.create');
+                Route::post('store', [BlogController::class, 'store'])->name('setting.blog.store');
+                Route::get('edit/{blog}', [BlogController::class, 'edit'])->name('setting.blog.edit');
+                Route::put('update/{blog}', [BlogController::class, 'update'])->name('setting.blog.update');
+                Route::delete('delete/{blog}', [BlogController::class, 'delete'])->name('setting.blog.delete');
+            });
+            Route::prefix('crm')->group(function () {
+                Route::get('/', [CrmController::class, 'index'])->name('setting.crm');
+                Route::get('create', [CrmController::class, 'create'])->name('setting.crm.create');
+                Route::post('store', [CrmController::class, 'store'])->name('setting.crm.store');
+                Route::get('edit/{crm}', [CrmController::class, 'edit'])->name('setting.crm.edit');
+                Route::put('update/{crm}', [CrmController::class, 'update'])->name('setting.crm.update');
+            });
             Route::prefix('client')->group(function () {
                 Route::get('/', [ClientController::class, 'index'])->name('setting.client');
                 Route::get('create', [ClientController::class, 'create'])->name('setting.client.create');
@@ -312,6 +383,7 @@ Route::middleware([
                 Route::get('edit/{client}', [ClientController::class, 'edit'])->name('setting.client.edit');
                 Route::put('update/{client}', [ClientController::class, 'update'])->name('setting.client.update');
                 Route::delete('delete/{client}', [ClientController::class, 'delete'])->name('setting.client.delete');
+                Route::get('sms/{client}', [ClientController::class, 'sms'])->name('setting.client.sms');
             });
             Route::prefix('user')->group(function () {
                 Route::get('/', [UserController::class, 'index'])->name('setting.user');
@@ -319,11 +391,18 @@ Route::middleware([
                 Route::get('edit-planing/{user}', [UserController::class, 'editPlaning'])->name('setting.user.edit-planing');
                 Route::get('edit/{user}', [UserController::class, 'edit'])->name('setting.user.edit');
                 Route::get('create/{client}', [UserController::class, 'create'])->name('setting.user.create');
+                Route::get('create/for/crm/{client}', [UserController::class, 'createForCrm'])->name('setting.user.create.for.crm');
+                Route::post('store/for/crm/{client}', [UserController::class, 'storeForCrm'])->name('setting.user.store.for.crm');
+                Route::get('edit/for/crm/{user}', [UserController::class, 'editForCrm'])->name('setting.user.edit.for.crm');
+                Route::put('update/for/crm/{user}', [UserController::class, 'updateForCrm'])->name('setting.user.update.for.crm');
                 Route::put('update-company/{user}', [UserController::class, 'updateCompany'])->name('setting.user.update-company');
                 Route::get('show/{user}', [UserController::class, 'show'])->name('setting.user.show');
                 Route::delete('delete/{user}', [UserController::class, 'delete'])->name('setting.user.delete');
-                Route::get('config_planing/{user}', [UserController::class, 'config'])->name('setting.user.config_planing');
+                Route::get('config_planing/{user}', [UserController::class, 'config_planing'])->name('setting.user.config_planing');
                 Route::put('update_planing/{user}', [UserController::class, 'update_planing'])->name('setting.user.update_planing');
+                Route::get('config_sms/{user}', [UserController::class, 'config_sms'])->name('setting.user.config_sms');
+                Route::put('update_sms/{user}', [UserController::class, 'update_sms'])->name('setting.user.update_sms');
+                Route::post('disconnect/{user}', [UserController::class, 'disconnect'])->name('setting.user.disconnect');
             });
         });
 

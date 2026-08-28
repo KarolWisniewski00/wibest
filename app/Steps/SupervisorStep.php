@@ -3,6 +3,8 @@
 namespace App\Steps;
 
 use App\Mail\UserMail;
+use App\Models\UserCompanyHistory;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Vildanbina\LivewireWizard\Components\Step;
@@ -36,11 +38,18 @@ class SupervisorStep extends Step
         $user->position = $state['position'];
         $user->gender = ($state['gender'] ?? false) ? 'male' : 'female';
         $user->role = $state['role'];
-        $user->assigned_at = now();
         $user->supervisor_id = $state['supervisor_id'];
-        $user->company_id = Auth::user()->company_id;
+        $user->company_id = $state['company_id'];
         $user->password = Hash::make($password);
         $user->save();
+
+        UserCompanyHistory::create([
+            'company_id' => $user->company_id,
+            'user_id' => $user->id,
+            'assigned_at' => Carbon::now(),
+            'paid_from' => Carbon::now()->startOfMonth(),
+            'user_price' => $user->company->user_price,
+        ]);
 
         $userMail = new UserMail($user, $password);
         try {

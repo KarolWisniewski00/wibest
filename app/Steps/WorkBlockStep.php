@@ -63,8 +63,8 @@ class WorkBlockStep extends Step
             'type' => $shiftType,
             'duration_seconds' => $timeInWorkSeconds,
         ]);
-
-        return redirect()->route('calendar.work-schedule.index')->with('success', 'Operacja zakończona powodzeniem.');
+        $backUrl = session()->pull('redirect_back_to', route('calendar.work-schedule.index'));
+        return redirect($backUrl)->with('success', 'Operacja zakończona powodzeniem.');
     }
     public function icon(): string
     {

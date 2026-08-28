@@ -103,7 +103,6 @@
         <x-container-content>
             <!--MOBILE VIEW-->
             <x-list :items="$events" emptyMessage="Brak użytkowników do wyświetlenia.">
-                <x-loader-event-card />
                 @foreach ($events as $event)
                 <x-card-event :event="$event" />
                 @endforeach

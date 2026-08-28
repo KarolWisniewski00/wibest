@@ -9,12 +9,16 @@ use App\Mail\LeaveMailAccept;
 use App\Mail\LeaveMailReject;
 use App\Mail\LeaveMailCancel;
 use App\Models\Leave;
+use App\Models\LeaveBalance;
 use App\Models\SentMessage;
+use App\Models\User;
 use App\Models\WorkBlock;
+use App\Repositories\UserRepository;
 use App\Repositories\WorkSessionRepository;
 use App\Services\FilterDateService;
 use App\Services\LeaveService;
 use App\Services\SmsApi;
+use App\Services\UserService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -25,13 +29,16 @@ class LeavePendingReviewController extends Controller
 {
     protected FilterDateService $filterDateService;
     protected LeaveService $leaveService;
+    protected UserService $userService;
 
     public function __construct(
         FilterDateService $filterDateService,
         LeaveService $leaveService,
+        UserService $userService,
     ) {
         $this->filterDateService = $filterDateService;
         $this->leaveService = $leaveService;
+        $this->userService = $userService;
     }
 
     /**
@@ -149,7 +156,7 @@ class LeavePendingReviewController extends Controller
                 $currentDate->addDay();
             }
             if (!$has_working_day) {
-                return redirect()->route('leave.pending.index')->with('fail', 'Brak zaplanowanej pracy');
+                return redirect()->route('leave.pending.refill', $leave)->with('fail', 'Brak zaplanowanej pracy');
             } else {
                 $leave->working_days = $working_days;
                 $leave->non_working_days = $non_working_days;
@@ -212,42 +219,56 @@ class LeavePendingReviewController extends Controller
                 'price'      => 0.00,
             ]);
         }
-        $sms_api = new SmsApi();
-        $phone_validated = $sms_api->normalizePhoneNumber($leave->user->phone);
-        $startDate = Carbon::createFromFormat('Y-m-d', $leave->start_date)->format('d.m.Y');
-        $endDate = Carbon::createFromFormat('Y-m-d', $leave->end_date)->format('d.m.Y');
+        if ($leave->user->sms) {
+            $sms_api = new SmsApi();
+            $phone_validated = $sms_api->normalizePhoneNumber($leave->user->phone);
+            $startDate = Carbon::createFromFormat('Y-m-d', $leave->start_date)->format('d.m.Y');
+            $endDate = Carbon::createFromFormat('Y-m-d', $leave->end_date)->format('d.m.Y');
 
-        $message = 'Zaakceptowano wniosek
+            $message = 'Zaakceptowano wniosek
 ' . $leave->type . '
 ' . $leave->manager->name . '
 ' . $startDate . ' - ' . $endDate . '
 
 wibest.pl/login';
 
-        try {
-            $smsResult = $sms_api->sendSms($phone_validated, $message);
-            // 2. Analiza wyniku zwróconego przez sendSms()
-            if ($smsResult['success'] === true) {
-                // Odpowiedź API znajduje się w kluczu 'data'
-                $responseData = $smsResult['data'];
+            try {
+                $smsResult = $sms_api->sendSms($phone_validated, $message);
+                // 2. Analiza wyniku zwróconego przez sendSms()
+                if ($smsResult['success'] === true) {
+                    // Odpowiedź API znajduje się w kluczu 'data'
+                    $responseData = $smsResult['data'];
 
-                // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
-                if (isset($responseData['list'][0])) {
-                    $messageData = $responseData['list'][0];
+                    // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
+                    if (isset($responseData['list'][0])) {
+                        $messageData = $responseData['list'][0];
 
-                    // Użycie danych z API do zapisu
-                    SentMessage::create([
-                        'type'       => 'sms',
-                        'recipient'  => $phone_validated,
-                        'user_id'    => $leave->user_id,
-                        'company_id' => $leave->company_id,
-                        'subject'    => 'Wnioski',
-                        'body'       => 'Akceptacja wniosku przez ' . $leave->manager->name,
-                        'status'     => $messageData['status'] ?? 'SENT',
-                        'price'      => $messageData['points'] ?? 0.00,
-                    ]);
+                        // Użycie danych z API do zapisu
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->user_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Akceptacja wniosku przez ' . $leave->manager->name,
+                            'status'     => $messageData['status'] ?? 'SENT',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    } else {
+                        // Logowanie: Success=true, ale brak danych wiadomości w liście
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->user_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Akceptacja wniosku przez ' . $leave->manager->name,
+                            'status'     => 'UNKNOW',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    }
                 } else {
-                    // Logowanie: Success=true, ale brak danych wiadomości w liście
+                    // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
                     SentMessage::create([
                         'type'       => 'sms',
                         'recipient'  => $phone_validated,
@@ -255,12 +276,13 @@ wibest.pl/login';
                         'company_id' => $leave->company_id,
                         'subject'    => 'Wnioski',
                         'body'       => 'Akceptacja wniosku przez ' . $leave->manager->name,
-                        'status'     => 'UNKNOW',
+                        'status'     => 'FAILED',
                         'price'      => $messageData['points'] ?? 0.00,
                     ]);
+
+                    // finalStatus pozostaje 'API_FAILED'
                 }
-            } else {
-                // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
+            } catch (Exception) {
                 SentMessage::create([
                     'type'       => 'sms',
                     'recipient'  => $phone_validated,
@@ -271,20 +293,7 @@ wibest.pl/login';
                     'status'     => 'FAILED',
                     'price'      => $messageData['points'] ?? 0.00,
                 ]);
-
-                // finalStatus pozostaje 'API_FAILED'
             }
-        } catch (Exception) {
-            SentMessage::create([
-                'type'       => 'sms',
-                'recipient'  => $phone_validated,
-                'user_id'    => $leave->user_id,
-                'company_id' => $leave->company_id,
-                'subject'    => 'Wnioski',
-                'body'       => 'Akceptacja wniosku przez ' . $leave->manager->name,
-                'status'     => 'FAILED',
-                'price'      => $messageData['points'] ?? 0.00,
-            ]);
         }
 
         if (auth()->user()->role == 'admin' || auth()->user()->role == 'menedżer' || auth()->user()->role == 'właściciel') {
@@ -329,42 +338,56 @@ wibest.pl/login';
                 'price'      => 0.00,
             ]);
         }
-        $sms_api = new SmsApi();
-        $phone_validated = $sms_api->normalizePhoneNumber($leave->user->phone);
-        $startDate = Carbon::createFromFormat('Y-m-d', $leave->start_date)->format('d.m.Y');
-        $endDate = Carbon::createFromFormat('Y-m-d', $leave->end_date)->format('d.m.Y');
+        if ($leave->user->sms) {
+            $sms_api = new SmsApi();
+            $phone_validated = $sms_api->normalizePhoneNumber($leave->user->phone);
+            $startDate = Carbon::createFromFormat('Y-m-d', $leave->start_date)->format('d.m.Y');
+            $endDate = Carbon::createFromFormat('Y-m-d', $leave->end_date)->format('d.m.Y');
 
-        $message = 'Odrzucono wniosek
+            $message = 'Odrzucono wniosek
 ' . $leave->type . '
 ' . $leave->manager->name . '
 ' . $startDate . ' - ' . $endDate . '
 
 wibest.pl/login';
 
-        try {
-            $smsResult = $sms_api->sendSms($phone_validated, $message);
-            // 2. Analiza wyniku zwróconego przez sendSms()
-            if ($smsResult['success'] === true) {
-                // Odpowiedź API znajduje się w kluczu 'data'
-                $responseData = $smsResult['data'];
+            try {
+                $smsResult = $sms_api->sendSms($phone_validated, $message);
+                // 2. Analiza wyniku zwróconego przez sendSms()
+                if ($smsResult['success'] === true) {
+                    // Odpowiedź API znajduje się w kluczu 'data'
+                    $responseData = $smsResult['data'];
 
-                // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
-                if (isset($responseData['list'][0])) {
-                    $messageData = $responseData['list'][0];
+                    // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
+                    if (isset($responseData['list'][0])) {
+                        $messageData = $responseData['list'][0];
 
-                    // Użycie danych z API do zapisu
-                    SentMessage::create([
-                        'type'       => 'sms',
-                        'recipient'  => $phone_validated,
-                        'user_id'    => $leave->user_id,
-                        'company_id' => $leave->company_id,
-                        'subject'    => 'Wnioski',
-                        'body'       => 'Odrzucenie wniosku przez ' . $leave->manager->name,
-                        'status'     => $messageData['status'] ?? 'SENT',
-                        'price'      => $messageData['points'] ?? 0.00,
-                    ]);
+                        // Użycie danych z API do zapisu
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->user_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Odrzucenie wniosku przez ' . $leave->manager->name,
+                            'status'     => $messageData['status'] ?? 'SENT',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    } else {
+                        // Logowanie: Success=true, ale brak danych wiadomości w liście
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->user_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Odrzucenie wniosku przez ' . $leave->manager->name,
+                            'status'     => 'UNKNOW',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    }
                 } else {
-                    // Logowanie: Success=true, ale brak danych wiadomości w liście
+                    // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
                     SentMessage::create([
                         'type'       => 'sms',
                         'recipient'  => $phone_validated,
@@ -372,12 +395,13 @@ wibest.pl/login';
                         'company_id' => $leave->company_id,
                         'subject'    => 'Wnioski',
                         'body'       => 'Odrzucenie wniosku przez ' . $leave->manager->name,
-                        'status'     => 'UNKNOW',
+                        'status'     => 'FAILED',
                         'price'      => $messageData['points'] ?? 0.00,
                     ]);
+
+                    // finalStatus pozostaje 'API_FAILED'
                 }
-            } else {
-                // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
+            } catch (Exception) {
                 SentMessage::create([
                     'type'       => 'sms',
                     'recipient'  => $phone_validated,
@@ -388,20 +412,7 @@ wibest.pl/login';
                     'status'     => 'FAILED',
                     'price'      => $messageData['points'] ?? 0.00,
                 ]);
-
-                // finalStatus pozostaje 'API_FAILED'
             }
-        } catch (Exception) {
-            SentMessage::create([
-                'type'       => 'sms',
-                'recipient'  => $phone_validated,
-                'user_id'    => $leave->user_id,
-                'company_id' => $leave->company_id,
-                'subject'    => 'Wnioski',
-                'body'       => 'Odrzucenie wniosku przez ' . $leave->manager->name,
-                'status'     => 'FAILED',
-                'price'      => $messageData['points'] ?? 0.00,
-            ]);
         }
         return redirect()->route('leave.pending.index')->with('success', 'Odrzucone.');
     }
@@ -441,42 +452,56 @@ wibest.pl/login';
                 'price'      => 0.00,
             ]);
         }
-        $sms_api = new SmsApi();
-        $phone_validated = $sms_api->normalizePhoneNumber($leave->manager->phone);
-        $startDate = Carbon::createFromFormat('Y-m-d', $leave->start_date)->format('d.m.Y');
-        $endDate = Carbon::createFromFormat('Y-m-d', $leave->end_date)->format('d.m.Y');
+        if ($leave->manager->sms) {
+            $sms_api = new SmsApi();
+            $phone_validated = $sms_api->normalizePhoneNumber($leave->manager->phone);
+            $startDate = Carbon::createFromFormat('Y-m-d', $leave->start_date)->format('d.m.Y');
+            $endDate = Carbon::createFromFormat('Y-m-d', $leave->end_date)->format('d.m.Y');
 
-        $message = 'Anulowano wniosek
+            $message = 'Anulowano wniosek
 ' . $leave->type . '
 ' . $leave->user->name . '
 ' . $startDate . ' - ' . $endDate . '
 
 wibest.pl/login';
 
-        try {
-            $smsResult = $sms_api->sendSms($phone_validated, $message);
-            // 2. Analiza wyniku zwróconego przez sendSms()
-            if ($smsResult['success'] === true) {
-                // Odpowiedź API znajduje się w kluczu 'data'
-                $responseData = $smsResult['data'];
+            try {
+                $smsResult = $sms_api->sendSms($phone_validated, $message);
+                // 2. Analiza wyniku zwróconego przez sendSms()
+                if ($smsResult['success'] === true) {
+                    // Odpowiedź API znajduje się w kluczu 'data'
+                    $responseData = $smsResult['data'];
 
-                // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
-                if (isset($responseData['list'][0])) {
-                    $messageData = $responseData['list'][0];
+                    // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
+                    if (isset($responseData['list'][0])) {
+                        $messageData = $responseData['list'][0];
 
-                    // Użycie danych z API do zapisu
-                    SentMessage::create([
-                        'type'       => 'sms',
-                        'recipient'  => $phone_validated,
-                        'user_id'    => $leave->manager_id,
-                        'company_id' => $leave->company_id,
-                        'subject'    => 'Wnioski',
-                        'body'       => 'Anulowanie wniosku przez ' . $leave->user->name,
-                        'status'     => $messageData['status'] ?? 'SENT',
-                        'price'      => $messageData['points'] ?? 0.00,
-                    ]);
+                        // Użycie danych z API do zapisu
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->manager_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Anulowanie wniosku przez ' . $leave->user->name,
+                            'status'     => $messageData['status'] ?? 'SENT',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    } else {
+                        // Logowanie: Success=true, ale brak danych wiadomości w liście
+                        SentMessage::create([
+                            'type'       => 'sms',
+                            'recipient'  => $phone_validated,
+                            'user_id'    => $leave->manager_id,
+                            'company_id' => $leave->company_id,
+                            'subject'    => 'Wnioski',
+                            'body'       => 'Anulowanie wniosku przez ' . $leave->user->name,
+                            'status'     => 'UNKNOW',
+                            'price'      => $messageData['points'] ?? 0.00,
+                        ]);
+                    }
                 } else {
-                    // Logowanie: Success=true, ale brak danych wiadomości w liście
+                    // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
                     SentMessage::create([
                         'type'       => 'sms',
                         'recipient'  => $phone_validated,
@@ -484,12 +509,13 @@ wibest.pl/login';
                         'company_id' => $leave->company_id,
                         'subject'    => 'Wnioski',
                         'body'       => 'Anulowanie wniosku przez ' . $leave->user->name,
-                        'status'     => 'UNKNOW',
+                        'status'     => 'FAILED',
                         'price'      => $messageData['points'] ?? 0.00,
                     ]);
+
+                    // finalStatus pozostaje 'API_FAILED'
                 }
-            } else {
-                // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
+            } catch (Exception) {
                 SentMessage::create([
                     'type'       => 'sms',
                     'recipient'  => $phone_validated,
@@ -500,20 +526,7 @@ wibest.pl/login';
                     'status'     => 'FAILED',
                     'price'      => $messageData['points'] ?? 0.00,
                 ]);
-
-                // finalStatus pozostaje 'API_FAILED'
             }
-        } catch (Exception) {
-            SentMessage::create([
-                'type'       => 'sms',
-                'recipient'  => $phone_validated,
-                'user_id'    => $leave->manager_id,
-                'company_id' => $leave->company_id,
-                'subject'    => 'Wnioski',
-                'body'       => 'Anulowanie wniosku przez ' . $leave->user->name,
-                'status'     => 'FAILED',
-                'price'      => $messageData['points'] ?? 0.00,
-            ]);
         }
         return redirect()->route('leave.single.index')->with('success', 'Anulowane.');
     }
@@ -542,6 +555,77 @@ wibest.pl/login';
         $leavePending = $this->leaveService->countByUserId($request);
         return view('admin.leave-pending.edit', compact('leave', 'leavePending'));
     }
+    public function refill(Leave $leave, Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $leave1 = $this->leaveService->getLeaveById($leave);
+        $leavePending = $this->leaveService->countByUserId($request);
+
+
+        $startDate = $leave1->start_date;
+        $endDate = $leave1->end_date;
+
+        $dates = [];
+        $currentDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate);
+        $endDateCarbon = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate);
+
+        while ($currentDate->lte($endDateCarbon)) {
+            $dates[] = $currentDate->format('d.m.y');
+            $currentDate->addDay();
+        }
+        $userRepository = new UserRepository();
+        $workSessionRepository = new WorkSessionRepository();
+        $calendar = new CalendarView();
+        $users = User::where('id', $leave1->user_id)->get();
+
+        foreach ($users as &$user) {
+            $userDates = [];
+            $userObjs = [];
+            foreach ($dates as $date) {
+                //$status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
+                $static = $userRepository->hasPlannedToday($user->id, $date);
+                $work = $userRepository->hasPlannedTodayWork($user->id, $date);
+                $work_obj = $userRepository->getPlannedTodayWork($user->id, $date);
+                $leave1 = $workSessionRepository->hasLeave($user->id, $date);
+                $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
+
+                //if ($user->public_holidays == true) {
+                $carbonDate = Carbon::createFromFormat('d.m.y', $date);
+                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $dateStr = $carbonDate->format('Y-m-d');
+
+                // Sprawdzenie czy to Nowy Rok lub Trzech Króli
+                if ($carbonDate->month == 1 && $carbonDate->day == 1) {
+                    $isHoliday = true; // Nowy Rok
+                } elseif ($carbonDate->month == 1 && $carbonDate->day == 6) {
+                    $isHoliday = true; // Trzech Króli
+                } else {
+                    $isHoliday = $holidays->contains($dateStr);
+                }
+                //} else {
+                //    $isHoliday = false;
+                //}
+
+                if ($leave1) {
+                    $userDates[$date] = 'leave';
+                    $userObjs[$date] = $leaveFirst;
+                } elseif ($work) {
+                    $userDates[$date] = "work";
+                    $userObjs[$date] = $work_obj;
+                } elseif ($isHoliday) {
+                    $userDates[$date] = "holiday";
+                } else if ($static) {
+                    $userDates[$date] = "static";
+                } else {
+                    $userDates[$date] = null;
+                }
+            }
+            $user->dates = $userDates;
+            $user->objs = $userObjs;
+        }
+        session(['redirect_back_to' => route('leave.pending.refill', $leave)]);
+        return view('admin.leave-pending.refill', compact('leave', 'leavePending', 'dates', 'users'));
+    }
     /**
      * Usuwa wniosek.
      *
@@ -557,14 +641,36 @@ wibest.pl/login';
     }
     public function toggle(Leave $leave)
     {
+        $year = Carbon::parse($leave->start_date)->year;
+        $balance = LeaveBalance::where('user_id', $leave->user_id)
+            ->where('year', $year)
+            ->first();
+
+        if (!$balance) {
+            $balance = LeaveBalance::create([
+                'user_id' => $leave->user_id,
+                'company_id' => $leave->user->company_id,
+                'year' => $year,
+                'base_days' => 0,
+                'carried_over' => 0,
+                'used_days' => 0,
+            ]);
+        }
+
         if ($leave->status == 'zaakceptowane' && $leave->is_used == false) {
             $leave->is_used = true;
             $leave->status = 'zrealizowane';
+            if ($leave->type == 'urlop wypoczynkowy') {
+                $balance->used_days += $leave->working_days;
+            }
         } else {
             $leave->is_used = false;
             $leave->status = 'zaakceptowane';
+            if ($leave->type == 'urlop wypoczynkowy') {
+                $balance->used_days -= $leave->working_days;
+            }
         }
-
+        $balance->save();
         $leave->save();
 
         // Zwróć odpowiedź do JavaScriptu

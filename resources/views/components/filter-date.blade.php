@@ -1,76 +1,88 @@
 @props([
-'loader' => 'calendar',
+    'loader' => 'calendar',
+    'showCalender' => 'true',
 ])
 @if($loader == 'calendar-smart')
-@php
-$smart = true;
-@endphp
+    @php
+        $smart = true;
+    @endphp
 @elseif($loader == 'planing-smart')
-@php
-$smart = true;
-@endphp
+    @php
+        $smart = true;
+    @endphp
 @else
-@php
-$smart = false;
-@endphp
+    @php
+        $smart = false;
+    @endphp
 @endif
 <!-- Ukryte pole na wybrane daty -->
 <li>
-    <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700" aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
-        <span class="flex-1 text-left rtl:text-right whitespace-nowrap text-md">Zakres dat</span>
-        <i class="fa-solid fa-chevron-up"></i>
-    </button>
-    <div id="pracownicy-dropdown" class="">
-        <input type="hidden" id="selected-dates" name="selected-dates" />
+    @if($showCalender == 'true')
+        <button type="button"
+            class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700"
+            aria-controls="pracownicy-dropdown" data-collapse-toggle="pracownicy-dropdown">
+            <span class="flex-1 text-left rtl:text-right whitespace-nowrap text-md">Zakres dat</span>
+            <i class="fa-solid fa-chevron-up"></i>
+        </button>
+        <div id="pracownicy-dropdown" class="">
+            <input type="hidden" id="selected-dates" name="selected-dates" />
 
-        <div class="w-full bg-white dark:bg-gray-800 rounded-xl p-2 text-sm text-gray-900 dark:text-white">
-            <!-- Nagłówek -->
-            <div class="flex justify-between items-center mb-4">
-                <span id="calendar-month" class="font-semibold text-md">
-                    <div class="h-[20px] rounded-lg bg-gray-200 dark:bg-gray-700 w-20 animate-pulse"></div>
-                </span>
-                <div class="space-x-2">
-                    <button id="prev-month" class="text-gray-500 hover:text-gray-500 dark:hover:text-gray-300">
-                        <i class="fa-solid fa-chevron-left"></i><span class="mx-1">pop</span>
-                    </button>
-                    <button id="next-month" class="text-gray-500 hover:text-gray-500 dark:hover:text-gray-300">
-                        <span class="mx-1">nas</span><i class="fa-solid fa-chevron-right"></i>
-                    </button>
+            <div class="w-full bg-white dark:bg-gray-800 rounded-xl p-2 text-sm text-gray-900 dark:text-white">
+                <!-- Nagłówek -->
+                <div class="flex justify-between items-center mb-4">
+                    <span id="calendar-month" class="font-semibold text-md">
+                        <div class="h-[20px] rounded-lg bg-gray-200 dark:bg-gray-700 w-20 animate-pulse"></div>
+                    </span>
+                    <div class="space-x-2">
+                        <button id="prev-month" class="text-gray-500 hover:text-gray-500 dark:hover:text-gray-300">
+                            <i class="fa-solid fa-chevron-left"></i><span class="mx-1">pop</span>
+                        </button>
+                        <button id="next-month" class="text-gray-500 hover:text-gray-500 dark:hover:text-gray-300">
+                            <span class="mx-1">nas</span><i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+
                 </div>
 
-            </div>
+                <!-- Przyciskowe skróty -->
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <button id="btn-today"
+                        class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white dark:hover:text-gray-900 tracking-widest">Dzisiaj</button>
+                    <button id="btn-this-week"
+                        class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white dark:hover:text-gray-900 tracking-widest">Ten
+                        tydzień</button>
+                    <button id="btn-this-month"
+                        class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2 dark:hover:text-gray-900 tracking-widest">Ten
+                        miesiąc</button>
+                    <button id="btn-custom-range"
+                        class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2 dark:hover:text-gray-900 tracking-widest">Zakres
+                        dat</button>
+                </div>
 
-            <!-- Przyciskowe skróty -->
-            <div class="grid grid-cols-2 gap-2 mb-4">
-                <button id="btn-today" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white dark:hover:text-gray-900 tracking-widest">Dzisiaj</button>
-                <button id="btn-this-week" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white dark:hover:text-gray-900 tracking-widest">Ten tydzień</button>
-                <button id="btn-this-month" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2 dark:hover:text-gray-900 tracking-widest">Ten miesiąc</button>
-                <button id="btn-custom-range" class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2 dark:hover:text-gray-900 tracking-widest">Zakres dat</button>
-            </div>
+                <!-- Dni tygodnia -->
+                <div class="grid grid-cols-7 text-center text-gray-500 dark:text-gray-500 mb-2">
+                    <div>Pon</div>
+                    <div>Wt</div>
+                    <div>Śr</div>
+                    <div>Czw</div>
+                    <div>Pt</div>
+                    <div>Sob</div>
+                    <div>Ndz</div>
+                </div>
 
-            <!-- Dni tygodnia -->
-            <div class="grid grid-cols-7 text-center text-gray-500 dark:text-gray-500 mb-2">
-                <div>Pon</div>
-                <div>Wt</div>
-                <div>Śr</div>
-                <div>Czw</div>
-                <div>Pt</div>
-                <div>Sob</div>
-                <div>Ndz</div>
+                <!-- Miejsce na dni miesiąca generowane przez JS -->
+                <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center">
+                    <!-- Dni będą wstawiane dynamicznie przez jQuery -->
+                    @for ($i = 0; $i < 35; $i++)
+                        <div class="h-[28px] rounded-lg bg-gray-200 dark:bg-gray-700 w-[28px] animate-pulse">
+                        </div>
+                    @endfor
+                </div>
             </div>
-
-            <!-- Miejsce na dni miesiąca generowane przez JS -->
-            <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center">
-                <!-- Dni będą wstawiane dynamicznie przez jQuery -->
-                @for ($i = 0; $i < 35; $i++)
-                    <div class="h-[28px] rounded-lg bg-gray-200 dark:bg-gray-700 w-[28px] animate-pulse">
-            </div>
-            @endfor
         </div>
-    </div>
-
+    @endif
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const monthNames = [
                 "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
                 "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
@@ -171,45 +183,47 @@ $smart = false;
                     url: `{{ $slot }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}&search=${encodeURIComponent(searchQuery)}`,
                     method: 'get',
                     // Wywołuje się ZANIM AJAX wyśle zapytanie
-                    beforeSend: function() {
+                    beforeSend: function () {
                         $body.empty(); // czyści stare dane
                         $list.empty();
                         for (let i = 0; i < 3; i++) {
                             $body.append(`
                                 @if($loader == 'calendar')
-                                <x-loader-calendar />
+                                    <x-loader-calendar />
                                 @elseif($loader == 'leave')
-                                <x-loader-leave />
+                                    <x-loader-leave />
                                 @elseif($loader == 'pending')
-                                <x-loader-leave-pending />
+                                    <x-loader-leave-pending />
                                 @elseif($loader == 'work-session')
-                                <x-loader-work-session />
+                                    <x-loader-work-session />
                                 @elseif($loader == 'event')
-                                <x-loader-event />
+                                    <x-loader-event />
                                 @elseif($loader == 'attendance')
-                                <x-loader-attendance />
+                                    <x-loader-attendance />
                                 @elseif($loader == 'planing')
-                                <x-loader-planing />
+                                    <x-loader-planing />
                                 @elseif($loader == 'calendar-smart')
-                                <x-loader-calendar-smart />
+                                    <x-loader-calendar-smart />
                                 @elseif($loader == 'planing-smart')
-                                <x-loader-planing-smart />
+                                    <x-loader-planing-smart />
+                                @elseif($loader == 'leave-balance')
+                                    <x-loader-leave-balance />
                                 @endif
                                 `);
                             $list.append(`
                                 @if($loader == 'leave')
-                                <x-loader-leave-card />
+                                    <x-loader-leave-card />
                                 @elseif($loader == 'pending')
-                                <x-loader-leave-pending-card />
+                                    <x-loader-leave-pending-card />
                                 @elseif($loader == 'work-session')
-                                <x-loader-work-session-card />
+                                    <x-loader-work-session-card />
                                 @elseif($loader == 'event')
-                                <x-loader-event-card />
+                                    <x-loader-event-card />
                                 @endif
                                 `);
                         };
                     },
-                    success: function(data) {
+                    success: function (data) {
                         $body.empty();
                         $list.empty();
                         $('.date-column').remove();
@@ -285,11 +299,11 @@ $smart = false;
                         $head.append(headHtml);
                         let added = false;
 
-                        data.table.forEach(function(row) {
+                        data.table.forEach(function (row) {
                             $body.append(row);
                             added = true;
                         });
-                        data.list.forEach(function(row) {
+                        data.list.forEach(function (row) {
                             $list.append(row);
                         });
 
@@ -304,7 +318,7 @@ $smart = false;
 
                         $(window).off('scroll');
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         console.error('Błąd:', xhr.responseText);
                     }
                 });
@@ -319,14 +333,14 @@ $smart = false;
             }
 
             // Nawigacja strzałkami
-            $('#prev-month').on('click', function() {
+            $('#prev-month').on('click', function () {
                 currentDate.setMonth(currentDate.getMonth() - 1);
                 renderCalendar(currentDate);
                 //ajaxFilter();
                 $(window).off('scroll');
             });
 
-            $('#next-month').on('click', function() {
+            $('#next-month').on('click', function () {
                 currentDate.setMonth(currentDate.getMonth() + 1);
                 renderCalendar(currentDate);
                 //ajaxFilter();
@@ -334,7 +348,7 @@ $smart = false;
             });
 
             // Kliknięcie dnia
-            $('#calendar-days').on('click', '.day-btn', function() {
+            $('#calendar-days').on('click', '.day-btn', function () {
                 const [year, month, day] = $(this).data('date').split('-').map(Number);
                 const clickedDate = new Date(year, month - 1, day);
 
@@ -364,55 +378,57 @@ $smart = false;
                     url: `{{ $slot }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}&search=${encodeURIComponent(searchQuery)}`,
                     method: 'get',
                     // Wywołuje się ZANIM AJAX wyśle zapytanie
-                    beforeSend: function() {
+                    beforeSend: function () {
                         $body.empty(); // czyści stare dane
                         $list.empty();
                         for (let i = 0; i < 3; i++) {
                             $body.append(`
                                 @if($loader == 'calendar')
-                                <x-loader-calendar />
+                                    <x-loader-calendar />
                                 @elseif($loader == 'leave')
-                                <x-loader-leave />
+                                    <x-loader-leave />
                                 @elseif($loader == 'pending')
-                                <x-loader-leave-pending />
+                                    <x-loader-leave-pending />
                                 @elseif($loader == 'work-session')
-                                <x-loader-work-session />
+                                    <x-loader-work-session />
                                 @elseif($loader == 'event')
-                                <x-loader-event />
+                                    <x-loader-event />
                                 @elseif($loader == 'attendance')
-                                <x-loader-attendance />
+                                    <x-loader-attendance />
                                 @elseif($loader == 'planing')
-                                <x-loader-planing />
+                                    <x-loader-planing />
                                 @elseif($loader == 'calendar-smart')
-                                <x-loader-calendar-smart />
+                                    <x-loader-calendar-smart />
                                 @elseif($loader == 'planing-smart')
-                                <x-loader-planing-smart />
+                                    <x-loader-planing-smart />
+                                @elseif($loader == 'leave-balance')
+                                    <x-loader-leave-balance />
                                 @endif
                                 `);
                             $list.append(`
                                 @if($loader == 'leave')
-                                <x-loader-leave-card />
+                                    <x-loader-leave-card />
                                 @elseif($loader == 'pending')
-                                <x-loader-leave-pending-card />
+                                    <x-loader-leave-pending-card />
                                 @elseif($loader == 'work-session')
-                                <x-loader-work-session-card />
+                                    <x-loader-work-session-card />
                                 @elseif($loader == 'event')
-                                <x-loader-event-card />
+                                    <x-loader-event-card />
                                 @endif
                                 `);
                         };
                     },
-                    success: function(data) {
+                    success: function (data) {
                         $body.empty();
                         $list.empty();
                         console.log(data);
                         let added = false;
 
-                        data.table.forEach(function(row) {
+                        data.table.forEach(function (row) {
                             $body.append(row);
                             added = true;
                         });
-                        data.list.forEach(function(row) {
+                        data.list.forEach(function (row) {
                             $list.append(row);
                         });
 
@@ -427,20 +443,20 @@ $smart = false;
 
                         $(window).off('scroll');
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         console.error('Błąd:', xhr.responseText);
                     }
                 });
             }
 
-            $('#btn-today').on('click', function() {
+            $('#btn-today').on('click', function () {
                 const today = clearTime(new Date());
                 setRange(today, today);
                 ajaxFilter();
                 $(window).off('scroll');
             });
 
-            $('#btn-this-week').on('click', function() {
+            $('#btn-this-week').on('click', function () {
                 const today = clearTime(new Date());
                 let day = today.getDay(); // 0 (niedziela) - 6 (sobota)
 
@@ -458,7 +474,7 @@ $smart = false;
             });
 
 
-            $('#btn-this-month').on('click', function() {
+            $('#btn-this-month').on('click', function () {
                 const today = new Date();
                 const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
                 const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
@@ -466,8 +482,21 @@ $smart = false;
                 ajaxFilter();
                 $(window).off('scroll');
             });
+            $('#allYear').on('click', function () {
 
-            $('#btn-custom-range').on('click', function() {
+                const today = new Date();
+                const year = today.getFullYear();
+
+                const firstDay = new Date(year, 0, 1);
+                const lastDay = new Date(year, 11, 31);
+
+                setRange(firstDay, lastDay);
+
+                ajaxFilter();
+
+                $(window).off('scroll');
+            });
+            $('#btn-custom-range').on('click', function () {
                 rangeStart = null;
                 rangeEnd = null;
                 renderCalendar(currentDate);
@@ -477,7 +506,7 @@ $smart = false;
             // 🔍 Wyszukiwanie natychmiast po wpisaniu
             let searchTimeout; // Zmienna do przechowywania identyfikatora timeoutu
 
-            $search.on('input', function() {
+            $search.on('input', function () {
                 // 1. Wyczyść poprzedni timeout (jeśli istnieje)
                 // Zapobiega to wykonaniu poprzedniego, opóźnionego wywołania
                 clearTimeout(searchTimeout);
@@ -487,7 +516,7 @@ $smart = false;
 
                 // 3. Ustaw nowy timeout
                 // Wyszukiwanie zostanie wywołane za 1000ms (1 sekundę)
-                searchTimeout = setTimeout(function() {
+                searchTimeout = setTimeout(function () {
                     // Ta funkcja jest wywoływana dopiero po upływie 1000ms bez nowej aktywności 'input'
                     loadSessions(true);
                 }, 1000);
@@ -512,8 +541,4 @@ $smart = false;
             }
         });
     </script>
-
-
-
-    </div>
 </li>

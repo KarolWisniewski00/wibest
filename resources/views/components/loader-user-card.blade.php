@@ -17,16 +17,7 @@
                     <div class="h-2 rounded-lg bg-gray-200 dark:bg-gray-700 w-1/2"></div>
                 </div>
             </div>
-            <div class="flex justify-between w-full">
-                <div class="flex justify-start items-center w-full justify-start">
-                    <div class="h-4 rounded-full bg-gray-200 dark:bg-gray-700 w-10"></div>
-                </div>
-            </div>
-            <div class="flex justify-between w-full">
-                <div class="flex justify-start items-center w-full justify-start">
-                    <div class="h-4 rounded-full bg-gray-200 dark:bg-gray-700 w-10"></div>
-                </div>
-            </div>
+
             {{-- Przyciski (Edit i Cancel) --}}
             <div class="flex space-x-4">
                 <div class="min-h-[38px] w-[54px] rounded-lg bg-gray-200 dark:bg-gray-700"></div>

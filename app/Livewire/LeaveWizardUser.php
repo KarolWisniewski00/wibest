@@ -4,13 +4,12 @@ namespace App\Livewire;
 
 
 use App\Models\Leave;
+use App\Models\LeaveBalance;
 use App\Repositories\UserRepository;
-use App\Steps\LeaveDateStep;
 use App\Steps\LeaveStep;
-use App\Steps\LeaveUserStep;
-use App\Steps\ManagerStep;
 use App\Steps\UserLeaveDateStep;
 use App\Steps\UserStep;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Vildanbina\LivewireWizard\WizardComponent;
 use Livewire\Attributes\On;
@@ -40,6 +39,20 @@ class LeaveWizardUser extends WizardComponent
     public function model(): Leave
     {
         return new Leave();
+    }
+    public function getLeaveFree()
+    {
+        try {
+            $leave_balance = LeaveBalance::where('user_id', Auth::id())
+                ->where('company_id', Auth::user()->company_id)
+                ->where('year', now()->year)
+                ->first();
+            $carried_over = $leave_balance->carried_over ?? 0;
+            $base_days = $leave_balance->base_days ?? 0;
+            return ($carried_over + $base_days) - $leave_balance->used_days;
+        } catch (Exception) {
+            return 0;
+        }
     }
     public function getUsers()
     {

@@ -21,25 +21,80 @@
             <form method="POST" action="{{route('setting.user.update-company', $user)}}">
                 @csrf
                 @method('PUT')
-                <!--NAZWA FIRMY-->
+                <style>
+                    @media (prefers-color-scheme: dark) {
+                        .ts-dropdown .active {
+                            background-color: rgb(75 85 99) !important;
+                            color: #fff !important;
+                        }
+
+                        .ts-dropdown {
+                            border: 1px solid rgb(75 85 99) !important;
+                            border-radius: 0.5rem !important;
+                        }
+
+                        .option {
+                            padding-left: 12px !important;
+                        }
+
+                        .ts-control {
+                            background-color: rgb(55 65 81) !important;
+                            border: 1px solid rgb(75 85 99) !important;
+                            border-radius: 0.5rem !important;
+                            min-height: 46px !important;
+                            color: #fff !important;
+                            font-size: 1.125rem !important;
+                            line-height: 1.75rem !important;
+                            padding-left: 12px !important;
+                        }
+
+                        .ts-control input {
+                            color: #fff !important;
+                            margin: auto 0 !important;
+                            font-size: 1.125rem !important;
+                            line-height: 1.75rem !important;
+                        }
+
+                        .item {
+                            margin: auto 0 !important;
+                        }
+                    }
+                </style>
                 <div class="mt-2">
-                    <label for="company" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                    <label for="company"
+                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                         <span>🏢</span> Nazwa firmy
                     </label>
-                    <x-select id="company" placeholder="Wybierz firmę"
-                        class="mt-2 rounded-lg text-lg"
-                        :options="$companies"
-                        option-label="name"
-                        :value="old('company', $user->company_id)"
-                        name="company"
-                        option-value="id" />
-                    @error('company')
-                    <p class="text-red-500 text-xs mt-1">
-                        {{ $message }}
-                    </p>
-                    @enderror
+                    <select id="company" name="company" autocomplete="off" class="mt-2 rounded-lg text-lg">
+                        <option value="">Wybierz firmę</option>
+                        @foreach($companies as $company)
+                            <option value="{{ $company['id'] }}" data-description="{{ $company['description'] }}" {{ $company['id'] == $user->company_id ? 'selected' : '' }}>
+                                🏢 {{ $company['name'] }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-                <!--NAZWA FIRMY-->
+                <script>
+                    $(document).ready(function () {
+                        // inicjalizacja TomSelect
+                        let companySelect = new TomSelect('#company', {
+                            maxItems: 1,
+                            render: {
+                                option: function (data, escape) {
+                                    return `
+                                    <div class="px-3 py-2 dark:bg-gray-700 dark:text-white">
+                                        <div class="text-lg">${escape(data.text)}</div>
+                                        <div class="opacity-70 text-xs">${escape(data.description || '')}</div>
+                                    </div>
+                                `;
+                                },
+                                item: function (data, escape) {
+                                    return `<div>${escape(data.text)}</div>`;
+                                }
+                            },
+                        });
+                    });
+                </script>
 
                 <!-- RESETY -->
                 <div class="mt-2 flex flex-col">

@@ -21,6 +21,11 @@
         <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
             {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
         </x-status-cello>
+
+        <x-button-blue id="allYear" class="text-xs ms-4">
+            <i class="fa-solid fa-calendar mr-2"></i>Pokaż cały rok
+        </x-button-blue>
+
         <!--CONTENT-->
         <x-container-content>
             <!--MOBILE VIEW-->

@@ -5,22 +5,25 @@
     </x-h1-display>
     <x-flex-center class="gap-2">
         @if($role == 'admin' || $role == 'właściciel' || $role == 'menedżer')
-        <x-button-link-green href="{{ route('rcp.work-session.create') }}" class="text-xs">
-            <i class="fa-solid fa-plus mr-2"></i>Dodaj Pracę RCP
-        </x-button-link-green>
+            <x-button-link-yellow href="{{ route('rcp.work-session.create.start') }}" class="text-xs">
+                <i class="fa-solid fa-plus"></i>
+            </x-button-link-yellow>
+            <x-button-link-green href="{{ route('rcp.work-session.create') }}" class="text-xs">
+                <i class="fa-solid fa-plus mr-2"></i>Dodaj Pracę RCP
+            </x-button-link-green>
         @endif
         @if(!Str::startsWith(request()->path(), 'dashboard/rcp/location'))
-        <div class="hidden md:flex">
-            <x-button-neutral type="button" id="download-xlsx" class="text-xs">
-                <i class="fa-solid fa-download mr-2"></i>Pobierz
-            </x-button-neutral>
-        </div>
+            <div class="hidden md:flex">
+                <x-button-neutral type="button" id="download-xlsx" class="text-xs">
+                    <i class="fa-solid fa-download mr-2"></i>Pobierz
+                </x-button-neutral>
+            </div>
         @endif
     </x-flex-center>
 </x-container-header>
 @if(!Str::startsWith(request()->path(), 'dashboard/rcp/location'))
-<x-label class="px-4 invisible h-0 md:h-auto md:visible" id="selected-count">
-    0 zaznaczonych
-</x-label>
+    <x-label class="px-4 invisible h-0 md:h-auto md:visible" id="selected-count">
+        0 zaznaczonych
+    </x-label>
 @endif
 <!--HEADER-->

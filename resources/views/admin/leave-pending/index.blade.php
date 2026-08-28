@@ -50,10 +50,10 @@
             <script>
                 $(document).ready(function() {
                     // Nasłuchujemy na zmianę (kliknięcie) na każdym elemencie z klasą 'toggle-status'
-                    $('.toggle-status').on('change', function() {
+                    $(document).on('change', '.toggle-status', function() {
                         var leaveId = $(this).data('leave-id'); // Pobieramy ID z atrybutu data-leave-id
                         var isChecked = $(this).is(':checked'); // Sprawdzamy nowy stan przełącznika
-
+                        console.log(leaveId);
                         $.ajax({
                             url: '{{ route("leave.pending.toggle", "")}}/' + leaveId,
                             type: 'GET',

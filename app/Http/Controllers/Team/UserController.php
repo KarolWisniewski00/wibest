@@ -6,8 +6,10 @@ use App\Exports\UsersExport;
 use App\Http\Controllers\Controller;
 use App\Mail\PasswordMail;
 use App\Models\Leave;
+use App\Models\LeaveBalance;
 use App\Models\SentMessage;
 use App\Models\User;
+use App\Models\UserCompanyHistory;
 use App\Repositories\UserRepository;
 use App\Repositories\InvitationRepository;
 use App\Repositories\CompanyRepository;
@@ -98,8 +100,23 @@ class UserController extends Controller
             ];
         });
         $msg = SentMessage::where('user_id', $user->id)->orderByDesc('created_at')->get();
+        $msg_sms = SentMessage::where('user_id', $user->id)->where('type', 'sms')->orderByDesc('created_at')->get();
+        $msg_email = SentMessage::where('user_id', $user->id)->where('type', 'email')->orderByDesc('created_at')->get();
 
-        return view('admin.team.user', compact('user', 'invitations', 'leaves_used', 'msg'));
+        try {
+            $leave_balance = LeaveBalance::where('user_id', $user->id)
+                ->where('company_id', $user->company_id)
+                ->where('year', now()->year)
+                ->first();
+            $carried_over = $leave_balance->carried_over ?? 0;
+            $base_days = $leave_balance->base_days ?? 0;
+            $leave_balance_left = ($carried_over + $base_days) - $leave_balance->used_days;
+        } catch (Exception) {
+            $leave_balance = null;
+            $leave_balance_left =  0;
+        }
+
+        return view('admin.team.user', compact('leave_balance', 'leave_balance_left', 'user', 'invitations', 'leaves_used', 'msg', 'msg_sms', 'msg_email'));
     }
     public function restart(User $user)
     {
@@ -192,10 +209,15 @@ class UserController extends Controller
     }
     public function disconnect(User $user)
     {
+        UserCompanyHistory::where('user_id', $user->id)->update(
+            [
+                'unassigned_at' => Carbon::now(),
+                'paid_to' => Carbon::now()->endOfMonth()
+            ]
+        );
         $user->company_id = null;
         $user->supervisor_id = null;
         $user->position = null;
-        $user->assigned_at = null;
         $user->role = null;
         $user->save();
         return redirect(route('team.user.index'))->with('success', 'Rozłączono.');
@@ -212,11 +234,17 @@ class UserController extends Controller
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         return view('admin.team.planing', compact('user', 'invitations'));
     }
-    public function config(User $user)
+    public function config_planing(User $user)
     {
         $companyId = $this->companyRepository->getCompanyId();
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         return view('admin.team.config', compact('user', 'invitations'));
+    }
+    public function config_sms(User $user)
+    {
+        $companyId = $this->companyRepository->getCompanyId();
+        $invitations = $this->invitationRepository->getByCompanyId($companyId);
+        return view('admin.team.sms', compact('user', 'invitations'));
     }
     public function update_planing(Request $request, User $user)
     {
@@ -245,6 +273,21 @@ class UserController extends Controller
         $user->overtime_task = $request->has('overtime_task');
         $user->overtime_accept = $request->has('overtime_accept');
         $user->public_holidays = $request->has('public_holidays');
+
+        $user->save();
+
+        return redirect()
+            ->route('team.user.show', $user)
+            ->with('success', 'Konfiguracja została zaktualizowana.');
+    }
+    public function update_sms(Request $request, User $user)
+    {
+        $request->validate([
+            'sms' => 'nullable|in:on',
+        ]);
+
+        // Pozostałe pola
+        $user->sms = $request->has('sms');
 
         $user->save();
 

@@ -14,21 +14,6 @@
         </div>
     </td>
 
-    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-        <x-paragraf-display class="text-xs whitespace-nowrap">
-            <x-status-cello>
-                {{ $user->assigned_at ? $user->assigned_at->format('d.m.Y') : '' }}
-            </x-status-cello>
-        </x-paragraf-display>
-    </td>
-    <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50">
-        <x-paragraf-display class="text-xs whitespace-nowrap">
-            <x-status-cello>
-                {{ $user->paid_until ? $user->paid_until->format('d.m.Y') : '' }}
-            </x-status-cello>
-        </x-paragraf-display>
-    </td>
-
     @if(!request()->routeIs('setting'))
     <x-show-cell href="{{route('setting.user.show', $user)}}" />
     @else

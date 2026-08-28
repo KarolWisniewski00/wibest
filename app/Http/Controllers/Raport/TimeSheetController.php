@@ -219,6 +219,9 @@ class TimeSheetController extends Controller
                 $leave = $workSessionRepository->hasLeave($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
                 $leaveFirst = $workSessionRepository->getFirstLeave($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
 
+                $static = $userRepository->hasPlannedToday($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
+                $work = $userRepository->hasPlannedTodayWork($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
+                $work_obj = $userRepository->getPlannedTodayWork($value->id, \Carbon\Carbon::createFromFormat('Y-m-d', $date['date'])->format('d.m.y'));
                 //if ($user->public_holidays == true) {
                 $carbonDate = \Carbon\Carbon::createFromFormat('Y-m-d', $date['date']);
                 if ($carbonDate->year < 100) {
@@ -241,9 +244,13 @@ class TimeSheetController extends Controller
 
 
                 if ($leave) {
-                    $type = $leaveFirst->type;
-                    $short = config('leavetypes.shortType')[$type] ?? null;
-                    $userDates[$date['date']] = $short ?? '';
+                    if ($static || $work) {
+                        $type = $leaveFirst->type;
+                        $short = config('leavetypes.shortType')[$type] ?? null;
+                        $userDates[$date['date']] = $short ?? '';
+                    } else if ($isHoliday == true) {
+                        $userDates[$date['date']] = "ŚUW";
+                    }
                 } else if ($hasEvent) {
                     $userDates[$date['date']] = "RCP";
                 } else if ($hasStartEvent && $hasStopEvent) {

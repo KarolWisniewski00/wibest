@@ -2,197 +2,308 @@
 <html lang="pl">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faktura</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WIBEST – Wizytówka</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            margin: 0;
-            padding: 0;
-            font-size: 12px;
-        }
+        /*
+      FORMAT:
+      - netto: 90x50 mm
+      - brutto ze spadami: 96x56 mm
+      - spady: 3 mm z każdej strony
+      - bezpieczny margines: 5 mm
+      - kolorystyka przygotowana pod CMYK
+    */
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 8px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        /* Usunięcie cienia i dodatkowych efektów z ramek tabel */
-        table {
-            border: none;
-            /* Usunięcie domyślnej ramki */
-        }
-
-        td,
-        th {
-            border: 1px solid #ddd;
-            /* Prostokątna ramka bez cienia */
-        }
-
-        /* Styl dla nagłówka faktury */
-        .invoice-header {
-            margin-bottom: 5px;
-        }
-
-        .invoice-header span {
-            font-weight: bold;
-        }
-
-        /* Styl dla podziału */
-        .divider {
-            border-bottom: 1px solid #000;
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-
-        /* Styl dla tabeli sprzedawcy i nabywcy */
-        .seller-buyer-table {
-            width: 100%;
-            margin-top: 20px;
-            /* Dodanie marginesu górnego */
-            border-collapse: collapse;
-            border: none;
-        }
-
-        .seller-buyer-table td {
-            padding: 10px;
-            margin: 0px;
-            border: none;
+        * {
             box-sizing: border-box;
-            /* Uwzględnij padding w szerokości */
-            vertical-align: top;
-            /* Ustawienie wyrównania do góry */
         }
 
-        .seller,
-        .buyer {
-            width: 50%;
-            /* Szerokość każdego bloku, aby razem wynosiły 100% */
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #d1d5db;
+            font-family: "Lato", sans-serif;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            justify-content: center;
         }
 
-        .seller h2,
-        .buyer h2,
-        .seller p span,
-        .buyer p span {
-            font-weight: bold;
-            /* Pogrubienie tekstu */
+        .sheet {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
-        /* Styl dla podsumowania */
-        .summary {
+        .card {
+            position: relative;
+            width: 96mm;
+            height: 56mm;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        /* linia pomocnicza netto 90x50 */
+        .trim-line {
+            position: absolute;
+            top: 3mm;
+            left: 3mm;
+            width: 90mm;
+            height: 50mm;
+            pointer-events: none;
+        }
+
+        /* bezpieczny obszar 5mm od cięcia */
+        .safe-zone {
+            position: absolute;
+            top: 8mm;
+            left: 8mm;
+            width: 80mm;
+            height: 40mm;
+            pointer-events: none;
+        }
+
+        /* FRONT */
+        .front {
+            background-color: rgb(249 250 251);
+        }
+
+        .front-content {
+            position: absolute;
+            inset: 8mm;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+            z-index: 2;
+        }
+
+        .brand-side {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 42%;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-mark {
+            width: 16mm;
+            height: 16mm;
+            border-radius: 4mm;
+            background: linear-gradient(135deg, #bbf7d0, #4ade80);
+            color: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22pt;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-name {
+            font-size: 20pt;
+            font-weight: 700;
+            color: rgb(134 239 172);
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .subtitle {
+            margin-top: 6px;
+            color: rgb(75 85 99);
+            font-size: 7pt;
+            line-height: 1.7;
+            letter-spacing: 0.2px;
+        }
+
+        .services {
+            font-size: 7pt;
+            color: rgb(75 85 99);
+            line-height: 1.7;
+            border-left: 2px solid rgba(134, 239, 172, 0.25);
+            padding-left: 10px;
+            letter-spacing: 0.2px;
+        }
+
+        .contact-side {
+            width: 48%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             text-align: right;
-            /* Wyrównanie tekstu do prawej */
-            margin-top: 20px;
-            /* Dodanie marginesu górnego */
         }
 
-        .summary p {
-            margin: 5px 0;
-            /* Dodanie marginesu górnego i dolnego */
+        .person {
+            font-size: 11pt;
+            color: rgb(17 24 39);
+            letter-spacing: 0.2px;
         }
 
-        /* Styl dla uwag */
-        .notes-section {
-            margin-top: 20px;
+        .company {
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: rgb(134 239 172);
+            margin-bottom: 6mm;
+            font-weight: 600;
         }
 
-        /* Styl dla napisu w lewym dolnym rogu */
-        .footer-left {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            font-size: 10px;
-            color: #555;
+        .contact-item {
+            font-size: 8pt;
+            color: rgb(17 24 39);
+            letter-spacing: 0.2px;
+            margin-top: 1.2mm;
+        }
+
+        .details {
+            margin-top: 6mm;
+            font-size: 7pt;
+            color: rgb(75 85 99);
+            line-height: 1.7;
+            letter-spacing: 0.2px;
+        }
+
+        /* BACK */
+        .back {
+            background: #1f2937;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .back::before {
+            content: '';
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            background:
+                radial-gradient(circle at center, rgba(74, 222, 128, 0.12), transparent 50%);
+            transform: rotate(-8deg);
+        }
+
+        .back-logo {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .back-logo .mark {
+            font-size: 54pt;
+            font-weight: 700;
+            color: rgba(187, 247, 208, 0.08);
+            line-height: 1;
+            margin-bottom: -12px;
+        }
+
+        .back-logo .name {
+            font-size: 28pt;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #bbf7d0;
+        }
+
+        .back-logo .site {
+            margin-top: 6px;
+            color: #9ca3af;
+            font-size: 8pt;
+            letter-spacing: 2px;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .sheet {
+                gap: 0;
+            }
+
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+
+        @page {
+            size: 96mm 56mm;
+            margin: 0;
         }
     </style>
 </head>
 
 <body>
-    <div class="invoice-header">
-        <p><span>Faktura numer</span><h2 class="h2">1/03/2026</h2></p>
-        <p><span>Data wystawienia:</span> 2026-03-11</p>
-        <p><span>Data sprzedaży:</span> 2026-03-11</p>
-        <p><span>Termin płatności:</span> 2026-03-18</p>
-        <p><span>Płatność:</span> przelew</p>
-    </div>
-    <div class="divider"></div>
 
-    <table class="seller-buyer-table">
-        <tr>
-            <td class="seller">
-                <h2 class="h2">Sprzedawca</h2>
-                <p>Karol Wiśniewski WIBEST</p>
-                <p>Sielecka 63, 42-500, Będzin</p>
-                <p><span>NIP:</span> 8992998536</p>
-                <p><span>Numer konta:</span> 65 1050 1227 1000 0090 8643 8406</p>
-            </td>
-            <td class="buyer">
-                <h2 class="h2">Nabywca</h2>
-                <p>Fox II. Sklep z art. skórzanymi i obuwiem. Guziak W.</p>
-                <p>Krupówki 25, 34-500 Zakopane, woj. małopolskie</p>
-                <p><span>NIP:</span> 7361185964</p>
-            </td>
-        </tr>
-    </table>
+    <div class="sheet">
 
-    <h2>Pozycje</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Lp.</th>
-                <th>Nazwa usługi lub towaru</th>
-                <th>Ilość</th>
-                <th>Cena netto</th>
-                <th>Wartość netto</th>
-                <th>Stawka VAT</th>
-                <th>Kwota VAT</th>
-                <th>Wartość brutto</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>1.</td>
-                <td>Usługa informatyczna</td>
-                <td>1 szt</td>
-                <td>2571.00 PLN</td>
-                <td>2571.00 PLN</td>
-                <td>0 %</td>
-                <td>0.00 PLN</td>
-                <td>2571.00 PLN</td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- FRONT -->
+        <div class="card front">
+            <div class="trim-line"></div>
+            <div class="safe-zone"></div>
 
-    <div class="summary">
-        <h2 class="h2">Podsumowanie</h2>
-        <p>Razem netto: 2571.00 PLN</p>
-        <p>VAT: 0.00 PLN</p>
-        <p>Razem brutto: 2571.00 PLN</p>
-    </div>
-    <div class="summary">
-        <h2 class="h2">Słownie</h2>
-        <p>dwa tysiące pięćset siedemdziesiąt jeden złotych 00/100</p>
-    </div>
-    <div class="divider"></div>
-    <h2 class="h2">Uwagi</h2>
-    <p>Produkcja strony WWW obuwiepremium.pl i obuwie-premium.pl<br>+ aktualizacja i zmiany na stronie</p>
+            <div class="front-content">
 
-    <!-- Napis w lewym dolnym rogu -->
-    <div class="footer-left">
-        Faktura wystawiona w wibest.pl
+                <div class="brand-side">
+                    <div>
+                        <div class="logo-box">
+                            <div>
+                                <div class="brand-name" style="font-family: 'Raleway', sans-serif;">WIBEST</div>
+                                <div class="subtitle">
+                                    RCP | e-wnioski | raporty
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="services">
+                        Nowoczesne rozwiązania<br>
+                        dla firm
+                    </div>
+                </div>
+
+                <div class="contact-side">
+                    <div>
+                        <div class="person">Karol Wiśniewski</div>
+                        <div class="company" style="font-family: 'Raleway', sans-serif;">WIBEST</div>
+
+                        <div class="contact-item">biuro@wibest.pl</div>
+                        <div class="contact-item">662 294 073</div>
+                        <div class="contact-item">wibest.pl</div>
+
+                        <div class="details">
+                            NIP: 8992998536<br>
+                            REGON: 52915565800000
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- BACK -->
+        <div class="card back">
+            <div class="trim-line"></div>
+            <div class="safe-zone"></div>
+
+            <div class="back-logo">
+                <div class="mark" style="font-family: 'Raleway', sans-serif;">W</div>
+                <div class="name" style="font-family: 'Raleway', sans-serif;">WIBEST</div>
+                <div class="site" style="font-family: 'Raleway', sans-serif;">wibest.pl</div>
+            </div>
+        </div>
+
     </div>
 
 </body>

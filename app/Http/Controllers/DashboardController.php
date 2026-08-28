@@ -2,19 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Livewire\Calendar;
 use App\Models\Event;
 use App\Models\Leave;
+use App\Models\LeaveBalance;
 use App\Models\User;
 use App\Models\WorkBlock;
 use App\Models\WorkSession;
-use App\Repositories\WorkSessionRepository;
+use App\Services\GroqApi;
 use App\Services\LeaveService;
-use App\Services\SmsApi;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -111,9 +110,23 @@ class DashboardController extends Controller
             ];
         });
         $user = Auth::user();
-        return view('dashboard', compact('task', 'work_session', 'leaves_used', 'user'));
-    }
 
+
+        try {
+            $leave_balance = LeaveBalance::where('user_id', Auth::id())
+                ->where('company_id', Auth::user()->company_id)
+                ->where('year', now()->year)
+                ->first();
+            $carried_over = $leave_balance->carried_over ?? 0;
+            $base_days = $leave_balance->base_days ?? 0;
+            $leave_balance_left = ($carried_over + $base_days) - $leave_balance->used_days;
+        } catch (Exception) {
+            $leave_balance = null;
+            $leave_balance_left =  0;
+        }
+
+        return view('dashboard', compact('leave_balance', 'leave_balance_left', 'task', 'work_session', 'leaves_used', 'user'));
+    }
     public function version()
     {
         return view('admin.version.index');

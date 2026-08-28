@@ -12,7 +12,7 @@
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
             </x-button-link-back>
             <!--POWRÓT-->
-            <h2 class="text-xl font-semibold dark:text-white mb-4">Edytuj Użytkownika</h2>
+            <h2 class="text-xl font-semibold dark:text-white mb-4 text-center">Dodaj Użytkownika</h2>
             
             <livewire:user-wizard company_id="{{$client->id}}" routeBack="setting.user.show" />
         </x-container-content-form>

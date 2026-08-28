@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Invitation;
 use App\Models\Leave;
+use App\Models\LeaveBalance;
 use App\Models\PlannedLeave;
 use App\Models\SentMessage;
 use App\Models\User;
+use App\Models\UserCompanyHistory;
 use App\Models\WorkSession;
 use App\Repositories\CompanyRepository;
 use App\Repositories\InvitationRepository;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -31,7 +34,7 @@ class UserController extends Controller
     }
     public function index()
     {
-        $users = User::with('company')
+        $users = User::withoutGlobalScope('no_crm')->with('company')
             ->orderByRaw('ISNULL(company_id) DESC') // najpierw NULL-e
             ->orderBy('created_at', 'desc')         // potem najnowsze
             ->paginate(3);
@@ -42,7 +45,7 @@ class UserController extends Controller
     }
     public function get(Request $request)
     {
-        $users = User::with('company')
+        $users = User::withoutGlobalScope('no_crm')->with('company')
             ->orderByRaw('ISNULL(company_id) DESC') // najpierw NULL-e
             ->orderBy('created_at', 'desc')         // potem najnowsze
             ->paginate(3);
@@ -65,12 +68,71 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load('company');
+        //Wykorzystane wnioski
+        $yearStart = Carbon::now()->startOfYear();
+        $yearEnd = Carbon::now()->endOfYear();
+
+        $leaves = Leave::selectRaw("
+        type,
+        status,
+        SUM(days) as days,
+        SUM(working_days) as working_days,
+        SUM(non_working_days) as non_working_days
+    ")
+            ->where('user_id', $user->id)
+            ->where('start_date', '<=', $yearEnd)
+            ->where('end_date', '>=', $yearStart)
+            ->whereIn('status', ['zaakceptowane', 'zrealizowane'])
+            ->groupBy('type', 'status')
+            ->get();
+
+        $leaves_used = $leaves->groupBy('type')->map(function ($items) {
+
+            $accepted = $items->firstWhere('status', 'zaakceptowane');
+            $realized = $items->firstWhere('status', 'zrealizowane');
+
+            return [
+                'zaakceptowane' => [
+                    'days' => $accepted->days ?? 0,
+                    'working_days' => $accepted->working_days ?? 0,
+                    'non_working_days' => $accepted->non_working_days ?? 0,
+                ],
+                'zrealizowane' => [
+                    'days' => $realized->days ?? 0,
+                    'working_days' => $realized->working_days ?? 0,
+                    'non_working_days' => $realized->non_working_days ?? 0,
+                ],
+            ];
+        });
         $msg = SentMessage::where('user_id', $user->id)->orderByDesc('created_at')->get();
-        return view('admin.user.show', compact('user', 'msg'));
+        $msg_sms = SentMessage::where('user_id', $user->id)->where('type', 'sms')->orderByDesc('created_at')->get();
+        $msg_email = SentMessage::where('user_id', $user->id)->where('type', 'email')->orderByDesc('created_at')->get();
+
+        try {
+            $leave_balance = LeaveBalance::where('user_id', $user->id)
+                ->where('company_id', $user->id->company_id)
+                ->where('year', now()->year)
+                ->first();
+            $carried_over = $leave_balance->carried_over ?? 0;
+            $base_days = $leave_balance->base_days ?? 0;
+            $leave_balance_left = ($carried_over + $base_days) - $leave_balance->used_days;
+        } catch (Exception) {
+            $leave_balance = null;
+            $leave_balance_left =  0;
+        }
+
+        return view('admin.user.show', compact('leave_balance', 'leave_balance_left', 'user', 'leaves_used', 'msg', 'msg_sms', 'msg_email'));
     }
     public function delete(User $user)
     {
+        $user_id = $user->id;
         if ($user->delete()) {
+            UserCompanyHistory::where('user_id', $user_id)->update(
+                [
+                    'unassigned_at' => Carbon::now(),
+                    'paid_to' => Carbon::now()->endOfMonth()
+                ]
+            );
             return redirect()->route('setting.user')->with('success', 'Operacja się powiodła.');
         }
         return redirect()->back()->with('fail', 'Wystąpił błąd.');
@@ -157,27 +219,58 @@ class UserController extends Controller
 
         if ($request->company != null) {
             //Aktualizacja
+            $user->load('company');
+            if ($user->role != 'CRM') {
+                // sprawdź, ilu użytkowników ma ta firma
+                $usersCount = User::withoutGlobalScope('no_crm')->where('company_id', $request->company)->count();
+                // ustaw rolę
+                $role = $usersCount === 0 ? 'admin' : 'użytkownik';
+                try {
+                    $user_price = $user->company->user_price;
+                } catch (Exception) {
+                    $user_price = 10;
+                }
+            } else {
+                $role = 'CRM';
+                $user_price = 0;
+            }
 
-            // sprawdź, ilu użytkowników ma ta firma
-            $usersCount = User::where('company_id', $request->company)->count();
-            // ustaw rolę
-            $role = $usersCount === 0 ? 'admin' : 'użytkownik';
 
-            $user->company_id = $request->company;
-            $user->supervisor_id = null;
-            $user->position = null;
-            $user->assigned_at = Carbon::now();
-            $user->role = $role;
-            $user->save();
+            if ($user->company_id != $request->company) {
+                $user->company_id = $request->company;
+                $user->supervisor_id = null;
+                $user->position = null;
+                $user->role = $role;
+                $user->save();
+                UserCompanyHistory::where('user_id', $user->id)->update(
+                    [
+                        'unassigned_at' => Carbon::now(),
+                        'paid_to' => Carbon::now()->endOfMonth()
+                    ]
+                );
+                UserCompanyHistory::create([
+                    'company_id' => $user->company_id,
+                    'user_id' => $user->id,
+                    'assigned_at' => Carbon::now(),
+                    'paid_from' => Carbon::now()->startOfMonth(),
+                    'user_price' => $user_price,
+                ]);
+            }
+
             return redirect()->route('setting.user.show', $user)->with('success', 'Zapisano firmę.');
         } else {
             //Usunięcie firmy
             $user->company_id = null;
             $user->supervisor_id = null;
             $user->position = null;
-            $user->assigned_at = null;
             $user->role = null;
             $user->save();
+            UserCompanyHistory::where('user_id', $user->id)->update(
+                [
+                    'unassigned_at' => Carbon::now(),
+                    'paid_to' => Carbon::now()->endOfMonth()
+                ]
+            );
             return redirect()->route('setting.user.show', $user)->with('success', 'Usunięto firmę.');
         }
     }
@@ -189,26 +282,103 @@ class UserController extends Controller
     {
         return view('admin.user.edit', compact('user'));
     }
+
+    public function prefabCreate(Company $client)
+    {
+        $user =  new User();
+        $user->name = 'Administrator';
+        $user->company_id = $client->id;
+        $user->email = Str::random(12);
+        $user->password = Hash::make(Str::random(12));
+        $user->role = 'admin';
+        $user->save();
+        UserCompanyHistory::create([
+            'company_id' => $client->id,
+            'user_id' => $user->id,
+            'assigned_at' => Carbon::now(),
+            'paid_from' => Carbon::now()->startOfMonth(),
+            'user_price' => 0,
+        ]);
+    }
     public function create(Company $client)
     {
         if ($client->getUsersCount() === 0) {
-            $user =  new User();
-            $user->name = 'Administrator';
-            $user->company_id = $client->id;
-            $user->email = Str::random(12);
-            $user->password = Hash::make(Str::random(12));
-            $user->role = 'admin';
-            $user->assigned_at = Carbon::now();
-            $user->save();
+            $this->prefabCreate($client);
             return redirect()->route('setting.client.show', $client)->with('success', 'Dodano admina w celu zapewnienia prawidłowego działania.');
         }
         return view('admin.user.create', compact('client'));
     }
-    public function config(User $user)
+    public function createForCrm(Company $client)
+    {
+        if ($client->getUsersCount() === 0) {
+            $this->prefabCreate($client);
+            return redirect()->route('setting.client.show', $client)->with('success', 'Dodano admina w celu zapewnienia prawidłowego działania.');
+        }
+        return view('admin.user.create-for-crm', compact('client'));
+    }
+    public function editForCrm(User $user)
+    {
+        return view('admin.user.edit-for-crm', compact('user'));
+    }
+    public function updateForCrm(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'phone' => 'nullable|string|max:20',
+            'position' => 'nullable|string|max:255',
+        ]);
+
+        $user->update($request->only(['name', 'email', 'phone', 'position']));
+
+        return redirect()->route('setting.user.show', $user)->with('success', 'Zaktualizowano dane użytkownika.');
+    }
+    public function storeForCrm(Request $request, Company $client)
+    {
+        $user = User::create([
+            'name' => $request->name ?? 'Użytkownik CRM',
+            'email' => $request->email ?? Str::random(12),
+            'password' => Hash::make(Str::random(12)),
+            'phone' => $request->phone ?? null,
+            'position' => $request->position ?? null,
+            'company_id' => $client->id,
+            'role' => 'CRM',
+        ]);
+        UserCompanyHistory::create([
+            'company_id' => $client->id,
+            'user_id' => $user->id,
+            'assigned_at' => Carbon::now(),
+            'paid_from' => Carbon::now()->startOfMonth(),
+            'user_price' => 0,
+        ]);
+        return redirect()->route('setting.client.show', $client)->with('success', 'Dodano użytkownika dla CRM.');
+    }
+    public function disconnect(User $user)
+    {
+        UserCompanyHistory::where('user_id', $user->id)->update(
+            [
+                'unassigned_at' => Carbon::now(),
+                'paid_to' => Carbon::now()->endOfMonth()
+            ]
+        );
+        $user->company_id = null;
+        $user->supervisor_id = null;
+        $user->position = null;
+        $user->role = null;
+        $user->save();
+        return redirect(route('setting.user'))->with('success', 'Rozłączono.');
+    }
+    public function config_planing(User $user)
     {
         $companyId = $this->companyRepository->getCompanyId();
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         return view('admin.user.config', compact('user', 'invitations'));
+    }
+    public function config_sms(User $user)
+    {
+        $companyId = $this->companyRepository->getCompanyId();
+        $invitations = $this->invitationRepository->getByCompanyId($companyId);
+        return view('admin.user.sms', compact('user', 'invitations'));
     }
     public function update_planing(Request $request, User $user)
     {
@@ -237,6 +407,21 @@ class UserController extends Controller
         $user->overtime_task = $request->has('overtime_task');
         $user->overtime_accept = $request->has('overtime_accept');
         $user->public_holidays = $request->has('public_holidays');
+
+        $user->save();
+
+        return redirect()
+            ->route('setting.user.show', $user)
+            ->with('success', 'Konfiguracja została zaktualizowana.');
+    }
+    public function update_sms(Request $request, User $user)
+    {
+        $request->validate([
+            'sms' => 'nullable|in:on',
+        ]);
+
+        // Pozostałe pola
+        $user->sms = $request->has('sms');
 
         $user->save();
 

@@ -5,10 +5,18 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class WorkSession extends Model
 {
     use HasFactory;
+    use LogsActivity;
+
+    protected static $logAll = true;
+    protected static $logOnlyDirty = true;
+    protected static $submitEmptyLogs = false;
 
     protected $fillable = [
         'user_id',
@@ -22,7 +30,13 @@ class WorkSession extends Model
         'task_id',
         'info',
     ];
-
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll() // albo konkretne pola
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs();
+    }
     public function user()
     {
         return $this->belongsTo(User::class)->withDefault([
@@ -171,5 +185,83 @@ class WorkSession extends Model
         }
 
         return $task;
+    }
+    public function isBlocked(): bool
+    {
+        $startDate = Carbon::parse($this->eventStart->time);
+        $endDate = Carbon::parse(
+            $this->eventStop ? $this->eventStop->time : Carbon::now()
+        );
+
+        return WorkSession::query()
+            ->where('id', '!=', $this->id) // pomijamy aktualną sesję
+            ->where('user_id', $this->user_id)
+            ->whereNotNull('event_start_id')
+            ->where(function ($query) use ($startDate, $endDate) {
+
+                $query->whereHas('eventStart', function ($q) use ($endDate) {
+                    $q->where('time', '<', $endDate);
+                })->whereHas('eventStop', function ($q) use ($startDate) {
+                    $q->where('time', '>', $startDate);
+                });
+            })
+            ->exists();
+    }
+    protected static function boot()
+    {
+        parent::boot();
+
+        // 🚨 Uruchamia logikę ZARAZ PO POBRANIU modelu z bazy
+        static::retrieved(function ($workSession) {
+            if (!$workSession->user_id) {
+                return;
+            }
+
+            $isBlocked = $workSession->isBlocked();
+            if ($isBlocked) {
+                if ($workSession->status == 'Praca zakończona' || $workSession->status == 'W trakcie pracy') {
+                    $startTime = $workSession->eventStart->time;
+
+                    if (!$workSession->eventStop) {
+                        $eventStop = Event::create([
+                            'time' => $startTime,
+                            'location' => '',
+                            'device' => '',
+                            'event_type' => 'stop',
+                            'user_id' => $workSession->user_id,
+                            'company_id' => $workSession->company_id,
+                            'created_user_id' => $workSession->created_user_id,
+                        ]);
+
+                        $workSession->event_stop_id = $eventStop->id;
+                    } else {
+                        $workSession->eventStop->time = $startTime;
+                        $workSession->eventStop->save();
+                    }
+
+                    $workSession->status = 'Zablokowane';
+                    $workSession->time_in_work = '00:00:00';
+                    $workSession->notes = '[SYSTEM] Sesja zablokowana z powodu konfliktu z inną sesją.';
+                    $workSession->save();
+
+                    Activity::where('subject_id', $workSession->id)
+                        ->where('subject_type', WorkSession::class)
+                        ->latest()
+                        ->first()
+                        ->update([
+                            'causer_id' => null,
+                            'causer_type' => null,
+                        ]);
+                    Activity::where('subject_id', $workSession->event_stop_id)
+                        ->where('subject_type', Event::class)
+                        ->latest()
+                        ->first()
+                        ->update([
+                            'causer_id' => null,
+                            'causer_type' => null,
+                        ]);
+                }
+            }
+        });
     }
 }

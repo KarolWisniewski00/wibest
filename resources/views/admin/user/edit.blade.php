@@ -12,7 +12,7 @@
                 <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do profilu
             </x-button-link-back>
             <!--POWRÓT-->
-            <h2 class="text-xl font-semibold dark:text-white mb-4">Edytuj Użytkownika</h2>
+            <h2 class="text-xl font-semibold dark:text-white mb-4 text-center">Edytuj Użytkownika</h2>
             
             <livewire:edit-user-wizard :user-id="$user->id" routeBack="setting.user.show" />
         </x-container-content-form>

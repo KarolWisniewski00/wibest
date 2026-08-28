@@ -11,6 +11,7 @@ use App\Models\SentMessage;
 use App\Models\WorkSession;
 use App\Services\SmsApi;
 use Exception;
+use Spatie\Activitylog\Models\Activity;
 
 class SendDelayed implements ShouldQueue
 {
@@ -43,23 +44,69 @@ class SendDelayed implements ShouldQueue
     public function handle()
     {
         $work_session = WorkSession::where('id', $this->workSessionId)->first();
+        $hasUpdates = Activity::query()
+            ->where('subject_type', WorkSession::class)
+            ->where('subject_id', $work_session->id)
+            ->where('event', 'updated')
+            ->exists();
+            
+        if (! $hasUpdates) {
+            if ($work_session->user->sms) {
+                if ($work_session && $work_session->status === 'W trakcie pracy') {
+                    $sms_api = new SmsApi();
+                    $phone_validated = $sms_api->normalizePhoneNumber($work_session->user->phone);
 
-        if ($work_session && $work_session->status === 'W trakcie pracy') {
-            $sms_api = new SmsApi();
-            $phone_validated = $sms_api->normalizePhoneNumber($work_session->user->phone);
+                    try {
+                        $smsResult = $sms_api->sendSms($phone_validated, $this->message);
+                        // 2. Analiza wyniku zwróconego przez sendSms()
+                        if ($smsResult['success'] === true) {
+                            // Odpowiedź API znajduje się w kluczu 'data'
+                            $responseData = $smsResult['data'];
 
-            try {
-                $smsResult = $sms_api->sendSms($phone_validated, $this->message);
-                // 2. Analiza wyniku zwróconego przez sendSms()
-                if ($smsResult['success'] === true) {
-                    // Odpowiedź API znajduje się w kluczu 'data'
-                    $responseData = $smsResult['data'];
+                            // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
+                            if (isset($responseData['list'][0])) {
+                                $messageData = $responseData['list'][0];
 
-                    // Sprawdzenie, czy struktura odpowiedzi jest poprawna (jak w przykładzie)
-                    if (isset($responseData['list'][0])) {
-                        $messageData = $responseData['list'][0];
+                                // Użycie danych z API do zapisu
+                                SentMessage::create([
+                                    'type'       => 'sms',
+                                    'recipient'  => $phone_validated,
+                                    'user_id'    => $work_session->user_id,
+                                    'company_id' => $work_session->company_id,
+                                    'subject'    => $this->subject,
+                                    'body'       => $this->body,
+                                    'status'     => $messageData['status'] ?? 'SENT',
+                                    'price'      => $messageData['points'] ?? 0.00,
+                                ]);
+                            } else {
+                                // Logowanie: Success=true, ale brak danych wiadomości w liście
+                                SentMessage::create([
+                                    'type'       => 'sms',
+                                    'recipient'  => $phone_validated,
+                                    'user_id'    => $work_session->user_id,
+                                    'company_id' => $work_session->company_id,
+                                    'subject'    => $this->subject,
+                                    'body'       => $this->body,
+                                    'status'     => 'UNKNOW',
+                                    'price'      => $messageData['points'] ?? 0.00,
+                                ]);
+                            }
+                        } else {
+                            // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
+                            SentMessage::create([
+                                'type'       => 'sms',
+                                'recipient'  => $phone_validated,
+                                'user_id'    => $work_session->user_id,
+                                'company_id' => $work_session->company_id,
+                                'subject'    => $this->subject,
+                                'body'       => $this->body,
+                                'status'     => 'FAILED',
+                                'price'      => $messageData['points'] ?? 0.00,
+                            ]);
 
-                        // Użycie danych z API do zapisu
+                            // finalStatus pozostaje 'API_FAILED'
+                        }
+                    } catch (Exception) {
                         SentMessage::create([
                             'type'       => 'sms',
                             'recipient'  => $phone_validated,
@@ -67,48 +114,11 @@ class SendDelayed implements ShouldQueue
                             'company_id' => $work_session->company_id,
                             'subject'    => $this->subject,
                             'body'       => $this->body,
-                            'status'     => $messageData['status'] ?? 'SENT',
-                            'price'      => $messageData['points'] ?? 0.00,
-                        ]);
-                    } else {
-                        // Logowanie: Success=true, ale brak danych wiadomości w liście
-                        SentMessage::create([
-                            'type'       => 'sms',
-                            'recipient'  => $phone_validated,
-                            'user_id'    => $work_session->user_id,
-                            'company_id' => $work_session->company_id,
-                            'subject'    => $this->subject,
-                            'body'       => $this->body,
-                            'status'     => 'UNKNOW',
+                            'status'     => 'FAILED',
                             'price'      => $messageData['points'] ?? 0.00,
                         ]);
                     }
-                } else {
-                    // Wystąpił błąd HTTP, błąd połączenia lub błąd biznesowy z API (wg logiki w sendSms)
-                    SentMessage::create([
-                        'type'       => 'sms',
-                        'recipient'  => $phone_validated,
-                        'user_id'    => $work_session->user_id,
-                        'company_id' => $work_session->company_id,
-                        'subject'    => $this->subject,
-                        'body'       => $this->body,
-                        'status'     => 'FAILED',
-                        'price'      => $messageData['points'] ?? 0.00,
-                    ]);
-
-                    // finalStatus pozostaje 'API_FAILED'
                 }
-            } catch (Exception) {
-                SentMessage::create([
-                    'type'       => 'sms',
-                    'recipient'  => $phone_validated,
-                    'user_id'    => $work_session->user_id,
-                    'company_id' => $work_session->company_id,
-                    'subject'    => $this->subject,
-                    'body'       => $this->body,
-                    'status'     => 'FAILED',
-                    'price'      => $messageData['points'] ?? 0.00,
-                ]);
             }
         }
     }

@@ -1,5 +1,5 @@
 @props([
-    'maxHeight' => 'max-h-80', // domyślna wysokość
+    'maxHeight' => 'max-h-[500px]', // domyślna wysokość
 ])
 
 <div

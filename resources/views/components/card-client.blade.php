@@ -34,26 +34,6 @@
                 </x-status-gray>
             </x-paragraf-display>
 
-            <x-paragraf-display class="text-xs">
-                <x-status-gray>
-                    @if($client->msg != null)
-                    <span>📩</span> {{ $client->msg->count() }}
-                    @else
-                    <span>📩</span> 0
-                    @endif
-                </x-status-gray>
-            </x-paragraf-display>
-
-            <x-paragraf-display class="text-xs">
-                <x-status-gray>
-                    @if($client->msg != null)
-                    <span>📱</span> {{ $client->msg->sum('price') ?? 0 }} PLN
-                    @else
-                    <span>📱</span> 0
-                    @endif
-                </x-status-gray>
-            </x-paragraf-display>
-
             <div class="flex space-x-3">
                 <x-button-link-neutral href="{{route('setting.client.show', $client)}}" class="min-h-[38px]">
                     <i class="fa-solid fa-eye"></i>

@@ -9,4 +9,9 @@
     {{ $work_session->status }}
 </x-status-green>
 @endif
+@if($work_session->status == 'Zablokowane')
+<x-status-red {{ $attributes }}>
+    {{ $work_session->status }}
+</x-status-red>
+@endif
 <!--PRZY ZMIANACH PAMIĘTAJ ŻE W JQUERY TEŻ TRZEBA ZMIENIĆ-->

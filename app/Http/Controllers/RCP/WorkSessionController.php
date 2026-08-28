@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\RCP;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\WorkSessionRequest;
 use App\Jobs\SendDelayed;
 use App\Jobs\SendNow;
 use App\Models\Event;
@@ -13,7 +12,6 @@ use App\Models\User;
 use App\Models\WorkBlock;
 use App\Models\WorkSession;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
 class WorkSessionController extends Controller

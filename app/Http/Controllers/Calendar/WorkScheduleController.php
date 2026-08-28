@@ -47,7 +47,7 @@ class WorkScheduleController extends Controller
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
         $users = $this->userService->paginatedByRoleAddDatesAndPlaningByFilterDate($request);
-
+        session()->forget('redirect_back_to');
         return view('admin.planing.index', compact('dates', 'startDate', 'endDate', 'users'));
     }
     public function smart(Request $request): \Illuminate\View\View
@@ -188,7 +188,8 @@ class WorkScheduleController extends Controller
     public function delete(WorkBlock $work_block)
     {
         if ($work_block->delete()) {
-            return redirect()->route('calendar.work-schedule.index')->with('success', 'Operacja się powiodła.');
+            $backUrl = session()->pull('redirect_back_to', route('calendar.work-schedule.index'));
+            return redirect($backUrl)->with('success', 'Operacja zakończona powodzeniem.');
         }
         return redirect()->back()->with('fail', 'Wystąpił błąd.');
     }

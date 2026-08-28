@@ -10,7 +10,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
-use App\Models\WorkBlock;
 use App\Models\WorkSession;
 use App\Repositories\UserRepository;
 use App\Repositories\WorkSessionRepository;
