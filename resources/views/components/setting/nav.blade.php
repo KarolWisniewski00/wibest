@@ -58,8 +58,8 @@
                 :active="request()->routeIs('setting')">
                 Moja firma
             </x-responsive-nav-link>
-            <x-responsive-nav-link class="h-full text-center" href="{{ route('setting') }}"
-                :active="request()->routeIs('setting')">
+            <x-responsive-nav-link class="h-full text-center" href="{{ route('setting.sms') }}"
+                :active="request()->routeIs('setting.sms')">
                 Moduł SMS
             </x-responsive-nav-link>
             @if($role == 'właściciel')

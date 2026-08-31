@@ -27,8 +27,8 @@ class WorkSessionController extends Controller
             ->whereDate('end_date', '>=', $now)
             ->whereIn('status', ['zaakceptowane', 'zrealizowane'])
             ->exists();
-        
-        if($isLeave){
+
+        if ($isLeave) {
             return response()->json([
                 'message' => 'Praca nie może zostać rozpoczęta ponieważ jest już wniosek',
                 'work_session_id' => '',
@@ -185,6 +185,11 @@ wibest.pl/login';
                 'event_stop_id' => $stopEvent->id,
                 'status' => 'Praca zakończona',
                 'time_in_work' => $timeInWork,
+            ]);
+            $activity = $workSession->activities()->latest()->first();
+
+            $activity->update([
+                'log_name' => 'ignore',
             ]);
 
             $user = User::where('id', $workSession->user_id)->first();

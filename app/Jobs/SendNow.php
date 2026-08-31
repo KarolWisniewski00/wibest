@@ -48,8 +48,10 @@ class SendNow implements ShouldQueue
             ->where('subject_type', WorkSession::class)
             ->where('subject_id', $work_session->id)
             ->where('event', 'updated')
+            ->where('log_name', 'default')
             ->exists();
-        if (! $hasUpdates) {
+
+        if (!$hasUpdates) {
             if ($work_session->user->sms) {
                 if ($work_session && $work_session->status === 'Praca zakończona') {
                     $sms_api = new SmsApi();

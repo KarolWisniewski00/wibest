@@ -188,6 +188,14 @@ class WorkSession extends Model
     }
     public function isBlocked(): bool
     {
+        if ($this->eventStart == null) {
+            $this->status = 'Zablokowane';
+            $this->time_in_work = '00:00:00';
+            $this->notes = '[SYSTEM] Sesja zablokowana z powodu braku zdarzenia rozpoczęcia pracy.';
+            $this->save();
+            return true;
+        }
+
         $startDate = Carbon::parse($this->eventStart->time);
         $endDate = Carbon::parse(
             $this->eventStop ? $this->eventStop->time : Carbon::now()

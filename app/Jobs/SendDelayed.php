@@ -50,7 +50,7 @@ class SendDelayed implements ShouldQueue
             ->where('event', 'updated')
             ->exists();
             
-        if (! $hasUpdates) {
+        if (!$hasUpdates) {
             if ($work_session->user->sms) {
                 if ($work_session && $work_session->status === 'W trakcie pracy') {
                     $sms_api = new SmsApi();
