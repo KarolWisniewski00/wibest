@@ -101,6 +101,9 @@ class EventController extends Controller
         // 🔍 WYSZUKIWANIE PO NAZWIE UŻYTKOWNIKA
         if ($request->filled('search')) {
             $query->where('users.name', 'like', '%' . $request->input('search') . '%');
+            session([
+                'search' => $request->input('search')
+            ]);
         }
 
         $events = $query->paginate($perPage);
@@ -159,6 +162,9 @@ class EventController extends Controller
         // 🔍 WYSZUKIWANIE PO NAZWIE UŻYTKOWNIKA
         if ($request->filled('search')) {
             $query->where('users.name', 'like', '%' . $request->input('search') . '%');
+            session([
+                'search' => $request->input('search')
+            ]);
         }
 
         $events = $query->get();

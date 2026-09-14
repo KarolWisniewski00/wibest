@@ -10,6 +10,7 @@ use App\Services\FilterDateService;
 use App\Services\LeaveService;
 use App\Services\UserService;
 use App\Services\WorkSessionService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -49,6 +50,69 @@ class WorkScheduleController extends Controller
         $users = $this->userService->paginatedByRoleAddDatesAndPlaningByFilterDate($request);
         session()->forget('redirect_back_to');
         return view('admin.planing.index', compact('dates', 'startDate', 'endDate', 'users'));
+    }
+    public function calendarUser(Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        if ($request->filled('start_date')) {
+            $startDate =  $request->start_date;
+        }
+        if ($request->filled('end_date')) {
+            $endDate =  $request->end_date;
+        }
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'właściciel') {
+        } else {
+            // Zabezpieczenie: jeżeli zaznaczony jest cały rok,
+            // ustaw aktualny miesiąc
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate);
+
+            if (
+                $start->format('m-d') === '01-01' &&
+                $end->format('m-d') === '12-31'
+            ) {
+                $startDate = now()->startOfMonth()->toDateString();
+                $endDate = now()->endOfMonth()->toDateString();
+                $request->session()->put('start_date', $startDate);
+                $request->session()->put('end_date', $endDate);
+                $request->session()->flash(
+                    'warning',
+                    'Zmieniono zakres dat na aktualny miesiąc'
+                );
+            }
+        }
+        $users = $this->userService->paginatedByRoleAddDatesAndPlaningByFilterDate($request);
+        session()->forget('redirect_back_to');
+        return view('admin.planing.user-calendar', compact('users', 'startDate', 'endDate'));
+    }
+    public function setDateCalendarUser(DateRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $users = $this->userService->getByRoleAddDatesAndPlaningByFilterDate($request);
+        $table = [];
+        $rows_list = [];
+
+        foreach ($users as $user) {
+            foreach ($user->dates as $dateInfo => $obj_status) {
+
+                $obj = $user->objs[$dateInfo] ?? null;
+
+                $table[$dateInfo] = View::make('components.cell-calendar-user-planing', [
+                    'user' => $user,
+                    'obj' => $obj,
+                    'obj_status' => $obj_status,
+                    'dateInfo' => $dateInfo,
+                    'startDate' => $request->start_date,
+                    'endDate' => $request->end_date,
+                ])->render();
+            }
+        }
+        return response()->json([
+            'table' => $table,
+            'list' => $rows_list,
+        ]);
     }
     public function smart(Request $request): \Illuminate\View\View
     {

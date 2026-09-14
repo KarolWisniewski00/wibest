@@ -8,12 +8,10 @@ use App\Models\LeaveBalance;
 use App\Models\User;
 use App\Models\WorkBlock;
 use App\Models\WorkSession;
-use App\Services\GroqApi;
 use App\Services\LeaveService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -124,8 +122,85 @@ class DashboardController extends Controller
             $leave_balance = null;
             $leave_balance_left =  0;
         }
+        $typePlaning = Auth::user()->working_hours_regular;
+        if ($typePlaning == 'stały planing') {
+            $daysOfWeek = [
+                'monday' => 'poniedziałek',
+                'tuesday' => 'wtorek',
+                'wednesday' => 'środa',
+                'thursday' => 'czwartek',
+                'friday' => 'piątek',
+                'saturday' => 'sobota',
+                'sunday' => 'niedziela',
+            ];
+            // Pobranie dnia tygodnia po angielsku
+            $dayEnglish = strtolower(Carbon::now()->format('l')); // np. 'monday'
 
-        return view('dashboard', compact('leave_balance', 'leave_balance_left', 'task', 'work_session', 'leaves_used', 'user'));
+            // Zamiana na polski
+            $dayPolish = $daysOfWeek[$dayEnglish];
+            $startDay = $user->working_hours_start_day; // np. "poniedziałek"
+            $stopDay  = $user->working_hours_stop_day;  // np. "piątek"
+
+            // Mapowanie dni tygodnia na liczby (poniedziałek = 0)
+            $daysMap = [
+                'poniedziałek' => 0,
+                'wtorek'      => 1,
+                'środa'       => 2,
+                'czwartek'    => 3,
+                'piątek'      => 4,
+                'sobota'      => 5,
+                'niedziela'   => 6,
+            ];
+
+            // Zamiana na liczby
+            $dayNum   = $daysMap[$dayPolish];
+            $startNum = $daysMap[$startDay];
+            $stopNum  = $daysMap[$stopDay];
+
+            // Sprawdzenie, czy dzień jest w przedziale
+            $inRange = false;
+
+            if ($startNum <= $stopNum) {
+                // np. poniedziałek - piątek
+                $inRange = ($dayNum >= $startNum && $dayNum <= $stopNum);
+            } else {
+                // np. piątek - wtorek (cykliczne)
+                $inRange = ($dayNum >= $startNum || $dayNum <= $stopNum);
+            }
+
+            if ($inRange) {
+                $workingSeconds = (int)$user->working_hours_custom * 3600;
+                $workingStart = Carbon::parse($user->working_hours_from);
+                $workingEnd = Carbon::parse($user->working_hours_to);
+            } else {
+                $workingStart = null;
+                $workingEnd = null;
+                $workingSeconds = 0;
+            }
+        } else {
+            // GRAFIK ZMIENNY
+
+            $today = Carbon::now();
+
+            $workblock = Workblock::where('user_id', $user->id)
+                ->whereDate('starts_at', $today->toDateString())
+                ->first();
+
+            if ($workblock) {
+
+                $workingStart = Carbon::parse($workblock->starts_at);
+                $workingEnd = Carbon::parse($workblock->ends_at);
+
+                $workingSeconds = $workingEnd->diffInSeconds($workingStart);
+            } else {
+
+                $workingStart = null;
+                $workingEnd = null;
+                $workingSeconds = 0;
+            }
+        }
+
+        return view('dashboard', compact('typePlaning','workingStart', 'workingEnd', 'workingSeconds', 'leave_balance', 'leave_balance_left', 'task', 'work_session', 'leaves_used', 'user'));
     }
     public function version()
     {

@@ -290,10 +290,13 @@ class UserController extends Controller
         $user->sms = $request->has('sms');
 
         $user->save();
-
-        return redirect()
-            ->route('team.user.show', $user)
-            ->with('success', 'Konfiguracja została zaktualizowana.');
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'właściciel') {
+            return redirect()
+                ->route('team.user.show', $user)
+                ->with('success', 'Konfiguracja została zaktualizowana.');
+        } else {
+            return back()->with('success', 'Konfiguracja została zaktualizowana.');
+        }
     }
     public function update(Request $request, User $user)
     {

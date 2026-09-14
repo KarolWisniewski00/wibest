@@ -3,51 +3,9 @@
     @if ($company)
         <!--SIDE BAR-->
         <x-sidebar-left>
-            @if(isset($filter_user_id) && $filter_user_id)
-                <div class="relative">
-                    <div class="p-2 pt-0 text-sm rounded-lg">
-                        <div class="flex flex-col gap-4">
-                            <span class="text-gray-900 dark:text-white">👤 Dla zespołu</span>
-                            <label
-                                class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
-
-                                <div class="flex items-center gap-2">
-                                    <x-user-photo :user="App\Models\User::where('id', $filter_user_id)->first()" />
-                                    <x-user-name :user="App\Models\User::where('id', $filter_user_id)->first()"
-                                        class="flex-wrap" />
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    @if($startDate != '' || $endDate != '')
-                        <div class="p-2 pt-0 text-sm rounded-lg flex flex-col gap-4 flex-wrap">
-                            <span class="text-gray-900 dark:text-white">📅 Zakres</span>
-                            <x-status-cello>
-                                @if($startDate != '')
-                                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y') ?? ''}}
-                                @endif
-                                <span class="px-2">-</span>
-                                @if($endDate != '')
-                                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y') ?? ''}}
-                                @endif
-                            </x-status-cello>
-                        </div>
-                    @endif
-                </div>
-            @else
-                @if($role == 'admin' || $role == 'właściciel')
-                    <x-search-filter />
-                    <x-filter-date loader="work-session">
-                        {{ route('api.v1.rcp.work-session.set.date') }}
-                    </x-filter-date>
-                @else
-                    <x-filter-date-user loader="work-session">
-                        {{ route('api.v1.rcp.work-session.set.date') }}
-                    </x-filter-date-user>
-                @endif
-            @endif
+            <x-filter-date-user loader="work-session">
+                {{ route('api.v1.rcp.work-session-calendar-user.set.date') }}
+            </x-filter-date-user>
             <input type="hidden" id="start_date" value="{{ $startDate }}">
             <input type="hidden" id="end_date" value="{{ $endDate }}">
         </x-sidebar-left>
@@ -56,20 +14,10 @@
         <!--MAIN-->
         <x-main>
             <x-RCP.nav :countEvents="$countEvents" />
-            @if($role == 'admin' || $role == 'właściciel')
-                <x-RCP.header>
-                    <span>⏱️</span> RCP
-                </x-RCP.header>
-                <x-status-cello id="show-filter"
-                    class="mb-4 mx-4 md:m-4">
-                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} -
-                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
-                </x-status-cello>
-            @else
-                <x-RCP.header>
-                    <span>⏱️</span> Lista czasu pracy
-                </x-RCP.header>
-                @php
+            <x-RCP.header>
+                <span>⏱️</span> Kalendarz czasu pracy
+            </x-RCP.header>
+@php
                     $start = \Carbon\Carbon::parse($startDate);
                     $end = \Carbon\Carbon::parse($endDate);
 
@@ -85,6 +33,9 @@
 
                     {{-- Poprzedni miesiąc --}}
                     <button type="button" id="prev-month-bt" class="@if($allYear) hidden @endif w-9 h-9 flex items-center justify-center
+                                                           @if($allYear)
+                                                           ml-[44px]
+                                                           @endif
                                                            rounded-xl
                                                            bg-gray-100 dark:bg-gray-800
                                                            text-gray-700 dark:text-gray-200
@@ -95,9 +46,6 @@
 
                     {{-- Aktualny miesiąc --}}
                     <div id="current-month-bt" class="min-w-[180px] text-center
-                                                           @if($allYear)
-                                                           ml-[44px]
-                                                           @endif
                                                            px-5 py-2
                                                            h-9
                                                            rounded-xl
@@ -133,7 +81,6 @@ Cały rok
                     </button>
 
                 </div>
-            @endif
             @php
                 $showTable = true;
             @endphp
@@ -217,33 +164,150 @@ Cały rok
             @if($showTable)
                 <!--CONTENT-->
                 <x-container-content>
-                    <!--MOBILE VIEW-->
-                    <x-list :items="$work_sessions" emptyMessage="Brak użytkowników do wyświetlenia.">
-                        @foreach ($work_sessions as $work_session)
-                            <x-card-work-session :work_session="$work_session" />
-                        @endforeach
-                        <x-loader-work-session-card id="loader-card" />
-                    </x-list>
-                    <!--MOBILE VIEW-->
+                    <div id="work-calendar" class="w-full bg-white dark:bg-gray-800 rounded-xl shadow overflow-hidden">
 
-                    <!--PC VIEW-->
-                    <x-table :headers="['Nazwa', 'Status', 'Lokalizacja', 'Ikona', 'Czas Pracy', 'Kiedy', 'Podgląd']"
-                        :items="$work_sessions" emptyMessage="Brak użytkowników do wyświetlenia.">
-                        @foreach($work_sessions as $work_session)
-                            <x-row-work-session :work_session="$work_session" />
-                        @endforeach
-                        <x-loader-work-session id="loader" />
-                    </x-table>
-                    <!--PC VIEW-->
-                    @if(isset($filter_user_id) && $filter_user_id)
-                        <x-loader-script filter_user_id="{{ $filter_user_id }}">
-                            {{ route('api.v1.rcp.work-session.get') }}
-                        </x-loader-script>
-                    @else
-                        <x-loader-script>
-                            {{ route('api.v1.rcp.work-session.get') }}
-                        </x-loader-script>
-                    @endif
+                        @php
+                            $startDate = \Carbon\Carbon::parse($startDate);
+                            $endDate = \Carbon\Carbon::parse($endDate);
+
+                            $year = $startDate->year;
+                            $month = $startDate->month;
+
+                            $firstDay = $startDate->copy()->startOfMonth();
+                            $daysInMonth = $firstDay->daysInMonth;
+
+                            // Carbon: Monday = 1 ... Sunday = 7
+                            $startDay = $firstDay->dayOfWeekIso;
+
+                            $sessionsByDay = $work_sessions->groupBy(function ($session) {
+                                return \Carbon\Carbon::parse(
+                                    $session->eventStart->time
+                                )->format('Y-m-d');
+                            });
+                        @endphp
+
+
+                        <!-- ========================= -->
+                        <!-- HEADER DNI TYGODNIA -->
+                        <!-- ========================= -->
+                        <div
+                            class="grid grid-cols-7  text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
+                            @foreach(['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'So', 'Nd'] as $index => $day)
+                                <div
+                                    class="px-2 py-2 bg-gray-50 dark:bg-gray-700 {{ $index >= 5 ? 'bg-gray-100 dark:bg-gray-900/40' : ''}}">
+                                    {{ $day }}
+                                </div>
+                            @endforeach
+                        </div>
+
+
+                        <!-- ========================= -->
+                        <!-- KALENDARZ -->
+                        <!-- ========================= -->
+
+                        <div id="calendarUserContainer" class="grid grid-cols-7 border-l dark:border-gray-700">
+
+
+                            {{-- Puste pola przed początkiem miesiąca --}}
+
+                            @for($i = 1; $i < $startDay; $i++)
+                                <div
+                                    class=" min-h-[72px] sm:min-h-[100px] md:min-h-[125px] border-r border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                                </div>
+                            @endfor
+
+
+                            {{-- ========================= --}}
+                            {{-- DNI MIESIĄCA --}}
+                            {{-- ========================= --}}
+
+                            @for($day = 1; $day <= $daysInMonth; $day++)
+                                @php
+                                    $date = \Carbon\Carbon::create(
+                                        $year,
+                                        $month,
+                                        $day
+                                    );
+                                    $dateInfo = $date->format('d.m.y');
+
+                                    $dateKey = $date->format('Y-m-d');
+
+                                    $daySessions = $sessionsByDay->get(
+                                        $dateKey,
+                                        collect()
+                                    );
+                                    
+
+
+
+                                    $isToday = $date->isToday();
+                                    $isWeekend = $date->isWeekend();
+                                @endphp
+                                <div
+                                    class=" relative min-h-[72px] sm:min-h-[100px] md:min-h-[125px] p-1 sm:p-2 md:p-3 border-r border-b dark:border-gray-700 transition hover:bg-gray-50 dark:hover:bg-gray-700/40 {{ $isWeekend ? 'bg-gray-50/70 dark:bg-gray-900/20' : ''}} ">
+                                    <!-- ========================= -->
+                                    <!-- NUMER DNIA -->
+                                    <!-- ========================= -->
+                                    <div class="flex flex-col items-start justify-start">
+                                        @if ($isToday)
+                                            <div class="w-6 h-6 shrink-0 rounded-full
+                                                                    bg-red-300
+                                                                    flex items-center justify-center
+                                                                    text-[11px] font-semibold
+                                                                    leading-none
+                                                                    text-gray-900 mb-2">
+                                                <span class="block leading-none">
+                                                    {{ $day }}
+                                                </span>
+                                            </div>
+                                        @else
+                                            <div class="w-6 h-6 shrink-0 rounded-full
+                                                                    flex items-center justify-center
+                                                                    text-[11px] font-semibold
+                                                                    leading-none
+                                                                    text-gray-900 dark:text-white mb-2">
+                                                <span class="block leading-none">
+                                                    {{ $day }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    @php
+                                        $obj_status = $users[0]->dates[$dateInfo];
+                                    @endphp
+                                    <x-cell-calendar-user :obj="$users[0]->objs[$dateInfo] ?? null" :obj_status="$obj_status"
+                                        :dateInfo="$dateInfo" :startDate="$startDate ?? null" :endDate="$endDate ?? null" />
+                                </div>
+
+                            @endfor
+
+
+                            <!-- ========================= -->
+                            <!-- PUSTE POLA PO KOŃCU -->
+                            <!-- ========================= -->
+
+                            @php
+                                $totalCells = ($startDay - 1) + $daysInMonth;
+
+                                $remainingCells = (7 - ($totalCells % 7)) % 7;
+                            @endphp
+
+
+                            @for($i = 0; $i < $remainingCells; $i++)
+
+                                <div
+                                    class=" min-h-[72px] sm:min-h-[100px] md:min-h-[125px] border-r border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40">
+                                </div>
+
+                            @endfor
+
+                        </div>
+
+                    </div>
+
+                    <x-loader-script>
+                        {{ route('api.v1.rcp.work-session.get') }}
+                    </x-loader-script>
                 </x-container-content>
             @endif
             <!--CONTENT-->

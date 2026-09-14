@@ -13,6 +13,7 @@ use App\Models\WorkBlock;
 use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class WorkSessionController extends Controller
 {
@@ -53,11 +54,63 @@ class WorkSessionController extends Controller
         if ($request->input('lat') == '' || $request->input('lon') == '') {
         } else {
             try {
-                $location = Location::create([
-                    'name' => $request->input('name', ''),
-                    'latitude' => $request->input('lat', null),
-                    'longitude' => $request->input('lon', null),
-                ]);
+                $lat = $request->input('lat');
+                $lon = $request->input('lon');
+
+                if ($lat && $lon) {
+                    $response = Http::withHeaders([
+                        'User-Agent' => 'WIBEST/1.0 (biuro@wibest.pl)',
+                    ])->get('https://nominatim.openstreetmap.org/reverse', [
+                        'format' => 'jsonv2',
+                        'lat' => $lat,
+                        'lon' => $lon,
+                        'zoom' => 18,
+                        'addressdetails' => 1,
+                    ]);
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+
+                        $addressData = $data['address'] ?? [];
+
+                        $name = $data['display_name'] ?? null;
+
+                        $address = implode(' ', array_filter([
+                            $addressData['road'] ?? null,
+                            $addressData['house_number'] ?? null,
+                        ]));
+
+                        $city = $addressData['city']
+                            ?? $addressData['town']
+                            ?? $addressData['village']
+                            ?? $addressData['municipality']
+                            ?? null;
+
+                        $postalCode = $addressData['postcode'] ?? null;
+
+                        $country = $addressData['country'] ?? null;
+                    }
+                }
+            } catch (\Exception $e) {
+            }
+            try {
+                if ($name) {
+                    $location = Location::create([
+                        'name' => $name,
+                        'latitude' => $request->input('lat', null),
+                        'longitude' => $request->input('lon', null),
+                        'address' => $address,
+                        'city' => $city,
+                        'postal_code' => $postalCode,
+                        'country' => $country,
+                    ]);
+                } else {
+                    $location = Location::create([
+                        'name' => $request->input('name', ''),
+                        'latitude' => $request->input('lat', null),
+                        'longitude' => $request->input('lon', null),
+                    ]);
+                }
             } catch (\Exception $e) {
             }
         }
@@ -161,11 +214,63 @@ wibest.pl/login';
             if ($request->input('lat') == '' || $request->input('lon') == '') {
             } else {
                 try {
-                    $location = Location::create([
-                        'name' => $request->input('name', ''),
-                        'latitude' => $request->input('lat', null),
-                        'longitude' => $request->input('lon', null),
-                    ]);
+                    $lat = $request->input('lat');
+                    $lon = $request->input('lon');
+
+                    if ($lat && $lon) {
+                        $response = Http::withHeaders([
+                            'User-Agent' => 'WIBEST/1.0 (biuro@wibest.pl)',
+                        ])->get('https://nominatim.openstreetmap.org/reverse', [
+                            'format' => 'jsonv2',
+                            'lat' => $lat,
+                            'lon' => $lon,
+                            'zoom' => 18,
+                            'addressdetails' => 1,
+                        ]);
+
+                        if ($response->successful()) {
+                            $data = $response->json();
+
+                            $addressData = $data['address'] ?? [];
+
+                            $name = $data['display_name'] ?? null;
+
+                            $address = implode(' ', array_filter([
+                                $addressData['road'] ?? null,
+                                $addressData['house_number'] ?? null,
+                            ]));
+
+                            $city = $addressData['city']
+                                ?? $addressData['town']
+                                ?? $addressData['village']
+                                ?? $addressData['municipality']
+                                ?? null;
+
+                            $postalCode = $addressData['postcode'] ?? null;
+
+                            $country = $addressData['country'] ?? null;
+                        }
+                    }
+                } catch (\Exception $e) {
+                }
+                try {
+                    if ($name) {
+                        $location = Location::create([
+                            'name' => $name,
+                            'latitude' => $request->input('lat', null),
+                            'longitude' => $request->input('lon', null),
+                            'address' => $address,
+                            'city' => $city,
+                            'postal_code' => $postalCode,
+                            'country' => $country,
+                        ]);
+                    } else {
+                        $location = Location::create([
+                            'name' => $request->input('name', ''),
+                            'latitude' => $request->input('lat', null),
+                            'longitude' => $request->input('lon', null),
+                        ]);
+                    }
                 } catch (\Exception $e) {
                 }
             }

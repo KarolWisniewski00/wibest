@@ -24,7 +24,7 @@
                 <!--PC VIEW-->
 
                 <x-loader-script>
-                    {{ route('api.v1.setting.crm.get') }}
+                    {{ route('api.v1.setting.blog.get') }}
                 </x-loader-script>
             </x-container-content>
             <!--CONTENT-->

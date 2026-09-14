@@ -6,6 +6,7 @@ use App\Exports\WorkSessionsExport;
 use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DateRequest;
 use App\Http\Requests\StoreWorkSessionRequest;
 use App\Livewire\CalendarView;
 use App\Mail\RcpMailTask;
@@ -51,7 +52,7 @@ class RCPController extends Controller
      * @param Request $request
      * @return \Illuminate\View\View
      */
-    public function index(Request $request): \Illuminate\View\View
+    public function index(Request $request)
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
@@ -62,6 +63,28 @@ class RCPController extends Controller
         if ($request->filled('end_date')) {
             $endDate =  $request->end_date;
         }
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'właściciel') {
+        } else {
+            // Zabezpieczenie: jeżeli zaznaczony jest cały rok,
+            // ustaw aktualny miesiąc
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate);
+
+            if (
+                $start->format('m-d') === '01-01' &&
+                $end->format('m-d') === '12-31'
+            ) {
+                $startDate = now()->startOfMonth()->toDateString();
+                $endDate = now()->endOfMonth()->toDateString();
+                $request->session()->put('start_date', $startDate);
+                $request->session()->put('end_date', $endDate);
+                $request->session()->flash(
+                    'warning',
+                    'Zmieniono zakres dat na aktualny miesiąc'
+                );
+            }
+        }
+
         if ($request->filled('filter_user_id')) {
             $filter_user_id =  $request->filter_user_id;
         } else {
@@ -69,9 +92,79 @@ class RCPController extends Controller
         }
         $work_sessions = $this->workSessionService->paginatedByRoleWithFilterDate($request);
         $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
+
         return view('admin.rcp.index', compact('work_sessions', 'startDate', 'endDate', 'countEvents', 'filter_user_id'));
     }
+    public function calendarUser(Request $request): \Illuminate\View\View
+    {
+        $this->filterDateService->initFilterDateIfNotExist($request);
+        $startDate = $this->filterDateService->getStartDateDateFilter($request);
+        $endDate = $this->filterDateService->getEndDateDateFilter($request);
+        if ($request->filled('start_date')) {
+            $startDate =  $request->start_date;
+        }
+        if ($request->filled('end_date')) {
+            $endDate =  $request->end_date;
+        }
+        if (Auth::user()->role == 'admin' || Auth::user()->role == 'właściciel') {
+        } else {
+            // Zabezpieczenie: jeżeli zaznaczony jest cały rok,
+            // ustaw aktualny miesiąc
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate);
 
+            if (
+                $start->format('m-d') === '01-01' &&
+                $end->format('m-d') === '12-31'
+            ) {
+                $startDate = now()->startOfMonth()->toDateString();
+                $endDate = now()->endOfMonth()->toDateString();
+                $request->session()->put('start_date', $startDate);
+                $request->session()->put('end_date', $endDate);
+                $request->session()->flash(
+                    'warning',
+                    'Zmieniono zakres dat na aktualny miesiąc'
+                );
+            }
+        }
+        if ($request->filled('filter_user_id')) {
+            $filter_user_id =  $request->filter_user_id;
+        } else {
+            $filter_user_id = null;
+        }
+        $work_sessions = $this->workSessionService->paginatedByRoleWithFilterDate($request);
+        $countEvents = $this->eventRepository->getEventsTasksForCurrentUserCount($startDate, $endDate);
+        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
+
+        return view('admin.rcp.user-calendar', compact('users', 'work_sessions', 'startDate', 'endDate', 'countEvents', 'filter_user_id'));
+    }
+    public function setDateCalendarUser(DateRequest $request): \Illuminate\Http\JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $users = $this->userService->getByRoleAddDatesByFilterDate($request);
+        $table = [];
+        $rows_list = [];
+
+        foreach ($users as $user) {
+            foreach ($user->dates as $dateInfo => $obj_status) {
+
+                $obj = $user->objs[$dateInfo] ?? null;
+
+                $table[$dateInfo] = View::make('components.cell-calendar-user', [
+                    'obj' => $obj,
+                    'obj_status' => $obj_status,
+                    'user' => $user,
+                    'dateInfo' => $dateInfo,
+                    'startDate' => $request->start_date,
+                    'endDate' => $request->end_date,
+                ])->render();
+            }
+        }
+        return response()->json([
+            'table' => $table,
+            'list' => $rows_list,
+        ]);
+    }
     /**
      * Wyświetla formularz do dodawania sesji pracy.
      *

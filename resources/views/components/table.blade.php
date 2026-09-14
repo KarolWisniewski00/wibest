@@ -11,6 +11,7 @@
     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
         <tr>
             @if($checkBox)
+            @if($role == 'admin' || $role == 'właściciel')
             <th class="px-2 py-2 hidden md:table-cell">
                 @if(!$radio)
                 <x-flex-center>
@@ -18,6 +19,7 @@
                 </x-flex-center>
                 @endif
             </th>
+            @endif
             @endif
 
             @foreach ($headers as $header)

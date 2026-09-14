@@ -15,7 +15,7 @@
         <x-calendar.nav />
         <!--HEADER-->
         <x-calendar.header>
-            <span>📅</span> Planing
+            <span>📅</span> Grafik
         </x-calendar.header>
         <!--HEADER-->
         <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">

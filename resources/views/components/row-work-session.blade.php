@@ -8,6 +8,7 @@ border-b border-gray-200 dark:border-gray-700
     border-none
 @endif
 text-center">
+@if($role == 'admin' || $role == 'właściciel')
     <td class="px-3 py-2">
         <x-flex-center>
             <input type="checkbox" value=""
@@ -15,7 +16,7 @@ text-center">
                 data-id="{{ $work_session->id }}">
         </x-flex-center>
     </td>
-
+@endif
     <td class="px-2 py-2">
         <div
             class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">

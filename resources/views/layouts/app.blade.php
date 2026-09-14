@@ -66,16 +66,16 @@
     <input type="hidden" id="lon" value="">
     <script>
         $(document).ready(function () {
-            function getLocation() {
+            function getLocation(type) {
                 return new Promise((resolve) => {
                     if (navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition(
                             position => {
-                                showPosition(position);
+                                showPosition(position, type);
                                 resolve(true); // sukces
                             },
                             error => {
-                                showError(error);
+                                showError(error, type);
                                 resolve(false); // błąd, ale dalej kontynuujemy
                             }
                         );
@@ -86,7 +86,7 @@
                 });
             }
 
-            function showPosition(position) {
+            function showPosition(position, type) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
                 const acc = position.coords.accuracy;
@@ -94,23 +94,35 @@
                 $('#locationWidget').text(
                     "Szerokość: " + lat + "\nDługość: " + lon + "\nDokładność: " + Math.round(acc) + " metrów"
                 );
+
+                $('#locationGeo'+type).text(
+                    lat + ", " + lon
+                );
+                $('#locationAcc'+type).text(
+                    Math.round(acc) + " m"
+                );
+
                 $('#lat').val(lat);
                 $('#lon').val(lon);
             }
 
-            function showError(error) {
+            function showError(error, type) {
                 switch (error.code) {
                     case error.PERMISSION_DENIED:
                         $('#locationWidget').text("Użytkownik odmówił dostępu do lokalizacji.");
+                        $('#locationWrapper'+type).addClass('hidden')
                         break;
                     case error.POSITION_UNAVAILABLE:
                         $('#locationWidget').text("Informacje o lokalizacji są niedostępne.");
+                        $('#locationWrapper'+type).addClass('hidden')
                         break;
                     case error.TIMEOUT:
                         $('#locationWidget').text("Przekroczono czas oczekiwania na lokalizację.");
+                        $('#locationWrapper'+type).addClass('hidden')
                         break;
                     case error.UNKNOWN_ERROR:
                         $('#locationWidget').text("Wystąpił nieznany błąd.");
+                        $('#locationWrapper'+type).addClass('hidden')
                         break;
                 }
             }
@@ -126,16 +138,42 @@
                     self.companyId = $('#company_id').val(); // Id firmy
                     self.session_id = null; // Id sesji
                     self.session_status = false; // Status sesji
+                    self.work_session_start_time = null;
+                    self.work_session_stop_time = null;
                 }
                 // Funkcja do liczenia czasu
                 counting() {
                     $('#clock_info').text("Obliczanie czasu pracy...");
+                    $('#statusText')
+                        .text("Obliczanie czasu pracy")
+                        .addClass('text-gray-700 dark:text-gray-300')
+                        .removeClass('text-green-700 dark:text-green-300');
+                    $('#statusPing')
+                        .addClass('bg-gray-300')
+                        .removeClass('bg-green-300')
+                        .removeClass('hidden');
+                    $('#statusDot')
+                        .addClass('bg-gray-300')
+                        .removeClass('bg-green-300');
+                    $('#statusWrapper')
+                        .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                        .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                     const self = this;
                     self.timerInterval = setInterval(() => {
                         self.elapsedSeconds++;
                         $('#timerWidget').text(self.formatTime(self.elapsedSeconds));
                         $('#timer').text(self.formatTime(self.elapsedSeconds));
                     }, 1000);
+
+                    if(self.work_session_start_time){
+                        $('#startTimeWidget').text(self.work_session_start_time.split(" ")[1]);
+                    }
+                    if(self.work_session_stop_time){
+                        $('#stopTimeWidget').text(self.work_session_stop_time.split(" ")[1]);
+                    }
+                    
+
+
                     $('#startButtonWidget').addClass('hidden');
                     $('#stopButtonWidget').removeClass('hidden');
                     $('#startButton').addClass('hidden');
@@ -151,11 +189,41 @@
                     $('#loaderClock').addClass('hidden');
                     $('#timer').removeClass('hidden');
                     $('#clock_info').text("");
+                    $('#statusText')
+                        .text("Jesteś w trakcie pracy")
+                        .removeClass('text-gray-700 dark:text-gray-300')
+                        .addClass('text-green-700 dark:text-green-300');
+                    $('#statusPing')
+                        .removeClass('bg-gray-300')
+                        .removeClass('hidden')
+                        .addClass('bg-green-300');
+                    $('#statusDot')
+                        .removeClass('bg-gray-300')
+                        .addClass('bg-green-300');
+                    $('#statusWrapper')
+                        .removeClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                        .addClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                 }
 
                 // Funkcja do pobierania sesji pracy
                 updateWidgetWorkSession() {
                     $('#clock_info').text("Ładowanie obecnej sesji pracy...");
+                    $('#statusText')
+                        .text("Ładowanie sesji pracy")
+                        .addClass('text-gray-700 dark:text-gray-300')
+                        .removeClass('text-green-700 dark:text-green-300');
+                    $('#statusPing')
+                        .addClass('bg-gray-300')
+                        .removeClass('hidden')
+                        .removeClass('bg-green-300');
+                    $('#statusDot')
+                        .addClass('bg-gray-300')
+                        .removeClass('bg-green-300');
+                    $('#statusWrapper')
+                        .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                        .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
+                    $('#planingWrapper').removeClass('hidden');
+                    $('#loaderPlaningWrapper').addClass('hidden');
                     const self = this;
                     $.ajax({
                         url: self.workSessions + '/' + self.userId,
@@ -163,10 +231,12 @@
                         dataType: 'json',
                         success: function (response) {
                             $('#clock_info').text("");
+                            $('#statusText').text("");
                             if (response.message === 'W trakcie pracy') {
                                 self.session_id = response.work_session_id;
                                 self.session_status = response.work_session_status;
                                 const dateString = response.work_session_start_time;
+                                self.work_session_start_time = response.work_session_start_time;
                                 const date = new Date(dateString.replace(" ", "T")); // Konwersja na format ISO 8601
                                 const now = new Date(); // Aktualny czas
                                 const diffInSeconds = Math.floor((now - date) / 1000);
@@ -176,6 +246,20 @@
                         },
                         error: function (xhr, status, error) {
                             $('#clock_info').text("");
+                            $('#statusText')
+                                .text("Jesteś poza pracą")
+                                .addClass('text-gray-700 dark:text-gray-300')
+                                .removeClass('text-green-700 dark:text-green-300');
+                            $('#statusPing')
+                                .addClass('bg-gray-300')
+                                .addClass('hidden')
+                                .removeClass('bg-green-300');
+                            $('#statusDot')
+                                .addClass('bg-gray-300')
+                                .removeClass('bg-green-300');
+                            $('#statusWrapper')
+                                .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                                .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                             $('#startButtonWidget').removeClass('hidden');
                             $('#loaderTimerWidget').addClass('hidden');
                             $('#loaderLocationWidget').addClass('hidden');
@@ -216,6 +300,8 @@
                             $('#loaderTimerWidget').addClass('hidden');
                             $('#loaderTimer').addClass('hidden');
                             $('#clock_info').text("");
+                            $('#statusText').text("Jesteś w trakcie pracy");
+                            self.work_session_start_time = response.work_session_start_time;
                         },
                         error: function (xhr, status, error) {
                             toastr.error('Błąd podczas rozpoczęcia pracy');
@@ -237,6 +323,20 @@
                             $('#loaderClock').removeClass('hidden');
                             $('#timer').addClass('hidden');
                             $('#clock_info').text("Błąd podczas rozpoczęcia pracy");
+                            $('#statusText')
+                                .text("Wystąpił błąd")
+                                .addClass('text-gray-700 dark:text-gray-300')
+                                .removeClass('text-green-700 dark:text-green-300');
+                            $('#statusPing')
+                                .addClass('bg-gray-300')
+                                .removeClass('hidden')
+                                .removeClass('bg-green-300');
+                            $('#statusDot')
+                                .addClass('bg-gray-300')
+                                .removeClass('bg-green-300');
+                            $('#statusWrapper')
+                                .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                                .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                         }
                     });
                 }
@@ -273,10 +373,35 @@
                             $('#startButton').removeClass('hidden');
                             $('#loaderTimer').addClass('hidden');
                             $('#clock_info').text("");
+                            $('#statusText').text("Jesteś poza pracą");
+                            $('#statusPing')
+                                .addClass('bg-gray-300')
+                                .addClass('hidden')
+                                .removeClass('bg-green-300');
+                            $('#statusDot')
+                                .addClass('bg-gray-300')
+                                .removeClass('bg-green-300');
+                            $('#statusWrapper')
+                                .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                                .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                         },
                         error: function (xhr, status, error) {
                             toastr.error('Błąd podczas zakończenia pracy');
                             $('#clock_info').text("Błąd podczas zakończenia pracy");
+                            $('#statusText')
+                                .text("Wystąpił błąd")
+                                .addClass('text-gray-700 dark:text-gray-300')
+                                .removeClass('text-green-700 dark:text-green-300');
+                            $('#statusPing')
+                                .addClass('bg-gray-300')
+                                .removeClass('bg-green-300')
+                                .removeClass('hidden');
+                            $('#statusDot')
+                                .addClass('bg-gray-300')
+                                .removeClass('bg-green-300');
+                            $('#statusWrapper')
+                                .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                                .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                         }
                     });
                 }
@@ -326,21 +451,49 @@
 
                     $('#startButton, #startButtonWidget').click(async function () {
                         $('#clock_info').text("Wysyłanie danych rozpoczęcia pracy...");
+                        $('#statusText')
+                            .text("Wysyłanie danych")
+                            .addClass('text-gray-700 dark:text-gray-300')
+                            .removeClass('text-green-700 dark:text-green-300');
+                        $('#statusPing')
+                            .addClass('bg-gray-300')
+                            .removeClass('bg-green-300')
+                            .removeClass('hidden');
+                        $('#statusDot')
+                            .addClass('bg-gray-300')
+                            .removeClass('bg-green-300');
+                        $('#statusWrapper')
+                            .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                            .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                         $('#startButtonWidget').addClass('hidden');
                         $('#startButton').addClass('hidden');
                         $('#loaderTimerWidget').removeClass('hidden');
                         $('#loaderTimer').removeClass('hidden');
-                        await getLocation();
+                        await getLocation("Start");
                         self.startTimer();
                     });
 
                     $('#stopButton, #stopButtonWidget').click(async function () {
                         $('#clock_info').text("Wysyłanie danych zakończenia pracy...");
+                        $('#statusText')
+                            .text("Wysyłanie danych")
+                            .addClass('text-gray-700 dark:text-gray-300')
+                            .removeClass('text-green-700 dark:text-green-300');
+                        $('#statusPing')
+                            .addClass('bg-gray-300')
+                            .removeClass('bg-green-300')
+                            .removeClass('hidden');
+                        $('#statusDot')
+                            .addClass('bg-gray-300')
+                            .removeClass('bg-green-300');
+                        $('#statusWrapper')
+                            .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                            .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
                         $('#stopButtonWidget').addClass('hidden');
                         $('#stopButton').addClass('hidden');
                         $('#loaderTimerWidget').removeClass('hidden');
                         $('#loaderTimer').removeClass('hidden');
-                        await getLocation();
+                        await getLocation("Stop");
                         self.stopTimer();
                     });
                 }

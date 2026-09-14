@@ -8,6 +8,7 @@ use App\Models\Leave;
 use App\Services\FilterDateService;
 use App\Services\LeaveService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 
 class LeaveSingleController extends Controller

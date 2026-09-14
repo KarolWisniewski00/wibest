@@ -39,6 +39,7 @@
         <thead class="sticky top-0 z-40 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-300">
             <tr>
                 @if($checkBox)
+                @if($role == 'admin' || $role == 'właściciel')
                 <th class="px-2 py-2 hidden sticky md:left-0 md:z-50 md:table-cell bg-gray-50 dark:bg-gray-700 min-w-[32px]">
                     @if(!$radio)
                     <x-flex-center>
@@ -46,6 +47,7 @@
                     </x-flex-center>
                     @endif
                 </th>
+                @endif
                 @endif
                 @foreach ($headers as $header)
                 @if($header == 'Nazwa')

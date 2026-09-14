@@ -45,7 +45,9 @@
                     <i class="fa-solid fa-chevron-left mr-2"></i>Wróć do listy
                 </x-button-link-back>
                 <!--POWRÓT-->
-                <h2 class="text-xl font-semibold dark:text-white mb-4"><span>🏖️</span> Urlopy – <x-status-cello>{{ $leave->year }}</x-status-cello></h2>
+                <h2 class="text-xl font-semibold dark:text-white mb-4"><span>🏖️</span> Urlopy –
+                    <x-status-cello>{{ $leave->year }}</x-status-cello>
+                </h2>
                 <form method="POST" action="{{ route('leave.balance.update', $leave) }}">
                     @csrf
                     @method('PUT')
@@ -137,6 +139,15 @@
                         </x-button-green>
                     </div>
                     <!--ZAPISZ-->
+                </form>
+                <form action="{{route('leave.balance.delete', $leave->id)}}" method="POST"
+                    onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        class="text-lg mt-4 min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-red-300 text-gray-900 dark:bg-red-300 border border-transparent rounded-lg font-semibold dark:text-gray-900 uppercase tracking-widest hover:bg-red-200 dark:hover:bg-red-400 focus:bg-red-200 dark:focus:bg-red-300 active:bg-red-200 dark:active:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 dark:focus:ring-offset-red-800 transition ease-in-out duration-150">
+                        <i class="fa-solid fa-trash mr-2"></i> USUŃ
+                    </button>
                 </form>
             </div>
             <!--CONTENT-->

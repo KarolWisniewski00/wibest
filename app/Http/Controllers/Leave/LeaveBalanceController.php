@@ -165,4 +165,11 @@ class LeaveBalanceController extends Controller
             ->route('leave.balance.index')
             ->with('success', 'Bilans urlopu został zaktualizowany.');
     }
+    public function delete(LeaveBalance $leave)
+    {
+        if ($leave->delete()) {
+            return redirect()->route('leave.balance.index')->with('success', 'Operacja się powiodła.');
+        }
+        return redirect()->back()->with('fail', 'Wystąpił błąd.');
+    }
 }

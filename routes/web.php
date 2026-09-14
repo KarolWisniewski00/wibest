@@ -100,6 +100,9 @@ Route::prefix('api')->group(function () {
                 Route::get('set-date/', [RCPController::class, 'setDate'])->name('api.v1.rcp.work-session.set.date');
                 Route::post('/export-xlsx', [RCPController::class, 'exportXlsx'])->name('api.v1.rcp.work-session.export.xlsx');
             });
+            Route::prefix('work-session-calendar-user')->group(function () {
+                Route::get('set-date/', [RCPController::class, 'setDateCalendarUser'])->name('api.v1.rcp.work-session-calendar-user.set.date');
+            });
             Route::prefix('event')->group(function () {
                 Route::get('/', [EventController::class, 'get'])->name('api.v1.rcp.event.get');
                 Route::get('set-date/', [EventController::class, 'setDate'])->name('api.v1.rcp.event.set.date');
@@ -119,6 +122,9 @@ Route::prefix('api')->group(function () {
             });
             Route::prefix('crm')->group(function () {
                 Route::get('/', [CrmController::class, 'get'])->name('api.v1.setting.crm.get');
+            });
+            Route::prefix('blog')->group(function () {
+                Route::get('/', [BlogController::class, 'get'])->name('api.v1.setting.blog.get');
             });
             Route::prefix('client')->group(function () {
                 Route::get('/', [ClientController::class, 'get'])->name('api.v1.setting.client.get');
@@ -152,6 +158,9 @@ Route::prefix('api')->group(function () {
                 Route::get('/', [WorkScheduleController::class, 'get'])->name('api.v1.calendar.work-schedule.get');
                 Route::get('set-date/', [WorkScheduleController::class, 'setDate'])->name('api.v1.calendar.work-schedule.set.date');
                 Route::post('/export-xlsx', [WorkScheduleController::class, 'exportXlsx'])->name('api.v1.calendar.work-schedule.export.xlsx');
+            });
+            Route::prefix('work-schedule-calendar-user')->group(function () {
+                Route::get('set-date/', [WorkScheduleController::class, 'setDateCalendarUser'])->name('api.v1.calendar.work-schedule-calendar-user.set.date');
             });
             Route::prefix('work-smart')->group(function () {
                 Route::get('/', [WorkScheduleController::class, 'getSmart'])->name('api.v1.calendar.work-smart.get');
@@ -217,6 +226,7 @@ Route::middleware([
         Route::prefix('calendar')->group(function () {
             Route::prefix('work-schedule')->group(function () {
                 Route::get('/', [WorkScheduleController::class, 'index'])->name('calendar.work-schedule.index');
+                Route::get('/calendar', [WorkScheduleController::class, 'calendarUser'])->name('calendar.work-schedule.calendar.user');
                 Route::get('/create', [WorkScheduleController::class, 'create'])->name('calendar.work-schedule.create');
                 Route::get('/create/{user}/{date}', [WorkScheduleController::class, 'createUser'])->name('calendar.work-schedule.create.user');
                 Route::get('/edit/{work_block}', [WorkScheduleController::class, 'edit'])->name('calendar.work-schedule.edit');
@@ -261,6 +271,7 @@ Route::middleware([
         Route::prefix('rcp')->group(function () {
             Route::prefix('work-session')->group(function () {
                 Route::get('/', [RCPController::class, 'index'])->name('rcp.work-session.index');
+                Route::get('/calendar', [RCPController::class, 'calendarUser'])->name('rcp.work-session.calendar.user');
                 Route::get('/create', [RCPController::class, 'create'])->name('rcp.work-session.create');
                 Route::get('/create/{user}/{date}', [RCPController::class, 'createUser'])->name('rcp.work-session.create.user');
                 Route::get('/create-note/{work_session}', [RCPController::class, 'createNote'])->name('rcp.work-session.create.note');

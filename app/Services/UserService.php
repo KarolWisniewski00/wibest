@@ -323,10 +323,10 @@ class UserService
                 } elseif ($work) {
                     $userDates[$date] = "work";
                     $userObjs[$date] = $work_obj;
-                } elseif ($static) {
-                    $userDates[$date] = "static";
                 } else if ($isHoliday) {
                     $userDates[$date] = "holiday";
+                } elseif ($static) {
+                    $userDates[$date] = "static";
                 } else {
                     $userDates[$date] = null;
                 }

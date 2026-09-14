@@ -407,15 +407,51 @@
                                         00:00:00
                                     </x-paragraf-display>
                                 </x-flex-center>
-
+                                <div id="statusWrapper"
+                                    class="md:w-fit md:mx-auto inline-flex items-center px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-500/10 border border-gray-200 dark:border-gray-500/20">
+                                    <span class="relative flex size-3">
+                                        <span id="statusPing"
+                                            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-300 opacity-75 hidden"></span>
+                                        <span id="statusDot"
+                                            class="relative inline-flex size-3 rounded-full bg-gray-300"></span>
+                                    </span>
+                                    <span id="statusText"
+                                        class="mx-auto pr-3 md:pl-3 text-[0.7rem] uppercase tracking-[0.25em] font-bold text-gray-700 dark:text-gray-300">Jesteś
+                                        poza pracą</span>
+                                </div>
                                 <x-flex-center>
-                                    <div id="loaderLocationWidget"
-                                        class="hidden h-6 rounded-lg bg-gray-200 dark:bg-gray-600 w-32 mx-auto animate-pulse">
+                                    <div
+                                        class="h-fit flex flex-row items-center justify-center text-center w-fit
+                                                                                                                                                                                        rounded-2xl
+                                                                                                                                                                                        transition-colors duration-200">
+
+                                        <!-- Ikona i etykieta -->
+                                        <div class="flex flex-col items-center justify-center h-full">
+                                            <span class="text-2xl">🏢</span>
+                                            <span
+                                                class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
+                                                                                                                                                                                                    bg-blue-300 text-gray-900 uppercase tracking-widest">
+                                                Grafik
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <!-- Dane szczegółowe -->
+                                            <div
+                                                class="mt-2 flex flex-col items-center text-[0.65rem] md:text-sm text-gray-800 dark:text-gray-100 leading-tight">
+                                                <div class="font-semibold tracking-widest uppercase">
+                                                    08:00
+                                                    –
+                                                    16:00
+                                                </div>
+                                            </div>
+
+                                            <!-- Opis -->
+                                            <p
+                                                class="mt-2 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-100 tracking-wide uppercase">
+                                                08:00:00
+                                            </p>
+                                        </div>
                                     </div>
-                                    <x-paragraf-display id="locationWidget"
-                                        class=" text-lg md:text-xl text-gray-600 dark:text-gray-300">
-                                        LOKALIZACJA ZOSTANIE POBRANA W MOMENCIE KLIKNIĘCIA
-                                    </x-paragraf-display>
                                 </x-flex-center>
                             </div>
 
@@ -441,6 +477,10 @@
 
                                 const $timer = $('#timerWidget');
                                 const $location = $('#locationWidget');
+                                const statusWrapper = $('#statusWrapper');
+                                const statusText = $('#statusText');
+                                const statusDot = $('#statusDot');
+                                const statusPing = $('#statusPing');
 
                                 let seconds = 0;
 
@@ -484,6 +524,13 @@
                                     reset();
 
                                     setLocation("SZEROKOŚĆ: 50.0647 DŁUGOŚĆ: 19.9450 DOKŁADOŚĆ: 35m");
+                                    statusWrapper.addClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20')
+                                    .removeClass('bg-gray-100 dark:bg-gray-500/10 border border-gray-200 dark:border-gray-500/20');
+                                    statusText.addClass('text-green-700 dark:text-green-300');
+                                    statusText.addClass('text-gray-700 dark:text-gray-300');
+                                    statusText.text('Jesteś w trakcie pracy')
+                                    statusDot.addClass('bg-green-300').removeClass('bg-gray-300')
+                                    statusPing.addClass('bg-green-300 animate-ping').removeClass('bg-gray-300')
 
                                     let tick = setInterval(() => {
                                         if (state !== STATE.RUN) {
@@ -577,6 +624,13 @@
 
 
                                     setLocation("SZEROKOŚĆ: 52.2297 DŁUGOŚĆ: 21.0122 DOKŁADOŚĆ: 12m");
+                                    statusWrapper.removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20')
+                                    .addClass('bg-gray-100 dark:bg-gray-500/10 border border-gray-200 dark:border-gray-500/20');
+                                    statusText.removeClass('text-green-700 dark:text-green-300');
+                                    statusText.removeClass('text-gray-700 dark:text-gray-300');
+                                    statusText.text('Jesteś poza pracą')
+                                    statusDot.removeClass('bg-green-300').addClass('bg-gray-300')
+                                    statusPing.removeClass('bg-green-300 animate-ping').addClass('bg-gray-300')
 
                                     setTimeout(() => {
                                         pausePhase();
@@ -1930,7 +1984,7 @@
                                     </div>
                                 </div>
                                 <div
-                                    class="w-fit mb-4 bg-gray-50 dark:bg-gray-800 sm:border border-gray-100 dark:border-gray-700 rounded-xl sm:p-4 sm:shadow animate-float delay-200">
+                                    class="w-fit mb-4 bg-transparent sm:bg-gray-50 dark:bg-gray-800 sm:border border-gray-100 dark:border-gray-700 rounded-xl sm:p-4 sm:shadow animate-float delay-200">
                                     <div
                                         class="font-bold grid grid-cols-7 gap-1 text-xs text-gray-700 dark:text-gray-300 text-center text-xs uppercase">
                                         <span class="system-font">Pon</span>
@@ -1979,7 +2033,7 @@
                                     </div>
                                 </div>
                                 <div
-                                    class="w-fit mb-4 bg-gray-50 dark:bg-gray-800 sm:border border-gray-100 dark:border-gray-700 rounded-xl sm:p-4 sm:shadow animate-float delay-200">
+                                    class="w-fit mb-4 bg-transparent sm:bg-gray-50 dark:bg-gray-800 sm:border border-gray-100 dark:border-gray-700 rounded-xl sm:p-4 sm:shadow animate-float delay-200">
                                     <div
                                         class="font-bold grid grid-cols-7 gap-1 text-xs text-gray-700 dark:text-gray-300 text-center text-xs uppercase">
                                         <span class="system-font">Pon</span>

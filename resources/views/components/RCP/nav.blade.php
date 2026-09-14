@@ -1,6 +1,7 @@
 <!--NAV-->
 <div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
     <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
+        @if($role == 'admin' || $role == 'właściciel')
         <x-nav-link class="h-full text-center"
             href="{{ route('rcp.work-session.index') }}"
             :active="Str::startsWith(request()->path(), 'dashboard/rcp/work-session')">
@@ -25,6 +26,26 @@
             :active="Str::startsWith(request()->path(), 'dashboard/rcp/location')">
             Lokalizacje
         </x-nav-link>
+        @else
+        @if(request()->routeIs('rcp.work-session.calendar.user'))
+        <x-nav-link class="h-full text-center"
+            href="{{ route('rcp.work-session.index') }}"
+            :active="request()->routeIs('rcp.work-session.index')">
+            Lista
+        </x-nav-link>
+        @else
+        <x-nav-link class="h-full text-center"
+            href="{{ route('rcp.work-session.index') }}"
+            :active="Str::startsWith(request()->path(), 'dashboard/rcp/work-session')">
+            Lista
+        </x-nav-link>
+        @endif
+        <x-nav-link class="h-full text-center"
+            href="{{ route('rcp.work-session.calendar.user') }}"
+            :active="Str::startsWith(request()->path(), 'dashboard/rcp/work-session/calendar')">
+            Kalendarz
+        </x-nav-link>
+        @endif
     </nav>
 </div>
 <!--NAV-->

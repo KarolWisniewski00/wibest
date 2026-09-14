@@ -17,21 +17,7 @@
     <td class="px-2 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 bg-green-300">
         <x-paragraf-display class="text-xs whitespace-nowrap">
             <x-status-dark class="!text-gray-900">
-                @if($blog->type == 'spotkanie')
-                    👤 {{ $blog->type }}
-                @elseif($blog->type == 'telefon')
-                    📱 {{ $blog->type }}
-                @elseif($blog->type == 'mail')       
-                    📧  {{ $blog->type }}
-                @elseif($blog->type == 'follow_up') 
-                    🔄  {{ $blog->type }}
-                @elseif($blog->type == 'inne') 
-                    📌  {{ $blog->type }} 
-                @elseif($blog->type == 'oferta')
-                    🛒 {{ $blog->type }}
-                @else
                     {{ $blog->type }}
-                @endif
             </x-status-dark>
         </x-paragraf-display>
     </td>

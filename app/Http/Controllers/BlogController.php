@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\View;
 
 class BlogController extends Controller
 {
@@ -14,7 +15,8 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = Post::all();
+        $blogs = Post::orderBy('created_at', 'desc')
+            ->paginate(3);
         return view('admin.blog.index', compact('blogs'));
     }
     public function create()
@@ -112,5 +114,24 @@ class BlogController extends Controller
         return redirect()
             ->route('setting.blog')
             ->with('success', 'Post usunięty!');
+    }
+    public function get(Request $request)
+    {
+        $blogs = Post::orderBy('created_at', 'desc')
+        ->paginate(3);
+
+        $rows_table = [];
+        $rows_list = [];
+        foreach ($blogs as $blog) {
+            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
+            array_push($rows_table, View::make('components.row-blog', ['blog' => $blog])->render());
+        }
+
+        return response()->json([
+            'data' => $blogs->items(),
+            'table' => $rows_table,
+            'list' => $rows_list,
+            'next_page_url' => $blogs->nextPageUrl(),
+        ]);
     }
 }

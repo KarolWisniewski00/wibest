@@ -50,16 +50,16 @@
                 @if($date['leave'] == null)
                     <!--START STOP + ZDARZENIA -->
                     <x-container>
-                        <x-widget-display-nav class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 w-full">
+                        <x-widget-display-nav class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 w-full">
                             <!-- Lewa kolumna: Data i Timer -->
-                            <div class="space-y-6 flex flex-col justify-center">
+                            <div class="flex flex-col justify-center gap-4">
                                 <!-- Data -->
                                 <x-flex-center>
                                     <div id="loaderDateWidget"
                                         class="h-6 rounded-lg bg-gray-200 dark:bg-gray-600 w-32 mx-auto animate-pulse">
                                     </div>
                                     <x-paragraf-display id="dateWidget"
-                                        class="dateWidget text-lg md:text-xl text-gray-600 dark:text-gray-300">
+                                        class="dateWidget text-md md:text-xl text-gray-600 dark:text-gray-300">
                                         <!-- Data -->
                                     </x-paragraf-display>
                                 </x-flex-center>
@@ -74,20 +74,104 @@
                                         00:00:00
                                     </x-paragraf-display>
                                 </x-flex-center>
-
-                                <x-flex-center>
-                                    <div id="loaderLocationWidget"
-                                        class="h-6 rounded-lg bg-gray-200 dark:bg-gray-600 w-32 mx-auto animate-pulse">
+                                <div id="statusWrapper"
+                                    class="md:w-fit md:mx-auto inline-flex items-center px-4 py-1.5 rounded-full bg-gray-100 dark:bg-gray-500/10 border border-gray-200 dark:border-gray-500/20">
+                                    <span class="relative flex size-3">
+                                        <span id="statusPing"
+                                            class="absolute inline-flex h-full w-full animate-ping rounded-full bg-gray-300 opacity-75"></span>
+                                        <span id="statusDot"
+                                            class="relative inline-flex size-3 rounded-full bg-gray-300"></span>
+                                    </span>
+                                    <span id="statusText"
+                                        class="mx-auto pr-3 md:pl-3 text-[0.7rem] uppercase tracking-[0.25em] font-bold text-gray-700 dark:text-gray-300">
+                                        Ładowanie
+                                    </span>
+                                </div>
+                                <div id="loaderPlaningWrapper"
+                                        class="h-[55px] rounded-lg bg-gray-200 dark:bg-gray-600 w-[137px] mx-auto animate-pulse">
                                     </div>
-                                    <x-paragraf-display id="locationWidget"
-                                        class="hidden text-lg md:text-xl text-gray-600 dark:text-gray-300">
-                                        LOKALIZACJA ZOSTANIE POBRANA W MOMENCIE KLIKNIĘCIA
-                                    </x-paragraf-display>
-                                </x-flex-center>
+                                @if($workingSeconds != 0)
+                                    <x-flex-center id="planingWrapper" class="flex-col hidden">
+                                        <div
+                                            class="h-fit flex flex-row items-center justify-center text-center w-fit
+                                                                                                                                                                                        rounded-2xl
+                                                                                                                                                                                        transition-colors duration-200">
+
+                                            <!-- Ikona i etykieta -->
+                                            <div class="flex flex-col items-center justify-center h-full">
+                                                @if($typePlaning == 'stały planing')
+                                                <span class="text-2xl">🏢</span>
+                                                <span
+                                                    class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
+                                                                                                                                                                                                    bg-blue-300 text-gray-900 uppercase tracking-widest">
+                                                    Grafik
+                                                </span>
+                                                @else
+                                                <span class="text-2xl">🌀</span>
+                                                <span
+                                                    class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
+                                                                                                                                                                                                    bg-violet-300 text-gray-900 uppercase tracking-widest">
+                                                    Grafik
+                                                </span>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <!-- Dane szczegółowe -->
+                                                <div
+                                                    class="mt-2 flex flex-col items-center text-[0.65rem] md:text-sm text-gray-800 dark:text-gray-100 leading-tight">
+                                                    <div class="font-semibold tracking-widest uppercase">
+                                                        {{ $workingStart ? $workingStart->format('H:i') : '' }}
+                                                        –
+                                                        {{ $workingEnd ? $workingEnd->format('H:i') : '' }}
+                                                    </div>
+                                                </div>
+
+                                                <!-- Opis -->
+                                                <p
+                                                    class="mt-2 text-[0.7rem] font-semibold text-gray-800 dark:text-gray-100 tracking-wide uppercase">
+                                                    {{ gmdate('H:i:s', $workingSeconds) }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </x-flex-center>
+                                @else
+
+                                    <x-flex-center id="planingWrapper" class="flex-col hidden">
+
+                                        <div class="h-fit flex flex-row items-center justify-center text-center w-fit
+                                                   rounded-2xl transition-colors duration-200">
+
+                                            <!-- Ikona i etykieta -->
+                                            <div class="flex flex-col items-center justify-center h-full">
+
+                                                <span class="text-3xl">🏖️</span>
+
+                                            </div>
+
+                                            <!-- Informacja -->
+                                            <div class="ml-3">
+
+                                                <p class="text-sm md:text-base font-bold text-gray-800 dark:text-gray-100
+                                                           uppercase tracking-widest">
+                                                    Dziś masz wolne
+                                                </p>
+
+                                                <p class="mt-1 text-[0.65rem] md:text-xs font-semibold
+                                                           text-gray-500 dark:text-gray-400 tracking-wide">
+                                                    Nie masz zaplanowanej pracy
+                                                </p>
+
+                                            </div>
+
+                                        </div>
+
+                                    </x-flex-center>
+
+                                @endif
                             </div>
 
                             <!-- Prawa kolumna: Przyciski -->
-                            <div class="flex flex-col justify-center items-center space-y-6">
+                            <div class="flex flex-col justify-center items-center">
                                 <div id="loaderTimerWidget"
                                     class="h-[66px] rounded-lg bg-gray-200 dark:bg-gray-600 w-[179px] mx-auto animate-pulse">
                                 </div>
@@ -101,8 +185,9 @@
                                     <i class="fa-solid fa-stop mr-2"></i>Stop
                                 </button>
                             </div>
+
                         </x-widget-display-nav>
-                        <div id="clock_info" class="italic text-xs text-gray-500 dark:text-gray-500 !text-center">
+                        <div id="clock_info" class="hidden mb-4 italic text-xs text-gray-500 dark:text-gray-500 !text-center">
                             Ładowanie...
                         </div>
                         @if($task)
@@ -278,6 +363,185 @@
                                 </div>
                             @endif
                         @endif
+                        <!--
+                        <div  class="w-full grid grid-cols-2 gap-4">
+
+                            START LOCATION 
+                            <div
+                                class="min-w-0 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
+
+                                MAPA 
+                                <div id="startMapWidget" class="w-full h-32 sm:h-48 bg-gray-200 dark:bg-gray-700"></div>
+
+                                INFORMACJE
+                                <div class="p-3 sm:p-4">
+
+                                    NAGŁÓWEK
+                                    <div class="flex items-center justify-between gap-2 mb-4">
+
+                                        <div class="flex items-center gap-2 min-w-0">
+
+                                            <div
+                                                class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300">
+                                                <i class="fa-solid fa-location-dot"></i>
+                                            </div>
+
+                                            <div class="min-w-0">
+
+                                                <p
+                                                    class="text-xs uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400">
+                                                    Start
+                                                </p>
+
+                                                GODZINA
+                                                <span
+                                                    class="inline-flex items-center whitespace-nowrap text-cello-300 dark:text-cello-300 font-semibold text-xs sm:text-sm">
+                                                    <i class="fa-regular fa-clock mr-1"></i>
+                                                    <span id="startTimeWidget">
+                                                    </span>
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                                    ADRES
+                                    <div class="mb-3">
+
+                                        <p
+                                            class="text-xs uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">
+                                            Adres
+                                        </p>
+
+                                        <p id="startAddressWidget"
+                                            class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-5 break-words">
+                                            ul. Floriańska 1, Kraków
+                                        </p>
+
+                                    </div>
+
+
+                                    WSPÓŁRZĘDNE
+                                    <div class="flex items-center gap-2 min-w-0">
+
+                                        <i
+                                            class="fa-solid fa-location-crosshairs text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+
+                                        <p id="locationGeoStart" class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                            50.06, 19.94
+                                        </p>
+
+                                    </div>
+
+
+                                    DOKŁADNOŚĆ
+                                    <div class="flex items-center gap-2 mt-1 min-w-0">
+
+                                        <i
+                                            class="fa-solid fa-bullseye text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+
+                                        <p id="locationAccStart" class="text-xs text-gray-400 dark:text-gray-500 truncate">
+                                            35 m
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            STOP LOCATION
+                            <div
+                                class="min-w-0 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
+
+                                MAPA
+                                <div id="stopMapWidget" class="w-full h-32 sm:h-48 bg-gray-200 dark:bg-gray-700"></div>
+
+                                INFORMACJE
+                                <div class="p-3 sm:p-4">
+
+                                    NAGŁÓWEK
+                                    <div class="flex items-center justify-between gap-2 mb-4">
+
+                                        <div class="flex items-center gap-2 min-w-0">
+
+                                            <div
+                                                class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300">
+                                                <i class="fa-solid fa-location-dot"></i>
+                                            </div>
+
+                                            <div class="min-w-0">
+
+                                                <p
+                                                    class="text-xs uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400">
+                                                    Stop
+                                                </p>
+
+                                                GODZINA
+                                                <span
+                                                    class="inline-flex items-center whitespace-nowrap text-cello-300 dark:text-cello-300 font-semibold text-xs sm:text-sm">
+                                                    <i class="fa-regular fa-clock mr-1"></i>
+                                                    <span id="stopTimeWidget">
+                                                    </span>
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    ADRES
+                                    <div class="mb-3">
+
+                                        <p
+                                            class="text-xs uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">
+                                            Adres
+                                        </p>
+
+                                        <p id="stopAddressWidget"
+                                            class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-5 break-words">
+                                            ul. Szewska 12, Kraków
+                                        </p>
+
+                                    </div>
+
+
+                                    WSPÓŁRZĘDNE
+                                    <div class="flex items-center gap-2 min-w-0">
+
+                                        <i
+                                            class="fa-solid fa-location-crosshairs text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+
+                                        <p id="locationGeoStop" class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                            50.06, 19.93
+                                        </p>
+
+                                    </div>
+
+
+                                    DOKŁADNOŚĆ
+                                    <div class="flex items-center gap-2 mt-1 min-w-0">
+
+                                        <i
+                                            class="fa-solid fa-bullseye text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+
+                                        <p id="locationAccStop" class="text-xs text-gray-400 dark:text-gray-500 truncate">
+                                            28 m
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                        -->
                     </x-container>
                     <!--START STOP + ZDARZENIA -->
                 @elseif($date['leave'] != null)
