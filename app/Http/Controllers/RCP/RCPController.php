@@ -321,6 +321,7 @@ class RCPController extends Controller
      */
     public function show(Request $request, WorkSession $work_session): \Illuminate\View\View
     {
+        $this->filterDateService->initFilterDateIfNotExist($request);
         $task = null;
         try {
             $task = $work_session->getAlertTask();

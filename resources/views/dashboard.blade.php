@@ -342,9 +342,10 @@
                                 <div id="clockNotePanel" class="bg-white dark:bg-gray-800 p-4 rounded-lg mt-4 w-full">
 
                                     <form id="clockNoteForm" method="POST" class="space-y-4"
-                                        action="{{ $work_session ? route('rcp.work-session.store.note', $work_session) : '#' }}">
+                                        action="{{ $work_session ? route('rcp.work-session.update.note', $work_session) : route('rcp.work-session.update.note', '') }}">
 
                                         @csrf
+                                        @method('PUT')
 
 
                                         <!-- EDYTOR -->

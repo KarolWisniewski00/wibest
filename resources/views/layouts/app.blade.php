@@ -331,6 +331,10 @@
                             $('#clock_info').text("");
                             $('#statusText').text("Jesteś w trakcie pracy");
                             $('#clockNoteWrapper').removeClass('hidden');
+                            $('#clockNoteForm').attr(
+                                'action',
+                                $('#clockNoteForm').attr('action') + '/' + self.session_id
+                            );
                             self.work_session_start_time = response.work_session_start_time;
                             
                             const clockClickSound = new Audio('{{ asset('sounds/startstop.wav') }}');
@@ -391,6 +395,11 @@
                         dataType: 'json',
                         success: function (response) {
                             toastr.success('Zakończono pracę');
+                            $('#clockNoteForm').attr(
+                                'action',
+                                $('#clockNoteForm').attr('action').replace(/\/[^/]+$/, '')
+                            );
+                            $('#clockNoteForm .ql-editor').html('')
                             let height = $('#totalDay').height();
                             $('#loaderTotalDay').height(height);
                             $('#loaderTotalDay').removeClass('hidden');
