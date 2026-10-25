@@ -43,7 +43,8 @@ class LeaveWizardUser extends WizardComponent
     public function getLeaveFree()
     {
         try {
-            $leave_balance = LeaveBalance::where('user_id', Auth::id())
+            $state = $this->getState();
+            $leave_balance = LeaveBalance::where('user_id', $state['user_id'])
                 ->where('company_id', Auth::user()->company_id)
                 ->where('year', now()->year)
                 ->first();

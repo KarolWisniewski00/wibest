@@ -22,7 +22,7 @@
 
             <!--PC VIEW-->
             <x-table
-                :headers="['Nazwa', 'Adres', 'NIP', 'Użytkownicy', 'Podgląd']"
+                :headers="['Nazwa', 'Analiza AI', 'Adres', 'NIP', 'Użytkownicy', 'Podgląd']"
                 :items="$companies"
                 :checkBox="false"
                 emptyMessage="Brak klientów do wyświetlenia.">

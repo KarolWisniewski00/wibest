@@ -535,294 +535,283 @@
                             @endif
                         @endif
                     @endif
-                    @if($work_session->eventStart != null)
-                        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                        <x-container-gray>
-                            <!--status-->
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Zdarzenie
-                                </x-text-cell-label>
-                                <x-text-cell-value>
-                                    <x-text-cell-span class="gap-2 w-full">
-                                        <x-status-green>
-                                            🟢 Start
-                                        </x-status-green>
-                                    </x-text-cell-span>
-                                </x-text-cell-value>
-                            </x-text-cell>
-                            <!--status-->
-                            <!--Czas w pracy-->
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Kiedy
-                                </x-text-cell-label>
-                                <x-text-cell-value>
-                                    <x-text-cell-span class="gap-2 w-full">
-                                        <x-status-cello>
-                                            📅
-                                            {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $work_session->eventStart->time)->format('d.m.Y H:i:s') ?? '' }}
-                                        </x-status-cello>
-                                    </x-text-cell-span>
-                                </x-text-cell-value>
-                            </x-text-cell>
-                            <!--Czas w pracy-->
-                            @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
-                            @if($work_session->status == 'W trakcie pracy')
-                            <input id="start-time-picker" type="datetime-local" value="{{ $startTime }}"
-                                max="{{ now()->format('Y-m-d\ H:i') }}" class="hidden" />
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Przesuń rozpoczęcie pracy
-                                </x-text-cell-label>
-                                <x-text-cell-value>
-                                    <x-text-cell-span class="gap-2 w-full" id="start-time-wrapper">
-                                        <div class="flex flex-col items-start w-full justify-start gap-2">
-                                            <x-button-blue href="" id="open-start-time" class="text-lg w-full">
-                                                <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja startu
-                                            </x-button-blue>
-                                        </div>
-                                    </x-text-cell-span>
-                                </x-text-cell-value>
-                            </x-text-cell>
-                            <script>
+@if($work_session->eventStart != null)
+    <x-container-gray>
+        {{-- Status --}}
+        <x-text-cell>
+            <x-text-cell-label>
+                Zdarzenie
+            </x-text-cell-label>
+            <x-text-cell-value>
+                <x-text-cell-span class="gap-2 w-full">
+                    <x-status-green>
+                        🟢 Start
+                    </x-status-green>
+                </x-text-cell-span>
+            </x-text-cell-value>
+        </x-text-cell>
 
-                                $(document).ready(function () {
+        {{-- Czas --}}
+        <x-text-cell>
+            <x-text-cell-label>
+                Kiedy
+            </x-text-cell-label>
+            <x-text-cell-value>
+                <x-text-cell-span class="gap-2 w-full">
+                    <x-status-cello>
+                        📅
+                        {{ \Carbon\Carbon::parse($work_session->eventStart->time)->format('d.m.Y H:i:s') }}
+                    </x-status-cello>
+                </x-text-cell-span>
+            </x-text-cell-value>
+        </x-text-cell>
 
-                                    const $wrapper = $('#start-time-wrapper');
-                                    const $input = $('#start-time-picker');
+        {{-- Edycja godziny rozpoczęcia --}}
+        @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
+            @if($work_session->status == 'W trakcie pracy')
+                <input
+                    id="start-time-picker"
+                    type="datetime-local"
+                    value="{{ $startTime }}"
+                    max="{{ now()->format('Y-m-d\TH:i') }}"
+                    class="hidden"
+                />
 
-                                    let originalValue = $input.val();
+                <x-text-cell>
+                    <x-text-cell-label>
+                        Przesuń rozpoczęcie pracy
+                    </x-text-cell-label>
+                    <x-text-cell-value>
+                        <x-text-cell-span class="gap-2 w-full" id="start-time-wrapper">
+                            <div class="flex flex-col items-start w-full justify-start gap-2">
+                                <x-button-blue href="" id="open-start-time" class="text-lg w-full">
+                                    <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja startu
+                                </x-button-blue>
+                            </div>
+                        </x-text-cell-span>
+                    </x-text-cell-value>
+                </x-text-cell>
 
-                                    // 🔵 wejście w tryb edycji
-                                    $(document).on('click', '#open-start-time', function (e) {
-                                        e.preventDefault();
+                <script>
+                    $(document).ready(function () {
+                        const $wrapper = $('#start-time-wrapper');
+                        const $input = $('#start-time-picker');
 
-                                        originalValue = $input.val();
-                                        const time = originalValue.split('T')[1];
-                                        const now = new Date();
-                                        const nowTime = now.toTimeString().split(' ')[0]; // HH:mm:ss
-                                        const inputHtml = `
-                                        <form method="POST" action="{{ route('rcp.work-session.update.start', $work_session) }}" class="flex flex-col w-full">
-                                            @method('PUT')
-                                            @csrf
-                                            <x-label-form value="⏱️ Wybierz godzinę rozpoczęcia" />
-                                            <div class="relative mb-4 border-gray-300">
-                                                <input
-                                                    type="time"
-                                                    step="1"
-                                                    id="editing-start-time"
-                                                    name="editing_start_time"
-                                                    value="${time}"
-                                                    max="${nowTime}"
-                                                    class="datepicker h-12 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 pl-12 pr-4 outline-none dark:bg-gray-700 dark:text-gray-50"
-                                                />
-                                                <span
-                                                    id="toggleDatepicker"
-                                                    class="toggleDatepicker absolute inset-y-0 flex h-12 w-12 items-center justify-center text-gray-50">
-                                                    <i class="fa-regular fa-clock"></i>
-                                                </span>
-                                            </div>
+                        $(document).on('click', '#open-start-time', function (e) {
+                            e.preventDefault();
 
-                                            <div class="flex flex-col gap-2">
-                                                <x-button-green type="submit" class="text-lg w-full">
-                                                    <i class="fa-solid fa-floppy-disk mr-2"></i>Zapisz
-                                                </x-button-green>
-                                                <x-button-neutral type="button" id="cancel-start-time" class="text-lg w-full">
-                                                    <i class="fa-solid fa-chevron-left mr-2"></i>Anuluj
-                                                </x-button-neutral>
-                                            </div>
-                                        </form>
-                                                            `;
-                                        $wrapper.html(inputHtml);
-                                    });
+                            const originalValue = $input.val();
+                            const time = originalValue.split('T')[1] || '';
+                            const now = new Date();
+                            const nowTime = now.toTimeString().split(' ')[0];
 
-                                    // 🔴 cancel
-                                    $(document).on('click', '#cancel-start-time', function () {
-                                        restoreButton();
-                                    });
+                            const inputHtml = `
+                                <form method="POST"
+                                    action="{{ route('rcp.work-session.update.start', $work_session) }}"
+                                    class="flex flex-col w-full">
+                                    @method('PUT')
+                                    @csrf
 
-                                    $(document).on('change input', '#editing-start-time', function () {
+                                    <x-label-form value="⏱️ Wybierz godzinę rozpoczęcia" />
 
-                                        const value = $(this).val();
-                                        if (!value) return;
+                                    <div class="relative mb-4 border-gray-300">
+                                        <input
+                                            type="time"
+                                            step="1"
+                                            id="editing-start-time"
+                                            name="editing_start_time"
+                                            value="${time}"
+                                            max="${nowTime}"
+                                            required
+                                            class="datepicker h-12 w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-100 pl-12 pr-4 outline-none dark:bg-gray-700 dark:text-gray-50"
+                                        />
 
-                                        const now = new Date();
-
-                                        // 👉 budujemy pełną datę (dzisiaj + czas)
-                                        const [h, m, s] = value.split(':');
-
-                                        const selected = new Date(
-                                            now.getFullYear(),
-                                            now.getMonth(),
-                                            now.getDate(),
-                                            h,
-                                            m,
-                                            s || 0
-                                        ).getTime();
-
-                                        const current = Date.now();
-
-                                        console.log('selected:', selected);
-                                        console.log('now:', current);
-
-                                        if (selected > current) {
-                                            toastr.error('Nie możesz wybrać przyszłej godziny');
-                                            $(this).val('');
-                                            return;
-                                        }
-
-                                        console.log('OK:', value);
-                                    });
-                                    function restoreButton(newValue = null) {
-                                        if (newValue) {
-                                            $input.val(newValue);
-                                        }
-
-                                        $wrapper.html(`
-                                                            <x-button-blue href="" id="open-start-time" class="text-lg w-full">
-                                                                <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja startu
-                                                            </x-button-blue>
-                                                        `);
-                                    }
-                                });
-                            </script>
-                            @endif
-                            @endif
-                            @if($work_session->eventStart->location)
-                                <!--Lokalizacja-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Lokalizacja
-                                    </x-text-cell-label>
-                                    <div id="map_start"
-                                        style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;">
+                                        <span
+                                            id="toggleDatepicker"
+                                            class="toggleDatepicker absolute inset-y-0 flex h-12 w-12 items-center justify-center text-gray-500">
+                                            <i class="fa-regular fa-clock"></i>
+                                        </span>
                                     </div>
-                                </x-text-cell>
-                                <!--Lokalizacja-->
-                                
-                                <input type="hidden" id="latitude_start" value="{{$work_session->eventStart->location->latitude}}">
-                                <input type="hidden" id="longitude_start"
-                                    value="{{$work_session->eventStart->location->longitude}}">
-                                <script>
-                                    $(document).ready(function () {
-                                        // 1. Odczytanie danych z ukrytych inputów
-                                        const latitude = $('#latitude_start').val();
-                                        const longitude = $('#longitude_start').val();
 
-                                        // Konwersja na liczby zmiennoprzecinkowe jest często bezpieczna
-                                        const lat = parseFloat(latitude);
-                                        const lon = parseFloat(longitude);
+                                    <div class="flex flex-col gap-2">
+                                        <x-button-green type="submit" class="text-lg w-full">
+                                            <i class="fa-solid fa-floppy-disk mr-2"></i>Zapisz
+                                        </x-button-green>
 
-                                        // Sprawdzenie, czy dane zostały poprawnie odczytane (opcjonalne, ale zalecane)
-                                        if (isNaN(lat) || isNaN(lon)) {
-                                            console.error('Nie udało się odczytać prawidłowych współrzędnych z ukrytych pól.');
-                                            return; // Przerwij działanie, jeśli dane są nieprawidłowe
-                                        }
-
-                                        // 2. Inicjalizacja mapy Leaflet
-                                        const map = L.map('map_start').setView([lat, lon], 13);
-
-                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
-                                        const greenIcon = L.icon({
-                                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-                                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                                            iconSize: [25, 41],
-                                            iconAnchor: [12, 41],
-                                            popupAnchor: [1, -34],
-                                            shadowSize: [41, 41]
-                                        });
-                                        L.marker([lat, lon], {
-                                            icon: greenIcon
-                                        }).addTo(map);
-                                    });
-                                </script>
-                            @endif
-                        </x-container-gray>
-                    @endif
-                    @if($work_session->eventStop != null)
-                        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                        <x-container-gray>
-                            <!--status-->
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Zdarzenie
-                                </x-text-cell-label>
-                                <x-text-cell-value>
-                                    <x-text-cell-span class="gap-2 w-full">
-                                        <x-status-red>
-                                            🔴 Stop
-                                        </x-status-red>
-                                    </x-text-cell-span>
-                                </x-text-cell-value>
-                            </x-text-cell>
-                            <!--status-->
-                            <!--Czas w pracy-->
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Kiedy
-                                </x-text-cell-label>
-                                <x-text-cell-value>
-                                    <x-text-cell-span class="gap-2 w-full">
-                                        <x-status-cello>
-                                            📅
-                                            {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $work_session->eventStop->time)->format('d.m.Y H:i:s') ?? '' }}
-                                        </x-status-cello>
-                                    </x-text-cell-span>
-                                </x-text-cell-value>
-                            </x-text-cell>
-                            <!--Czas w pracy-->
-                            @if($work_session->eventStop->location)
-                                <!--Lokalizacja-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Lokalizacja
-                                    </x-text-cell-label>
-                                    <div id="map_stop"
-                                        style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;">
+                                        <x-button-neutral type="button" id="cancel-start-time" class="text-lg w-full">
+                                            <i class="fa-solid fa-chevron-left mr-2"></i>Anuluj
+                                        </x-button-neutral>
                                     </div>
-                                </x-text-cell>
-                                <!--Lokalizacja-->
-                                <input type="hidden" id="latitude_stop" value="{{$work_session->eventStop->location->latitude}}">
-                                <input type="hidden" id="longitude_stop" value="{{$work_session->eventStop->location->longitude}}">
-                                <script>
-                                    $(document).ready(function () {
-                                        // 1. Odczytanie danych z ukrytych inputów
-                                        const latitude = $('#latitude_stop').val();
-                                        const longitude = $('#longitude_stop').val();
+                                </form>
+                            `;
 
-                                        // Konwersja na liczby zmiennoprzecinkowe jest często bezpieczna
-                                        const lat = parseFloat(latitude);
-                                        const lon = parseFloat(longitude);
+                            $wrapper.html(inputHtml);
+                        });
 
-                                        // Sprawdzenie, czy dane zostały poprawnie odczytane (opcjonalne, ale zalecane)
-                                        if (isNaN(lat) || isNaN(lon)) {
-                                            console.error('Nie udało się odczytać prawidłowych współrzędnych z ukrytych pól.');
-                                            return; // Przerwij działanie, jeśli dane są nieprawidłowe
-                                        }
+                        $(document).on('click', '#cancel-start-time', function () {
+                            restoreButton();
+                        });
 
-                                        // 2. Inicjalizacja mapy Leaflet
-                                        const map = L.map('map_stop').setView([lat, lon], 13);
+                        $(document).on('change input', '#editing-start-time', function () {
+                            const value = $(this).val();
+                            if (!value) return;
 
-                                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
-                                        const redIcon = L.icon({
-                                            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                                            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                                            iconSize: [25, 41],
-                                            iconAnchor: [12, 41],
-                                            popupAnchor: [1, -34],
-                                            shadowSize: [41, 41]
-                                        });
-                                        L.marker([lat, lon], {
-                                            icon: redIcon
-                                        }).addTo(map);
-                                    });
-                                </script>
-                            @endif
-                        </x-container-gray>
+                            const [h, m, s] = value.split(':');
+                            const now = new Date();
+
+                            const selected = new Date(
+                                now.getFullYear(),
+                                now.getMonth(),
+                                now.getDate(),
+                                Number(h),
+                                Number(m),
+                                Number(s || 0)
+                            ).getTime();
+
+                            if (selected > Date.now()) {
+                                toastr.error('Nie możesz wybrać przyszłej godziny');
+                                $(this).val('');
+                            }
+                        });
+
+                        function restoreButton() {
+                            $wrapper.html(`
+                                <x-button-blue href="" id="open-start-time" class="text-lg w-full">
+                                    <i class="fa-solid fa-pen-to-square mr-2"></i>Edycja startu
+                                </x-button-blue>
+                            `);
+                        }
+                    });
+                </script>
+            @endif
+        @endif
+
+        {{-- Lokalizacja --}}
+        @if($work_session->eventStart->location)
+            @php
+                $location = $work_session->eventStart->location;
+                $latitude = $location->latitude;
+                $longitude = $location->longitude;
+            @endphp
+
+            <x-text-cell>
+                <x-text-cell-label>
+                    Lokalizacja
+                </x-text-cell-label>
+
+                <div class="w-full mt-3 space-y-3">
+                    {{-- Google Maps --}}
+                    @if(is_numeric($latitude) && is_numeric($longitude))
+                        <div class="overflow-hidden rounded-xl">
+                            <iframe
+                                title="Lokalizacja rozpoczęcia pracy"
+                                src="https://maps.google.com/maps?q={{ urlencode($latitude . ',' . $longitude) }}&z=15&output=embed"
+                                width="100%"
+                                height="300"
+                                style="border: 0;"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                            ></iframe>
+                        </div>
                     @endif
+
+                    {{-- Przybliżony adres --}}
+                    @if($location->address !== null)
+                        <div class="rounded-xl dark:bg-gray-700 text-sm text-gray-400">
+                            @if($location->name)
+                                <div class="font-medium">
+                                    {{ $location->name }}
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </x-text-cell>
+        @endif
+    </x-container-gray>
+@endif
+@if($work_session->eventStop != null)
+    <x-container-gray>
+        {{-- Status --}}
+        <x-text-cell>
+            <x-text-cell-label>
+                Zdarzenie
+            </x-text-cell-label>
+            <x-text-cell-value>
+                <x-text-cell-span class="gap-2 w-full">
+                    <x-status-red>
+                        🔴 Stop
+                    </x-status-red>
+                </x-text-cell-span>
+            </x-text-cell-value>
+        </x-text-cell>
+
+        {{-- Czas --}}
+        <x-text-cell>
+            <x-text-cell-label>
+                Kiedy
+            </x-text-cell-label>
+            <x-text-cell-value>
+                <x-text-cell-span class="gap-2 w-full">
+                    <x-status-cello>
+                        📅
+                        {{ \Carbon\Carbon::parse($work_session->eventStop->time)->format('d.m.Y H:i:s') }}
+                    </x-status-cello>
+                </x-text-cell-span>
+            </x-text-cell-value>
+        </x-text-cell>
+
+        @if($work_session->eventStop->location)
+            @php
+                $location = $work_session->eventStop->location;
+
+                $latitude = $location->latitude;
+                $longitude = $location->longitude;
+
+                $googleMapsUrl = 'https://www.google.com/maps?q='
+                    . urlencode($latitude . ',' . $longitude);
+            @endphp
+
+            {{-- Lokalizacja --}}
+            <x-text-cell>
+                <x-text-cell-label>
+                    Lokalizacja
+                </x-text-cell-label>
+
+                <div class="w-full mt-3 space-y-3">
+
+                    {{-- Google Maps --}}
+                    @if(is_numeric($latitude) && is_numeric($longitude))
+                        <a
+                            href="{{ $googleMapsUrl }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="block overflow-hidden rounded-xl"
+                        >
+                            <iframe
+                                title="Lokalizacja zakończenia pracy"
+                                src="https://maps.google.com/maps?q={{ urlencode($latitude . ',' . $longitude) }}&z=15&output=embed"
+                                width="100%"
+                                height="300"
+                                style="border: 0; pointer-events: none;"
+                                loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"
+                            ></iframe>
+                        </a>
+                    @endif
+                    {{-- Dane adresowe --}}
+                    @if($location->address !== null)
+                        <div class="space-y-2 rounded-xl dark:bg-gray-700 text-sm text-gray-400">
+                            @if($location->name)
+                                    <span class="font-medium">{{ $location->name }}</span>
+                            @endif
+                        </div>
+                    @endif
+                </div>
+            </x-text-cell>
+        @endif
+    </x-container-gray>
+@endif
                 </div>
                 <div class="flex flex-col md:flex-row justify-end gap-4 mt-4">
                     @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')

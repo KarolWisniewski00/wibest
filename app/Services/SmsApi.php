@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -24,26 +25,39 @@ class SmsApi
      * @param string $phoneNumber Numer telefonu do normalizacji.
      * @return string Znormalizowany numer telefonu z prefiksem '48'.
      */
-    public function normalizePhoneNumber(string $phoneNumber): string
+    public function normalizePhoneNumber(?string $phoneNumber): ?string
     {
-        // 1. Usuń wszystkie znaki niebędące cyframi.
-        // To usunie spacje, myślniki, nawiasy, a także znak '+'.
-        $cleanNumber = preg_replace('/\D/', '', $phoneNumber);
+        try {
+            if (empty($phoneNumber)) {
+                return '';
+            }
 
-        // 2. Sprawdź, czy numer zaczyna się od '48'
-        if (str_starts_with($cleanNumber, '48')) {
-            // Jeśli ma już prefiks '48', zwróć go.
+            // Usuń wszystkie znaki niebędące cyframi.
+            $cleanNumber = preg_replace('/\D/', '', $phoneNumber);
+
+            if (empty($cleanNumber)) {
+                return '';
+            }
+
+            // Usuń początkowe zero.
+            if (str_starts_with($cleanNumber, '0')) {
+                $cleanNumber = substr($cleanNumber, 1);
+            }
+
+            // Dodaj prefiks 48, jeśli go nie ma.
+            if (!str_starts_with($cleanNumber, '48')) {
+                $cleanNumber = '48' . $cleanNumber;
+            }
+
+            // Sprawdź, czy numer ma prawidłową długość dla Polski.
+            if (strlen($cleanNumber) !== 11) {
+                return '';
+            }
+
             return $cleanNumber;
+        } catch (Exception) {
+            return '';
         }
-
-        // 3. Jeśli numer zaczyna się np. od '0' (co jest częste), 
-        // usuń go (jeśli chcesz mieć wyłącznie format międzynarodowy '48...')
-        if (str_starts_with($cleanNumber, '0')) {
-            $cleanNumber = substr($cleanNumber, 1);
-        }
-
-        // 4. Jeśli nie ma prefiksu '48', dodaj go na początku.
-        return '48' . $cleanNumber;
     }
     /**
      * Zamienia polskie znaki diakrytyczne na ich odpowiedniki bez akcentów.

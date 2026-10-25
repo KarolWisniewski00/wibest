@@ -200,23 +200,22 @@
                             <article
                                 class=" appearance-none rounded-lg shadow border border-gray-100 dark:border-gray-700 bg-gray-100 p-4 lg:p-8 outline-none dark:bg-gray-800 dark:text-gray-50 flex flex-col gap-4">
                                 <!-- HEADER -->
-                                <div class="flex items-start justify-between gap-4">
-
-                                    <div>
+                                <div>
+                                    <div class="flex flex-row justify-between gap-4">
                                         <p class="text-xs uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 mb-4">
                                             {{ $post->type }}
                                         </p>
-
-                                        <h3 class="text-3xl font-black text-gray-900 dark:text-white leading-tight">
-                                            {{ $post->title }}
-                                        </h3>
+                                        <span class="text-sm text-gray-600 dark:text-gray-400">
+                                            {{ $post->created_at->locale('pl')->diffForHumans() }}
+                                        </span>
                                     </div>
 
-                                    <span class="text-sm text-gray-600 dark:text-gray-400">
-                                        {{ $post->created_at->locale('pl')->diffForHumans() }}
-                                    </span>
-
+                                    <h3 class="text-3xl font-black text-gray-900 dark:text-white leading-tight">
+                                        {{ $post->title }}
+                                    </h3>
                                 </div>
+
+
                                 <p class="text-gray-600 dark:text-gray-300 leading-7">
                                     {{ $post->short_description }}
                                 </p>

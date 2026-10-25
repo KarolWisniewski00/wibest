@@ -139,17 +139,17 @@ class LeaveDateStep extends Step
             ]);
         }
         if ($leave->manager->sms) {
-            $sms_api = new SmsApi();
-            $phone_validated = $sms_api->normalizePhoneNumber($leave->manager->phone);
 
-            $message = 'Złożono nowy wniosek
+            try {
+                $sms_api = new SmsApi();
+                $phone_validated = $sms_api->normalizePhoneNumber($leave->manager->phone);
+
+                $message = 'Złożono nowy wniosek
 ' . $state['type'] . '
 ' . $leave->user->name . '
 ' . $startDate->format('d.m.Y') . ' - ' . $endDate->format('d.m.Y') . '
 
 wibest.pl/login';
-
-            try {
                 $smsResult = $sms_api->sendSms($phone_validated, $message);
                 // 2. Analiza wyniku zwróconego przez sendSms()
                 if ($smsResult['success'] === true) {
@@ -202,7 +202,7 @@ wibest.pl/login';
             } catch (Exception) {
                 SentMessage::create([
                     'type'       => 'sms',
-                    'recipient'  => $phone_validated,
+                    'recipient'  => null,
                     'user_id'    => $leave->manager_id,
                     'company_id' => $leave->company_id,
                     'subject'    => 'Wnioski',

@@ -18,6 +18,9 @@ class Company extends Model
         'created_user_id',
         'sms_price',
         'user_price',
+        'ai_classification',
+        'ai_classification_reason',
+        'ai_classification_updated_at',
     ];
 
     /**

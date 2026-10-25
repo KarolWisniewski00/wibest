@@ -634,49 +634,158 @@
                             </div>
                             <!--Podsumowanie dnia-->
 
-                            <!--HEADER-->
-                            <div class="flex flex-col w-full md:pt-4">
-                                <x-h1-display class="text-center md:text-start my-4 md:my-0">
-                                    <span>🏖️</span> Urlopy {{ \Carbon\Carbon::now()->year }}
-                                </x-h1-display>
-                            </div>
-                            <!--HEADER-->
-                            <div class="md:py-4">
-                                <div
-                                    class="grid md:grid-cols-2 gap-4 w-full h-full appearance-none rounded-lg shadow border border-gray-100 dark:border-gray-700 bg-gray-100 p-4 outline-none  dark:bg-gray-700 dark:text-gray-50">
-                                    @php
-                                        $shortcut = 'UW';
-                                        $icon = '🏖️';
-                                        $type = 'urlop wypoczynkowy';
-                                    @endphp
-                                    <x-leave-name :icon="$icon" :type="$type" :shortcut="$shortcut" />
-                                    @if($leave_balance_left <= 0)
-                                        <span
-                                            class="text-xs font-semibold text-gray-900 dark:text-yellow-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                            w {{ now()->year }} pozostało: BRAK DAYCH
-                                        </span>
-                                    @else
-                                        <div class="flex flex-col text-end">
-                                            <span
-                                                class="text-xs font-semibold text-gray-900 dark:text-gray-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                                Należy Ci się: {{ $leave_balance->base_days }} dni
-                                            </span>
-                                            <span
-                                                class="text-xs font-semibold text-gray-900 dark:text-gray-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                                Pozostało z ubiegłego roku: {{ $leave_balance->carried_over }} dni
-                                            </span>
-                                            <span
-                                                class="text-xs font-semibold text-orange-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                                Wykorzystano: {{ $leave_balance->used_days }} dni
-                                            </span>
-                                            <span
-                                                class="text-xs font-semibold text-green-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                                w {{ now()->year }} pozostało: {{ $leave_balance_left }} dni
-                                            </span>
+                            <div class="md:pb-4">
+                                @php
+                                    $shortcut = 'UW';
+                                    $icon = '🏖️';
+                                    $type = 'urlop wypoczynkowy';
+
+                                    $baseDays = (float) ($leave_balance->base_days ?? 0);
+                                    $carriedOver = (float) ($leave_balance->carried_over ?? 0);
+                                    $usedDays = (float) ($leave_balance->used_days ?? 0);
+                                    $remainingDays = max(0, (float) ($leave_balance_left ?? 0));
+
+                                    $totalDays = $baseDays + $carriedOver;
+                                    $usedPercentage = $totalDays > 0
+                                        ? min(100, max(0, ($usedDays / $totalDays) * 100))
+                                        : 0;
+                                @endphp
+
+                                <section
+                                    class="group relative h-full overflow-hidden rounded-lg bg-gray-100 p-5 shadow-sm transition-all duration-300 ease-out hover:shadow-md dark:bg-gray-700 dark:hover:shadow-black/10 sm:p-6 motion-reduce:transition-none"
+                                    aria-label="Podsumowanie urlopu wypoczynkowego">
+                                    <!-- Nagłówek -->
+                                    <div class="flex items-start justify-between gap-4">
+                                        <div class="flex min-w-0 items-center gap-3">
+                                            <div
+                                                class="text-2xl shrink-0 hidden sm:flex w-14 h-14 rounded-2xl items-center justify-center bg-gradient-to-br from-pink-200 to-rose-100 dark:from-pink-500/20 dark:to-rose-500/10 text-pink-300 dark:text-pink-300">
+                                                {{ $icon }}
+                                            </div>
+
+                                            <div class="min-w-0">
+                                                <div
+                                                    class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                                    Twój urlop
+                                                </div>
+
+                                                <h3 class="mt-1 text-base font-semibold text-gray-900 dark:text-white">
+                                                    Urlop wypoczynkowy
+                                                </h3>
+                                            </div>
                                         </div>
 
+                                        <span
+                                            class="shrink-0 rounded-lg bg-gray-200 px-2.5 py-1 text-xs font-semibold text-gray-600 dark:bg-gray-600 dark:text-gray-100">
+                                            {{ now()->year }}
+                                        </span>
+                                    </div>
+
+                                    @if($leave_balance_left <= 0)
+                                        <!-- Brak dostępnych dni -->
+                                        <div class="mt-7 rounded-xl bg-gray-200 p-4 dark:bg-gray-600/70">
+                                            <div class="flex items-center gap-3">
+                                                <div
+                                                    class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200 text-gray-600 dark:bg-gray-500 dark:text-white">
+                                                    <i class="fa-solid fa-calendar-xmark"></i>
+                                                </div>
+
+                                                <div>
+                                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                                        Brak dostępnych dni
+                                                    </p>
+                                                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-200">
+                                                        Nie masz obecnie pozostałego urlopu do wykorzystania.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <!-- Główna wartość -->
+                                        <div class="mt-7">
+                                            <p class="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                                Pozostało Ci
+                                            </p>
+
+                                            <div class="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                                                <span
+                                                    class="text-4xl font-bold tracking-tight tabular-nums text-gray-900 dark:text-white sm:text-5xl">
+                                                    {{ $leave_balance_left }}
+                                                </span>
+
+                                                <span class="text-base font-medium text-gray-500 dark:text-gray-200">
+                                                    {{ $leave_balance_left == 1 ? 'dzień' : 'dni' }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Pasek wykorzystania -->
+                                        <div class="mt-6">
+                                            <div class="mb-2 flex items-center justify-between gap-3 text-sm">
+                                                <span class="text-gray-600 dark:text-gray-200">
+                                                    Wykorzystano
+                                                </span>
+
+                                                <span class="font-semibold tabular-nums text-gray-900 dark:text-white">
+                                                    {{ $usedDays }} z {{ $totalDays }} dni
+                                                </span>
+                                            </div>
+
+                                            <div class="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-600" role="progressbar"
+                                                aria-label="Wykorzystanie puli urlopowej" aria-valuemin="0" aria-valuemax="100"
+                                                aria-valuenow="{{ round($usedPercentage) }}">
+                                                <div class="h-full rounded-full bg-pink-500 transition-[width] duration-700 ease-out motion-reduce:transition-none dark:bg-pink-400"
+                                                    style="width: {{ $usedPercentage }}%"></div>
+                                            </div>
+
+                                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-300">
+                                                {{ round($usedPercentage) }}% puli urlopowej wykorzystane
+                                            </p>
+                                        </div>
+
+                                        <!-- Szczegóły -->
+                                        <div
+                                            class="mt-6 divide-y divide-gray-200 border-t border-gray-200 dark:divide-gray-600 dark:border-gray-600">
+                                            <div class="flex items-center justify-between gap-4 py-3">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="h-2 w-2 shrink-0 rounded-full bg-gray-400 dark:bg-gray-300"></span>
+                                                    <span class="text-sm text-gray-600 dark:text-gray-200">
+                                                        Przysługujący urlop
+                                                    </span>
+                                                </div>
+
+                                                <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-white">
+                                                    {{ $leave_balance->base_days }} dni
+                                                </span>
+                                            </div>
+
+                                            <div class="flex items-center justify-between gap-4 py-3">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="h-2 w-2 shrink-0 rounded-full bg-gray-400 dark:bg-gray-300"></span>
+                                                    <span class="text-sm text-gray-600 dark:text-gray-200">
+                                                        Zaległy urlop
+                                                    </span>
+                                                </div>
+
+                                                <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-white">
+                                                    {{ $leave_balance->carried_over }} dni
+                                                </span>
+                                            </div>
+
+                                            <div class="flex items-center justify-between gap-4 py-3">
+                                                <div class="flex items-center gap-3">
+                                                    <span class="h-2 w-2 shrink-0 rounded-full bg-pink-400"></span>
+                                                    <span class="text-sm text-gray-600 dark:text-gray-200">
+                                                        Wykorzystany urlop
+                                                    </span>
+                                                </div>
+
+                                                <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-white">
+                                                    {{ $leave_balance->used_days }} dni
+                                                </span>
+                                            </div>
+                                        </div>
                                     @endif
-                                </div>
+                                </section>
                             </div>
                         @endif
                     @endif

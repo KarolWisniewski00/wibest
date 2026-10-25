@@ -248,9 +248,34 @@
                     </script>
                 </div>
                 <!--Typ-->
+                @if($crm->plan)
+                <div class="mb-4 rounded-xl border border-gray-200 dark:border-gray-700
+           bg-gray-50 dark:bg-gray-800/60
+           px-4 py-3">
+
+                    <div class="flex items-start gap-3">
+                        <div class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center
+                   rounded-lg bg-gray-100 dark:bg-gray-700
+                   text-gray-600 dark:text-gray-400">
+                            <i class="fa-regular fa-calendar text-sm"></i>
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <div class="mb-1 text-xs font-semibold uppercase tracking-wide
+                        text-gray-400 dark:text-gray-500">
+                                Zaplanowane działanie
+                            </div>
+
+                            <div class="text-sm leading-6 text-gray-700 dark:text-gray-200">
+                                {!! $crm->plan !!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @endif
                 <label for="editor"
                     class="pb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                    <span>📝</span> Notatka
+                    <span>📝</span> Rezultat
                 </label>
                 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
                 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
@@ -329,7 +354,7 @@
                     }
                 </style>
                 <div id="editor" class="bg-white dark:bg-gray-700 dark:text-white rounded-md h-64 overflow-y-auto">
-                    {!! old('notes', $crm->notes) !!}
+                    {!! old('notes', $crm->result) !!}
                 </div>
 
                 <textarea id="editor-content" name="content" style="display:none;"></textarea>
@@ -402,50 +427,24 @@
                     });
                 </script>
 
-                <div class="mt-2 flex flex-col">
-                    <label for="company"
-                        class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                        <span>✅</span> Czy już realizowane?
-                    </label>
-                    <!-- Resetuj urlopy planowane -->
-                    <label class="inline-flex items-center cursor-pointer mt-2">
-                        <input type="checkbox" {{ old('already_realized', $crm->datetime_complete) ? 'checked' : '' }}
-                            name="already_realized" class="sr-only peer">
-                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700
-                        peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
-                        peer-checked:after:border-white
-                        after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white
-                        after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300 cursor-pointer"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            Zrealizowane
-                        </span>
-                    </label>
-                    <label for="company"
-                        class=" mt-2 block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                        <span>❗</span> Czy pilne?
-                    </label>
-                    <!-- Resetuj urlopy planowane -->
-                    <label class="inline-flex items-center cursor-pointer mt-2">
-                        <input type="checkbox" {{ old('important', $crm->important) ? 'checked' : '' }} name="important"
-                            class="sr-only peer">
-                        <div class="relative w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700
-                        peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full
-                        peer-checked:after:border-white
-                        after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white
-                        after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-                        peer-checked:bg-green-300 dark:peer-checked:bg-green-300 cursor-pointer"></div>
-                        <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                            Pilne
-                        </span>
-                    </label>
-                </div>
                 <div class="flex justify-end mt-4">
                     <x-button-green type="submit" class="text-lg">
-                        <i class="fa-solid fa-floppy-disk mr-2"></i>Zapisz
+                        <i class="fa-solid fa-check mr-2"></i>Zrobione
                     </x-button-green>
                 </div>
             </form>
+            <!--USUŃ-->
+            <form action="{{ route('setting.crm.delete', $crm) }}" method="POST" class="w-full md:w-fit"
+                onsubmit="return confirm('Czy na pewno chcesz usunąć tą aktywność?');">
+
+                @csrf
+                @method('DELETE')
+
+                <x-button-red type="submit" class="text-lg w-full md:w-fit">
+                    <i class="fa-solid fa-trash mr-2"></i>Usuń
+                </x-button-red>
+            </form>
+            <!--USUŃ-->
         </x-container-content-form>
         <!--CONTENT-->
 

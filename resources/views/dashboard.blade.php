@@ -88,31 +88,31 @@
                                     </span>
                                 </div>
                                 <div id="loaderPlaningWrapper"
-                                        class="h-[55px] rounded-lg bg-gray-200 dark:bg-gray-600 w-[137px] mx-auto animate-pulse">
-                                    </div>
+                                    class="h-[55px] rounded-lg bg-gray-200 dark:bg-gray-600 w-[137px] mx-auto animate-pulse">
+                                </div>
                                 @if($workingSeconds != 0)
                                     <x-flex-center id="planingWrapper" class="flex-col hidden">
                                         <div
                                             class="h-fit flex flex-row items-center justify-center text-center w-fit
-                                                                                                                                                                                        rounded-2xl
-                                                                                                                                                                                        transition-colors duration-200">
+                                                                                                                                                                                                                                            rounded-2xl
+                                                                                                                                                                                                                                            transition-colors duration-200">
 
                                             <!-- Ikona i etykieta -->
                                             <div class="flex flex-col items-center justify-center h-full">
                                                 @if($typePlaning == 'stały planing')
-                                                <span class="text-2xl">🏢</span>
-                                                <span
-                                                    class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
-                                                                                                                                                                                                    bg-blue-300 text-gray-900 uppercase tracking-widest">
-                                                    Grafik
-                                                </span>
+                                                    <span class="text-2xl">🏢</span>
+                                                    <span
+                                                        class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
+                                                                                                                                                                                                                                                                        bg-blue-300 text-gray-900 uppercase tracking-widest">
+                                                        Grafik
+                                                    </span>
                                                 @else
-                                                <span class="text-2xl">🌀</span>
-                                                <span
-                                                    class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
-                                                                                                                                                                                                    bg-violet-300 text-gray-900 uppercase tracking-widest">
-                                                    Grafik
-                                                </span>
+                                                    <span class="text-2xl">🌀</span>
+                                                    <span
+                                                        class="px-2 py-0.5 mt-1 rounded-full text-[0.6rem] font-bold 
+                                                                                                                                                                                                                                                                        bg-violet-300 text-gray-900 uppercase tracking-widest">
+                                                        Grafik
+                                                    </span>
                                                 @endif
                                             </div>
                                             <div>
@@ -138,8 +138,9 @@
 
                                     <x-flex-center id="planingWrapper" class="flex-col hidden">
 
-                                        <div class="h-fit flex flex-row items-center justify-center text-center w-fit
-                                                   rounded-2xl transition-colors duration-200">
+                                        <div
+                                            class="h-fit flex flex-row items-center justify-center text-center w-fit
+                                                                                                       rounded-2xl transition-colors duration-200">
 
                                             <!-- Ikona i etykieta -->
                                             <div class="flex flex-col items-center justify-center h-full">
@@ -151,13 +152,15 @@
                                             <!-- Informacja -->
                                             <div class="ml-3">
 
-                                                <p class="text-sm md:text-base font-bold text-gray-800 dark:text-gray-100
-                                                           uppercase tracking-widest">
+                                                <p
+                                                    class="text-sm md:text-base font-bold text-gray-800 dark:text-gray-100
+                                                                                                               uppercase tracking-widest">
                                                     Dziś masz wolne
                                                 </p>
 
-                                                <p class="mt-1 text-[0.65rem] md:text-xs font-semibold
-                                                           text-gray-500 dark:text-gray-400 tracking-wide">
+                                                <p
+                                                    class="mt-1 text-[0.65rem] md:text-xs font-semibold
+                                                                                                               text-gray-500 dark:text-gray-400 tracking-wide">
                                                     Nie masz zaplanowanej pracy
                                                 </p>
 
@@ -185,6 +188,342 @@
                                     <i class="fa-solid fa-stop mr-2"></i>Stop
                                 </button>
                             </div>
+                            <!-- ========================================================= -->
+                            <!-- NOTATKA DO ZEGARA                                         -->
+                            <!-- ========================================================= -->
+
+                            <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
+
+                            <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+
+                            <style>
+                                /* ========================================================= */
+                                /* PANEL NOTATKI                                             */
+                                /* ========================================================= */
+
+                                #clockNotePanel {
+                                    /*
+                                             * WAŻNE:
+                                             * jQuery steruje display:none / block.
+                                             */
+                                    display: none;
+                                }
+
+
+                                /* ========================================================= */
+                                /* QUILL                                                      */
+                                /* ========================================================= */
+
+                                #clockNoteEditor {
+                                    border: 0 !important;
+
+                                    overflow: hidden;
+
+                                    border-radius: 0.375rem;
+                                }
+
+
+                                .ql-toolbar {
+                                    border: 0 !important;
+                                    background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+                                    border-radius: 0.375rem;
+                                    overflow-y: auto;
+                                    padding: 8px 12px !important;
+                                    margin: 0 !important;
+                                }
+
+
+                                #clockNoteEditor .ql-container {
+                                    border: 0 !important;
+
+                                    background-color: #ffffff;
+                                }
+
+
+                                #clockNoteEditor .ql-editor {
+                                    min-height: 90px;
+
+                                    padding: 12px !important;
+
+                                    font-family: inherit;
+
+                                    font-size: 14px;
+
+                                    line-height: 1.5;
+
+                                    color: #1f2937;
+                                    background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+                                }
+
+
+                                #clockNoteEditor .ql-editor.ql-blank::before {
+                                    left: 12px;
+
+                                    color: #9ca3af;
+
+                                    font-style: normal;
+                                }
+
+
+                                /* ========================================================= */
+                                /* QUILL DARK                                                 */
+                                /* ========================================================= */
+                                @media (prefers-color-scheme: dark) {
+                                    .ql-toolbar {
+                                        background-color: rgb(55 65 81 / var(--tw-bg-opacity)) !important;
+                                    }
+
+                                    #clockNoteEditor .ql-container {
+                                        background-color: #374151;
+                                    }
+
+
+                                    #clockNoteEditor .ql-editor {
+                                        background-color: #374151;
+
+                                        color: #ffffff;
+                                    }
+
+
+                                    #clockNoteEditor .ql-editor.ql-blank::before {
+                                        color: #9ca3af;
+                                    }
+
+
+                                    #clockNoteEditor .ql-stroke {
+                                        stroke: #ffffff !important;
+                                    }
+
+
+                                    #clockNoteEditor .ql-fill {
+                                        fill: #ffffff !important;
+                                    }
+
+
+                                    #clockNoteEditor .ql-picker {
+                                        color: #ffffff !important;
+                                    }
+
+                                    .ql-italic .ql-stroke {
+                                        stroke: white !important;
+                                    }
+
+                                    .ql-underline .ql-stroke {
+                                        stroke: white !important;
+                                    }
+
+                                    .ql-bold .ql-stroke {
+                                        stroke: white !important;
+                                    }
+                                }
+                            </style>
+
+
+                            <!-- ========================================================= -->
+                            <!-- HTML                                                       -->
+                            <!-- ========================================================= -->
+
+                            <div id="clockNoteWrapper" class="hidden mt-4 md:col-span-2 flex flex-col items-center justify-center md:justify-start md:items-start w-full">
+
+                                <!-- PRZYCISK -->
+                                <x-button-neutral type="button" id="clockNoteToggle">
+
+                                    <i id="clockNoteIcon" class="fa-regular fa-note-sticky mr-2"></i>
+
+                                    <span id="clockNoteToggleText">
+                                        Dodaj notatkę
+                                    </span>
+
+                                </x-button-neutral>
+
+
+                                <!-- PANEL NOTATKI -->
+                                <div id="clockNotePanel" class="bg-white dark:bg-gray-800 p-4 rounded-lg mt-4 w-full">
+
+                                    <form id="clockNoteForm" method="POST" class="space-y-4"
+                                        action="{{ $work_session ? route('rcp.work-session.store.note', $work_session) : '#' }}">
+
+                                        @csrf
+
+
+                                        <!-- EDYTOR -->
+                                        <div id="clockNoteEditor">@if($work_session) {!! $work_session->notes !!} @endif</div>
+
+
+                                        <!-- UKRYTE POLE -->
+                                        <textarea id="clockNoteContent" name="content" style="display: none;"></textarea>
+
+
+                                        <!-- ZAPISZ -->
+                                        <x-button-green type="submit" id="clockNoteSave">
+
+                                            <i class="fa-solid fa-check mr-2"></i>
+
+                                            <span>
+                                                Zapisz
+                                            </span>
+
+                                        </x-button-green>
+
+                                    </form>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- ========================================================= -->
+                            <!-- JAVASCRIPT                                                 -->
+                            <!-- ========================================================= -->
+
+                            <script>
+
+                                $(document).ready(function () {
+
+                                    /*
+                                     * ======================================================
+                                     * QUILL
+                                     * ======================================================
+                                     */
+
+                                    const clockNoteQuill = new Quill('#clockNoteEditor', {
+
+                                        theme: 'snow',
+
+                                        placeholder: 'Dodaj notatkę...',
+
+                                        modules: {
+
+                                            toolbar: [
+                                                [
+                                                    'bold',
+                                                    'italic',
+                                                    'underline'
+                                                ]
+                                            ]
+
+                                        }
+
+                                    });
+
+
+                                    /*
+                                     * ======================================================
+                                     * OTWIERANIE / ZAMYKANIE
+                                     * ======================================================
+                                     */
+
+                                    $('#clockNoteToggle').on('click', function () {
+
+                                        const $panel = $('#clockNotePanel');
+
+                                        const $text = $('#clockNoteToggleText');
+
+                                        const $icon = $('#clockNoteIcon');
+
+
+                                        /*
+                                         * OTWIERANIE
+                                         */
+
+                                        if (!$panel.is(':visible')) {
+
+                                            $panel
+                                                .stop(true, true)
+                                                .slideDown(200);
+
+
+                                            $text.text('Ukryj notatkę');
+
+
+                                            $icon
+                                                .removeClass('fa-regular fa-note-sticky')
+                                                .addClass('fa-solid fa-chevron-up');
+
+
+                                            /*
+                                             * Focus po zakończeniu animacji
+                                             */
+
+                                            setTimeout(function () {
+
+                                                clockNoteQuill.focus();
+
+                                            }, 220);
+
+                                        }
+
+
+                                        /*
+                                         * ZAMYKANIE
+                                         */
+
+                                        else {
+
+                                            $panel
+                                                .stop(true, true)
+                                                .slideUp(200);
+
+
+                                            $text.text('Dodaj notatkę');
+
+
+                                            $icon
+                                                .removeClass('fa-solid fa-chevron-up')
+                                                .addClass('fa-regular fa-note-sticky');
+
+                                        }
+
+                                    });
+
+
+                                    /*
+                                     * ======================================================
+                                     * ZAPIS NOTATKI
+                                     * ======================================================
+                                     */
+
+                                    $('#clockNoteForm').on('submit', function (e) {
+
+                                        /*
+                                         * Sprawdzamy czy coś wpisano
+                                         */
+
+                                        const noteText = clockNoteQuill
+                                            .getText()
+                                            .trim();
+
+
+                                        /*
+                                         * Pusta notatka
+                                         */
+
+                                        if (noteText === '') {
+
+                                            e.preventDefault();
+
+                                            clockNoteQuill.focus();
+
+                                            return false;
+                                        }
+
+
+                                        /*
+                                         * Przekazujemy HTML Quilla
+                                         * do textarea
+                                         */
+
+                                        $('#clockNoteContent').val(
+                                            clockNoteQuill.root.innerHTML
+                                        );
+
+                                    });
+
+                                });
+
+                            </script>
+
 
                         </x-widget-display-nav>
                         <div id="clock_info" class="hidden mb-4 italic text-xs text-gray-500 dark:text-gray-500 !text-center">
@@ -364,184 +703,184 @@
                             @endif
                         @endif
                         <!--
-                        <div  class="w-full grid grid-cols-2 gap-4">
+                                                            <div  class="w-full grid grid-cols-2 gap-4">
 
-                            START LOCATION 
-                            <div
-                                class="min-w-0 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
+                                                                START LOCATION 
+                                                                <div
+                                                                    class="min-w-0 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
 
-                                MAPA 
-                                <div id="startMapWidget" class="w-full h-32 sm:h-48 bg-gray-200 dark:bg-gray-700"></div>
+                                                                    MAPA 
+                                                                    <div id="startMapWidget" class="w-full h-32 sm:h-48 bg-gray-200 dark:bg-gray-700"></div>
 
-                                INFORMACJE
-                                <div class="p-3 sm:p-4">
+                                                                    INFORMACJE
+                                                                    <div class="p-3 sm:p-4">
 
-                                    NAGŁÓWEK
-                                    <div class="flex items-center justify-between gap-2 mb-4">
+                                                                        NAGŁÓWEK
+                                                                        <div class="flex items-center justify-between gap-2 mb-4">
 
-                                        <div class="flex items-center gap-2 min-w-0">
+                                                                            <div class="flex items-center gap-2 min-w-0">
 
-                                            <div
-                                                class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300">
-                                                <i class="fa-solid fa-location-dot"></i>
-                                            </div>
+                                                                                <div
+                                                                                    class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300">
+                                                                                    <i class="fa-solid fa-location-dot"></i>
+                                                                                </div>
 
-                                            <div class="min-w-0">
+                                                                                <div class="min-w-0">
 
-                                                <p
-                                                    class="text-xs uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400">
-                                                    Start
-                                                </p>
+                                                                                    <p
+                                                                                        class="text-xs uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400">
+                                                                                        Start
+                                                                                    </p>
 
-                                                GODZINA
-                                                <span
-                                                    class="inline-flex items-center whitespace-nowrap text-cello-300 dark:text-cello-300 font-semibold text-xs sm:text-sm">
-                                                    <i class="fa-regular fa-clock mr-1"></i>
-                                                    <span id="startTimeWidget">
-                                                    </span>
-                                                </span>
+                                                                                    GODZINA
+                                                                                    <span
+                                                                                        class="inline-flex items-center whitespace-nowrap text-cello-300 dark:text-cello-300 font-semibold text-xs sm:text-sm">
+                                                                                        <i class="fa-regular fa-clock mr-1"></i>
+                                                                                        <span id="startTimeWidget">
+                                                                                        </span>
+                                                                                    </span>
 
-                                            </div>
+                                                                                </div>
 
-                                        </div>
-                                    </div>
-
-
-                                    ADRES
-                                    <div class="mb-3">
-
-                                        <p
-                                            class="text-xs uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">
-                                            Adres
-                                        </p>
-
-                                        <p id="startAddressWidget"
-                                            class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-5 break-words">
-                                            ul. Floriańska 1, Kraków
-                                        </p>
-
-                                    </div>
+                                                                            </div>
+                                                                        </div>
 
 
-                                    WSPÓŁRZĘDNE
-                                    <div class="flex items-center gap-2 min-w-0">
+                                                                        ADRES
+                                                                        <div class="mb-3">
 
-                                        <i
-                                            class="fa-solid fa-location-crosshairs text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+                                                                            <p
+                                                                                class="text-xs uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">
+                                                                                Adres
+                                                                            </p>
 
-                                        <p id="locationGeoStart" class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                            50.06, 19.94
-                                        </p>
+                                                                            <p id="startAddressWidget"
+                                                                                class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-5 break-words">
+                                                                                ul. Floriańska 1, Kraków
+                                                                            </p>
 
-                                    </div>
-
-
-                                    DOKŁADNOŚĆ
-                                    <div class="flex items-center gap-2 mt-1 min-w-0">
-
-                                        <i
-                                            class="fa-solid fa-bullseye text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
-
-                                        <p id="locationAccStart" class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                                            35 m
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
+                                                                        </div>
 
 
-                            STOP LOCATION
-                            <div
-                                class="min-w-0 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
+                                                                        WSPÓŁRZĘDNE
+                                                                        <div class="flex items-center gap-2 min-w-0">
 
-                                MAPA
-                                <div id="stopMapWidget" class="w-full h-32 sm:h-48 bg-gray-200 dark:bg-gray-700"></div>
+                                                                            <i
+                                                                                class="fa-solid fa-location-crosshairs text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
 
-                                INFORMACJE
-                                <div class="p-3 sm:p-4">
+                                                                            <p id="locationGeoStart" class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                                                50.06, 19.94
+                                                                            </p>
 
-                                    NAGŁÓWEK
-                                    <div class="flex items-center justify-between gap-2 mb-4">
-
-                                        <div class="flex items-center gap-2 min-w-0">
-
-                                            <div
-                                                class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300">
-                                                <i class="fa-solid fa-location-dot"></i>
-                                            </div>
-
-                                            <div class="min-w-0">
-
-                                                <p
-                                                    class="text-xs uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400">
-                                                    Stop
-                                                </p>
-
-                                                GODZINA
-                                                <span
-                                                    class="inline-flex items-center whitespace-nowrap text-cello-300 dark:text-cello-300 font-semibold text-xs sm:text-sm">
-                                                    <i class="fa-regular fa-clock mr-1"></i>
-                                                    <span id="stopTimeWidget">
-                                                    </span>
-                                                </span>
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
+                                                                        </div>
 
 
-                                    ADRES
-                                    <div class="mb-3">
+                                                                        DOKŁADNOŚĆ
+                                                                        <div class="flex items-center gap-2 mt-1 min-w-0">
 
-                                        <p
-                                            class="text-xs uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">
-                                            Adres
-                                        </p>
+                                                                            <i
+                                                                                class="fa-solid fa-bullseye text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
 
-                                        <p id="stopAddressWidget"
-                                            class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-5 break-words">
-                                            ul. Szewska 12, Kraków
-                                        </p>
+                                                                            <p id="locationAccStart" class="text-xs text-gray-400 dark:text-gray-500 truncate">
+                                                                                35 m
+                                                                            </p>
 
-                                    </div>
+                                                                        </div>
 
+                                                                    </div>
 
-                                    WSPÓŁRZĘDNE
-                                    <div class="flex items-center gap-2 min-w-0">
-
-                                        <i
-                                            class="fa-solid fa-location-crosshairs text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
-
-                                        <p id="locationGeoStop" class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                                            50.06, 19.93
-                                        </p>
-
-                                    </div>
+                                                                </div>
 
 
-                                    DOKŁADNOŚĆ
-                                    <div class="flex items-center gap-2 mt-1 min-w-0">
+                                                                STOP LOCATION
+                                                                <div
+                                                                    class="min-w-0 rounded-lg bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
 
-                                        <i
-                                            class="fa-solid fa-bullseye text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+                                                                    MAPA
+                                                                    <div id="stopMapWidget" class="w-full h-32 sm:h-48 bg-gray-200 dark:bg-gray-700"></div>
 
-                                        <p id="locationAccStop" class="text-xs text-gray-400 dark:text-gray-500 truncate">
-                                            28 m
-                                        </p>
+                                                                    INFORMACJE
+                                                                    <div class="p-3 sm:p-4">
 
-                                    </div>
+                                                                        NAGŁÓWEK
+                                                                        <div class="flex items-center justify-between gap-2 mb-4">
 
-                                </div>
+                                                                            <div class="flex items-center gap-2 min-w-0">
 
-                            </div>
+                                                                                <div
+                                                                                    class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300">
+                                                                                    <i class="fa-solid fa-location-dot"></i>
+                                                                                </div>
 
-                        </div>
-                        -->
+                                                                                <div class="min-w-0">
+
+                                                                                    <p
+                                                                                        class="text-xs uppercase tracking-wider font-bold text-gray-500 dark:text-gray-400">
+                                                                                        Stop
+                                                                                    </p>
+
+                                                                                    GODZINA
+                                                                                    <span
+                                                                                        class="inline-flex items-center whitespace-nowrap text-cello-300 dark:text-cello-300 font-semibold text-xs sm:text-sm">
+                                                                                        <i class="fa-regular fa-clock mr-1"></i>
+                                                                                        <span id="stopTimeWidget">
+                                                                                        </span>
+                                                                                    </span>
+
+                                                                                </div>
+
+                                                                            </div>
+
+                                                                        </div>
+
+
+                                                                        ADRES
+                                                                        <div class="mb-3">
+
+                                                                            <p
+                                                                                class="text-xs uppercase tracking-wider font-semibold text-gray-400 dark:text-gray-500 mb-1">
+                                                                                Adres
+                                                                            </p>
+
+                                                                            <p id="stopAddressWidget"
+                                                                                class="text-sm font-semibold text-gray-700 dark:text-gray-200 leading-5 break-words">
+                                                                                ul. Szewska 12, Kraków
+                                                                            </p>
+
+                                                                        </div>
+
+
+                                                                        WSPÓŁRZĘDNE
+                                                                        <div class="flex items-center gap-2 min-w-0">
+
+                                                                            <i
+                                                                                class="fa-solid fa-location-crosshairs text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+
+                                                                            <p id="locationGeoStop" class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                                                50.06, 19.93
+                                                                            </p>
+
+                                                                        </div>
+
+
+                                                                        DOKŁADNOŚĆ
+                                                                        <div class="flex items-center gap-2 mt-1 min-w-0">
+
+                                                                            <i
+                                                                                class="fa-solid fa-bullseye text-gray-400 dark:text-gray-500 text-sm flex-shrink-0"></i>
+
+                                                                            <p id="locationAccStop" class="text-xs text-gray-400 dark:text-gray-500 truncate">
+                                                                                28 m
+                                                                            </p>
+
+                                                                        </div>
+
+                                                                    </div>
+
+                                                                </div>
+
+                                                            </div>
+                                                            -->
                     </x-container>
                     <!--START STOP + ZDARZENIA -->
                 @elseif($date['leave'] != null)
@@ -582,178 +921,158 @@
                     </x-container>
                     <!-- WNIOSEK -->
                 @endif
-                <!--HEADER-->
-                <div class="flex flex-col w-full md:pt-4 md:px-4">
-                    <x-h1-display class="text-center md:text-start my-4 md:my-0">
-                        ⏱️ Podsumowanie dnia
-                    </x-h1-display>
-                </div>
-                <!--HEADER-->
-                <div class="md:p-4">
-                    <x-container-gray>
-                        <x-text-cell>
-                            <x-text-cell-value>
-                                <div id="loaderTotalDay"
-                                    class="hidden h-6 rounded-lg bg-gray-200 dark:bg-gray-600 w-64 mx-auto animate-pulse">
+                <div class="md:px-4 md:pb-4">
+                    @php
+                        $shortcut = 'UW';
+                        $icon = '🏖️';
+                        $type = 'urlop wypoczynkowy';
+
+                        $baseDays = (float) ($leave_balance->base_days ?? 0);
+                        $carriedOver = (float) ($leave_balance->carried_over ?? 0);
+                        $usedDays = (float) ($leave_balance->used_days ?? 0);
+                        $remainingDays = max(0, (float) ($leave_balance_left ?? 0));
+
+                        $totalDays = $baseDays + $carriedOver;
+                        $usedPercentage = $totalDays > 0
+                            ? min(100, max(0, ($usedDays / $totalDays) * 100))
+                            : 0;
+                    @endphp
+
+                    <section
+                        class="group relative h-full overflow-hidden rounded-lg bg-gray-100 p-5 shadow-sm transition-all duration-300 ease-out hover:shadow-md dark:bg-gray-700 dark:hover:shadow-black/10 sm:p-6 motion-reduce:transition-none"
+                        aria-label="Podsumowanie urlopu wypoczynkowego">
+                        <!-- Nagłówek -->
+                        <div class="flex items-start justify-between gap-4">
+                            <div class="flex min-w-0 items-center gap-3">
+                                <div
+                                    class="text-2xl shrink-0 hidden sm:flex w-14 h-14 rounded-2xl items-center justify-center bg-gradient-to-br from-pink-200 to-rose-100 dark:from-pink-500/20 dark:to-rose-500/10 text-pink-300 dark:text-pink-300">
+                                    {{ $icon }}
                                 </div>
-                                <x-text-cell-span id="totalDay" class="flex flex-col w-full">
-                                    @if($user->working_hours_regular != null)
-                                        @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel' || $user->id == auth()->user()->id)
-                                            @php
-                                                $status = $user->getToday();
-                                            @endphp
-                                            @if($status['status'] == 'warning')
-                                                <x-alert-span class="!text-center">
-                                                    {{ $status['message'] }}
-                                                </x-alert-span>
-                                            @elseif($status['status'] == 'success')
-                                                <x-success-span class="!text-center">
-                                                    {{ $status['message'] }}
-                                                </x-success-span>
-                                            @else
-                                                <x-danger-span class="!text-center">
-                                                    {{ $status['message'] }}
-                                                </x-danger-span>
-                                            @endif
 
-                                            @if($status['timing'])
-                                                <div class="italic text-xs text-gray-500 dark:text-gray-500 !text-center">
-                                                    {{ $status['timing'] }}
-                                                </div>
-                                            @endif
+                                <div class="min-w-0">
+                                    <div
+                                        class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        Twój urlop
+                                    </div>
 
-                                            @if($status['type'] == 'rcp' && ($status['start'] || $status['stop']))
-                                                <div
-                                                    class="flex flex-col md:flex-row items-center justify-center gap-2  px-2 py-2 rounded-2xl ">
-
-                                                    {{-- Ikonka + typ --}}
-                                                    <div class="flex flex-col items-center justify-center">
-                                                        <span class="text-lg md:text-xl">
-                                                            ⏱️
-                                                        </span>
-                                                        <x-label-green class="mt-1">
-                                                            RCP
-                                                        </x-label-green>
-                                                    </div>
-
-                                                    {{-- Dane szczegółowe --}}
-                                                    <div
-                                                        class="flex flex-col items-center md:flex-col gap-3 text-sm md:text-base text-gray-800 dark:text-gray-100">
-                                                        <div class="flex flex-col items-center justify-center gap-2 my-auto">
-                                                            <x-paragraf-display
-                                                                class="text-xs whitespace-nowrap font-semibold w-fit text-start relative">
-                                                                <x-status-dark>
-                                                                    @if($status['start'])
-                                                                    {{ \Carbon\Carbon::parse($status['start'])->format('H:i') }} @endif
-                                                                    @if($status['stop']) -
-                                                                    {{ \Carbon\Carbon::parse($status['stop'])->format('H:i') }} @else -
-                                                                    TERAZ @endif
-                                                                </x-status-dark>
-                                                            </x-paragraf-display>
-                                                            @if($status['worked_time'])
-                                                                @if($status['stop'])
-                                                                    <x-paragraf-display
-                                                                        class="text-gray-900 dark:text-gray-50 hover:text-gray-900 hover:dark:text-gray-50 text-xs whitespace-nowrap font-semibold w-fit text-start relative">
-                                                                        <span>{{ $status['worked_time'] }}</span>
-                                                                    </x-paragraf-display>
-                                                                @endif
-                                                            @endif
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-
-                                            @if($status['type'] == 'leave')
-                                                <div
-                                                    class="flex flex-col md:flex-row items-center justify-center gap-2  px-2 py-2 rounded-2xl ">
-
-                                                    {{-- Ikonka + typ --}}
-                                                    <div class="flex flex-col items-center justify-center">
-                                                        <span class="text-lg md:text-xl">
-                                                            {{ config('leavetypes.icons.' . $status['timing'], '') }}
-                                                        </span>
-                                                        <x-label-pink class="mt-1">
-                                                            {{ config('leavetypes.shortType.' . $status['timing'], '') }}
-                                                        </x-label-pink>
-                                                    </div>
-
-                                                    {{-- Dane szczegółowe --}}
-                                                    <div
-                                                        class="flex flex-col md:flex-col gap-3 text-sm md:text-base text-gray-800 dark:text-gray-100">
-                                                        <x-paragraf-display class="text-xs whitespace-nowrap">
-                                                            <x-status-cello>
-                                                                @if($status['timing'])
-                                                                {{ \Carbon\Carbon::parse($status['start'])->format('d.m') }} @endif
-                                                                @if($status['start'] && $status['stop']) - @endif @if($status['stop'])
-                                                                {{ \Carbon\Carbon::parse($status['stop'])->format('d.m') }} @endif
-                                                            </x-status-cello>
-                                                        </x-paragraf-display>
-                                                    </div>
-                                                </div>
-                                            @endif
-
-                                        @endif
-                                    @else
-
-                                        @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
-                                            <x-alert-span href="{{ route('team.user.config_planing', $user->id) }}">
-                                                Konfiguracja
-                                            </x-alert-span>
-                                        @else
-                                            <x-alert-span href="">
-                                                Konfiguracja
-                                            </x-alert-span>
-                                        @endif
-
-                                    @endif
-                                </x-text-cell-span>
-                            </x-text-cell-value>
-                        </x-text-cell>
-                    </x-container-gray>
-                </div>
-                <!--HEADER-->
-                <div class="flex flex-col w-full md:pt-4 md:px-4">
-                    <x-h1-display class="text-center md:text-start my-4 md:my-0">
-                        <span>🏖️</span> Urlopy {{ \Carbon\Carbon::now()->year }}
-                    </x-h1-display>
-                </div>
-                <!--HEADER-->
-                <div class="md:p-4">
-                    <div
-                        class="grid md:grid-cols-2 gap-4 w-full h-full appearance-none rounded-lg shadow border border-gray-100 dark:border-gray-700 bg-gray-100 p-4 outline-none  dark:bg-gray-700 dark:text-gray-50">
-                        @php
-                            $shortcut = 'UW';
-                            $icon = '🏖️';
-                            $type = 'urlop wypoczynkowy';
-                        @endphp
-                        <x-leave-name :icon="$icon" :type="$type" :shortcut="$shortcut" />
-                        @if($leave_balance_left <= 0)
-                            <span
-                                class="text-xs font-semibold text-gray-900 dark:text-yellow-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                w {{ now()->year }} pozostało: BRAK DAYCH
-                            </span>
-                        @else
-                            <div class="flex flex-col text-end">
-                                <span
-                                    class="text-xs font-semibold text-gray-900 dark:text-gray-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                    Należy Ci się: {{ $leave_balance->base_days }} dni
-                                </span>
-                                <span
-                                    class="text-xs font-semibold text-gray-900 dark:text-gray-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                    Pozostało z ubiegłego roku: {{ $leave_balance->carried_over }} dni
-                                </span>
-                                <span
-                                    class="text-xs font-semibold text-orange-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                    Wykorzystano: {{ $leave_balance->used_days }} dni
-                                </span>
-                                <span
-                                    class="text-xs font-semibold text-green-300 uppercase tracking-widest transition ease-in-out duration-150 whitespace-normal mt-1">
-                                    w {{ now()->year }} pozostało: {{ $leave_balance_left }} dni
-                                </span>
+                                    <h3 class="mt-1 text-base font-semibold text-gray-900 dark:text-white">
+                                        Urlop wypoczynkowy
+                                    </h3>
+                                </div>
                             </div>
 
+                            <span
+                                class="shrink-0 rounded-lg bg-gray-200 px-2.5 py-1 text-xs font-semibold text-gray-600 dark:bg-gray-600 dark:text-gray-100">
+                                {{ now()->year }}
+                            </span>
+                        </div>
+
+                        @if($leave_balance_left <= 0)
+                            <!-- Brak dostępnych dni -->
+                            <div class="mt-7 rounded-xl bg-gray-200 p-4 dark:bg-gray-600/70">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gray-200 text-gray-600 dark:bg-gray-500 dark:text-white">
+                                        <i class="fa-solid fa-calendar-xmark"></i>
+                                    </div>
+
+                                    <div>
+                                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                            Brak dostępnych dni
+                                        </p>
+                                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-200">
+                                            Nie masz obecnie pozostałego urlopu do wykorzystania.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        @else
+                            <!-- Główna wartość -->
+                            <div class="mt-7">
+                                <p class="text-sm font-medium text-gray-500 dark:text-gray-300">
+                                    Pozostało Ci
+                                </p>
+
+                                <div class="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                                    <span
+                                        class="text-4xl font-bold tracking-tight tabular-nums text-gray-900 dark:text-white sm:text-5xl">
+                                        {{ $leave_balance_left }}
+                                    </span>
+
+                                    <span class="text-base font-medium text-gray-500 dark:text-gray-200">
+                                        {{ $leave_balance_left == 1 ? 'dzień' : 'dni' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Pasek wykorzystania -->
+                            <div class="mt-6">
+                                <div class="mb-2 flex items-center justify-between gap-3 text-sm">
+                                    <span class="text-gray-600 dark:text-gray-200">
+                                        Wykorzystano
+                                    </span>
+
+                                    <span class="font-semibold tabular-nums text-gray-900 dark:text-white">
+                                        {{ $usedDays }} z {{ $totalDays }} dni
+                                    </span>
+                                </div>
+
+                                <div class="h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-600" role="progressbar"
+                                    aria-label="Wykorzystanie puli urlopowej" aria-valuemin="0" aria-valuemax="100"
+                                    aria-valuenow="{{ round($usedPercentage) }}">
+                                    <div class="h-full rounded-full bg-pink-500 transition-[width] duration-700 ease-out motion-reduce:transition-none dark:bg-pink-400"
+                                        style="width: {{ $usedPercentage }}%"></div>
+                                </div>
+
+                                <p class="mt-2 text-xs text-gray-500 dark:text-gray-300">
+                                    {{ round($usedPercentage) }}% puli urlopowej wykorzystane
+                                </p>
+                            </div>
+
+                            <!-- Szczegóły -->
+                            <div
+                                class="mt-6 divide-y divide-gray-200 border-t border-gray-200 dark:divide-gray-600 dark:border-gray-600">
+                                <div class="flex items-center justify-between gap-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="h-2 w-2 shrink-0 rounded-full bg-gray-400 dark:bg-gray-300"></span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-200">
+                                            Przysługujący urlop
+                                        </span>
+                                    </div>
+
+                                    <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-white">
+                                        {{ $leave_balance->base_days }} dni
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="h-2 w-2 shrink-0 rounded-full bg-gray-400 dark:bg-gray-300"></span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-200">
+                                            Zaległy urlop
+                                        </span>
+                                    </div>
+
+                                    <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-white">
+                                        {{ $leave_balance->carried_over }} dni
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <span class="h-2 w-2 shrink-0 rounded-full bg-pink-400"></span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-200">
+                                            Wykorzystany urlop
+                                        </span>
+                                    </div>
+
+                                    <span class="text-sm font-semibold tabular-nums text-gray-900 dark:text-white">
+                                        {{ $leave_balance->used_days }} dni
+                                    </span>
+                                </div>
+                            </div>
                         @endif
-                    </div>
+                    </section>
                 </div>
             </div>
         </x-main-no-filter>

@@ -51,8 +51,13 @@
                     </x-nav-link>
                     @endif
                     @if($role == 'admin' || $role == 'właściciel')
+                    <!--
+                        <x-nav-link href="{{ route('object.dashboard') }}" :active="Str::startsWith(request()->path(), 'dashboard/objects')">
+                            <i class="fa-solid fa-cube mr-2"></i>Obiekty
+                        </x-nav-link>
+                    -->
                         <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
-                            <i class="fa-solid fa-gear mr-2"></i>Moja firma
+                            <i class="fa-solid fa-gear"></i>
                         </x-nav-link>
                     @endif
                 </div>

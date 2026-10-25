@@ -15,7 +15,21 @@ class Crm extends Model
         'type',
         'datetime_complete',
         'important',
-        'notes',
+
+        'plan',
+        'result',
+
+        'ai_analysis',
+        'ai_next_step',
+        'ai_next_step_at',
+        'ai_next_step_type',
+        'ai_signals',
+        'ai_problem',
+        'ai_value',
+        'ai_missing_information',
+        'ai_reason',
+        'ai_should_create_next_step',
+        'ai_sales_stage',
         'datetime_start',
         'datetime_end',
     ];
@@ -28,7 +42,7 @@ class Crm extends Model
     // 🔹 Pracownik, którego dotyczy wpis
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     // 🔹 Firma

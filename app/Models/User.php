@@ -14,6 +14,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -881,5 +882,10 @@ class User extends Authenticatable
     public function leaveBalances()
     {
         return $this->hasMany(LeaveBalance::class);
+    }
+    public function objects(): BelongsToMany
+    {
+        return $this->belongsToMany(WorkObject::class, 'object_user')
+            ->withTimestamps();
     }
 }

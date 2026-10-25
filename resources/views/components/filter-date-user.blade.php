@@ -34,16 +34,16 @@
 
                     <button type="button" id="prev-year"
                         class="hidden w-9 h-9 rounded-lg bg-gray-100 hover:bg-green-300
-                                                                               dark:bg-gray-700 dark:hover:bg-green-300
-                                                                               text-gray-900 dark:text-white dark:hover:text-gray-900">
+                                                                                           dark:bg-gray-700 dark:hover:bg-green-300
+                                                                                           text-gray-900 dark:text-white dark:hover:text-gray-900">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
                     <div id="prev-year-l" class="h-[36px] rounded-lg bg-gray-200 dark:bg-gray-700 w-[36px] animate-pulse">
                     </div>
 
                     <button type="button" id="current-year" class="hidden px-4 py-2 rounded-lg bg-gray-100
-                                                                               dark:bg-gray-700 text-gray-900 dark:text-white
-                                                                               font-semibold tracking-wider">
+                                                                                           dark:bg-gray-700 text-gray-900 dark:text-white
+                                                                                           font-semibold tracking-wider">
                         {{ now()->year }}
                     </button>
                     <div id="current-year-l"
@@ -52,8 +52,8 @@
 
                     <button type="button" id="next-year"
                         class="hidden w-9 h-9 rounded-lg bg-gray-100 hover:bg-green-300
-                                                                               dark:bg-gray-700 dark:hover:bg-green-300
-                                                                               text-gray-900 dark:text-white dark:hover:text-gray-900">
+                                                                                           dark:bg-gray-700 dark:hover:bg-green-300
+                                                                                           text-gray-900 dark:text-white dark:hover:text-gray-900">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
                     <div id="next-year-l" class="h-[36px] rounded-lg bg-gray-200 dark:bg-gray-700 w-[36px] animate-pulse">
@@ -135,12 +135,12 @@
                     <div id="btn-12-l" class="h-[36px] rounded-lg bg-gray-200 dark:bg-gray-700 w-[69px] animate-pulse">
                     </div>
                     @if(request()->routeIs('leave.single.index'))
-                    <button
-                        class="btn-year w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-3 dark:hover:text-gray-900 tracking-widest">
-                        Cały rok
-                    </button>
-                    <div class="btn-year-l h-[36px] rounded-lg bg-gray-200 dark:bg-gray-700 w-[224px] animate-pulse">
-                    </div>
+                        <button
+                            class="btn-year w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-3 dark:hover:text-gray-900 tracking-widest">
+                            Cały rok
+                        </button>
+                        <div class="btn-year-l h-[36px] rounded-lg bg-gray-200 dark:bg-gray-700 w-[224px] animate-pulse">
+                        </div>
                     @endif
                 </div>
             </div>
@@ -216,6 +216,149 @@
             const $body = $('#body');
             const $list = $('#list');
             const $search = $('#search');
+
+            function loadAttendanceSummary(start, end) {
+                const $wrapper = $('#attendance-summary-wrapper');
+
+                if (!$wrapper.length) {
+                    return;
+                }
+
+                const $skeleton = $wrapper.find('#attendance-summary-skeleton');
+                const $content = $wrapper.find('#attendance-summary-content');
+
+                $skeleton.show();
+                $content.empty().hide();
+
+                const url = `${$wrapper.data('url')}?page=&start_date=${formatDate(start)}&end_date=${formatDate(end)}`;
+                console.log('Wysyłanie żądania AJAX do:', url);
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    dataType: 'json',
+
+                    success: function (response) {
+                        console.log('Odpowiedź z serwera:', response);
+                        if (!response.success || !response.data) {
+                            $skeleton.hide();
+                            $content
+                                .html('<p class="mx-4 text-sm text-red-600 dark:text-red-400">Nie udało się pobrać podsumowania czasu pracy.</p>')
+                                .show();
+
+                            return;
+                        }
+
+                        const data = response.data;
+
+                        const $summary = $(`
+                <div class="mb-4 mx-4 space-y-3" x-data="{ detailsOpen: false }">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="min-w-0 rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-gray-700 motion-safe:animate-[stats-in_.4s_ease-out_both]">
+                            <div class="mb-3 flex items-center gap-2">
+                                <div class="shrink-0 hidden sm:flex w-8 h-8 rounded-xl items-center justify-center bg-gradient-to-br from-gray-200 to-gray-100 dark:from-gray-500/20 dark:to-gray-500/10 text-gray-300 dark:text-gray-300">
+                                    <i class="fa-solid fa-clock" aria-hidden="true"></i>
+                                </div>
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-300">Przepracowano</span>
+                            </div>
+                            <div data-summary="workedHours" class="text-2xl font-semibold tracking-tight tabular-nums text-gray-900 dark:text-white sm:text-3xl"></div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-300">Godziny pracy</p>
+                        </div>
+
+                        <div class="min-w-0 rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-gray-700 motion-safe:animate-[stats-in_.4s_ease-out_.08s_both]">
+                            <div class="mb-3 flex items-center gap-2">
+                                <div class="shrink-0 hidden sm:flex w-8 h-8 rounded-xl items-center justify-center bg-gradient-to-br from-green-200 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/10 text-green-700 dark:text-green-300">
+                                    <i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>
+                                </div>
+                                <span class="text-xs font-medium text-gray-500 dark:text-gray-300">Nadgodziny</span>
+                            </div>
+                            <div data-summary="overtimeHours" class="text-2xl font-semibold tracking-tight tabular-nums text-green-700 dark:text-green-300 sm:text-3xl"></div>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-300">Ponad normę</p>
+                        </div>
+                    </div>
+
+                    <div class="overflow-hidden rounded-lg bg-gray-100 shadow-sm dark:bg-gray-700">
+                        <button type="button"
+                                @click="detailsOpen = !detailsOpen"
+                                :aria-expanded="detailsOpen.toString()"
+                                class="flex min-h-12 w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors duration-200 hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-500 dark:hover:bg-gray-600/50">
+                            <span class="text-sm font-medium text-gray-700 dark:text-white">Pozostałe informacje</span>
+                            <span class="flex items-center gap-2">
+                                <span class="hidden text-xs text-gray-500 dark:text-gray-300 sm:inline">Grafik i rozliczenie</span>
+                                <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform duration-200 dark:text-gray-300"
+                                   :class="{ 'rotate-180': detailsOpen }"></i>
+                            </span>
+                        </button>
+
+                        <div x-cloak
+                             x-show="detailsOpen"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 -translate-y-1"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="border-t border-gray-100 px-4 dark:border-gray-600">
+
+                            <div class="flex items-center justify-between gap-3 py-3">
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <i class="fa-regular fa-calendar shrink-0 text-gray-400 dark:text-gray-300"></i>
+                                    <span class="text-sm text-gray-600 dark:text-gray-200">Zaplanowane godziny</span>
+                                </div>
+                                <span data-summary="plannedHours" class="shrink-0 text-sm font-semibold tabular-nums text-gray-900 dark:text-white"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3 border-t border-gray-100 py-3 dark:border-gray-600">
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <i class="fa-regular fa-file-lines shrink-0 text-gray-400 dark:text-gray-300"></i>
+                                    <span class="text-sm text-gray-600 dark:text-gray-200">Godziny z e-wniosków</span>
+                                </div>
+                                <span data-summary="leaveHours" class="shrink-0 text-sm font-semibold tabular-nums text-gray-900 dark:text-white"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3 border-t border-gray-100 py-3 dark:border-gray-600">
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <i class="fa-regular fa-hourglass-half shrink-0 text-gray-400 dark:text-gray-300"></i>
+                                    <span class="text-sm text-gray-600 dark:text-gray-200">Brak do normy</span>
+                                </div>
+                                <span data-summary="hoursMissing" class="shrink-0 text-sm font-semibold tabular-nums text-amber-700 dark:text-amber-300"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+
+                        Object.entries({
+                            workedHours: data.workedHours,
+                            overtimeHours: data.overtimeHours,
+                            plannedHours: data.plannedHours,
+                            leaveHours: data.leaveHours,
+                            hoursMissing: data.hoursMissing
+                        }).forEach(function ([key, value]) {
+                            $summary.find('[data-summary="' + key + '"]')
+                                .text(value ?? '—');
+                        });
+
+                        $content.empty().append($summary);
+
+                        // Inicjalizacja Alpine dla dynamicznie dodanego x-data.
+                        if (window.Alpine) {
+                            window.Alpine.initTree($summary[0]);
+                        }
+
+                        $skeleton.hide();
+                        $content.show();
+                    },
+
+                    error: function (xhr) {
+                        console.error(
+                            'Błąd pobierania podsumowania czasu pracy:',
+                            xhr.status,
+                            xhr.responseText
+                        );
+                        $content
+                            .html('<p class="mx-4 text-sm text-red-600 dark:text-red-400">Nie udało się załadować podsumowania. Odśwież stronę i spróbuj ponownie.</p>')
+                            .show();
+                    }
+                });
+            }
+
 
             function renderCalendar(date) {
                 const year = date.getFullYear();
@@ -307,6 +450,7 @@
                 }
 
                 updateHiddenInput();
+                loadAttendanceSummary(rangeStart, rangeEnd);
             }
 
             function formatDate(date) {
@@ -1019,7 +1163,7 @@
                 const today = new Date();
                 setRange(today, today);
             }
-            
+
         });
     </script>
 </li>

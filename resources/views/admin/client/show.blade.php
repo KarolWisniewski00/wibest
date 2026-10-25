@@ -112,6 +112,267 @@
                     </x-text-cell>
                     <!--Ilość wysłanych wiadomości email-->
                 </x-container-gray>
+                    @php
+        $company = $client;
+
+        /*
+        |--------------------------------------------------------------------------
+        | AI - klasyfikacja
+        |--------------------------------------------------------------------------
+        */
+
+        $classificationData = match ($company->ai_classification) {
+            'ideal' => [
+                'label' => 'Idealny klient',
+                'icon' => 'fa-solid fa-star',
+                'color' => 'green',
+            ],
+            'potential' => [
+                'label' => 'Potencjalny klient',
+                'icon' => 'fa-solid fa-chart-simple',
+                'color' => 'yellow',
+            ],
+            'weak' => [
+                'label' => 'Słabe dopasowanie',
+                'icon' => 'fa-solid fa-arrow-down',
+                'color' => 'orange',
+            ],
+            'disqualified' => [
+                'label' => 'Nie zakwalifikowany',
+                'icon' => 'fa-solid fa-ban',
+                'color' => 'red',
+            ],
+            'unknown' => [
+                'label' => 'Brak danych',
+                'icon' => 'fa-solid fa-circle-question',
+                'color' => 'gray',
+            ],
+            default => [
+                'label' => 'Nie sklasyfikowano',
+                'icon' => 'fa-solid fa-circle-question',
+                'color' => 'gray',
+            ],
+        };
+    @endphp
+                                    @if ($classificationData['color'] === 'blue')
+
+                        <div class="relative overflow-hidden md:col-span-2 rounded-xl bg-blue-900/20 border border-blue-800/40 px-5 py-4">
+
+                            {{-- IKONA W TLE --}}
+                            <div class="absolute -right-5 -bottom-7 text-8xl text-blue-400/10 pointer-events-none">
+                                <i class="{{ $classificationData['icon'] }}"></i>
+                            </div>
+
+                            <div class="relative z-10">
+
+                                <div class="text-xs uppercase tracking-wider mb-3 text-blue-300/70">
+                                    Klasyfikacja klienta
+                                </div>
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                        class="w-11 h-11 min-w-[44px] rounded-lg bg-blue-900/40 border border-blue-700/30 flex items-center justify-center">
+                                        <i class="{{ $classificationData['icon'] }} text-blue-300"></i>
+                                    </div>
+
+                                    <div class="min-w-0">
+
+                                        <div class="font-semibold text-white">
+                                            {{ $classificationData['label'] }}
+                                        </div>
+
+                                        @if($company->ai_classification_updated_at)
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                Aktualizacja:
+                                                {{ \Carbon\Carbon::parse($company->ai_classification_updated_at)->format('d.m.Y H\:i') }}
+                                            </div>
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @elseif ($classificationData['color'] === 'green')
+
+                        <div
+                            class="relative overflow-hidden md:col-span-2 rounded-xl bg-green-900/20 border border-green-800/40 px-5 py-4">
+
+                            {{-- IKONA W TLE --}}
+                            <div class="absolute -right-5 -bottom-7 text-8xl text-green-400/10 pointer-events-none">
+                                <i class="{{ $classificationData['icon'] }}"></i>
+                            </div>
+
+                            <div class="relative z-10">
+
+                                <div class="text-xs uppercase tracking-wider mb-3 text-green-300/70">
+                                    Klasyfikacja klienta
+                                </div>
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                        class="w-11 h-11 min-w-[44px] rounded-lg bg-green-900/40 border border-green-700/30 flex items-center justify-center">
+                                        <i class="{{ $classificationData['icon'] }} text-green-300"></i>
+                                    </div>
+
+                                    <div class="min-w-0">
+
+                                        <div class="font-semibold text-white">
+                                            {{ $classificationData['label'] }}
+                                        </div>
+
+                                        @if($company->ai_classification_updated_at)
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                Aktualizacja:
+                                                {{ \Carbon\Carbon::parse($company->ai_classification_updated_at)->format('d.m.Y H\:i') }}
+                                            </div>
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @elseif ($classificationData['color'] === 'red')
+
+                        <div class="relative overflow-hidden md:col-span-2 rounded-xl bg-red-900/20 border border-red-800/40 px-5 py-4">
+
+                            {{-- IKONA W TLE --}}
+                            <div class="absolute -right-5 -bottom-7 text-8xl text-red-400/10 pointer-events-none">
+                                <i class="{{ $classificationData['icon'] }}"></i>
+                            </div>
+
+                            <div class="relative z-10">
+
+                                <div class="text-xs uppercase tracking-wider mb-3 text-red-300/70">
+                                    Klasyfikacja klienta
+                                </div>
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                        class="w-11 h-11 min-w-[44px] rounded-lg bg-red-900/40 border border-red-700/30 flex items-center justify-center">
+                                        <i class="{{ $classificationData['icon'] }} text-red-300"></i>
+                                    </div>
+
+                                    <div class="min-w-0">
+
+                                        <div class="font-semibold text-white">
+                                            {{ $classificationData['label'] }}
+                                        </div>
+
+                                        @if($company->ai_classification_updated_at)
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                Aktualizacja:
+                                                {{ \Carbon\Carbon::parse($company->ai_classification_updated_at)->format('d.m.Y H\:i') }}
+                                            </div>
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @elseif ($classificationData['color'] === 'yellow')
+
+                        <div
+                            class="relative overflow-hidden md:col-span-2 rounded-xl bg-yellow-900/20 border border-yellow-800/40 px-5 py-4">
+
+                            {{-- IKONA W TLE --}}
+                            <div class="absolute -right-5 -bottom-7 text-8xl text-yellow-400/10 pointer-events-none">
+                                <i class="{{ $classificationData['icon'] }}"></i>
+                            </div>
+
+                            <div class="relative z-10">
+
+                                <div class="text-xs uppercase tracking-wider mb-3 text-yellow-300/70">
+                                    Klasyfikacja klienta
+                                </div>
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                        class="w-11 h-11 min-w-[44px] rounded-lg bg-yellow-900/40 border border-yellow-700/30 flex items-center justify-center">
+                                        <i class="{{ $classificationData['icon'] }} text-yellow-300"></i>
+                                    </div>
+
+                                    <div class="min-w-0">
+
+                                        <div class="font-semibold text-white">
+                                            {{ $classificationData['label'] }}
+                                        </div>
+
+                                        @if($company->ai_classification_updated_at)
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                Aktualizacja:
+                                                {{ \Carbon\Carbon::parse($company->ai_classification_updated_at)->format('d.m.Y H\:i') }}
+                                            </div>
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @else
+
+                        {{-- GRAY / DOMYŚLNY --}}
+                        <div class="relative overflow-hidden md:col-span-2 rounded-xl bg-gray-700/40 border border-gray-600/40 px-5 py-4">
+
+                            {{-- IKONA W TLE --}}
+                            <div class="absolute -right-5 -bottom-7 text-8xl text-gray-400/10 pointer-events-none">
+                                <i class="{{ $classificationData['icon'] }}"></i>
+                            </div>
+
+                            <div class="relative z-10">
+
+                                <div class="text-xs uppercase tracking-wider mb-3 text-gray-400">
+                                    Klasyfikacja klienta
+                                </div>
+
+                                <div class="flex items-center gap-3">
+
+                                    <div
+                                        class="w-11 h-11 min-w-[44px] rounded-lg bg-gray-700 border border-gray-600/30 flex items-center justify-center">
+                                        <i class="{{ $classificationData['icon'] }} text-gray-300"></i>
+                                    </div>
+
+                                    <div class="min-w-0">
+
+                                        <div class="font-semibold text-white">
+                                            {{ $classificationData['label'] }}
+                                        </div>
+
+                                        @if($company->ai_classification_updated_at)
+                                            <div class="text-xs text-gray-400 mt-1">
+                                                Aktualizacja:
+                                                {{ \Carbon\Carbon::parse($company->ai_classification_updated_at)->format('d.m.Y H\:i') }}
+                                            </div>
+                                        @endif
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    @endif
                 <h1 class="text-2xl font-medium text-gray-700 dark:text-gray-100 md:col-span-2">
                     <span>📊</span> Wykres Użytkowników
                 </h1>

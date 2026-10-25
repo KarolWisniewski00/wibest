@@ -67,6 +67,59 @@
                 </x-status-cello>
             @else
                 <x-RCP.header>
+                    <span>⏱️</span> Podsumowanie czasu pracy
+                </x-RCP.header>
+
+{{-- Skeleton podsumowania czasu pracy --}}
+<div id="attendance-summary-wrapper"
+     data-url="{{ route('api.v1.raport.attendance-sheet.summary') }}">
+
+    {{-- Skeleton podsumowania czasu pracy --}}
+    <div id="attendance-summary-skeleton"
+         class="mb-4 mx-4 space-y-3"
+         role="status"
+         aria-label="Ładowanie podsumowania czasu pracy">
+
+        {{-- Główne statystyki --}}
+        <div class="grid grid-cols-2 gap-3">
+
+            {{-- Przepracowano --}}
+            <div class="min-w-0 rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-gray-700">
+                <div class="mb-3 flex items-center gap-2">
+                    <div class="size-8 shrink-0 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-600"></div>
+                    <div class="h-3 w-24 max-w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-600"></div>
+                </div>
+                <div class="h-8 w-3/4 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-600"></div>
+                <div class="mt-2 h-3 w-20 animate-pulse rounded-md bg-gray-100 dark:bg-gray-600"></div>
+            </div>
+
+            {{-- Nadgodziny --}}
+            <div class="min-w-0 rounded-lg bg-gray-100 p-4 shadow-sm dark:bg-gray-700">
+                <div class="mb-3 flex items-center gap-2">
+                    <div class="size-8 shrink-0 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-600"></div>
+                    <div class="h-3 w-20 max-w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-600"></div>
+                </div>
+                <div class="h-8 w-2/3 animate-pulse rounded-lg bg-gray-200 dark:bg-gray-600"></div>
+                <div class="mt-2 h-3 w-16 animate-pulse rounded-md bg-gray-100 dark:bg-gray-600"></div>
+            </div>
+        </div>
+
+        {{-- Pozostałe informacje --}}
+        <div class="overflow-hidden rounded-lg bg-gray-100 shadow-sm dark:bg-gray-700">
+            <div class="flex min-h-12 items-center justify-between gap-3 px-4 py-3">
+                <div class="h-4 w-36 max-w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-600"></div>
+                <div class="size-4 shrink-0 animate-pulse rounded bg-gray-100 dark:bg-gray-600"></div>
+            </div>
+
+        </div>
+
+        <span class="sr-only">Ładowanie danych o czasie pracy...</span>
+    </div>
+
+    {{-- Tutaj jQuery wstawi gotowe podsumowanie --}}
+    <div id="attendance-summary-content"></div>
+</div>
+                <x-RCP.header>
                     <span>⏱️</span> Lista czasu pracy
                 </x-RCP.header>
                 @php

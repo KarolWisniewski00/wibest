@@ -391,25 +391,25 @@
                     $(document).ready(function () {
                         function updateCalendar() {
 
-    const today = new Date();
+                            const today = new Date();
 
-    // JS: 0 = niedziela, 1 = poniedziałek...
-    // Przesuwamy tak, żeby:
-    // 0 = poniedziałek ... 6 = niedziela
-    const day = (today.getDay() + 6) % 7;
+                            // JS: 0 = niedziela, 1 = poniedziałek...
+                            // Przesuwamy tak, żeby:
+                            // 0 = poniedziałek ... 6 = niedziela
+                            const day = (today.getDay() + 6) % 7;
 
-    const $calendar = $('#calendarDays');
+                            const $calendar = $('#calendarDays');
 
-    // Czyścimy cały kalendarz
-    $calendar.empty();
+                            // Czyścimy cały kalendarz
+                            $calendar.empty();
 
-    // Tworzymy puste dni przed dzisiejszym
-    for (let i = 0; i < day; i++) {
-        $calendar.append('<div></div>');
-    }
+                            // Tworzymy puste dni przed dzisiejszym
+                            for (let i = 0; i < day; i++) {
+                                $calendar.append('<div></div>');
+                            }
 
-    // Dzisiejszy dzień
-    $calendar.append(`
+                            // Dzisiejszy dzień
+                            $calendar.append(`
         <div class="p-0">
             <div
                 class="w-[38px] h-[68px] flex flex-col items-center justify-center text-center w-full rounded-2xl p-1 bg-green-300 dark:bg-green-400 hover:bg-green-400 dark:hover:bg-green-500 transition-colors duration-200">
@@ -430,7 +430,7 @@
             </div>
         </div>
     `);
-}
+                        }
 
                         const statusWidth = $('#workStatus').outerWidth();
 
@@ -510,7 +510,7 @@
                             // Godzina rozpoczęcia
                             updateWorkHours();
 
-updateCalendar();
+                            updateCalendar();
 
                             timerInterval = setInterval(function () {
 
@@ -2322,51 +2322,19 @@ updateCalendar();
                             </x-text-cell-value>
                         </x-text-cell>
                         <!--Czas w pracy-->
-                        <!--Lokalizacja-->
+                        {{-- Lokalizacja --}}
                         <x-text-cell>
                             <x-text-cell-label class="system-font">
                                 Lokalizacja
                             </x-text-cell-label>
-                            <div id="map_start"
-                                style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;">
+
+                            <div class="w-full mt-3 overflow-hidden rounded-xl">
+                                <iframe id="map_start" title="Lokalizacja rozpoczęcia pracy"
+                                    src="https://maps.google.com/maps?q=50.2649,19.0238&z=13&output=embed" width="100%"
+                                    height="300" style="border: 0; border-radius: 0.5rem;" loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                             </div>
                         </x-text-cell>
-                        <!--Lokalizacja-->
-                        <input type="hidden" id="latitude_start" value="50.2649">
-                        <input type="hidden" id="longitude_start" value="19.0238">
-                        <script>
-                            $(document).ready(function () {
-                                // 1. Odczytanie danych z ukrytych inputów
-                                const latitude = $('#latitude_start').val();
-                                const longitude = $('#longitude_start').val();
-
-                                // Konwersja na liczby zmiennoprzecinkowe jest często bezpieczna
-                                const lat = parseFloat(latitude);
-                                const lon = parseFloat(longitude);
-
-                                // Sprawdzenie, czy dane zostały poprawnie odczytane (opcjonalne, ale zalecane)
-                                if (isNaN(lat) || isNaN(lon)) {
-                                    console.error('Nie udało się odczytać prawidłowych współrzędnych z ukrytych pól.');
-                                    return; // Przerwij działanie, jeśli dane są nieprawidłowe
-                                }
-
-                                // 2. Inicjalizacja mapy Leaflet
-                                const map = L.map('map_start').setView([lat, lon], 13);
-
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
-                                const greenIcon = L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([lat, lon], {
-                                    icon: greenIcon
-                                }).addTo(map);
-                            });
-                        </script>
                     </div>
                     <div
                         class="flex flex-col gap-4 appearance-none rounded-lg shadow border border-gray-100 dark:border-gray-700 bg-gray-50 p-4 outline-none  dark:bg-gray-700 dark:text-gray-50 mb-4">
@@ -2399,51 +2367,19 @@ updateCalendar();
                             </x-text-cell-value>
                         </x-text-cell>
                         <!--Czas w pracy-->
-                        <!--Lokalizacja-->
+                        {{-- Lokalizacja --}}
                         <x-text-cell>
                             <x-text-cell-label class="system-font">
                                 Lokalizacja
                             </x-text-cell-label>
-                            <div id="map_stop"
-                                style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;">
+
+                            <div class="w-full mt-3 overflow-hidden rounded-xl">
+                                <iframe id="map_stop" title="Lokalizacja zakończenia pracy"
+                                    src="https://maps.google.com/maps?q=50.2945,18.6714&z=13&output=embed" width="100%"
+                                    height="300" style="border: 0; border-radius: 0.5rem;" loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>
                             </div>
                         </x-text-cell>
-                        <!--Lokalizacja-->
-                        <input type="hidden" id="latitude_stop" value="50.2945">
-                        <input type="hidden" id="longitude_stop" value="18.6714">
-                        <script>
-                            $(document).ready(function () {
-                                // 1. Odczytanie danych z ukrytych inputów
-                                const latitude = $('#latitude_stop').val();
-                                const longitude = $('#longitude_stop').val();
-
-                                // Konwersja na liczby zmiennoprzecinkowe jest często bezpieczna
-                                const lat = parseFloat(latitude);
-                                const lon = parseFloat(longitude);
-
-                                // Sprawdzenie, czy dane zostały poprawnie odczytane (opcjonalne, ale zalecane)
-                                if (isNaN(lat) || isNaN(lon)) {
-                                    console.error('Nie udało się odczytać prawidłowych współrzędnych z ukrytych pól.');
-                                    return; // Przerwij działanie, jeśli dane są nieprawidłowe
-                                }
-
-                                // 2. Inicjalizacja mapy Leaflet
-                                const map = L.map('map_stop').setView([lat, lon], 13);
-
-                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
-                                const greenIcon = L.icon({
-                                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                                    iconSize: [25, 41],
-                                    iconAnchor: [12, 41],
-                                    popupAnchor: [1, -34],
-                                    shadowSize: [41, 41]
-                                });
-                                L.marker([lat, lon], {
-                                    icon: greenIcon
-                                }).addTo(map);
-                            });
-                        </script>
                     </div>
                 </div>
             </div>

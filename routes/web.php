@@ -1,32 +1,25 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\Calendar\WorkScheduleController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\ContractController;
-use App\Http\Controllers\CostController;
 use App\Http\Controllers\CrmController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoogleController;
 use App\Http\Controllers\Leave\LeaveBalanceController;
+use App\Http\Controllers\Object\ObjectController;
 use App\Http\Controllers\SmsController;
 use App\Http\Controllers\TSI\InvoiceController;
 use App\Http\Controllers\Leave\LeavePendingReviewController;
 use App\Http\Controllers\Leave\LeaveSingleController;
 use App\Http\Controllers\OfferController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\Raport\AttendanceSheetController;
 use App\Http\Controllers\Raport\TimeSheetController;
 use App\Http\Controllers\RCP\EventController;
 use App\Http\Controllers\RCP\LocationController;
 use App\Http\Controllers\RCP\WorkSessionController as RCPWorkSessionController;
 use App\Http\Controllers\RCP\RCPController;
-use App\Http\Controllers\SeoController;
-use App\Http\Controllers\ServiceController;
-use App\Http\Controllers\SetController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\Team\InvitationController;
 use App\Http\Controllers\Team\UserController as TeamUserController;
@@ -148,6 +141,7 @@ Route::prefix('api')->group(function () {
                 Route::get('set-date/', [TimeSheetController::class, 'setDateSmart'])->name('api.v1.raport.time-smart.set.date');
             });
             Route::prefix('attendance-sheet')->group(function () {
+                Route::get('summary', [AttendanceSheetController::class, 'getAttendanceSummary'])->name('api.v1.raport.attendance-sheet.summary');
                 Route::get('/', [AttendanceSheetController::class, 'get'])->name('api.v1.raport.attendance-sheet.get');
                 Route::get('set-date/', [AttendanceSheetController::class, 'setDate'])->name('api.v1.raport.attendance-sheet.set.date');
                 Route::post('/export-xlsx', [AttendanceSheetController::class, 'exportPdf'])->name('api.v1.raport.attendance-sheet.export.xlsx');
@@ -319,7 +313,12 @@ Route::middleware([
                 Route::post('excel', [AttendanceSheetController::class, 'excel'])->name('raport.attendance-sheet.excel');
             });
         });
-
+        // OBJECTS -------------------------------------------------------------------------------
+        Route::prefix('objects')->group(function () {
+            Route::get('/dashboard', [ObjectController::class, 'dashboard'])->name('object.dashboard');
+            Route::get('/', [ObjectController::class, 'index'])->name('object.index');
+            Route::get('/create', [ObjectController::class, 'create'])->name('object.create');
+        });
         // SETTINGS -----------------------------------------------------------------------------
         Route::prefix('setting')->group(function () {
             Route::get('/', [SettingController::class, 'index'])->name('setting');
@@ -385,6 +384,8 @@ Route::middleware([
                 Route::post('store', [CrmController::class, 'store'])->name('setting.crm.store');
                 Route::get('edit/{crm}', [CrmController::class, 'edit'])->name('setting.crm.edit');
                 Route::put('update/{crm}', [CrmController::class, 'update'])->name('setting.crm.update');
+                Route::get('ai-analysis/{crm}',[CrmController::class, 'aiNextStep'])->name('setting.crm.ai-analysis');
+                 Route::delete('delete/{crm}', [CrmController::class, 'delete'])->name('setting.crm.delete');
             });
             Route::prefix('client')->group(function () {
                 Route::get('/', [ClientController::class, 'index'])->name('setting.client');
@@ -494,70 +495,6 @@ Route::middleware([
             });
             Route::prefix('group')->group(function () {
                 Route::redirect('/', '/dashboard/leave/single')->name('leave.group.index');
-            });
-        });
-
-        Route::prefix('project')->group(function () {
-            Route::get('/', [ProjectController::class, 'index'])->name('project');
-            Route::get('refresh', [ProjectController::class, 'index_refresh'])->name('project.refresh');
-            Route::get('create/{client}', [ProjectController::class, 'create'])->name('project.create.client');
-            Route::post('store', [ProjectController::class, 'store'])->name('project.store');
-            Route::get('show/{project}', [ProjectController::class, 'show'])->name('project.show');
-            Route::get('edit/{project}', [ProjectController::class, 'edit'])->name('project.edit');
-            Route::put('update/{project}', [ProjectController::class, 'update'])->name('project.update');
-            Route::delete('delete/{project}', [ProjectController::class, 'delete'])->name('project.delete');
-            Route::get('search', [ProjectController::class, 'search'])->name('project.search');
-        });
-        Route::prefix('contract')->group(function () {
-            Route::get('/', [ContractController::class, 'index'])->name('contract');
-        });
-        Route::prefix('order')->group(function () {
-            Route::get('/', [ContractController::class, 'index'])->name('order');
-        });
-
-        Route::prefix('cost')->group(function () {
-            Route::get('/', [CostController::class, 'index'])->name('cost');
-            Route::get('create', [CostController::class, 'create'])->name('cost.create');
-            Route::post('store', [CostController::class, 'store'])->name('cost.store');
-            Route::get('show/{cost}', [CostController::class, 'show'])->name('cost.show');
-            Route::get('edit/{cost}', [CostController::class, 'edit'])->name('cost.edit');
-            Route::put('update/{cost}', [CostController::class, 'update'])->name('cost.update');
-            Route::delete('delete/{cost}', [CostController::class, 'delete'])->name('cost.delete');
-
-            Route::get('now', [CostController::class, 'index_now'])->name('cost.now');
-            Route::get('last', [CostController::class, 'index_last'])->name('cost.last');
-            Route::get('search', [CostController::class, 'search'])->name('cost.search');
-        });
-
-        Route::prefix('magazine')->group(function () {
-            Route::prefix('set')->group(function () {
-                Route::get('/', [SetController::class, 'index'])->name('set');
-                Route::get('create', [SetController::class, 'create'])->name('set.create');
-                Route::post('store', [SetController::class, 'store'])->name('set.store');
-                Route::get('show/{set}', [SetController::class, 'show'])->name('set.show');
-                Route::get('edit/{set}', [SetController::class, 'edit'])->name('set.edit');
-                Route::put('update/{set}', [SetController::class, 'update'])->name('set.update');
-                Route::delete('delete/{set}', [SetController::class, 'delete'])->name('set.delete');
-            });
-
-            Route::prefix('product')->group(function () {
-                Route::get('/', [ProductController::class, 'index'])->name('product');
-                Route::get('create', [ProductController::class, 'create'])->name('product.create');
-                Route::post('store', [ProductController::class, 'store'])->name('product.store');
-                Route::get('show/{product}', [ProductController::class, 'show'])->name('product.show');
-                Route::get('edit/{product}', [ProductController::class, 'edit'])->name('product.edit');
-                Route::put('update/{product}', [ProductController::class, 'update'])->name('product.update');
-                Route::delete('delete/{product}', [ProductController::class, 'delete'])->name('product.delete');
-            });
-
-            Route::prefix('service')->group(function () {
-                Route::get('/', [ServiceController::class, 'index'])->name('service');
-                Route::get('create', [ServiceController::class, 'create'])->name('service.create');
-                Route::post('store', [ServiceController::class, 'store'])->name('service.store');
-                Route::get('show/{service}', [ServiceController::class, 'show'])->name('service.show');
-                Route::get('edit/{service}', [ServiceController::class, 'edit'])->name('service.edit');
-                Route::put('update/{service}', [ServiceController::class, 'update'])->name('service.update');
-                Route::delete('delete/{service}', [ServiceController::class, 'delete'])->name('service.delete');
             });
         });
     });

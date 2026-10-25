@@ -95,10 +95,10 @@
                     "Szerokość: " + lat + "\nDługość: " + lon + "\nDokładność: " + Math.round(acc) + " metrów"
                 );
 
-                $('#locationGeo'+type).text(
+                $('#locationGeo' + type).text(
                     lat + ", " + lon
                 );
-                $('#locationAcc'+type).text(
+                $('#locationAcc' + type).text(
                     Math.round(acc) + " m"
                 );
 
@@ -110,19 +110,19 @@
                 switch (error.code) {
                     case error.PERMISSION_DENIED:
                         $('#locationWidget').text("Użytkownik odmówił dostępu do lokalizacji.");
-                        $('#locationWrapper'+type).addClass('hidden')
+                        $('#locationWrapper' + type).addClass('hidden')
                         break;
                     case error.POSITION_UNAVAILABLE:
                         $('#locationWidget').text("Informacje o lokalizacji są niedostępne.");
-                        $('#locationWrapper'+type).addClass('hidden')
+                        $('#locationWrapper' + type).addClass('hidden')
                         break;
                     case error.TIMEOUT:
                         $('#locationWidget').text("Przekroczono czas oczekiwania na lokalizację.");
-                        $('#locationWrapper'+type).addClass('hidden')
+                        $('#locationWrapper' + type).addClass('hidden')
                         break;
                     case error.UNKNOWN_ERROR:
                         $('#locationWidget').text("Wystąpił nieznany błąd.");
-                        $('#locationWrapper'+type).addClass('hidden')
+                        $('#locationWrapper' + type).addClass('hidden')
                         break;
                 }
             }
@@ -165,13 +165,13 @@
                         $('#timer').text(self.formatTime(self.elapsedSeconds));
                     }, 1000);
 
-                    if(self.work_session_start_time){
+                    if (self.work_session_start_time) {
                         $('#startTimeWidget').text(self.work_session_start_time.split(" ")[1]);
                     }
-                    if(self.work_session_stop_time){
+                    if (self.work_session_stop_time) {
                         $('#stopTimeWidget').text(self.work_session_stop_time.split(" ")[1]);
                     }
-                    
+
 
 
                     $('#startButtonWidget').addClass('hidden');
@@ -242,6 +242,34 @@
                                 const diffInSeconds = Math.floor((now - date) / 1000);
                                 self.elapsedSeconds = diffInSeconds;
                                 self.counting();
+                                $('#clockNoteWrapper').removeClass('hidden');
+                            } else if (response.message === 'Brak aktywnej sesji pracy'){
+                                $('#clock_info').text("");
+                                $('#statusText')
+                                    .text("Jesteś poza pracą")
+                                    .addClass('text-gray-700 dark:text-gray-300')
+                                    .removeClass('text-green-700 dark:text-green-300');
+                                $('#statusPing')
+                                    .addClass('bg-gray-300')
+                                    .addClass('hidden')
+                                    .removeClass('bg-green-300');
+                                $('#statusDot')
+                                    .addClass('bg-gray-300')
+                                    .removeClass('bg-green-300');
+                                $('#statusWrapper')
+                                    .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
+                                    .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
+                                $('#startButtonWidget').removeClass('hidden');
+                                $('#loaderTimerWidget').addClass('hidden');
+                                $('#loaderLocationWidget').addClass('hidden');
+                                $('#locationWidget').removeClass('hidden');
+                                $('#loaderClockWidget').addClass('hidden');
+                                $('#timerWidget').removeClass('hidden');
+
+                                $('#startButton').removeClass('hidden');
+                                $('#loaderTimer').addClass('hidden');
+                                $('#loaderClock').addClass('hidden');
+                                $('#timer').removeClass('hidden');
                             }
                         },
                         error: function (xhr, status, error) {
@@ -280,6 +308,7 @@
                     const self = this;
                     const lat = $('#lat').val();
                     const lon = $('#lon').val();
+                    console.log(lat, lon)
                     $.ajax({
                         url: self.workStart + '/' + self.userId,
                         type: 'GET',
@@ -301,7 +330,12 @@
                             $('#loaderTimer').addClass('hidden');
                             $('#clock_info').text("");
                             $('#statusText').text("Jesteś w trakcie pracy");
+                            $('#clockNoteWrapper').removeClass('hidden');
                             self.work_session_start_time = response.work_session_start_time;
+                            
+                            const clockClickSound = new Audio('{{ asset('sounds/startstop.wav') }}');
+                            clockClickSound.currentTime = 0;
+                            clockClickSound.play().catch(() => {});
                         },
                         error: function (xhr, status, error) {
                             toastr.error('Błąd podczas rozpoczęcia pracy');
@@ -368,6 +402,8 @@
                             $('#startButtonWidget').removeClass('hidden');
                             $('#loaderTimerWidget').addClass('hidden');
 
+                            $('#clockNoteWrapper').addClass('hidden');
+
                             $('#timer').text(self.formatTime(self.elapsedSeconds));
                             $('#stopButton').addClass('hidden');
                             $('#startButton').removeClass('hidden');
@@ -384,7 +420,10 @@
                             $('#statusWrapper')
                                 .addClass('bg-gray-100 dark:bg-gray-500/10 border-gray-200 dark:border-gray-500/20')
                                 .removeClass('bg-green-100 dark:bg-green-500/10 border-green-200 dark:border-green-500/20');
-                        },
+                            const clockClickSound = new Audio('{{ asset('sounds/startstop.wav') }}');
+                            clockClickSound.currentTime = 0;
+                            clockClickSound.play().catch(() => {});
+                            },
                         error: function (xhr, status, error) {
                             toastr.error('Błąd podczas zakończenia pracy');
                             $('#clock_info').text("Błąd podczas zakończenia pracy");

@@ -107,10 +107,10 @@ class UserController extends Controller
         $msg = SentMessage::where('user_id', $user->id)->orderByDesc('created_at')->get();
         $msg_sms = SentMessage::where('user_id', $user->id)->where('type', 'sms')->orderByDesc('created_at')->get();
         $msg_email = SentMessage::where('user_id', $user->id)->where('type', 'email')->orderByDesc('created_at')->get();
-
+        
         try {
             $leave_balance = LeaveBalance::where('user_id', $user->id)
-                ->where('company_id', $user->id->company_id)
+                ->where('company_id', $user->company->id)
                 ->where('year', now()->year)
                 ->first();
             $carried_over = $leave_balance->carried_over ?? 0;

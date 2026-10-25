@@ -150,7 +150,7 @@
         </div>
 
         <div class="invoice-details" style="text-align: center;">
-            <h2>{{ $leave->manager->name }}, pojawił się nowy wniosek urlopowy</h2>
+            <h2>{{ $leave->manager->name }}, pojawił się nowy e-wniosek</h2>
             <p style="font-weight: bold;">{{ $leave->user->name }}, {{ $leave->type }}, {{ $leave->start_date }} {{ $leave->end_date }}</p>
         </div>
 

@@ -1295,7 +1295,7 @@
                             class="flex items-start justify-between gap-4 mb-8 pt-4 border-t border-gray-200 dark:border-gray-600">
                             <div>
                                 <p class="text-xs uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 mb-4">
-                                    21 różnych typów nieobecności
+                                    23 różnych typów nieobecności
                                 </p>
 
                                 <h3 class="text-3xl font-black text-gray-900 dark:text-white leading-tight">
@@ -1305,7 +1305,7 @@
                         </div>
 
                         <p class="text-gray-600 dark:text-gray-300 mb-4 leading-7">
-                            Jeden moduł do obsługi najważniejszych spraw pracowników. WIBEST pozwala obsługiwać aż 21
+                            Jeden moduł do obsługi najważniejszych spraw pracowników. WIBEST pozwala obsługiwać aż 23
                             rodzajów wniosków, dzięki czemu nie musisz tworzyć osobnych formularzy, prowadzić
                             dodatkowych arkuszy ani szukać informacji w wiadomościach.
                         </p>
@@ -1513,7 +1513,7 @@
                                             <div class="flex flex-row items-center justify-center w-fit gap-2">
                                                 <p
                                                     class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 font-semibold w-10 h-10 flex items-center justify-center text-3xl">
-                                                    🎉
+                                                    📌
                                                 </p>
                                                 <div class="flex flex-col justify-center w-fit gap-2">
                                                     <p
@@ -1611,6 +1611,28 @@
                                                     </p> <span
                                                         class="system-font px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest w-fit">
                                                         OP
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                    <!--[if BLOCK]><![endif]-->
+                                    <li class="hidden lg:block">
+                                        <label for="urlop-bezplatny"
+                                            class="mb-4 h-full inline-flex items-center justify-between w-full p-4 text-gray-700 bg-gray-100 border-2 border-gray-200 rounded-lg  cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-400 dark:peer-checked:border-green-300 hover:text-gray-800 dark:peer-checked:text-gray-300 peer-checked:text-gray-800 hover:bg-gray-50 dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200">
+                                            <div class="flex flex-row items-center justify-center w-fit gap-2">
+                                                <p
+                                                    class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 font-semibold w-10 h-10 flex items-center justify-center text-3xl">
+                                                    👨‍👩‍👧
+                                                </p>
+                                                <div class="flex flex-col justify-center w-fit gap-2">
+                                                    <p
+                                                        class="system-font inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 font-semibold w-fit text-start text-xs">
+                                                        opieka nad dzieckiem do 14 lat
+                                                    </p> <span
+                                                        class="system-font px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest w-fit">
+                                                        OD14
                                                     </span>
                                                 </div>
                                             </div>
@@ -1787,6 +1809,28 @@
                                                     </p> <span
                                                         class="system-font px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest w-fit">
                                                         DEL
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </li>
+                                    <!--[if ENDBLOCK]><![endif]-->
+                                    <!--[if BLOCK]><![endif]-->
+                                    <li class="hidden lg:block">
+                                        <label for="urlop-bezplatny"
+                                            class="mb-4 h-full inline-flex items-center justify-between w-full p-4 text-gray-700 bg-gray-100 border-2 border-gray-200 rounded-lg  cursor-pointer dark:hover:text-gray-300 dark:border-gray-700 peer-checked:border-green-400 dark:peer-checked:border-green-300 hover:text-gray-800 dark:peer-checked:text-gray-300 peer-checked:text-gray-800 hover:bg-gray-50 dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200">
+                                            <div class="flex flex-row items-center justify-center w-fit gap-2">
+                                                <p
+                                                    class="inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 font-semibold w-10 h-10 flex items-center justify-center text-3xl">
+                                                    ⚡
+                                                </p>
+                                                <div class="flex flex-col justify-center w-fit gap-2">
+                                                    <p
+                                                        class="system-font inline-flex items-center text-gray-600 dark:text-gray-300 font-semibold uppercase tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 font-semibold w-fit text-start text-xs">
+                                                        siła wyższa
+                                                    </p> <span
+                                                        class="system-font px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-pink-300 dark:bg-pink-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest w-fit">
+                                                        SW
                                                     </span>
                                                 </div>
                                             </div>

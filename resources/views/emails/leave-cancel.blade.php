@@ -150,7 +150,7 @@
         </div>
 
         <div class="invoice-details" style="text-align: center;">
-            <h2>{{ $leave->user->name }}, twój wniosek został anulowany</h2>
+            <h2>{{ $leave->user->name }}, twój e-wniosek został anulowany</h2>
             <p style="font-weight: bold;">{{ $leave->type }}, {{ $leave->status }}, {{ $leave->start_date }} {{ $leave->end_date }}</p>
         </div>
 

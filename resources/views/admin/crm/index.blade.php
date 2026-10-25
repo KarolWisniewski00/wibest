@@ -12,11 +12,25 @@
             <!--CONTENT-->
             <x-container-content>
                 <!--PC VIEW-->
-                <x-table showMobile="true" :headers="['Firma', 'Użytkownik', 'typ', 'Notatka', 'Edycja']" :items="$crms"
-                    :checkBox="false" emptyMessage="Brak danych do wyświetlenia.">
+                <x-table
+                    showMobile="true"
+                    :headers="[
+                        'Firma',
+                        'Kontakt',
+                        'Typ',
+                        'Termin',
+                        'Akcja',
+                        'Analiza AI',
+                        'Edycja'
+                    ]"
+                    :items="$crms"
+                    :checkBox="false"
+                    emptyMessage="Brak danych do wyświetlenia."
+                >
                     @foreach($crms as $crm)
                         <x-row-crm :crm="$crm" />
                     @endforeach
+
                     <x-loader-crm id="loader" />
                 </x-table>
                 <!--PC VIEW-->

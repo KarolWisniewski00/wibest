@@ -25,7 +25,9 @@ return [
         'kwarantanna' => 'KW',
         'kwarantanna z pracą zdalną' => 'KWZPZ',
         'delegacja' => 'DEL',
-        'święto' => 'ŚUW'
+        'święto' => 'ŚUW',
+        'opieka nad dzieckiem do 14 lat' => 'OD14',
+        'siła wyższa' => 'SW',
     ],
 
     'icons' => [
@@ -39,7 +41,7 @@ return [
         'urlop bezpłatny' => '💸',
         'wolne z tytułu 5-dniowego tygodnia pracy' => '📆',
         'zwolnienie lekarsie - opieka' => '🧑‍⚕️',
-        'urlop okolicznościowy' => '🎉',
+        'urlop okolicznościowy' => '📌',
         'urlop wypoczynkowy "na żądanie"' => '📢',
         'oddanie krwi' => '🩸',
         'urlop ojcowski' => '👨‍👧',
@@ -52,6 +54,8 @@ return [
         'kwarantanna z pracą zdalną' => '🏠💻',
         'delegacja' => '✈️',
         'święto' => '🎌',
+        'opieka nad dzieckiem do 14 lat' => '👨‍👩‍👧',
+        'siła wyższa' => '⚡',
     ],
 
 ];

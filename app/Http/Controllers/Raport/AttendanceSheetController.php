@@ -18,6 +18,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class AttendanceSheetController extends Controller
 {
@@ -309,9 +311,9 @@ class AttendanceSheetController extends Controller
         $employees[0]->time_in_work_hms_leave = sprintf('%02dh %02dmin', $hoursLeave, $minutesLeave);
 
 
-        if($request->has('excel')){
+        if ($request->has('excel')) {
             $rows = $request->excel;
-        }else{
+        } else {
             $rows = null;
         }
 
@@ -368,5 +370,22 @@ class AttendanceSheetController extends Controller
         ]);
         $excel = $this->exportExcel($request);
         return view('admin.attendance.excel',  compact('startDate', 'endDate', 'user', 'excel'));
+    }
+    public function getAttendanceSummary(Request $request): JsonResponse
+    {
+        $this->filterDateService->initFilterDate($request);
+        $users = $this->userService->getByRoleAddEwiByFilterDate($request);
+        $user = $users[0];
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'workedHours' => $user->time_in_work_hms_total,
+                'overtimeHours' => $user->time_in_work_hms_extra,
+                'plannedHours' => $user->time_in_work_hms_planned,
+                'leaveHours' => $user->time_in_work_hms_leave,
+                'hoursMissing' => $user->time_in_work_hms_under,
+            ],
+        ]);
     }
 }

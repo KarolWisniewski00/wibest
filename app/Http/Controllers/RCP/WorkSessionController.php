@@ -14,6 +14,7 @@ use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use App\Events\WorkSessionStatusChanged;
 
 class WorkSessionController extends Controller
 {
@@ -181,6 +182,13 @@ wibest.pl/login';
         )
             ->delay(now()->addSeconds($seconds_remaining));
 
+        broadcast(new WorkSessionStatusChanged(
+            userId: (int) $workSession->user_id,
+            workSessionId: (int) $workSession->id,
+            status: 'W trakcie pracy',
+            startTime: $now->toIso8601String(),
+        ));
+
         return response()->json([
             'message' => 'Praca rozpoczęta',
             'work_session_id' => intval($workSession->id),
@@ -341,6 +349,18 @@ wibest.pl/login';
                 )
                     ->delay(now());
             }
+
+            broadcast(new WorkSessionStatusChanged(
+                userId: (int) $workSession->user_id,
+                workSessionId: (int) $workSession->id,
+                status: 'Praca zakończona',
+                startTime: optional($startEvent)->time
+                    ? Carbon::parse($startEvent->time)->toIso8601String()
+                    : null,
+                endTime: $endTime->toIso8601String(),
+
+            ));
+
             return response()->json([
                 'message' => 'Praca zakończona',
                 'work_session_id' => intval($id),
@@ -362,6 +382,17 @@ wibest.pl/login';
             ->with('eventStart')
             ->orderByDesc(Event::select('time')->whereColumn('events.id', 'work_sessions.event_start_id'))
             ->first();
+
+        // Brak aktywnej sesji — informujemy Fluttera wprost,
+        // że praca została zakończona lub nie jest zarejestrowana.
+        if (!$latestWorkSession) {
+            return response()->json([
+                'message' => 'Brak aktywnej sesji pracy',
+                'work_session_id' => null,
+                'work_session_status' => 'Brak aktywnej sesji pracy',
+                'work_session_start_time' => null,
+            ], 200);
+        }
 
         // Obliczenie przepracowanego czasu
         $endTime = Carbon::now();
@@ -386,6 +417,16 @@ wibest.pl/login';
                 'status' => 'Praca zakończona',
                 'time_in_work' => $timeInWork,
             ]);
+            // Powiadom wszystkie podłączone urządzenia.
+            $startTime = Carbon::parse($latestWorkSession->eventStart->time);
+            broadcast(new WorkSessionStatusChanged(
+                userId: (int) $latestWorkSession->user_id,
+                workSessionId: (int) $latestWorkSession->id,
+                status: 'Praca zakończona',
+                startTime: $startTime->toIso8601String(),
+                endTime: $endTime->toIso8601String(),
+            ));
+
             return response()->json([
                 'message' => 'Praca zakończona 24:00:00'
             ], 200);
