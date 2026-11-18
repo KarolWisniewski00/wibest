@@ -27,19 +27,6 @@
                 ->exists();
         @endphp
 
-        @if($hasRecentWork)
-
-            <span
-                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-semibold whitespace-nowrap"
-                title="Firma ma przynajmniej jeden odczyt pracy w aktualnym lub ubiegłym miesiącu"
-            >
-                <i class="fa-solid fa-clock"></i>
-                RCP aktywne
-            </span>
-
-        @endif
-
-
 {{-- KLASYFIKACJA AI --}}
     @php
         $company = $client;
@@ -84,7 +71,17 @@
         };
 
     @endphp
-@if($client->ai_classification)
+@if($hasRecentWork)
+
+<span
+    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-semibold whitespace-nowrap"
+    title="Firma ma przynajmniej jeden odczyt pracy w aktualnym lub ubiegłym miesiącu"
+>
+    <i class="fa-solid fa-clock"></i>
+    RCP aktywne
+</span>
+
+@elseif($client->ai_classification)
 
     @if($classificationData['color'] === 'blue')
 

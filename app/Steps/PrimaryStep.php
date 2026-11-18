@@ -2,6 +2,7 @@
 
 namespace App\Steps;
 
+use App\Support\UserInput;
 use Vildanbina\LivewireWizard\Components\Step;
 
 class PrimaryStep extends Step
@@ -18,6 +19,7 @@ class PrimaryStep extends Step
             'gender' => $this->model->gender ?? false,
         ]);
     }
+
     public function save($state)
     {
         $this->model->name = $state['name'];
@@ -26,30 +28,30 @@ class PrimaryStep extends Step
         $this->model->position = $state['position'];
         $this->model->gender = ($state['gender'] ?? false) ? 'male' : 'female';
     }
+
     public function validate()
     {
         return [
             [
-                'state.name'     => ['required'],
-                'state.email'     => ['required'],
-                'state.phone'     => ['required'],
-                'state.gender'   => ['required'],
-                'state.position'     => ['nullable'],
+                ...collect(UserInput::rules())->mapWithKeys(fn ($rules, $field) => ['state.'.$field => $rules])->all(),
+                'state.gender' => ['required', 'boolean'],
             ],
-            [],
+            collect(UserInput::messages())->mapWithKeys(fn ($message, $key) => ['state.'.$key => $message])->all(),
             [
-                'state.name'     => __('name'),
-                'state.email'     => __('email'),
-                'state.phone'     => __('phone'),
-                'state.gender'     => __('gender'),
-                'state.position'     => __('position'),
+                'state.name' => __('name'),
+                'state.email' => __('email'),
+                'state.phone' => __('phone'),
+                'state.gender' => __('gender'),
+                'state.position' => __('position'),
             ],
         ];
     }
+
     public function icon(): string
     {
         return 'clipboard';
     }
+
     public function title(): string
     {
         return __('📋 Wprowadź dane podstawowe');

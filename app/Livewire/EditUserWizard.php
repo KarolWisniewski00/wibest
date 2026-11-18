@@ -5,6 +5,7 @@ namespace App\Livewire;
 
 use App\Models\User;
 use App\Repositories\UserRepository;
+use App\Services\UserEmailAvailability;
 use App\Steps\EditPrimaryStep;
 use App\Steps\EditRoleStep;
 use App\Steps\EditSupervisorStep;
@@ -43,6 +44,12 @@ class EditUserWizard extends WizardComponent
     {
         return $this->user;
     }
+
+    public function checkEmail($email): array
+    {
+        return app(UserEmailAvailability::class)->checkForUser($email, $this->user);
+    }
+
     public function getUsers($company_id = null)
     {
         if (is_null($company_id)) {

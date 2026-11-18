@@ -79,10 +79,10 @@
                     @endif
 
 
-                    @if($crm->user->email && str_contains($crm->user->email, '@'))
+                    @if($crm->user->contact_email && str_contains($crm->user->contact_email, '@'))
                         <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 max-w-[220px] truncate">
                             <i class="fa-solid fa-envelope mr-1"></i>
-                            {{ $crm->user->email }}
+                            {{ $crm->user->contact_email }}
                         </div>
                     @endif
 
@@ -280,14 +280,14 @@
 
 
 
-    {{-- AI --}}
+    {{-- NASTĘPNY KROK --}}
     <td class="px-2 py-3 align-middle">
 
         @if($crm->datetime_complete)
 
             <x-button-link-orange href="{{ route('setting.crm.ai-analysis', $crm) }}" class="min-h-[38px]"
-                title="Analiza AI">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                title="Następny krok" aria-label="Następny krok">
+                <i class="fa-solid fa-arrow-right"></i>
             </x-button-link-orange>
 
         @endif
@@ -295,15 +295,11 @@
     </td>
 
 
-    {{-- KOMPLETOWANIE --}}
-    @if (!$crm->datetime_complete)
-        <td class="px-2 py-3 align-middle">
-            <x-button-link-green href="{{ route('setting.crm.edit', $crm) }}" class="min-h-[38px]" title="Kompletuj">
-                <i class="fa-solid fa-check"></i>
-            </x-button-link-green>
-        </td>
-    @else
-        <td class="px-2 py-3 align-middle">
-        </td>
-    @endif
+    {{-- EDYCJA --}}
+    <td class="px-2 py-3 align-middle">
+        <x-button-link-blue href="{{ route('setting.crm.edit', $crm) }}" class="min-h-[38px]"
+            title="Edycja" aria-label="Edycja">
+            <i class="fa-solid fa-pen-to-square"></i>
+        </x-button-link-blue>
+    </td>
 </tr>

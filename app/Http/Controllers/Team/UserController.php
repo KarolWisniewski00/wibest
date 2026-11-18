@@ -56,6 +56,7 @@ class UserController extends Controller
     public function create()
     {
         $companyId = $this->companyRepository->getCompanyId();
+        \App\Support\UserCreationAccess::authorize($companyId);
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         return view('admin.team.create', compact('invitations'));
     }

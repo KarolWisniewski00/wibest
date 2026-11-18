@@ -750,13 +750,19 @@ class WorkSessionRepository
     public function getTotalOfDayPlannedNew(int $userId, string $date): int
     {
         $formattedDate = Carbon::createFromFormat('d.m.y', $date)->format('Y-m-d');
-
         $user = User::findOrFail($userId);
+        $workBlock = $user->working_hours_regular == 'zmienny planing'
+            ? WorkBlock::where('user_id', $userId)->where('company_id', $user->company_id)
+                ->whereDate('starts_at', $formattedDate)->first()
+            : null;
+
+        return $this->plannedSecondsForData($user, $date, $workBlock);
+    }
+
+    /** Same planning calculation, with preloaded data for read-only batch consumers. */
+    public function plannedSecondsForData(User $user, string $date, ?WorkBlock $workBlock): int
+    {
         if ($user->working_hours_regular == 'zmienny planing') {
-            $workBlock = WorkBlock::where('user_id', $userId)
-                ->where('company_id', $user->company_id)
-                ->whereDate('starts_at', $formattedDate)
-                ->first();
             if ($workBlock && $workBlock->duration_seconds) {
                 $workingSeconds = (int)$workBlock->duration_seconds;
             } else {

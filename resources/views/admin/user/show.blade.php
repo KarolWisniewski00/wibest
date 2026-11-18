@@ -618,8 +618,8 @@
                         <!-- Reset hasła -->
                     @endif
 
-                    @if($user->company)
-                        @if($user->role != 'CRM')
+                    @if($user->company || $role === 'właściciel')
+                        @if(!$user->company || $user->role != 'CRM')
                             <!-- EDYTUJ -->
                             <x-button-link-blue href="{{route('setting.user.edit', $user)}}" class="text-lg">
                                 <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj

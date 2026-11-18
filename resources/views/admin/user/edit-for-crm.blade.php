@@ -1,4 +1,5 @@
 <x-app-layout class="flex">
+    @php($withoutCompany = $withoutCompany ?? false)
     @include('admin.elements.alerts')
     @if ($company)
         <!--MAIN-->
@@ -12,43 +13,22 @@
                     <i class="fa-solid fa-chevron-left mr-2"></i>Wróć
                 </x-button-link-back>
                 <!--POWRÓT-->
-                <h2 class="text-xl font-semibold dark:text-white mb-4">🚀 Edytuj Użytkownika dla CRM</h2>
+                <h2 class="text-xl font-semibold dark:text-white mb-4">🚀 {{ $withoutCompany ? 'Edytuj Użytkownika' : 'Edytuj Użytkownika dla CRM' }}</h2>
 
                 <div>
-                    <form method="POST" action="{{route('setting.user.update.for.crm', $user)}}">
+                    <form method="POST" action="{{ route($withoutCompany ? 'setting.user.update' : 'setting.user.update.for.crm', $user) }}">
                         @csrf
                         @method('PUT')
-                        <div class="mt-2">
-                            <label for="name"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                                <span>👤</span> Imię i nazwisko <span class="text-xs text-gray-400">(opcjonalne)</span>
-                            </label>
-                            <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                                class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
-                        </div>
-                        <div class="mt-2">
-                            <label for="email"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                                <span>✉️</span> Email <span class="text-xs text-gray-400">(opcjonalne)</span>
-                            </label>
-                            <input type="text" name="email" value="{{ old('email', $user->email) }}"
-                                class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
-                        </div>
-                        <div class="mt-2">
-                            <label for="phone"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                                <span>📞</span> Telefon <span class="text-xs text-gray-400">(opcjonalne)</span>
-                            </label>
-                            <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
-                                class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
-                        </div>
+                        <x-user-identity-fields :edit-user="$user" :optional-phone="true" />
                         <div class="mt-2">
                             <label for="position"
                                 class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                                 <span>💼</span> Stanowisko <span class="text-xs text-gray-400">(opcjonalne)</span>
                             </label>
-                            <input type="text" name="position" value="{{ old('position', $user->position) }}"
+                            <input id="position" type="text" name="position" value="{{ old('position', $user->position) }}" maxlength="255" aria-describedby="position-help"
                                 class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
+                            <p id="position-help" class="mt-1 text-sm text-gray-500 dark:text-gray-400">Pole opcjonalne, np. Specjalista ds. sprzedaży. Maksymalnie 255 znaków.</p>
+                            @error('position') <p role="alert" class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                         </div>
                         <!--ZAPISZ-->
                         <div class="flex justify-end mt-4">

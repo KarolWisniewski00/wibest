@@ -7,9 +7,13 @@ use App\Models\Company;
 use App\Models\Crm;
 use App\Services\CrmAnalysisService;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
+use OpenAI\Exceptions\ErrorException;
+use OpenAI\Exceptions\RateLimitException;
 
 class CrmController extends Controller
 {
@@ -23,7 +27,7 @@ class CrmController extends Controller
                 $q->withoutGlobalScope('no_crm');
             }
         ])
-            ->orderBy('created_at', 'desc')
+            ->activityOrder()
             ->paginate(3);
 
         return view('admin.crm.index', [
@@ -81,19 +85,23 @@ class CrmController extends Controller
         $end = Carbon::createFromFormat('d.m.Y H:i', $validated['datetime_end']);
 
         // Jeżeli aktywność została od razu zrealizowana → analiza AI
-        if ($request->has('already_realized')) {
+        if ($request->boolean('already_realized')) {
             $crm = Crm::create([
                 'company_id' => $validated['company'],
                 'user_id' => $validated['user'],
                 'type' => $validated['type'],
-                'result' => $validated['content'],
+                'result' => $validated['content'] ?? null,
                 'datetime_start' => $start,
                 'datetime_end' => $end,
-                'datetime_complete' => $request->has('already_realized') ? now() : null, // aktualna data jeśli zaznaczone
+                'datetime_complete' => now(),
                 'important' => $request->has('important'), // checkbox
                 'created_user_id' => Auth::id() // zapis twórcy
             ]);
-            $analysis = app(CrmAnalysisService::class)->analyzeActivity($crm);
+            $analysis = $this->analyzeActivity($crm);
+
+            if ($analysis === null) {
+                return $this->analysisRateLimitedResponse();
+            }
 
             $crm->update([
                 'ai_analysis' => $analysis['summary'] ?? null,
@@ -124,10 +132,10 @@ class CrmController extends Controller
             'company_id' => $validated['company'],
             'user_id' => $validated['user'],
             'type' => $validated['type'],
-            'plan' => $validated['content'],
+            'plan' => $validated['content'] ?? null,
             'datetime_start' => $start,
             'datetime_end' => $end,
-            'datetime_complete' => $request->has('already_realized') ? now() : null, // aktualna data jeśli zaznaczone
+            'datetime_complete' => null,
             'important' => $request->has('important'), // checkbox
             'created_user_id' => Auth::id() // zapis twórcy
         ]);
@@ -142,6 +150,8 @@ class CrmController extends Controller
             'user' => 'required|exists:users,id',
             'type' => 'required|string',
             'content' => 'nullable|string',
+            'plan' => 'nullable|string',
+            'result' => 'nullable|string',
             'datetime_start' => 'required|string',
             'datetime_end' => 'required|string',
             'already_realized' => 'nullable',
@@ -152,17 +162,38 @@ class CrmController extends Controller
         $start = Carbon::createFromFormat('d.m.Y H:i', $validated['datetime_start']);
         $end = Carbon::createFromFormat('d.m.Y H:i', $validated['datetime_end']);
 
+        $wasCompleted = $crm->datetime_complete !== null;
+        $isCompleted = $wasCompleted || $request->boolean('already_realized');
+        $content = [($isCompleted ? 'result' : 'plan') => $validated['content'] ?? null];
+
+        if ($wasCompleted) {
+            $content = [
+                'plan' => array_key_exists('plan', $validated) ? $validated['plan'] : $crm->plan,
+                'result' => array_key_exists('result', $validated)
+                    ? $validated['result']
+                    : ($validated['content'] ?? $crm->result),
+            ];
+        }
+
         $crm->update([
             'company_id' => $validated['company'],
             'user_id' => $validated['user'],
             'type' => $validated['type'],
-            'result' => $validated['content'],
             'datetime_start' => $start,
             'datetime_end' => $end,
-            'datetime_complete' => now(), // aktualna data jeśli zaznaczone
-            'important' => null, // checkbox
-        ]);
-            $analysis = app(CrmAnalysisService::class)->analyzeActivity($crm);
+            'datetime_complete' => $isCompleted ? ($crm->datetime_complete ?? now()) : null,
+            'important' => $isCompleted ? null : $crm->important,
+        ] + $content);
+
+        if (!$isCompleted) {
+            return redirect()->route('setting.crm')->with('success', 'Zaktualizowano aktywność.');
+        }
+
+            $analysis = $this->analyzeActivity($crm);
+
+            if ($analysis === null) {
+                return $this->analysisRateLimitedResponse();
+            }
 
             $crm->update([
                 'ai_analysis' => $analysis['summary'] ?? null,
@@ -206,7 +237,7 @@ class CrmController extends Controller
     }
     public function get(Request $request)
     {
-        $crms = Crm::orderBy('created_at', 'desc')->with([
+        $crms = Crm::activityOrder()->with('company')->with([
             'user' => function ($q) {
                 $q->withoutGlobalScope('no_crm');
             }
@@ -234,5 +265,40 @@ class CrmController extends Controller
         return redirect()
             ->route('setting.crm')
             ->with('success', 'Aktywność usunięta!');
+    }
+
+    private function analyzeActivity(Crm $crm): ?array
+    {
+        // Podstawowy zapis jest już wykonany. Przechwytujemy wyłącznie limit usługi AI.
+        try {
+            return app(CrmAnalysisService::class)->analyzeActivity($crm);
+        } catch (\Exception $exception) {
+            for ($error = $exception; $error !== null; $error = $error->getPrevious()) {
+                if ($error instanceof RateLimitException
+                    || ($error instanceof ErrorException && (
+                        $error->getStatusCode() === 429
+                        || $error->getErrorType() === 'rate_limit_exceeded'
+                        || $error->getErrorCode() === 'rate_limit_exceeded'
+                    ))
+                    || ($error instanceof RequestException && $error->getResponse()?->getStatusCode() === 429)
+                    || trim($error->getMessage()) === 'Request rate limit has been exceeded.') {
+                    Log::warning('CRM AI analysis rate limit exceeded.', [
+                        'crm_id' => $crm->id,
+                        'company_id' => $crm->company_id,
+                        'exception' => $exception,
+                    ]);
+
+                    return null;
+                }
+            }
+
+            throw $exception;
+        }
+    }
+
+    private function analysisRateLimitedResponse()
+    {
+        return redirect()->route('setting.crm')->with('warning',
+            'Aktywność została zapisana, ale analiza AI chwilowo nie mogła zostać wykonana z powodu limitu usługi.');
     }
 }

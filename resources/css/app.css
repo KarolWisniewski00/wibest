@@ -2,6 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
+.wibest-object-marker {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    border-radius: 50%;
+}
+.wibest-object-marker::after, .wibest-object-marker-active::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: var(--object-marker-color);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 5px #0006;
+}
+.wibest-object-marker-active::before {
+    animation: wibest-object-marker-pulse 2.4s ease-out infinite;
+    border: 0;
+    box-shadow: none;
+}
+.wibest-object-marker:focus-visible { outline: 3px solid #166534; outline-offset: 3px; }
+@keyframes wibest-object-marker-pulse {
+    0% { transform: scale(1); opacity: .5; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .wibest-object-marker-active::before { animation: none; opacity: .25; transform: scale(1.5); }
+}
+.wibest-object-popup { max-width: 260px; color: #111827; text-align: left; padding: 4px; }
+.wibest-object-popup strong { font-size: 14px; }
+.wibest-object-popup p { margin: 8px 0 12px; color: #4b5563; }
+.wibest-object-popup a { display: inline-block; padding: 9px 12px; border-radius: 8px; background: #166534; color: #fff; font-weight: 600; }
+.wibest-object-popup a:hover { background: #14532d; }
+.wibest-object-popup a:focus-visible { outline: 3px solid #166534; outline-offset: 3px; }
+
 [x-cloak] {
     display: none;
+}
+
+/* Keep the measured result layout and table headings while awaiting Object data. */
+.object-results-pending > .divide-y,
+.object-results-pending [data-object-list-content],
+.object-results-pending [data-object-mobile-work],
+.object-results-pending [data-object-mobile-list],
+.object-results-pending > .border-t,
+.object-results-pending tbody,
+.object-results-pending [data-work-pagination] {
+    visibility: hidden;
 }

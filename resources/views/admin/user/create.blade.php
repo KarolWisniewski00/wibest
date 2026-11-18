@@ -14,7 +14,7 @@
             <!--POWRÓT-->
             <h2 class="text-xl font-semibold dark:text-white mb-4 text-center">Dodaj Użytkownika</h2>
             
-            <livewire:user-wizard company_id="{{$client->id}}" routeBack="setting.user.show" />
+            <livewire:user-wizard :company_id="$client->id" :clients="true" />
         </x-container-content-form>
         <!--CONTENT-->
     </x-main-no-filter>

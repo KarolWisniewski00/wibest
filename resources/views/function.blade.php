@@ -197,7 +197,7 @@
         <div class="max-w-[85rem] mx-auto relative flex flex-col gap-2 px-12 py-4 my-6">
 
             <!-- Górna nawigacja -->
-            <div class="grid grid-cols-4 gap-4">
+            <div class="grid grid-cols-5 gap-4">
                 <!-- Krok 1 -->
                 <a href="#rcp" class="nav-link-2 flex flex-col items-center justify-center">
                     <span class="text-lg md:text-xl">
@@ -241,6 +241,7 @@
                         RAPORTY
                     </span>
                 </a>
+                <a href="#obiekty" class="nav-link-2 flex flex-col items-center justify-center"><span class="text-lg md:text-xl">🏗️</span><span class="system-font px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-green-300 dark:bg-green-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest mt-1">Obiekty</span></a>
             </div>
 
             <!-- Pasek postępu -->
@@ -248,16 +249,16 @@
 
                 <!-- Tło -->
                 <div
-                    class="absolute top-1/2 left-[12.5%] right-[12.5%] h-2 -translate-y-1/2 rounded-full bg-gray-300 dark:bg-gray-700">
+                    class="absolute top-1/2 left-[10%] right-[10%] h-2 -translate-y-1/2 rounded-full bg-gray-300 dark:bg-gray-700">
                 </div>
 
                 <!-- Progress -->
                 <div id="progress-bar"
-                    class="absolute top-1/2 left-[12.5%] h-2 w-[0%] -translate-y-1/2 rounded-full bg-green-300">
+                    class="absolute top-1/2 left-[10%] h-2 w-[0%] -translate-y-1/2 rounded-full bg-green-300">
                 </div>
 
                 <!-- Punkty -->
-                <div class="relative grid grid-cols-4 gap-4">
+                <div class="relative grid grid-cols-5 gap-4">
                     <!-- Krok 1 -->
                     <div class="flex flex-col items-center justify-center">
                         <div id="step-1"
@@ -284,6 +285,10 @@
                         <div id="step-4"
                             class="w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-700 border-4 border-white dark:border-gray-900">
                         </div>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center">
+                        <div id="step-5" class="w-5 h-5 rounded-full bg-gray-300 dark:bg-gray-700 border-4 border-white dark:border-gray-900"></div>
                     </div>
 
                 </div>
@@ -328,6 +333,7 @@
                                 class="nav-link px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
                                 <i class="fa-solid fa-chart-line mr-2"></i>Raporty
                             </a>
+                            <a href="#obiekty" class="nav-link px-4 py-3 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"><i class="fa-solid fa-cube mr-2"></i>Obiekty</a>
                         </nav>
 
                     </div>
@@ -3540,6 +3546,807 @@
 
                     </section>
 
+<style>#obiekty .wibest-object-marker {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    border-radius: 50%;
+}
+#obiekty .wibest-object-marker::after, #obiekty .wibest-object-marker-active::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border-radius: 50%;
+    background: var(--object-marker-color);
+    border: 2px solid #fff;
+    box-shadow: 0 1px 5px #0006;
+}
+#obiekty .wibest-object-marker-active::before {
+    animation: wibest-object-marker-pulse 2.4s ease-out infinite;
+    border: 0;
+    box-shadow: none;
+}
+#obiekty .wibest-object-marker:focus-visible { outline: 3px solid #166534; outline-offset: 3px; }
+@keyframes wibest-object-marker-pulse {
+    0% { transform: scale(1); opacity: .5; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    #obiekty .wibest-object-marker-active::before { animation: none; opacity: .25; transform: scale(1.5); }
+}
+#obiekty .wibest-object-popup { max-width: 260px; color: #111827; text-align: left; padding: 4px; }
+#obiekty .wibest-object-popup strong { font-size: 14px; }
+#obiekty .wibest-object-popup p { margin: 8px 0 12px; color: #4b5563; }
+#obiekty .wibest-object-popup a { display: inline-block; padding: 9px 12px; border-radius: 8px; background: #166534; color: #fff; font-weight: 600; }
+</style><script>
+(() => {
+const statusColors = {
+    active: '#86efac', paused: '#facc15', completed: '#6b7280',
+    planned: '#93c5fd', cancelled: '#fca5a5',
+};
+
+function validPosition(object) {
+    const numeric = value => value !== null && value !== undefined && String(value).trim() !== '' && Number.isFinite(Number(value));
+    return numeric(object.lat) && numeric(object.lng)
+        && Math.abs(Number(object.lat)) <= 90 && Math.abs(Number(object.lng)) <= 180;
+}
+
+function loadObjectGoogleMaps(apiKey) {
+    if (window.__wibestMapsAuthFailed) return Promise.reject(new Error('auth'));
+    if (window.google?.maps?.Map) return Promise.resolve(window.google.maps);
+    if (window.__wibestObjectMapsLoading) return window.__wibestObjectMapsLoading;
+
+    window.__wibestObjectMapsLoading = new Promise((resolve, reject) => {
+        let script = document.querySelector('script[data-wibest-google-maps], script[src*="maps.googleapis.com/maps/api/js"]');
+        if (!script && !apiKey) { reject(new Error('missing-key')); return; }
+        const existing = Boolean(script);
+        script ??= document.createElement('script');
+        const cleanup = () => {
+            clearTimeout(timeout);
+            clearInterval(poll);
+            script.removeEventListener('load', ready);
+            script.removeEventListener('error', failed);
+            window.removeEventListener('wibest:maps-auth-error', failed);
+        };
+        const ready = () => {
+            if (!window.google?.maps?.Map) return;
+            cleanup();
+            resolve(window.google.maps);
+        };
+        const failed = () => { cleanup(); reject(new Error('load')); };
+        const timeout = setTimeout(failed, 20000);
+        // Also handle a script that was loaded by the existing create form or another view.
+        const poll = setInterval(ready, 100);
+        script.addEventListener('load', ready);
+        script.addEventListener('error', failed);
+        window.addEventListener('wibest:maps-auth-error', failed);
+        if (!existing) {
+            const url = new URL('https://maps.googleapis.com/maps/api/js');
+            url.search = new URLSearchParams({ key: apiKey, libraries: 'places,marker', language: 'pl' }).toString();
+            script.src = url.toString();
+            script.async = true;
+            script.defer = true;
+            script.dataset.wibestGoogleMaps = 'true';
+            const nonce = document.querySelector('script[nonce]')?.nonce;
+            if (nonce) script.nonce = nonce;
+            document.head.appendChild(script);
+        }
+        ready();
+    });
+    return window.__wibestObjectMapsLoading;
+}
+
+function installAuthHandler() {
+    if (window.__wibestMapsAuthHandler) return;
+    window.__wibestMapsAuthHandler = true;
+    const previous = window.gm_authFailure;
+    window.gm_authFailure = () => {
+        window.__wibestMapsAuthFailed = true;
+        window.dispatchEvent(new Event('wibest:maps-auth-error'));
+        if (typeof previous === 'function') previous();
+    };
+}
+
+function popupContent(object) {
+    const popup = document.createElement('div');
+    popup.className = 'wibest-object-popup';
+    const name = document.createElement('strong');
+    name.textContent = object.name;
+    const address = document.createElement('p');
+    address.textContent = object.address || 'Brak adresu';
+    const link = document.createElement('a');
+    // Only accept the same-origin route supplied by the company-scoped controller.
+    const url = new URL(object.url, window.location.href);
+    if (url.origin === window.location.origin && ['http:', 'https:'].includes(url.protocol)) link.href = url.href;
+    link.textContent = 'Zobacz obiekt';
+    popup.append(name, address, link);
+    return popup;
+}
+
+function groupReadings(readings) {
+    const groups = new Map();
+    for (const reading of readings) {
+        if (!validPosition(reading) || !['START', 'STOP'].includes(reading.type)) continue;
+        const key = `${Number(reading.lat)}|${Number(reading.lng)}|${reading.type}`;
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(reading);
+    }
+    return [...groups.values()];
+}
+
+function readingPopup(readings) {
+    const container = document.createElement('div');
+    container.className = 'wibest-object-popup';
+    container.style.maxHeight = '240px';
+    container.style.overflowY = 'auto';
+    for (const reading of readings) {
+        const employee = document.createElement('strong');
+        employee.textContent = reading.employee;
+        const details = document.createElement('p');
+        details.textContent = `${reading.type} · ${reading.time} · ${reading.object}`;
+        container.append(employee, details);
+    }
+    return container;
+}
+
+function createMap(element, objects) {
+    const maps = window.google.maps;
+    const map = new maps.Map(element, {
+        center: { lat: 52.0693, lng: 19.4803 }, zoom: 6,
+        mapTypeControl: false, streetViewControl: false, fullscreenControl: false,
+        gestureHandling: 'cooperative',
+    });
+    const info = new maps.InfoWindow();
+
+    // OverlayView provides custom, keyboard-accessible markers without requiring a new map ID.
+    class ObjectMarker extends maps.OverlayView {
+        constructor(object) {
+            super();
+            this.object = object;
+            this.position = new maps.LatLng(Number(object.lat), Number(object.lng));
+            this.setMap(map);
+        }
+        onAdd() {
+            this.button = document.createElement('button');
+            this.button.type = 'button';
+            this.button.className = 'wibest-object-marker';
+            this.button.setAttribute('aria-label', this.object.name);
+            this.button.style.setProperty('--object-marker-color', statusColors[this.object.status] || '#6b7280');
+            if (this.object.radius) this.button.style.zIndex = '2';
+            if (this.object.status === 'active') this.button.classList.add('wibest-object-marker-active');
+            this.click = () => {
+                info.setContent(popupContent(this.object));
+                info.setPosition(this.position);
+                info.setOptions({ pixelOffset: new maps.Size(0, -18) });
+                info.open({ map, shouldFocus: true });
+            };
+            this.button.addEventListener('click', this.click);
+            maps.OverlayView.preventMapHitsAndGesturesFrom(this.button);
+            this.getPanes().overlayMouseTarget.appendChild(this.button);
+        }
+        draw() {
+            const point = this.getProjection()?.fromLatLngToDivPixel(this.position);
+            if (!point || !this.button) return;
+            this.button.style.left = `${point.x}px`;
+            this.button.style.top = `${point.y}px`;
+        }
+        onRemove() {
+            this.button?.removeEventListener('click', this.click);
+            this.button?.remove();
+            this.button = null;
+        }
+    }
+
+    const markers = objects.map(object => new ObjectMarker(object));
+    let readingMarkers = [];
+    class ReadingMarker extends maps.OverlayView {
+        constructor(readings) {
+            super();
+            this.readings = readings;
+            this.position = new maps.LatLng(Number(readings[0].lat), Number(readings[0].lng));
+            this.setMap(map);
+        }
+        onAdd() {
+            const start = this.readings[0].type === 'START';
+            this.button = document.createElement('button');
+            this.button.type = 'button';
+            this.button.setAttribute('aria-label', `${this.readings[0].type}: ${this.readings.length} odczytów`);
+            Object.assign(this.button.style, {
+                position: 'absolute', width: '18px', height: '18px', borderRadius: '50%',
+                border: '2px solid white', background: start ? '#16a34a' : '#dc2626',
+                transform: start ? 'translate(-150%, -50%)' : 'translate(50%, -50%)',
+                cursor: 'pointer', boxShadow: '0 1px 4px #0006', zIndex: '1',
+            });
+            this.click = () => {
+                info.setContent(readingPopup(this.readings));
+                info.setPosition(this.position);
+                info.setOptions({ pixelOffset: new maps.Size(0, -10) });
+                info.open({ map, shouldFocus: true });
+            };
+            this.button.addEventListener('click', this.click);
+            maps.OverlayView.preventMapHitsAndGesturesFrom(this.button);
+            this.getPanes().overlayMouseTarget.appendChild(this.button);
+        }
+        draw() {
+            const point = this.getProjection()?.fromLatLngToDivPixel(this.position);
+            if (point && this.button) Object.assign(this.button.style, { left: `${point.x}px`, top: `${point.y}px` });
+        }
+        onRemove() {
+            this.button?.removeEventListener('click', this.click);
+            this.button?.remove();
+            this.button = null;
+        }
+    }
+    // Only the object preview supplies a radius. Stored allowed_distance values are already in metres.
+    const circles = objects.filter(object => Number.isFinite(Number(object.radius)) && Number(object.radius) > 0)
+        .map(object => new maps.Circle({
+            map,
+            center: { lat: Number(object.lat), lng: Number(object.lng) },
+            radius: Number(object.radius),
+            fillColor: '#86efac', fillOpacity: 0.15,
+            strokeColor: '#16a34a', strokeOpacity: 0.85, strokeWeight: 2,
+            clickable: false,
+        }));
+    const fit = () => {
+        maps.event.trigger(map, 'resize');
+        if (!objects.length) return;
+        if (circles.length) {
+            const bounds = new maps.LatLngBounds();
+            objects.forEach(object => bounds.extend({ lat: Number(object.lat), lng: Number(object.lng) }));
+            circles.forEach(circle => { if (circle.getBounds()) bounds.union(circle.getBounds()); });
+            map.fitBounds(bounds, 40);
+        } else if (objects.length === 1) {
+            map.setCenter({ lat: Number(objects[0].lat), lng: Number(objects[0].lng) });
+            map.setZoom(15);
+        } else {
+            const bounds = new maps.LatLngBounds();
+            objects.forEach(object => bounds.extend({ lat: Number(object.lat), lng: Number(object.lng) }));
+            map.fitBounds(bounds, { top: 45, left: 45, right: 45, bottom: 120 });
+        }
+    };
+    // Clamp fitBounds even when several objects share exactly the same coordinates.
+    const zoomListener = map.addListener('zoom_changed', () => {
+        if (map.getZoom() > 18) map.setZoom(18);
+    });
+    const resizeObserver = new ResizeObserver(() => {
+        if (element.clientWidth && element.clientHeight) fit();
+    });
+    resizeObserver.observe(element);
+    fit();
+    return {
+        fit,
+        setReadings(readings) {
+            info.close();
+            readingMarkers.forEach(marker => marker.setMap(null));
+            readingMarkers = groupReadings(readings).map(group => new ReadingMarker(group));
+        },
+        close: () => info.close(),
+        destroy() {
+            info.close();
+            markers.forEach(marker => marker.setMap(null));
+            readingMarkers.forEach(marker => marker.setMap(null));
+            circles.forEach(circle => circle.setMap(null));
+            resizeObserver.disconnect();
+            zoomListener.remove();
+            maps.event.clearInstanceListeners(map);
+            maps.event.clearInstanceListeners(info);
+            element.replaceChildren();
+        },
+    };
+}
+
+function objectMaps({ objects, apiKey, readings = [] }) {
+    // Keep Google Maps instances outside Alpine's reactive proxies.
+    const instances = new Map();
+    let disposed = false;
+    let ready;
+    let currentReadings = readings;
+    const validObjects = objects.filter(validPosition);
+    const emptyMessage = objects.length
+        ? 'Brak obiektów z prawidłowymi współrzędnymi.'
+        : 'Brak obiektów z lokalizacją dla wybranych filtrów.';
+    return {
+        fullMapOpen: false,
+        message: 'Ładowanie mapy…',
+        readingsMessage: objects.some(object => object.radius) && !readings.length ? 'Brak odczytów START/STOP z lokalizacją dla aktywnych filtrów.' : '',
+        init() {
+            installAuthHandler();
+            this.authFailed = () => {
+                this.message = 'Nie udało się autoryzować Google Maps. Sprawdź konfigurację usługi.';
+            };
+            window.addEventListener('wibest:maps-auth-error', this.authFailed);
+            this.$watch('fullMapOpen', open => {
+                if (open) this.$nextTick(() => {
+                    document.getElementById('objects-full-map-dialog')?.focus();
+                    this.showFullMap();
+                });
+                else {
+                    instances.get('full')?.close();
+                    this.$nextTick(() => this.$refs.openButton?.focus());
+                }
+            });
+            if (!validObjects.length) {
+                this.message = emptyMessage;
+                return;
+            }
+            ready = loadObjectGoogleMaps(apiKey).then(() => {
+                if (disposed || window.__wibestMapsAuthFailed) return;
+                instances.set('card', createMap(this.$refs.cardMap, validObjects));
+                instances.get('card').setReadings(currentReadings);
+                this.message = '';
+            }).catch(error => {
+                if (disposed) return;
+                this.message = error.message === 'missing-key'
+                    ? 'Mapa jest niedostępna. Nie skonfigurowano Google Maps.'
+                    : 'Nie udało się załadować mapy. Sprawdź połączenie lub konfigurację Google Maps.';
+            });
+        },
+        updateReadings(readings) {
+            currentReadings = readings;
+            this.readingsMessage = readings.length ? '' : 'Brak odczytów START/STOP z lokalizacją dla aktywnych filtrów.';
+            instances.forEach(instance => instance.setReadings(currentReadings));
+        },
+        async showFullMap() {
+            await ready;
+            if (disposed || !this.fullMapOpen || this.message) return;
+            requestAnimationFrame(() => {
+                if (disposed || !this.fullMapOpen) return;
+                try {
+                    if (!instances.has('full')) instances.set('full', createMap(document.getElementById('objects-full-map'), validObjects));
+                    instances.get('full').setReadings(currentReadings);
+                    instances.get('full').fit();
+                } catch {
+                    this.message = 'Nie udało się wyświetlić mapy. Odśwież stronę i spróbuj ponownie.';
+                }
+            });
+        },
+        destroy() {
+            disposed = true;
+            window.removeEventListener('wibest:maps-auth-error', this.authFailed);
+            instances.forEach(instance => instance.destroy());
+            instances.clear();
+        },
+    };
+}
+
+window.functionObjectMap = options => {
+ const allReadings = options.readings;
+ const component = objectMaps(options);
+ const init = component.init;
+ component.init = function () {
+   init.call(this);
+   this.employeeListener = event => this.updateReadings(event.detail ? allReadings.filter(reading => reading.employee === event.detail) : allReadings);
+   window.addEventListener('function-demo-employee', this.employeeListener);
+ };
+ const destroy = component.destroy;
+ component.destroy = function () { window.removeEventListener('function-demo-employee', this.employeeListener); destroy.call(this); };
+ return component;
+};
+})();
+</script>
+                    <!-- 5 OBIEKTY -->
+                    <section id="obiekty" aria-labelledby="obiekty-title"
+                        class="doc-section min-w-0 appearance-none rounded-lg shadow border border-gray-100 dark:border-gray-700 bg-gray-100 p-4 lg:p-8 outline-none dark:bg-gray-800 dark:text-gray-50">
+                        <div class="flex items-start justify-between gap-4 mb-8">
+                            <div>
+                                <p class="text-xs uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 mb-4">Moduł</p>
+                                <h3 id="obiekty-title" class="text-3xl font-black text-gray-900 dark:text-white leading-tight">Obiekty</h3>
+                            </div>
+                            <div class="shrink-0 hidden sm:flex w-14 h-14 rounded-2xl items-center justify-center bg-gradient-to-br from-green-200 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/10 text-green-700 dark:text-green-300">
+                                <i class="fa-solid fa-cube text-2xl" aria-hidden="true"></i>
+                            </div>
+                        </div>
+
+                        <h4 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Wiesz, kto, gdzie i jak długo pracował.</h4>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4 leading-7">
+                            Sprawdź czas pracy w kontekście konkretnej budowy, placówki lub realizacji.
+                            Wybierz miesiąc, zobacz przypisanych pracowników i czas zakwalifikowany do obiektu.
+                            Właściciel zyskuje obraz zaangażowania zespołu, kierownik może sprawdzić rejestracje,
+                            a kadry łatwiej odnajdą dane wymagające wyjaśnienia przed rozliczeniem.
+                        </p>
+
+                        <figure class="min-w-0 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm overflow-hidden">
+                            <figcaption class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 lg:p-6 border-b border-gray-200 dark:border-gray-700">
+                                <span class="system-font text-sm font-semibold text-gray-900 dark:text-gray-50">Podgląd obiektu</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Przykładowe dane · uproszczony widok modułu</span>
+                            </figcaption>
+                            <div class="min-w-0 p-4 lg:p-6 space-y-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                    <div class="flex min-w-0 items-center gap-3">
+                                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-green-200 to-emerald-100 text-green-700 dark:from-green-500/20 dark:to-emerald-500/10 dark:text-green-300">
+                                            <i class="fa-solid fa-cube text-lg" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="min-w-0">
+                                            <p class="system-font text-lg font-semibold text-gray-900 dark:text-white break-words">Budowa</p>
+                                            <span class="inline-flex rounded-lg bg-green-100 px-2 py-1 text-xs font-semibold text-green-800 dark:bg-green-300/10 dark:text-green-300">Aktywny</span>
+                                        </div>
+                                    </div>
+                                    <div class="self-start rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
+                                        <i class="fa-regular fa-calendar mr-2 text-gray-500 dark:text-gray-400" aria-hidden="true"></i>Listopad 2026
+                                    </div>
+                                </div>
+
+<div class="my-4 grid grid-cols-1 gap-4 sm:grid-cols-2">        <div class="group h-full rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300 [@media(prefers-color-scheme:light)]:text-gray-900">
+            <div class="flex items-start gap-4">
+                <div class="h-11 sm:h-14 w-11 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-green-200 to-emerald-100 text-green-700 dark:from-green-500/20 dark:to-emerald-500/10 dark:text-green-300 flex">
+                    <i class="fa-solid fa-clock text-lg sm:text-2xl" aria-hidden="true"></i>
+                </div>
+                <div class="min-w-0 break-words text-start [overflow-wrap:anywhere]">
+                    <p class="text-sm text-gray-600 dark:text-gray-300 [@media(prefers-color-scheme:light)]:font-semibold [@media(prefers-color-scheme:light)]:text-gray-700">Czas na obiekcie</p>
+                    <p class="relative mt-2 text-3xl font-bold text-gray-900 dark:text-white">152:00:00</p>
+                    <p class="relative mt-4 text-xs text-gray-600 dark:text-gray-300">19 sesji</p>
+                </div>
+            </div>
+        </div>
+        <div class="group h-full rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300 [@media(prefers-color-scheme:light)]:text-gray-900">
+            <div class="flex items-start gap-4">
+                <div class="h-11 sm:h-14 w-11 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-yellow-200 to-amber-100 text-yellow-800 dark:from-yellow-500/20 dark:to-amber-500/10 dark:text-yellow-300 flex">
+                    <i class="fa-solid fa-triangle-exclamation text-lg sm:text-2xl" aria-hidden="true"></i>
+                </div>
+                <div class="min-w-0 break-words text-start [overflow-wrap:anywhere]">
+                    <p class="text-sm text-gray-600 dark:text-gray-300 [@media(prefers-color-scheme:light)]:font-semibold [@media(prefers-color-scheme:light)]:text-gray-700">Wymaga uwagi</p>
+                    <p class="relative mt-2 text-3xl font-bold text-gray-900 dark:text-white">1</p>
+                    <p class="relative mt-4 text-xs text-gray-600 dark:text-gray-300">Sesje bez jednoznacznego przypisania ? 11.2026</p>
+                </div>
+            </div>
+        </div>
+</div>
+<div class="my-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="group h-full rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300 [@media(prefers-color-scheme:light)]:text-gray-900">
+            <div class="flex items-start gap-4">
+                <div class="h-11 sm:h-14 w-11 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-green-100/50 to-emerald-100/30 text-green-700 dark:from-green-500/10 dark:to-emerald-500/5 dark:text-green-300 flex">
+                    <i class="fa-solid fa-clock text-lg sm:text-2xl" aria-hidden="true"></i>
+                </div>
+                <div class="min-w-0 break-words text-start [overflow-wrap:anywhere]">
+                    <p class="text-sm text-gray-600 dark:text-gray-300 [@media(prefers-color-scheme:light)]:font-semibold [@media(prefers-color-scheme:light)]:text-gray-700">Brak normy</p>
+                    <p class="relative mt-2 text-3xl font-bold text-gray-900 dark:text-white">06:00:00</p>
+                    <p class="relative mt-4 text-xs text-gray-600 dark:text-gray-300">1 sesja</p>
+                </div>
+            </div>
+        </div>
+        <div class="group h-full rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300 [@media(prefers-color-scheme:light)]:text-gray-900">
+            <div class="flex items-start gap-4">
+                <div class="h-11 sm:h-14 w-11 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-green-200 to-emerald-100 text-green-700 dark:from-green-500/20 dark:to-emerald-500/10 dark:text-green-300 flex">
+                    <i class="fa-solid fa-clock text-lg sm:text-2xl" aria-hidden="true"></i>
+                </div>
+                <div class="min-w-0 break-words text-start [overflow-wrap:anywhere]">
+                    <p class="text-sm text-gray-600 dark:text-gray-300 [@media(prefers-color-scheme:light)]:font-semibold [@media(prefers-color-scheme:light)]:text-gray-700">Norma</p>
+                    <p class="relative mt-2 text-3xl font-bold text-gray-900 dark:text-white">128:00:00</p>
+                    <p class="relative mt-4 text-xs text-gray-600 dark:text-gray-300">16 sesji</p>
+                </div>
+            </div>
+        </div>
+        <div class="group h-full rounded-2xl bg-white p-5 shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300 [@media(prefers-color-scheme:light)]:text-gray-900">
+            <div class="flex items-start gap-4">
+                <div class="h-11 sm:h-14 w-11 sm:w-14 shrink-0 items-center justify-center rounded-xl sm:rounded-2xl bg-gradient-to-br from-indigo-200 to-indigo-100 text-indigo-700 dark:from-indigo-500/20 dark:to-indigo-500/10 dark:text-indigo-300 flex">
+                    <i class="fa-solid fa-clock text-lg sm:text-2xl" aria-hidden="true"></i>
+                </div>
+                <div class="min-w-0 break-words text-start [overflow-wrap:anywhere]">
+                    <p class="text-sm text-gray-600 dark:text-gray-300 [@media(prefers-color-scheme:light)]:font-semibold [@media(prefers-color-scheme:light)]:text-gray-700">Nadgodziny</p>
+                    <p class="relative mt-2 text-3xl font-bold text-gray-900 dark:text-white">18:00:00</p>
+                    <p class="relative mt-4 text-xs text-gray-600 dark:text-gray-300">2 sesje</p>
+                </div>
+            </div>
+        </div>
+</div>
+                                <p class="text-xs leading-5 text-gray-500 dark:text-gray-400">
+                                    Kafelki pokazują czas sesji według klasyfikacji całego dnia pracownika.
+                                    „Nadgodziny” to czas sesji z dni z nadgodzinami, a nie sama liczba godzin ponad normę.
+                                </p>
+
+<div class="grid min-w-0 grid-cols-1 items-stretch gap-4 lg:grid-cols-2">                <section data-object-location class="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300">
+                    <div class="flex items-center justify-between border-b border-gray-600 px-5 py-4 [@media(prefers-color-scheme:light)]:border-gray-300">
+
+                        <div class="flex items-center gap-3">
+
+                            <div class="shrink-0 flex w-11 sm:w-14 h-11 sm:h-14 rounded-xl sm:rounded-2xl items-center justify-center bg-gradient-to-br from-green-200 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/10 text-green-700 dark:text-green-300">
+                                <i class="fa-solid fa-location-dot text-lg sm:text-2xl" aria-hidden="true"></i>
+                            </div>
+
+                            <div>
+                                <h2 class="text-start text-gray-900 dark:text-white text-sm font-semibold">
+                                    Lokalizacja obiektu
+                                </h2>
+
+                                <p class="text-start text-xs text-gray-400 [@media(prefers-color-scheme:light)]:text-gray-600">
+                                    Adres i położenie obiektu
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+<div x-data="functionObjectMap({ objects: [{name: 'Budowa', address: 'Lokalizacja demonstracyjna', lat: 52.2297, lng: 21.0122, radius: 100, status: 'active', url: '#obiekty'}], apiKey: {{ Illuminate\Support\Js::from(config('services.google.maps_key')) }}, readings: [
+{lat:52.2296,lng:21.0120,type:'START',employee:'Piotr Zieliński',object:'Budowa',time:'03.11.2026 07:00'},
+{lat:52.2297,lng:21.0121,type:'STOP',employee:'Piotr Zieliński',object:'Budowa',time:'03.11.2026 15:00'},
+{lat:52.2299,lng:21.0124,type:'START',employee:'Jan Kowalski',object:'Budowa',time:'03.11.2026 07:00'},
+{lat:52.2298,lng:21.0125,type:'STOP',employee:'Jan Kowalski',object:'Budowa',time:'03.11.2026 15:00'},
+{lat:52.2294,lng:21.0118,type:'START',employee:'Anna Nowak',object:'Budowa',time:'03.11.2026 07:00'},
+{lat:52.2295,lng:21.0119,type:'STOP',employee:'Anna Nowak',object:'Budowa',time:'03.11.2026 15:00'},
+{lat:52.2308,lng:21.0128,type:'START',employee:'Jan Kowalski',object:'Budowa',time:'04.11.2026 07:00'},
+{lat:52.2286,lng:21.0116,type:'STOP',employee:'Anna Nowak',object:'Budowa',time:'04.11.2026 15:00'}] })">                            <div class="relative h-[360px] bg-gray-100 dark:bg-gray-700" >
+
+                                <div x-ref="cardMap" class="h-full w-full" wire:ignore aria-label="Lokalizacja obiektu na mapie Google"></div>
+                                <div x-show="message" role="status" aria-live="polite" class="absolute inset-0 flex items-center justify-center bg-white/95 p-5 text-center text-sm text-gray-700 dark:bg-gray-700 dark:text-gray-200"><p x-text="message">Ładowanie mapy…</p></div>
+                            </div>
+
+                        </div>
+
+                    <div class="flex flex-wrap gap-4 px-5 pt-3 text-xs text-gray-600 dark:text-gray-300"><span>🟢 START</span><span>🔴 STOP</span><span>Przykładowe odczyty START i STOP. Punkty poza zielonym obszarem wymagają weryfikacji.</span></div>
+                    <div class="p-5 text-start">
+                        <div class="rounded-xl bg-gray-50 text-sm text-gray-500 dark:bg-gray-700 dark:text-gray-400 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:text-gray-600">
+                            <div class="break-words font-medium [overflow-wrap:anywhere]">Budowa · lokalizacja demonstracyjna · promień 100 m</div>
+                        </div>
+                    </div>
+                </section>
+
+<section class="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300" x-data="{ employeeSearch: '', reportLoading: false, selectedEmployeeId: null, selectEmployee(name) { this.selectedEmployeeId = this.selectedEmployeeId === name ? null : name; window.dispatchEvent(new CustomEvent('function-demo-employee', { detail: this.selectedEmployeeId })); }, clearEmployeeSearch() { this.employeeSearch = ''; }, hasMatchingEmployees() { return ['jan kowalski','anna nowak','piotr zieliński'].some(name => name.includes(this.employeeSearch.toLowerCase())); } }">                    <div class="flex flex-col gap-4 border-b border-gray-200 px-5 py-4 dark:border-gray-600 sm:flex-row sm:items-center sm:justify-between [@media(prefers-color-scheme:light)]:border-gray-300">
+                        <div class="flex min-w-0 items-center gap-3">
+                        <div class="shrink-0 flex w-11 sm:w-14 h-11 sm:h-14 rounded-xl sm:rounded-2xl items-center justify-center bg-gradient-to-br from-green-200 to-emerald-100 dark:from-green-500/20 dark:to-emerald-500/10 text-green-700 dark:text-green-300">
+                            <i class="fa-solid fa-users text-lg sm:text-2xl" aria-hidden="true"></i>
+                        </div>
+
+                        <div>
+                            <h2 class="text-start text-gray-900 dark:text-white text-sm font-semibold">
+                                Pracownicy
+                            </h2>
+
+                            <p class="text-start text-xs text-gray-400 [@media(prefers-color-scheme:light)]:text-gray-600">
+                                Osoby pracujące na tym obiekcie
+                            </p>
+                        </div>
+
+                        </div>
+                        <div class="relative w-full shrink-0 sm:w-56">
+                            <label for="demo-worker-search" class="sr-only">Szukaj pracownika po imieniu i nazwisku</label>
+                            <i class="fa-solid fa-magnifying-glass pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400 [@media(prefers-color-scheme:light)]:text-gray-600" aria-hidden="true"></i>
+                            <input id="demo-worker-search" data-employee-search type="search" x-model="employeeSearch" @keydown.escape.stop.prevent="clearEmployeeSearch()" maxlength="255" placeholder="Szukaj pracownika..." aria-label="Szukaj pracownika" aria-controls="demo-object-workers"
+                                class="h-9 w-full rounded-lg border border-gray-300 bg-gray-50 pl-9 pr-9 text-xs text-gray-900 placeholder:text-gray-500 outline-none transition focus:border-green-600 focus:ring-green-600 dark:border-gray-600 dark:bg-gray-600 dark:text-gray-100 dark:placeholder:text-gray-300 dark:focus:border-green-300/50 dark:focus:ring-green-300/50 [&::-webkit-search-cancel-button]:appearance-none">
+                            <button type="button" x-show="employeeSearch.length > 0" x-cloak @click.stop="clearEmployeeSearch()" aria-label="Wyczyść wyszukiwanie pracowników" title="Wyczyść wyszukiwanie" class="absolute right-1 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-gray-500 transition-all duration-200 hover:bg-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 dark:text-gray-300 dark:hover:bg-gray-500 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-xmark text-xs" aria-hidden="true"></i></button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="relative overflow-hidden" :aria-busy="reportLoading">
+                        <div :class="reportLoading ? 'invisible' : ''" :inert="reportLoading">
+<div id="demo-object-workers" class="max-h-[330px] divide-y divide-gray-200 overflow-y-auto pr-1 dark:divide-gray-600">
+                            <div role="button" tabindex="0"
+                                @click="selectEmployee('Jan Kowalski')" @keydown.enter.prevent="selectEmployee('Jan Kowalski')" @keydown.space.prevent="selectEmployee('Jan Kowalski')"
+                                :aria-pressed="selectedEmployeeId === 'Jan Kowalski'"
+                                :class="selectedEmployeeId === 'Jan Kowalski' ? 'rounded-xl bg-green-300/20 ring-1 ring-inset ring-green-300' : 'hover:rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600'"
+                                x-show="'jan kowalski'.includes(employeeSearch.toLowerCase())"
+                                class="flex cursor-pointer items-center gap-2 px-3 py-3 transition-all duration-200 focus-visible:rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300">
+                                <div class="min-w-0 flex-1 text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
+                                    <img src="https://ui-avatars.com/api/?name=J+K&amp;color=7F9CF5&amp;background=EBF4FF" alt="Jan Kowalski" class="flex-shrink-0 w-10 h-10 rounded-full">
+                                    <div class="flex min-w-0 flex-wrap items-center gap-2 text-start text-xs">
+                                        <span class="inline-flex items-center break-words text-gray-900 dark:text-gray-50 font-semibold uppercase tracking-widest transition ease-in-out duration-150">Jan Kowalski</span>
+                                        <div class="flex items-center gap-2 text-start">
+                                            <span class="px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-green-300 dark:bg-green-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest">Admin</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="shrink-0 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300"><i class="fa-solid fa-clock" aria-hidden="true"></i>80h</div>
+                            </div>
+                            <div role="button" tabindex="0"
+                                @click="selectEmployee('Anna Nowak')" @keydown.enter.prevent="selectEmployee('Anna Nowak')" @keydown.space.prevent="selectEmployee('Anna Nowak')"
+                                :aria-pressed="selectedEmployeeId === 'Anna Nowak'"
+                                :class="selectedEmployeeId === 'Anna Nowak' ? 'rounded-xl bg-green-300/20 ring-1 ring-inset ring-green-300' : 'hover:rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600'"
+                                x-show="'anna nowak'.includes(employeeSearch.toLowerCase())"
+                                class="flex cursor-pointer items-center gap-2 px-3 py-3 transition-all duration-200 focus-visible:rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300">
+                                <div class="min-w-0 flex-1 text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
+                                    <img src="https://ui-avatars.com/api/?name=A+N&amp;color=7F9CF5&amp;background=EBF4FF" alt="Anna Nowak" class="flex-shrink-0 w-10 h-10 rounded-full">
+                                    <div class="flex min-w-0 flex-wrap items-center gap-2 text-start text-xs">
+                                        <span class="inline-flex items-center break-words text-gray-900 dark:text-gray-50 font-semibold uppercase tracking-widest transition ease-in-out duration-150">Anna Nowak</span>
+                                        <div class="flex items-center gap-2 text-start">
+                                            <span class="px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-yellow-300 dark:bg-yellow-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest">Kierownik</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="shrink-0 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300"><i class="fa-solid fa-clock" aria-hidden="true"></i>72h</div>
+                            </div>
+                            <div role="button" tabindex="0"
+                                @click="selectEmployee('Piotr Zieliński')" @keydown.enter.prevent="selectEmployee('Piotr Zieliński')" @keydown.space.prevent="selectEmployee('Piotr Zieliński')"
+                                :aria-pressed="selectedEmployeeId === 'Piotr Zieliński'"
+                                :class="selectedEmployeeId === 'Piotr Zieliński' ? 'rounded-xl bg-green-300/20 ring-1 ring-inset ring-green-300' : 'hover:rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600'"
+                                x-show="'piotr zieliński'.includes(employeeSearch.toLowerCase())"
+                                class="flex cursor-pointer items-center gap-2 px-3 py-3 transition-all duration-200 focus-visible:rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300">
+                                <div class="min-w-0 flex-1 text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
+                                    <img src="https://ui-avatars.com/api/?name=P+Z&amp;color=7F9CF5&amp;background=EBF4FF" alt="Piotr Zieliński" class="flex-shrink-0 w-10 h-10 rounded-full">
+                                    <div class="flex min-w-0 flex-wrap items-center gap-2 text-start text-xs">
+                                        <span class="inline-flex items-center break-words text-gray-900 dark:text-gray-50 font-semibold uppercase tracking-widest transition ease-in-out duration-150">Piotr Zieliński</span>
+                                        <div class="flex items-center gap-2 text-start">
+                                            <span class="px-1 md:px-2 py-0.5 rounded-full text-[0.5rem] md:text-xs font-semibold bg-gray-300 dark:bg-gray-300 text-gray-900 dark:text-gray-900 uppercase tracking-widest">Użytkownik</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="shrink-0 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300"><i class="fa-solid fa-clock" aria-hidden="true"></i>24h</div>
+                            </div>
+</div>
+                        <p x-show="employeeSearch.trim().length > 0 && !hasMatchingEmployees()" x-cloak role="status" aria-live="polite" class="py-6 text-center text-sm text-gray-500 dark:text-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">Nie znaleziono pracowników</p>
+                        </div>
+
+                        </div>
+                        <div class="mt-4 flex min-h-8 flex-wrap items-center justify-between gap-3 border-t border-gray-200 pt-4 dark:border-gray-600 [@media(prefers-color-scheme:light)]:border-gray-300">
+                            <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                <span>Pracownicy przypisani</span>
+                                <span class="font-semibold text-green-800 dark:text-green-300">3</span>
+                            </div>
+                            <button type="button" x-show="selectedEmployeeId !== null" x-cloak @click="selectEmployee(null)" class="ml-auto rounded-lg px-2 py-1 text-xs font-medium text-green-800 transition-all duration-200 hover:bg-green-300/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 dark:text-green-300">Wyczyść filtry</button>
+                        </div>
+                    </div>
+</section></div>
+<section class="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-700 my-4" x-data="{ employee: null, category: 'all' }" @function-demo-employee.window="employee = $event.detail; category = 'all'">
+<div class="flex items-center gap-3 border-b border-gray-200 px-5 py-4 dark:border-gray-600"><div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-green-200 to-emerald-100 text-green-700 dark:from-green-500/20 dark:to-emerald-500/10 dark:text-green-300"><i class="fa-solid fa-clock" aria-hidden="true"></i></div><div><h4 class="text-sm font-semibold text-gray-900 dark:text-white">Czas pracy na obiekcie</h4><p class="text-xs text-gray-600 dark:text-gray-300">Przykładowe sesje czasu pracy · 11.2026</p></div></div>
+<div class="flex flex-wrap gap-2 border-b border-gray-200 px-5 py-3 dark:border-gray-600">
+<button type="button" @click="category = 'all'" :aria-pressed="category === 'all'" :class="category === 'all' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Wszystkie</button><button type="button" @click="category = 'normal'" :aria-pressed="category === 'normal'" :class="category === 'normal' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Norma</button><button type="button" @click="category = 'overtime'" :aria-pressed="category === 'overtime'" :class="category === 'overtime' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Nadgodziny</button><button type="button" @click="category = 'attention'" :aria-pressed="category === 'attention'" :class="category === 'attention' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Wymaga uwagi</button></div>@php
+    $demoObjectRows = collect([
+        ['Jan Kowalski', '03', '15:00', '08:00:00', 'normal'],
+        ['Anna Nowak', '03', '15:00', '08:00:00', 'normal'],
+        ['Piotr Zieliński', '03', '15:00', '08:00:00', 'normal'],
+        ['Jan Kowalski', '04', '16:00', '09:00:00', 'attention'],
+        ['Anna Nowak', '04', '16:00', '09:00:00', 'attention'],
+        ['Piotr Zieliński', '05', '16:00', '09:00:00', 'overtime'],
+    ])->map(function ($demo) {
+        return (object) [
+            'employee' => $demo[0],
+            'user' => (object) ['name' => $demo[0], 'role' => match ($demo[0]) { 'Jan Kowalski' => 'admin', 'Anna Nowak' => 'kierownik', default => 'użytkownik' }, 'profile_photo_url' => 'https://ui-avatars.com/api/?name='.urlencode($demo[0]).'&color=7F9CF5&background=EBF4FF'],
+            'status' => 'Praca zakończona', 'start_time' => '2026-11-'.$demo[1].' 07:00:00',
+            'stop_time' => '2026-11-'.$demo[1].' '.$demo[2].':00', 'time_in_work' => $demo[3],
+            'category' => $demo[4] === 'attention' ? null : $demo[4],
+            'reason' => $demo[4] === 'attention' ? \App\Services\Objects\AttentionReason::OutsideObjects : null,
+            'object' => (object) ['name' => 'Budowa', 'object_type' => null],
+            'start_lat' => 52.2297, 'start_lng' => 21.0122, 'stop_lat' => 52.2298, 'stop_lng' => 21.0123,
+            'missing_task' => false, 'day_difference' => $demo[4] === 'overtime' ? 3600 : 0, 'planned' => 28800,
+        ];
+    });
+@endphp
+<ul data-object-mobile-work class="block space-y-3 p-3 md:hidden">
+    @forelse($demoObjectRows as $row)
+        @php
+            $start = $row->start_time ? \Carbon\Carbon::parse($row->start_time) : null;
+            $stop = $row->stop_time ? \Carbon\Carbon::parse($row->stop_time) : null;
+            $night = $start && $stop && !$start->isSameDay($stop);
+            $category = ['under' => 'Brak normy', 'normal' => 'Norma', 'overtime' => 'Nadgodziny'][$row->category] ?? 'Wymaga uwagi';
+            $tone = match($row->category) {
+                'under' => $night ? 'bg-green-400/20 text-green-800 dark:text-green-400' : 'bg-green-300/20 text-green-800 dark:text-green-300',
+                'normal' => $night ? 'bg-green-400 text-green-950' : 'bg-green-300 text-green-900',
+                'overtime' => $night ? 'bg-indigo-400 text-indigo-950' : 'bg-indigo-300 text-indigo-950',
+                default => 'bg-yellow-300 text-yellow-950',
+            };
+        @endphp
+        <li x-show="(!employee || employee === {{ Illuminate\Support\Js::from($row->employee) }}) &amp;&amp; (category === 'all' || category === '{{ $row->reason ? 'attention' : $row->category }}')">
+        <a href="#obiekty" @click.prevent class="group cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition-colors duration-200 h-full block w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:border-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">
+        <div class="flex min-w-0 w-full flex-col items-start gap-3 text-xs leading-relaxed">
+            <div class="flex w-full items-start justify-between gap-3">
+                <div class="flex min-w-0 flex-1 flex-col items-start gap-2 [&>*]:m-0">
+                <x-RCP.work-session-status :work_session="$row" class="text-xs !font-medium" />
+                <x-status-cello class="text-xs !font-medium break-words !text-blue-600 dark:!text-blue-300">{{ $start?->copy()->locale('pl')->translatedFormat('d.m, l') ?? 'Brak START' }}@if($night) – {{ $stop->copy()->locale('pl')->translatedFormat('d.m, l') }}@endif</x-status-cello>
+                </div>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i></div>
+            </div>
+            <div class="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
+                <div class="flex flex-col items-center gap-1">
+                    <span aria-label="{{ $night ? 'Zmiana przez północ' : 'Sesja dzienna' }}">{{ $night ? '🌙' : '⏱️' }}</span>
+                    <span class="rounded-full px-2 py-0.5 text-xs font-medium {{ $tone }}">RCP</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 [&>*]:m-0">
+                    <x-paragraf-display class="text-xs leading-5 whitespace-nowrap font-semibold [&>*]:text-xs [&>*]:leading-5"><x-status-dark>{{ $start?->format('H:i') ?? '—' }} - {{ $stop?->format('H:i') ?? '—' }}</x-status-dark></x-paragraf-display>
+                    <x-paragraf-display class="text-xs leading-5 font-medium !text-gray-500 dark:!text-gray-300">{{ $row->time_in_work }}</x-paragraf-display>
+                </div>
+                <div class="flex items-center gap-1">
+                @if($row->start_lat !== null && $row->start_lng !== null)<x-status-green title="Lokalizacja START"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span class="sr-only">START</span></x-status-green>@endif
+                @if($row->stop_lat !== null && $row->stop_lng !== null)<x-status-red title="Lokalizacja STOP"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span class="sr-only">STOP</span></x-status-red>@endif
+                @if($row->missing_task || $row->time_in_work === '24:00:00')<span title="Sesja wymaga sprawdzenia">⚠️</span>@endif
+                </div>
+            </div>
+            @if($row->reason)
+                <div class="w-full border-t border-gray-200 pt-3 text-left dark:border-gray-600 [@media(prefers-color-scheme:light)]:border-gray-300"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {{ $tone }}">Wymaga uwagi</span></div>
+            @endif
+            @if($row->reason)
+                <p class="text-xs leading-5 text-gray-600 dark:text-gray-300">{{ $row->reason->label() }}</p>
+            @else
+                <div class="flex w-full min-w-0 items-center justify-start gap-2 border-t border-gray-200 pt-3 text-left dark:border-gray-600 [@media(prefers-color-scheme:light)]:border-gray-300"><x-object.type-icon :type="$row->object->object_type" :compact="true" /><span class="break-words text-xs font-semibold leading-5 [overflow-wrap:anywhere]">{{ $row->object->name }}</span></div>
+                <div class="w-full text-left"><span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {{ $tone }}">{{ $category }}</span></div>
+                <p class="w-full text-left text-xs leading-5 {{ $row->day_difference === null ? 'text-gray-600 dark:text-gray-300' : ($row->day_difference > 0 ? 'text-indigo-700 dark:text-indigo-200' : 'text-green-800 dark:text-green-200') }}" title="Bilans całego dnia pracownika">
+                    @if($row->day_difference === null) Brak określonej normy
+                    @elseif($row->day_difference < 0) Brakuje {{ \App\Services\Objects\ObjectWorkReport::duration(-$row->day_difference) }}
+                    @elseif($row->day_difference > 0) +{{ \App\Services\Objects\ObjectWorkReport::duration($row->day_difference) }} ponad normę
+                    @else Norma zrealizowana
+                    @endif
+                </p>
+            @endif
+            <div class="flex min-w-0 items-center gap-3 border-t border-gray-200 pt-3 font-semibold dark:border-gray-600 w-full [@media(prefers-color-scheme:light)]:border-gray-300">
+                <x-user-photo :user="$row->user" class="!h-8 !w-8" />
+                <div class="min-w-0 text-xs [overflow-wrap:anywhere]">
+                    <p class="break-words text-xs leading-5">{{ $row->user->name }}</p>
+                    <x-user-role :user="$row->user" />
+                </div>
+            </div>
+        </div>
+        </a>
+        </li>
+    @empty
+        <li class="p-4 text-center text-xs text-gray-500 dark:text-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">Brak sesji dla wybranego miesiąca i kategorii.</li>
+    @endforelse
+</ul>
+    <div id="work-list-results" class="hidden overflow-x-auto md:block">
+        <table class="w-full text-sm text-gray-700 dark:text-gray-200">
+            <thead class="border-b border-gray-200 bg-white text-center text-xs font-semibold text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:border-gray-300"><tr>
+                <th class="px-5 py-4 text-left">Pracownik</th><th class="px-5 py-4">Status</th><th class="px-5 py-4">Lokalizacja</th><th class="px-5 py-4">Typ</th><th class="px-5 py-4">Godziny / czas</th><th class="px-5 py-4">Data</th><th class="px-5 py-4">Klasyfikacja / obiekt</th>
+            </tr></thead>
+            <tbody>
+                @forelse($demoObjectRows as $row)
+                    @php
+                        $start = $row->start_time ? \Carbon\Carbon::parse($row->start_time) : null;
+                        $stop = $row->stop_time ? \Carbon\Carbon::parse($row->stop_time) : null;
+                        $url = '#obiekty';
+                        $night = $start && $stop && !$start->isSameDay($stop);
+                        $badgeStyle = match ($row->category) {
+                            'under' => $night ? 'bg-green-400/20 text-green-800 dark:bg-green-400/15 dark:text-green-400' : 'bg-green-300/20 text-green-700 dark:bg-green-300/10 dark:text-green-300',
+                            'normal' => $night ? 'bg-green-400 text-green-950' : 'bg-green-300 text-green-900',
+                            'overtime' => $night ? 'bg-indigo-400 text-indigo-950' : 'bg-indigo-300 text-indigo-950',
+                            default => 'bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300',
+                        };
+                        $badgeClass = 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium '.$badgeStyle;
+                    @endphp
+                    <tr x-show="(!employee || employee === {{ Illuminate\Support\Js::from($row->employee) }}) &amp;&amp; (category === 'all' || category === '{{ $row->reason ? 'attention' : $row->category }}')" class="group snap-center cursor-pointer border-b border-gray-200 bg-white text-center transition-colors duration-200 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:border-gray-300">
+                        <td class="px-5 py-4"><div class="flex items-center justify-start gap-2 font-semibold text-gray-700 dark:text-gray-100 [&>img]:!h-8 [&>img]:!w-8"><x-user-photo :user="$row->user" /><a href="#obiekty" @click.prevent class="rounded text-left text-xs [&>div]:!text-xs [&_span]:!text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"><x-user-name :user="$row->user" /></a></div></td>
+                        <td class="px-5 py-4"><x-RCP.work-session-status :work_session="$row" class="text-xs !font-medium" /></td>
+                        <td class="px-5 py-4"><div class="flex justify-center gap-1">
+                            @if($row->start_lat !== null && $row->start_lng !== null)<x-status-green title="Lokalizacja START"><i class="fa-solid fa-location-dot mx-1" aria-hidden="true"></i><span class="sr-only">START</span></x-status-green>@endif
+                            @if($row->stop_lat !== null && $row->stop_lng !== null)<x-status-red title="Lokalizacja STOP"><i class="fa-solid fa-location-dot mx-1" aria-hidden="true"></i><span class="sr-only">STOP</span></x-status-red>@endif
+                        </div></td>
+                        <td class="px-5 py-4"><div class="flex flex-col items-center gap-1"><span class="text-lg" aria-label="{{ $night ? 'Zmiana przez północ' : 'Sesja dzienna' }}">{{ $night ? '🌙' : '⏱️' }}</span><span class="{{ $row->reason ? 'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-yellow-300 text-yellow-950' : $badgeClass }}">RCP</span></div></td>
+                        <td class="px-5 py-4 font-semibold text-sm">
+                            @if($row->status === 'Praca zakończona' && $start && $stop)
+                                <div class="flex flex-col items-center justify-center gap-2 my-auto">
+                                    <x-paragraf-display class="text-sm whitespace-nowrap font-semibold w-fit text-start relative"><x-status-dark>{{ $start->format('H:i') }} - {{ $stop->format('H:i') }}</x-status-dark></x-paragraf-display>
+                                    <x-paragraf-display class="!text-gray-900 dark:!text-gray-50 hover:!text-gray-900 dark:hover:!text-gray-50 text-sm whitespace-nowrap font-semibold w-fit text-start relative">{{ $row->time_in_work }}</x-paragraf-display>
+                                </div>
+                            @endif
+                            <div class="flex flex-row items-center justify-center text-center gap-1 my-auto">
+                                @if(!(($row->status === 'W trakcie pracy' && $start && !$stop) || ($row->status === 'Praca zakończona' && $start && $stop)))<span title="Niekompletna lub nieprawidłowa sesja">❌</span>@endif
+                                @if($row->missing_task)<span title="Brak zadania dla nadgodzin">⚠️</span>@endif
+                                @if($row->time_in_work === '24:00:00')<span title="Automatyczne zakończenie">⚠️</span>@endif
+                            </div>
+                        </td>                        <td class="whitespace-nowrap px-5 py-4"><x-status-cello class="!text-blue-600 dark:!text-blue-300">{{ $start?->format('d.m.y') ?? 'Brak START' }}@if($stop && $start && !$start->isSameDay($stop)) – {{ $stop->format('d.m.y') }}@endif</x-status-cello></td>
+                        <td class="px-5 py-4"><div class="flex flex-col items-center justify-center gap-y-3 text-center">
+                            @if($row->reason)<x-alert-span>Wymaga uwagi</x-alert-span><p class="text-xs text-gray-500 dark:text-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">{{ $row->reason->label() }}</p>
+                            @else
+                                <div class="flex flex-col items-center justify-center gap-y-3 text-center">
+                                    <x-object.type-icon :type="$row->object->object_type" :compact="true" />
+                                    <div class="flex min-w-0 flex-col items-center justify-center gap-y-3 text-center">
+                                        <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $row->object->name }}</p>
+                                        <span class="{{ $badgeClass }}">{{ ['under' => 'Brak normy', 'normal' => 'Norma', 'overtime' => 'Nadgodziny'][$row->category] }}</span>
+                                        <p class="text-xs {{ $row->day_difference > 0 ? 'text-indigo-700 dark:text-indigo-200' : 'text-green-800 dark:text-green-200' }}" title="Bilans całego dnia pracownika; nie sumuj po sesjach">
+                                            @if($row->day_difference === null) Brak określonej normy
+                                            @elseif($row->day_difference < 0) Brakuje {{ \App\Services\Objects\ObjectWorkReport::duration(-$row->day_difference) }}
+                                            @elseif($row->day_difference > 0) +{{ \App\Services\Objects\ObjectWorkReport::duration($row->day_difference) }} ponad normę
+                                            @else Norma zrealizowana
+                                            @endif
+                                        </p>
+                                        <span class="text-[10px] text-gray-500 dark:text-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">Bilans dnia @if($row->planned > 0) · Norma dnia: {{ \App\Services\Objects\ObjectWorkReport::duration($row->planned) }}@endif</span>
+                                    </div>
+                                </div>
+                            @endif
+                        </div></td>
+                    </tr>
+                @empty
+                    <tr><td colspan="8" class="px-5 py-4 text-center text-gray-500 dark:text-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">Brak sesji dla wybranego miesiąca i kategorii.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</section></div></figure>
+<p class="mt-6 leading-7 text-gray-600 dark:text-gray-300">Sprawdź, kto i jak długo pracował na konkretnej realizacji. Wybierz pracownika, aby zobaczyć jego odczyty na mapie i sesje czasu pracy. Punkty poza obszarem wskazują rejestracje do dodatkowej weryfikacji.</p>
+<div class="mt-6 flex flex-col items-start gap-4 rounded-2xl bg-green-100 p-5 dark:bg-green-500/10"><h4 class="text-xl font-bold text-gray-900 dark:text-white">Uporządkuj czas pracy na swoich obiektach</h4><p class="text-gray-600 dark:text-gray-300">Zyskaj jeden widok zespołu, lokalizacji i godzin pracy przy każdej realizacji.</p><a href="{{ route('register') }}" class="system-font inline-flex items-center rounded-lg bg-green-300 px-4 py-2 text-sm font-semibold uppercase tracking-widest text-gray-900 transition hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Wypróbuj WIBEST<i class="fa-solid fa-arrow-right ml-2" aria-hidden="true"></i></a></div>
+</section>
                 </main>
 
             </div>
@@ -3595,36 +4402,10 @@
 
                     if (scrollPos >= top && scrollPos <= bottom) {
                         setActive($section.attr("id"));
-                        if ($section.attr("id") === "rcp") {
-                            $('#progress-bar').css('width', '00%');
-                            $('#step-1').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-2').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                            $('#step-3').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                            $('#step-4').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                        } else if ($section.attr("id") === "e-wnioski") {
-                            $('#progress-bar').css('width', '25%');
-                            $('#step-1').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-2').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-3').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                            $('#step-4').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                        } else if ($section.attr("id") === "planowanie") {
-                            $('#progress-bar').css('width', '50%');
-                            $('#step-1').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-2').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-3').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-4').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                        } else if ($section.attr("id") === "raporty") {
-                            $('#progress-bar').css('width', '75%');
-                            $('#step-1').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-2').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-3').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                            $('#step-4').removeClass('bg-gray-300 dark:bg-gray-700').addClass('bg-green-300 dark:bg-green-300')
-                        } else {
-                            $('#progress-bar').css('width', '0%');
-                            $('#step-1').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                            $('#step-2').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                            $('#step-3').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
-                            $('#step-4').addClass('bg-gray-300 dark:bg-gray-700').removeClass('bg-green-300 dark:bg-green-300')
+                        const index = ['rcp', 'e-wnioski', 'planowanie', 'raporty', 'obiekty'].indexOf($section.attr('id'));
+                        $('#progress-bar').css('width', Math.max(0, index) * 20 + '%');
+                        for (let step = 1; step <= 5; step++) {
+                            $('#step-' + step).toggleClass('bg-green-300 dark:bg-green-300', index >= step - 1).toggleClass('bg-gray-300 dark:bg-gray-700', index < step - 1);
                         }
                     }
                 });

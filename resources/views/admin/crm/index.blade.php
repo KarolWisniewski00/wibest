@@ -20,7 +20,7 @@
                         'Typ',
                         'Termin',
                         'Akcja',
-                        'Analiza AI',
+                        'Następny krok',
                         'Edycja'
                     ]"
                     :items="$crms"

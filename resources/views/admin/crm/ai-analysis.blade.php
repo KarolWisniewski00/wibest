@@ -140,6 +140,25 @@
         if (!is_array($missingInformation)) {
             $missingInformation = [];
         }
+
+        // Puste wartości JSON i listy bez treści nie stanowią analizy do pokazania.
+        $aiText = static function ($value) {
+            if (is_string($value)) {
+                $decoded = json_decode($value, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $value = $decoded;
+                }
+            }
+
+            return is_string($value) || is_numeric($value) ? trim((string) $value) : '';
+        };
+        $signals = array_values(array_filter(array_map($aiText, $signals), fn ($value) => $value !== ''));
+        $missingInformation = array_values(array_filter(array_map($aiText, $missingInformation), fn ($value) => $value !== ''));
+        $aiAnalysis = $aiText($crm->ai_analysis);
+        $hasAiAnalysis = $signals || $missingInformation || collect([
+            $aiAnalysis, $crm->ai_problem, $crm->ai_value, $crm->ai_reason,
+            $crm->ai_next_step, $crm->ai_sales_stage,
+        ])->contains(fn ($value) => $aiText($value) !== '');
     @endphp
     @include('admin.elements.alerts')
 
@@ -156,6 +175,7 @@
 
 
             {{-- HEADER --}}
+            @if($hasAiAnalysis)
             <div class="mb-4">
                 <div class="flex items-center gap-3">
 
@@ -175,6 +195,7 @@
 
                 </div>
             </div>
+            @endif
 
 
             @php
@@ -421,6 +442,9 @@
             </div>
 
             {{-- ANALIZA AI --}}
+            @if($hasAiAnalysis)
+            <div id="ai-analysis">
+            @if($aiAnalysis !== '')
             <div class="mb-4">
 
                 <div class="flex items-center gap-2 mb-2">
@@ -437,7 +461,7 @@
                     class="bg-white dark:bg-gray-700 rounded-xl px-5 py-4 border border-gray-200 dark:border-transparent border-l-4 border-l-orange-500 dark:border-l-orange-400">
 
                     <p class="text-gray-800 dark:text-gray-200 leading-7">
-                        {{ $crm->ai_analysis }}
+                        {{ $aiAnalysis }}
                     </p>
 
                 </div>
@@ -445,6 +469,7 @@
             </div>
             {{-- ODDZIELENIE --}}
             <div class="border-t border-gray-200 dark:border-gray-700 mb-4"></div>
+            @endif
             {{-- AI STATUS --}}
 
 <div class="mb-4">
@@ -954,7 +979,10 @@
 
 
             {{-- NASTĘPNY KROK --}}
-            <form method="POST" action="{{ route('setting.crm.store') }}">
+            </div>
+            @endif
+
+            <form id="myForm" method="POST" action="{{ route('setting.crm.store') }}">
 
                 @csrf
                 <input type="hidden" name="company" value="{{ $crm->company->id }}">
@@ -975,7 +1003,9 @@
                         </div>
 
                         <p class="text-sm text-gray-400 mt-1">
-                            Sprawdź propozycję AI i zdecyduj, co zrobić dalej.
+                            {{ filled($crm->ai_next_step)
+                                ? 'Sprawdź propozycję AI i zdecyduj, co zrobić dalej.'
+                                : 'Zaplanuj następny krok i zdecyduj, co zrobić dalej.' }}
                         </p>
 
                     </div>
@@ -1254,6 +1284,7 @@
                         </div>
                     </div>
 
+                </div>
             </form>
 
         </x-container-content-form>

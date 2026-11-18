@@ -186,6 +186,8 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::prefix('dashboard')->group(function () {
+        Route::post('user-email-availability', \App\Http\Controllers\UserEmailAvailabilityController::class)
+            ->middleware('throttle:60,1')->name('users.email-availability');
         //Mierzenie Czasu Pracy -----------------------------------------------------------------
         //Nazwy na podstawie zakładek
 
@@ -318,6 +320,12 @@ Route::middleware([
             Route::get('/dashboard', [ObjectController::class, 'dashboard'])->name('object.dashboard');
             Route::get('/', [ObjectController::class, 'index'])->name('object.index');
             Route::get('/create', [ObjectController::class, 'create'])->name('object.create');
+            Route::post('/store', [ObjectController::class, 'store'])->name('object.store');
+            Route::get('/show/{object}', [ObjectController::class, 'show'])->name('object.show');
+            Route::get('/edit/{object}', [ObjectController::class, 'edit'])->name('object.edit');
+            Route::put('/update/{object}', [ObjectController::class, 'update'])->name('object.update');
+            Route::patch('/status/{object}', [ObjectController::class, 'status'])->name('object.status');
+            Route::delete('/delete/{object}', [ObjectController::class, 'delete'])->name('object.delete');
         });
         // SETTINGS -----------------------------------------------------------------------------
         Route::prefix('setting')->group(function () {
@@ -402,6 +410,7 @@ Route::middleware([
                 Route::get('edit-company/{user}', [UserController::class, 'editCompany'])->name('setting.user.edit-company');
                 Route::get('edit-planing/{user}', [UserController::class, 'editPlaning'])->name('setting.user.edit-planing');
                 Route::get('edit/{user}', [UserController::class, 'edit'])->name('setting.user.edit');
+                Route::put('update/{user}', [UserController::class, 'update'])->name('setting.user.update');
                 Route::get('create/{client}', [UserController::class, 'create'])->name('setting.user.create');
                 Route::get('create/for/crm/{client}', [UserController::class, 'createForCrm'])->name('setting.user.create.for.crm');
                 Route::post('store/for/crm/{client}', [UserController::class, 'storeForCrm'])->name('setting.user.store.for.crm');

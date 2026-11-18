@@ -248,7 +248,7 @@
                     </script>
                 </div>
                 <!--Typ-->
-                @if($crm->plan)
+                @if($crm->plan && !$crm->datetime_complete)
                 <div class="mb-4 rounded-xl border border-gray-200 dark:border-gray-700
            bg-gray-50 dark:bg-gray-800/60
            px-4 py-3">
@@ -273,14 +273,10 @@
                     </div>
                 </div>
                 @endif
-                <label for="editor"
-                    class="pb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                    <span>📝</span> Rezultat
-                </label>
                 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
                 <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet">
                 <style>
-                    #editor {
+                    #editor, #plan-editor {
                         border: 0;
                     }
 
@@ -353,11 +349,31 @@
                         }
                     }
                 </style>
+                @if($crm->datetime_complete)
+                    <label for="plan-editor"
+                        class="pb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                        <span>📝</span> Plan
+                    </label>
+                    <div id="plan-editor" class="bg-white dark:bg-gray-700 dark:text-white rounded-md h-64 overflow-y-auto">
+                        {!! old('plan', $crm->plan) !!}
+                    </div>
+                    <textarea id="plan-content" name="plan" style="display:none;">{{ old('plan', $crm->plan) }}</textarea>
+                    @error('plan')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                @endif
+                <label for="editor"
+                    class="pb-2 block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                    <span>📝</span> Rezultat
+                </label>
                 <div id="editor" class="bg-white dark:bg-gray-700 dark:text-white rounded-md h-64 overflow-y-auto">
-                    {!! old('notes', $crm->result) !!}
+                    {!! $crm->datetime_complete ? old('result', $crm->result) : old('content', $crm->result ?? $crm->plan) !!}
                 </div>
 
-                <textarea id="editor-content" name="content" style="display:none;"></textarea>
+                <textarea id="editor-content" name="{{ $crm->datetime_complete ? 'result' : 'content' }}" style="display:none;">{{ $crm->datetime_complete ? old('result', $crm->result) : old('content', $crm->result ?? $crm->plan) }}</textarea>
+                @error('result')
+                    <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                @enderror
                 <script>
                     const quill = new Quill('#editor', {
                         theme: 'snow',
@@ -368,10 +384,20 @@
                             ]
                         }
                     });
+                    const planQuill = document.getElementById('plan-editor') ? new Quill('#plan-editor', {
+                        theme: 'snow',
+                        placeholder: '👈 Wpisz tutaj plan...',
+                        modules: {
+                            toolbar: [['bold', 'italic', 'underline']]
+                        }
+                    }) : null;
                     // Synchronizuj zawartość edytora z ukrytym polem tekstowym
                     document.getElementById('myForm').onsubmit = function () {
                         var editorContent = document.getElementById('editor-content');
                         editorContent.value = quill.root.innerHTML;
+                        if (planQuill) {
+                            document.getElementById('plan-content').value = planQuill.root.innerHTML;
+                        }
                     };
                 </script>
                 <div class="mb-6">
@@ -427,10 +453,19 @@
                     });
                 </script>
 
-                <div class="flex justify-end mt-4">
+                <div class="flex flex-col sm:flex-row justify-end gap-3 mt-4">
+                    @if($crm->datetime_complete)
                     <x-button-green type="submit" class="text-lg">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i>Zapisz
+                    </x-button-green>
+                    @else
+                    <x-button-neutral type="submit" class="text-lg">
+                        <i class="fa-solid fa-floppy-disk mr-2"></i>Zapisz bez kompletowania
+                    </x-button-neutral>
+                    <x-button-green type="submit" name="already_realized" value="1" class="text-lg">
                         <i class="fa-solid fa-check mr-2"></i>Zrobione
                     </x-button-green>
+                    @endif
                 </div>
             </form>
             <!--USUŃ-->

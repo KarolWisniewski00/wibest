@@ -8,6 +8,11 @@ class Crm extends Model
 {
     protected $table = 'crm';
 
+    protected $casts = [
+        'ai_signals' => 'array',
+        'ai_missing_information' => 'array',
+    ];
+
     protected $fillable = [
         'user_id',
         'company_id',
@@ -76,6 +81,21 @@ class Crm extends Model
     public function scopeForUser($query, $userId)
     {
         return $query->where('user_id', $userId);
+    }
+
+    public function scopeActivityOrder($query)
+    {
+        // Termin w UI jest określany przez datetime_start.
+        return $query->withoutGlobalScope('order')->reorder()
+            ->orderByRaw('CASE
+                WHEN datetime_complete IS NOT NULL THEN 2
+                WHEN datetime_start < ? THEN 0
+                ELSE 1 END', [now()])
+            ->orderByRaw('CASE WHEN datetime_complete IS NULL AND datetime_start IS NULL THEN 1 ELSE 0 END')
+            ->orderByRaw('CASE WHEN datetime_complete IS NULL THEN datetime_start END ASC')
+            ->orderByRaw('CASE WHEN datetime_complete IS NOT NULL THEN datetime_complete END DESC')
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id');
     }
 
     /*

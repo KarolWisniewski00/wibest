@@ -18,6 +18,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
+    public function getContactEmailAttribute(): ?string
+    {
+        return \App\Support\CrmTechnicalEmail::isTechnical($this->email) ? null : $this->email;
+    }
+
     use HasApiTokens;
     use HasFactory;
     use HasProfilePhoto;
@@ -885,7 +890,7 @@ class User extends Authenticatable
     }
     public function objects(): BelongsToMany
     {
-        return $this->belongsToMany(WorkObject::class, 'object_user')
+        return $this->belongsToMany(WorkObject::class, 'object_user', 'user_id', 'object_id')
             ->withTimestamps();
     }
 }

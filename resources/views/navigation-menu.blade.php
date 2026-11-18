@@ -50,15 +50,15 @@
                         <i class="fa-solid fa-clock mr-2"></i>Czas pracy
                     </x-nav-link>
                     @endif
-                    @if($role == 'admin' || $role == 'właściciel')
-                    <!--
+                    @if($role == 'admin' || $role == 'właściciel' || $role == 'kierownik')
                         <x-nav-link href="{{ route('object.dashboard') }}" :active="Str::startsWith(request()->path(), 'dashboard/objects')">
                             <i class="fa-solid fa-cube mr-2"></i>Obiekty
                         </x-nav-link>
-                    -->
+                        @if($role == 'admin' || $role == 'właściciel')
                         <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                             <i class="fa-solid fa-gear"></i>
                         </x-nav-link>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -342,10 +342,15 @@
                 <i class="fa-solid fa-clock mr-2"></i>Czas pracy
             </x-responsive-nav-link>
             @endif
-            @if($role == 'admin' || $role == 'właściciel')
+            @if($role == 'admin' || $role == 'właściciel' || $role == 'kierownik')
+                <x-responsive-nav-link href="{{ route('object.dashboard') }}" :active="request()->routeIs('object.*')">
+                    <i class="fa-solid fa-cube mr-2"></i>Obiekty
+                </x-responsive-nav-link>
+                @if($role == 'admin' || $role == 'właściciel')
                 <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                     <i class="fa-solid fa-gear mr-2"></i>Moja firma
                 </x-responsive-nav-link>
+                @endif
             @endif
         </div>
 

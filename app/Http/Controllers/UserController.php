@@ -13,6 +13,7 @@ use App\Models\UserCompanyHistory;
 use App\Models\WorkSession;
 use App\Repositories\CompanyRepository;
 use App\Repositories\InvitationRepository;
+use App\Support\UserInput;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -68,6 +69,9 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load('company');
+        if (!$user->company) {
+            abort_unless(auth()->user()?->role === 'właściciel', 403);
+        }
         //Wykorzystane wnioski
         $yearStart = Carbon::now()->startOfYear();
         $yearEnd = Carbon::now()->endOfYear();
@@ -110,12 +114,12 @@ class UserController extends Controller
         
         try {
             $leave_balance = LeaveBalance::where('user_id', $user->id)
-                ->where('company_id', $user->company->id)
+                ->where('company_id', $user->company?->id)
                 ->where('year', now()->year)
                 ->first();
             $carried_over = $leave_balance->carried_over ?? 0;
             $base_days = $leave_balance->base_days ?? 0;
-            $leave_balance_left = ($carried_over + $base_days) - $leave_balance->used_days;
+            $leave_balance_left = ($carried_over + $base_days) - ($leave_balance->used_days ?? 0);
         } catch (Exception) {
             $leave_balance = null;
             $leave_balance_left =  0;
@@ -280,42 +284,43 @@ class UserController extends Controller
     }
     public function edit(User $user)
     {
+        if (!$user->company) {
+            abort_unless(auth()->user()?->role === 'właściciel', 403);
+            return view('admin.user.edit-for-crm', ['user' => $user, 'withoutCompany' => true]);
+        }
         return view('admin.user.edit', compact('user'));
     }
 
-    public function prefabCreate(Company $client)
+    public function update(Request $request, User $user)
     {
-        $user =  new User();
-        $user->name = 'Administrator';
-        $user->company_id = $client->id;
-        $user->email = Str::random(12);
-        $user->password = Hash::make(Str::random(12));
-        $user->role = 'admin';
-        $user->save();
-        UserCompanyHistory::create([
-            'company_id' => $client->id,
-            'user_id' => $user->id,
-            'assigned_at' => Carbon::now(),
-            'paid_from' => Carbon::now()->startOfMonth(),
-            'user_price' => 0,
-        ]);
+        abort_unless($request->user()?->role === 'właściciel', 403);
+        // This endpoint only handles users without a company; assigned users use the wizard.
+        abort_if($user->company, 403);
+
+        $request->merge(UserInput::normalize($request->only(['name', 'email', 'phone', 'position'])));
+        $rules = UserInput::rules(false, $user->id);
+        $rules['phone'][0] = 'nullable';
+        $data = $request->validate(
+            $rules,
+            UserInput::messages()
+        );
+        $user->update($data);
+
+        return redirect()->route('setting.user.show', $user)->with('success', 'Zaktualizowano dane użytkownika.');
     }
+
     public function create(Company $client)
     {
-        if ($client->getUsersCount() === 0) {
-            $this->prefabCreate($client);
-            return redirect()->route('setting.client.show', $client)->with('success', 'Dodano admina w celu zapewnienia prawidłowego działania.');
-        }
+        \App\Support\UserCreationAccess::authorize($client->id, true);
         return view('admin.user.create', compact('client'));
     }
+
     public function createForCrm(Company $client)
     {
-        if ($client->getUsersCount() === 0) {
-            $this->prefabCreate($client);
-            return redirect()->route('setting.client.show', $client)->with('success', 'Dodano admina w celu zapewnienia prawidłowego działania.');
-        }
+        \App\Support\UserCreationAccess::authorize($client->id, true);
         return view('admin.user.create-for-crm', compact('client'));
     }
+
     public function editForCrm(User $user)
     {
         return view('admin.user.edit-for-crm', compact('user'));
@@ -335,22 +340,7 @@ class UserController extends Controller
     }
     public function storeForCrm(Request $request, Company $client)
     {
-        $user = User::create([
-            'name' => $request->name ?? 'Użytkownik CRM',
-            'email' => $request->email ?? Str::random(12),
-            'password' => Hash::make(Str::random(12)),
-            'phone' => $request->phone ?? null,
-            'position' => $request->position ?? null,
-            'company_id' => $client->id,
-            'role' => 'CRM',
-        ]);
-        UserCompanyHistory::create([
-            'company_id' => $client->id,
-            'user_id' => $user->id,
-            'assigned_at' => Carbon::now(),
-            'paid_from' => Carbon::now()->startOfMonth(),
-            'user_price' => 0,
-        ]);
+        app(\App\Services\CreateUser::class)->create($request->all(), $client->id, true, true);
         return redirect()->route('setting.client.show', $client)->with('success', 'Dodano użytkownika dla CRM.');
     }
     public function disconnect(User $user)

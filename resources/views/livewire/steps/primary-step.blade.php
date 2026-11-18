@@ -4,29 +4,13 @@
         <div id="manager">
             <x-label-form value="📋 Wprowadź dane podstawowe" />
             <div>
-                <div class="mt-2">
-                    <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                        <span>👤</span> Imię i nazwisko
-                    </label>
-                    <input type="text" name="name" wire:model="state.name" class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
-                </div>
-                <div class="mt-2">
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                        <span>✉️</span> Email
-                    </label>
-                    <input type="text" name="email" wire:model="state.email" class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
-                </div>
-                <div class="mt-2">
-                    <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
-                        <span>📞</span> Telefon
-                    </label>
-                    <input type="text" name="phone" wire:model="state.phone" class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
-                </div>
+                <x-user-identity-fields :livewire="true" />
                 <div class="mt-2">
                     <label for="position" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
                         <span>💼</span> Stanowisko <span class="text-xs text-gray-400">(opcjonalne)</span>
                     </label>
                     <input type="text" name="position" wire:model="state.position" class="w-full mt-2 rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white text-lg font-semibold" />
+                    @error('state.position') <p role="alert" class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p> @enderror
                 </div>
                 <div class="mt-2">
                     <label for="gender" class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
