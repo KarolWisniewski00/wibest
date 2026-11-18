@@ -61,6 +61,128 @@
 
                             <div class="space-y-5 p-5">
 
+                                <style>
+                                    .object-form-control,
+                                    body #object_type + .ts-wrapper .ts-control,
+                                    body #object-location-search gmp-place-autocomplete {
+                                        min-height: 46px;
+                                        width: 100%;
+                                        border: 1px solid #d1d5db !important;
+                                        border-radius: 0.5rem !important;
+                                        background-color: #fff !important;
+                                        color: #111827 !important;
+                                        font-size: 1.125rem !important;
+                                        line-height: 1.75rem !important;
+                                        box-shadow: none !important;
+                                        transition: border-color 150ms ease, box-shadow 150ms ease;
+                                    }
+
+                                    body #object-location-search gmp-place-autocomplete {
+                                        --gmpx-color-surface: #fff;
+                                        --gmpx-color-on-surface: #111827;
+                                        --gmpx-color-on-surface-variant: #9ca3af;
+                                        --gmpx-color-primary: #22c55e;
+                                        --gmpx-font-family-base: Lato, sans-serif;
+                                        --gmpx-font-size-base: 18px;
+                                    }
+
+                                    .object-form-control {
+                                        padding: 0.5rem 0.75rem;
+                                    }
+
+                                    .object-form-control::placeholder,
+                                    #object_type + .ts-wrapper .ts-control input::placeholder {
+                                        color: #9ca3af;
+                                    }
+
+                                    .object-form-control:focus,
+                                    body #object_type + .ts-wrapper.focus .ts-control,
+                                    body #object-location-search gmp-place-autocomplete:focus-within {
+                                        border-color: #22c55e !important;
+                                        outline: none !important;
+                                        box-shadow: 0 0 0 1px #22c55e !important;
+                                    }
+
+                                    body #object_type + .ts-wrapper .ts-control {
+                                        align-items: center;
+                                        padding: 0.5rem 0.75rem !important;
+                                    }
+
+                                    body #object_type + .ts-wrapper .ts-control input,
+                                    body #object_type + .ts-wrapper .item {
+                                        margin: 0 !important;
+                                        color: inherit !important;
+                                        font-size: inherit !important;
+                                        line-height: inherit !important;
+                                    }
+
+                                    .ts-dropdown {
+                                        overflow: hidden !important;
+                                        border: 1px solid #d1d5db !important;
+                                        border-radius: 0.5rem !important;
+                                        background-color: #fff !important;
+                                        color: #111827 !important;
+                                    }
+
+                                    .ts-dropdown .ts-dropdown-content {
+                                        max-height: 300px !important;
+                                    }
+
+                                    .ts-dropdown .active {
+                                        background-color: #f3f4f6 !important;
+                                        color: #111827 !important;
+                                    }
+
+                                    .ts-dropdown .optgroup-header {
+                                        border-top: 1px solid #e5e7eb !important;
+                                        background-color: #f9fafb !important;
+                                        color: #6b7280 !important;
+                                        padding: 10px 12px 7px !important;
+                                        font-size: 0.7rem !important;
+                                        font-weight: 700 !important;
+                                        letter-spacing: 0.08em !important;
+                                        text-transform: uppercase !important;
+                                    }
+
+                                    .ts-dropdown .optgroup:first-child .optgroup-header {
+                                        border-top: 0 !important;
+                                    }
+
+                                    @media (prefers-color-scheme: dark) {
+                                        .object-form-control,
+                                        body #object_type + .ts-wrapper .ts-control,
+                                        body #object-location-search gmp-place-autocomplete {
+                                            border-color: #4b5563 !important;
+                                            background-color: #4b5563 !important;
+                                            color: #f3f4f6 !important;
+                                        }
+
+                                        body #object-location-search gmp-place-autocomplete {
+                                            --gmpx-color-surface: #4b5563;
+                                            --gmpx-color-on-surface: #f3f4f6;
+                                            --gmpx-color-on-surface-variant: #9ca3af;
+                                            --gmpx-color-primary: #22c55e;
+                                        }
+
+                                        .ts-dropdown {
+                                            border-color: #4b5563 !important;
+                                            background-color: #1f2937 !important;
+                                            color: #fff !important;
+                                        }
+
+                                        .ts-dropdown .active {
+                                            background-color: #374151 !important;
+                                            color: #fff !important;
+                                        }
+
+                                        .ts-dropdown .optgroup-header {
+                                            border-color: #374151 !important;
+                                            background-color: #1f2937 !important;
+                                            color: #9ca3af !important;
+                                        }
+                                    }
+                                </style>
+
                                 {{-- NAZWA --}}
                                 <div class="mb-4 text-start">
                                     <label for="name"
@@ -68,7 +190,7 @@
                                         obiektu</label>
                                     <input type="text" id="name" name="name" value="{{ old('name', $object->name) }}" autofocus
                                         placeholder="Wpisz nazwę" required
-                                        class="h-[46px] placeholder-gray-400 mt-2 block w-full p-2 border border-gray-300 rounded-md shadow focus:ring-blue-500 focus:border-blue-500 sm:text-sm dark:bg-gray-600 dark:border-gray-600 dark:text-gray-100 !text-lg !leading-7 !pl-3">
+                                        class="object-form-control mt-2 block">
                                     @error('name')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
@@ -478,13 +600,22 @@
                                     rel="stylesheet">
                                 <style>
                                     #editor {
-                                        border: 0;
+                                        border: 1px solid #d1d5db;
+                                        border-radius: 0.5rem;
+                                        background-color: #fff;
+                                        color: #111827;
+                                        transition: border-color 150ms ease, box-shadow 150ms ease;
+                                    }
+
+                                    #editor:focus-within {
+                                        border-color: #22c55e;
+                                        box-shadow: 0 0 0 1px #22c55e;
                                     }
 
                                     .ql-toolbar {
-                                        border: 0 !important;
-                                        background-color: rgb(75 85 99) / var(--tw-bg-opacity));
-                                        border-radius: 0.375rem;
+                                        border: 1px solid #d1d5db !important;
+                                        background-color: #fff;
+                                        border-radius: 0.5rem;
                                         overflow-y: auto;
                                         padding: 8px 12px !important;
                                         margin: 0 !important;
@@ -493,7 +624,8 @@
                                     }
 
                                     .ql-editor {
-                                        background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+                                        background-color: #fff;
+                                        color: #111827;
                                         padding: 8px 12px !important;
                                         font-size: 1.125rem !important;
                                         line-height: 1.75rem !important;
@@ -501,12 +633,20 @@
                                     }
 
                                     @media (prefers-color-scheme: dark) {
+                                        #editor {
+                                            border-color: #4b5563;
+                                            background-color: #4b5563;
+                                            color: #f3f4f6;
+                                        }
+
                                         .ql-toolbar {
                                             background-color: rgb(75 85 99 / var(--tw-bg-opacity)) !important;
+                                            border-color: #4b5563 !important;
                                         }
 
                                         .ql-editor {
                                             background-color: rgb(75 85 99 / var(--tw-bg-opacity)) !important;
+                                            color: #f3f4f6;
                                         }
 
                                         .ql-editor.ql-blank::before {
@@ -552,7 +692,7 @@
                                     }
                                 </style>
                                 <div id="editor"
-                                    class="bg-white dark:bg-gray-700 dark:text-white rounded-md h-64 overflow-y-auto">
+                                    class="h-64 overflow-y-auto">
 
                                 </div>
 

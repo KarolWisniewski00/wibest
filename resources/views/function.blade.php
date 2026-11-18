@@ -4181,7 +4181,7 @@ window.functionObjectMap = options => {
                         </div>
                     </div>
 </section></div>
-<section class="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-700 my-4" x-data="{ employee: null, category: 'all' }" @function-demo-employee.window="employee = $event.detail; category = 'all'">
+<section class="min-w-0 overflow-hidden rounded-2xl bg-gray-100 shadow-sm dark:bg-gray-700 my-4" x-data="{ employee: null, category: 'all' }" @function-demo-employee.window="employee = $event.detail; category = 'all'">
 <div class="flex items-center gap-3 border-b border-gray-200 px-5 py-4 dark:border-gray-600"><div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-green-200 to-emerald-100 text-green-700 dark:from-green-500/20 dark:to-emerald-500/10 dark:text-green-300"><i class="fa-solid fa-clock" aria-hidden="true"></i></div><div><h4 class="text-sm font-semibold text-gray-900 dark:text-white">Czas pracy na obiekcie</h4><p class="text-xs text-gray-600 dark:text-gray-300">Przykładowe sesje czasu pracy · 11.2026</p></div></div>
 <div class="flex flex-wrap gap-2 border-b border-gray-200 px-5 py-3 dark:border-gray-600">
 <button type="button" @click="category = 'all'" :aria-pressed="category === 'all'" :class="category === 'all' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Wszystkie</button><button type="button" @click="category = 'normal'" :aria-pressed="category === 'normal'" :class="category === 'normal' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Norma</button><button type="button" @click="category = 'overtime'" :aria-pressed="category === 'overtime'" :class="category === 'overtime' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Nadgodziny</button><button type="button" @click="category = 'attention'" :aria-pressed="category === 'attention'" :class="category === 'attention' ? 'bg-green-100 text-green-800 dark:bg-green-300/10 dark:text-green-300' : 'text-gray-600 dark:text-gray-300'" class="rounded-lg px-3 py-1.5 text-xs font-medium transition">Wymaga uwagi</button></div>@php
@@ -4264,7 +4264,7 @@ window.functionObjectMap = options => {
             <div class="flex min-w-0 items-center gap-3 border-t border-gray-200 pt-3 font-semibold dark:border-gray-600 w-full [@media(prefers-color-scheme:light)]:border-gray-300">
                 <x-user-photo :user="$row->user" class="!h-8 !w-8" />
                 <div class="min-w-0 text-xs [overflow-wrap:anywhere]">
-                    <p class="break-words text-xs leading-5">{{ $row->user->name }}</p>
+                    <p class="break-words text-xs leading-5 dark:text-gray-50">{{ $row->user->name }}</p>
                     <x-user-role :user="$row->user" />
                 </div>
             </div>

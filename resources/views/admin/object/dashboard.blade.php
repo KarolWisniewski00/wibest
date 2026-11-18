@@ -3,7 +3,7 @@
     @if ($company)
         <x-main-no-filter>
             <x-object.nav />
-            <x-container-content>
+            <x-container-content style="box-shadow: 0 0 #0000;">
                 <div class="my-4 flex flex-wrap items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
                         <div class="flex h-11 sm:h-14 w-11 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-green-300/10 text-green-300 [@media(prefers-color-scheme:light)]:text-green-700 [@media(prefers-color-scheme:light)]:bg-green-100">

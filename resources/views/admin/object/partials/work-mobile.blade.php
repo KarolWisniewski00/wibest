@@ -56,7 +56,7 @@
             <div class="flex min-w-0 items-center gap-3 border-t border-gray-200 pt-3 font-semibold dark:border-gray-600 w-full [@media(prefers-color-scheme:light)]:border-gray-300">
                 <x-user-photo :user="$row->user" />
                 <div class="min-w-0 text-xs [overflow-wrap:anywhere]">
-                    <p class="break-words text-xs leading-5">{{ $row->user->name }}</p>
+                    <p class="break-words text-xs leading-5 dark:text-gray-50">{{ $row->user->name }}</p>
                     <x-user-role :user="$row->user" />
                 </div>
             </div>
