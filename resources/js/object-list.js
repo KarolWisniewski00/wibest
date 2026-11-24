@@ -1,9 +1,15 @@
+import { readFilterUrl, hideFilterUrl } from './filter-url.js';
+
 export function objectList({ endpoint, search = '', status = '', kind = 'objects' }) {
     const work = kind === 'work';
     const pageName = work ? 'work_page' : 'page';
     const marker = work ? 'X-Object-Work' : 'X-Object-List';
+    const explicitSearch = new URL(readFilterUrl()).searchParams.get('search');
+    const rememberedSearch = work ? search : (explicitSearch ?? search);
+    const restoreSearch = rememberedSearch !== search;
     const preservePeerFilters = url => {
-        const currentUrl = new URL(window.location.href);
+        const currentUrl = new URL(readFilterUrl());
+        for (const key of ['start_date', 'end_date']) if (currentUrl.searchParams.has(key)) url.searchParams.set(key, currentUrl.searchParams.get(key));
         for (const key of (work ? ['search', 'status', 'page'] : ['work_search', 'work_category', 'work_page'])) {
             url.searchParams.delete(key);
             if (currentUrl.searchParams.has(key)) url.searchParams.set(key, currentUrl.searchParams.get(key));
@@ -19,7 +25,8 @@ export function objectList({ endpoint, search = '', status = '', kind = 'objects
         version++;
     };
     return {
-        search: search ?? '', status: status ?? '', loading: false, error: '', announcement: '', retryPage: 1,
+        search: rememberedSearch ?? '', status: status ?? '', loading: restoreSearch, error: '', announcement: '', retryPage: 1,
+        init() { hideFilterUrl(); if (restoreSearch) this.load(1); },
         searchChanged(value) {
             this.search = value;
             // Invalidate an in-flight response immediately, before the debounce expires.
@@ -50,8 +57,8 @@ export function objectList({ endpoint, search = '', status = '', kind = 'objects
             url.searchParams.delete(searchName);
             url.searchParams.delete(statusName);
             url.searchParams.delete(pageName);
-            if (this.search) url.searchParams.set(searchName, this.search);
-            if (this.status) url.searchParams.set(statusName, this.status);
+            url.searchParams.set(searchName, this.search);
+            url.searchParams.set(statusName, this.status);
             if (page > 1) url.searchParams.set(pageName, String(page));
             this.loading = true;
             this.error = '';
@@ -68,7 +75,7 @@ export function objectList({ endpoint, search = '', status = '', kind = 'objects
                 this.announcement = this.$refs.results.querySelector('[data-object-list-summary]')?.textContent.trim() || '';
                 // The other section may have completed its own request while this one was pending.
                 preservePeerFilters(url);
-                window.history.replaceState(window.history.state, '', url);
+                hideFilterUrl(url);
             } catch (error) {
                 if (current !== version || error.name === 'AbortError') return;
                 this.error = work ? 'Nie udało się odświeżyć czasu pracy.' : 'Nie udało się odświeżyć listy obiektów.';

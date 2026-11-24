@@ -22,10 +22,10 @@ class WorkSessionReadQuery
             ->where(fn ($q) => $q->whereNull('s.event_stop_id')->orWhereNotNull('stop.id'));
     }
 
-    public function month(int $companyId, Carbon $month): Builder
+    public function month(int $companyId, Carbon $month, ?Carbon $end = null): Builder
     {
-        $from = $month->copy()->startOfMonth()->toDateTimeString();
-        $until = $month->copy()->startOfMonth()->addMonth()->toDateTimeString();
+        $from = ($end ? $month->copy()->startOfDay() : ($end ? $month->copy()->startOfDay() : $month->copy()->startOfMonth()))->toDateTimeString();
+        $until = ($end ? $end->copy()->addDay()->startOfDay() : ($end ? $end->copy()->addDay()->startOfDay() : $month->copy()->startOfMonth()->addMonth()))->toDateTimeString();
 
         return $this->base($companyId)
             ->leftJoin('locations as sl', 'sl.id', '=', 'start.location_id')
@@ -39,15 +39,15 @@ class WorkSessionReadQuery
                 'sl.longitude as start_lng', 'el.latitude as stop_lat', 'el.longitude as stop_lng');
     }
 
-    public function dailyTotals(int $companyId, array $userIds, Carbon $month): \Illuminate\Support\Collection
+    public function dailyTotals(int $companyId, array $userIds, Carbon $month, ?Carbon $end = null): \Illuminate\Support\Collection
     {
         // The stored duration is authoritative; do not recalculate START/STOP elapsed time.
         $seconds = '(CAST(SUBSTR(s.time_in_work, 1, LENGTH(s.time_in_work) - 6) AS SIGNED) * 3600'
             .' + CAST(SUBSTR(s.time_in_work, -5, 2) AS SIGNED) * 60 + CAST(SUBSTR(s.time_in_work, -2) AS SIGNED))';
 
         return $this->base($companyId)->whereIn('s.user_id', $userIds)->where('s.status', 'Praca zakończona')
-            ->where('start.time', '>=', $month->copy()->startOfMonth())
-            ->where('start.time', '<', $month->copy()->startOfMonth()->addMonth())
+            ->where('start.time', '>=', ($end ? $month->copy()->startOfDay() : $month->copy()->startOfMonth()))
+            ->where('start.time', '<', ($end ? $end->copy()->addDay()->startOfDay() : $month->copy()->startOfMonth()->addMonth()))
             ->selectRaw('s.user_id, DATE(start.time) as work_date, SUM('.$seconds.') as seconds')
             ->groupBy('s.user_id')->groupByRaw('DATE(start.time)')->get()
             ->keyBy(fn ($row) => $row->user_id.'|'.$row->work_date);

@@ -873,6 +873,21 @@ class User extends Authenticatable
     }
     protected static function booted()
     {
+        static::creating(function ($user) {
+            $user->working_hours_regular ??= 'zmienny planing';
+            foreach (['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as $day) {
+                $field = 'working_'.$day;
+                $user->$field ??= in_array($day, ['sat', 'sun']) ? 0 : 1;
+            }
+        });
+        static::saving(function ($user) {
+            if ($user->isDirty('working_hours_regular') && $user->working_hours_regular === 'stały planing') {
+                $user->working_hours_from ??= '08:00:00';
+                $user->working_hours_to ??= '16:00:00';
+                $user->working_hours_start_day ??= 'poniedziałek';
+                $user->working_hours_stop_day ??= 'piątek';
+            }
+        });
         static::addGlobalScope('order', function ($query) {
             $query->orderBy('name');
         });

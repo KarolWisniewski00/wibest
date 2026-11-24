@@ -1,0 +1,5 @@
+<a <?php echo e($attributes->merge(['class' => 'min-h-[34px] whitespace-nowrap inline-flex items-center px-4 py-2 bg-yellow-300 dark:bg-yellow-300 border border-transparent rounded-lg font-semibold text-white dark:text-gray-900 uppercase tracking-widest hover:bg-yellow-400 dark:hover:bg-yellow-400 focus:bg-yellow-400 dark:focus:bg-yellow-400 active:bg-yellow-400 dark:active:bg-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-300 focus:ring-offset-2 dark:focus:ring-offset-yellow-400 transition ease-in-out duration-150'])); ?>>
+    <?php echo e($slot); ?>
+
+</a>
+<?php /**PATH C:\xampp\htdocs\wibest\resources\views\components\button-link-yellow.blade.php ENDPATH**/ ?>

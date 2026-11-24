@@ -1,170 +1,77 @@
 @props(['work_session'])
-<li>
-    <div
-        class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-        <div class="flex flex-col w-full gap-4">
-            <div class="flex justify-between w-full">
-                <div class="flex justify-start items-center w-full justify-start">
-                    <x-RCP.work-session-status :work_session="$work_session" class="text-xs" />
-                </div>
-            </div>
-            @if(($work_session->eventStop == null && $work_session->status == 'W trakcie pracy') || ($work_session->eventStop != null && $work_session->status == 'Praca zakończona'))
-                @if($work_session->status == 'Praca zakończona')
-                    <div class="flex justify-between w-full">
-                        <div class="flex justify-start items-center w-full justify-start text-xs">
-                            <x-paragraf-display class="text-xs whitespace-nowrap">
-                                <x-status-cello>
-                                    @php
-                                        // Ustawienie polskiego locale dla Carbon
-                                        \Carbon\Carbon::setLocale('pl');
-
-                                        $startDate = \Carbon\Carbon::parse($work_session->eventStart->time);
-                                        $endDate = \Carbon\Carbon::parse($work_session->eventStop->time);
-                                    @endphp
-                                    @if ($work_session->eventStart->isSameDay($work_session->eventStop->time))
-                                        {{ $work_session->eventStart->format() }}
-                                    @else
-                                        {{ $startDate->format('d.m') }} - {{ $endDate->format('d.m') }}
-                                    @endif
-                                </x-status-cello>
-                            </x-paragraf-display>
-                        </div>
-                    </div>
-                    <div class="flex flex-row justify-start items-start w-fit gap-2">
-                        @php
-                            if ($work_session && $work_session->time_in_work != 0) {
-                                $event_start_obj = \App\Models\Event::where('id', $work_session->event_start_id)->first();
-                                $event_stop_obj = \App\Models\Event::where('id', $work_session->event_stop_id)->first();
-                                $startDateEvent = \Carbon\Carbon::parse($event_start_obj->time);
-                                $stopDateEvent = \Carbon\Carbon::parse($event_stop_obj->time);
-                                // Sprawdza, czy stopDateEvent ma inną datę niż startDateEvent
-                                if (!$stopDateEvent->isSameDay($startDateEvent)) {
-                                    $work_session->night = true; // Praca przeszła przez północ
-                                } else {
-                                    $work_session->night = false; // Praca zakończyła się w tym samym dniu
-                                }
-                            }
-                        @endphp
-                        @if($work_session->user->overtime_task)
-                            @if($work_session->getAlertTask() && $work_session->task_id == null)
-                                <div class="flex flex-col items-center justify-center text-center h-full w-full my-auto">
-                                    <span title="Brak zadania">⚠️</span>
-                                </div>
-                            @endif
-                        @endif
-                        @if($work_session->time_in_work == '24:00:00')
-                            <div class="flex flex-col items-center justify-center text-center h-full w-full my-auto">
-                                <span title="Automatyczne zakończenie">⚠️</span>
-                            </div>
-                        @endif
-                        <div class="flex flex-col items-center justify-center h-full w-full">
-                            <span class="text-lg md:text-xl">
-                                @if($work_session->night == true)
-                                    🌙
-                                @else
-                                    ⏱️
-                                @endif
-                            </span>
-                            <x-label-green class="mt-1">
-                                RCP
-                            </x-label-green>
-                        </div>
-                        <div class="flex flex-col items-center justify-center gap-2 my-auto">
-                            <x-paragraf-display class="text-xs whitespace-nowrap font-semibold w-fit text-start relative">
-                                <x-status-dark>
-                                    {{$startDateEvent->format('H:i')}} - {{$stopDateEvent->format('H:i')}}
-                                </x-status-dark>
-                            </x-paragraf-display>
-                            <x-paragraf-display
-                                class="text-gray-900 dark:text-gray-50 text-xs whitespace-nowrap font-semibold w-fit text-start relative">
-                                {{ $work_session->time_in_work }}
-                            </x-paragraf-display>
-                        </div>
-                        <div class="flex flex-row items-center justify-center my-auto">
-                            @if(isset($work_session->eventStart))
-                                @if($work_session->eventStart->location_id)
-                                    <x-status-green>
-                                        <i class="fa-solid fa-location-dot mx-1"></i>
-                                    </x-status-green>
-                                @endif
-                            @endif
-                            @if(isset($work_session->eventStop))
-                                @if($work_session->eventStop->location_id)
-                                    <x-status-red>
-                                        <i class="fa-solid fa-location-dot mx-1"></i>
-                                    </x-status-red>
-                                @endif
-                            @endif
-                        </div>
-                    </div>
-                @endif
-            @else
-                <div class="flex flex-row justify-start items-start w-fit gap-2">
-                    <div class="text-xs flex flex-col items-center justify-center text-center h-full w-full my-auto">
-                        <span title="Error">
-                            ❌ <x-status-red>Error</x-status-red>
-                        </span>
-                    </div>
-                </div>
-            @endif
-            @if($work_session->task_id != null)
-                <div class="flex justify-between w-full">
-                    <div class="flex justify-start items-center w-full justify-start">
-                        @if($work_session->task->status != null)
-                            @if($work_session->task->status == 'oczekujące')
-                                <x-status-yellow class="text-xs">
-                                    {{ $work_session->task->status }}
-                                </x-status-yellow>
-                            @elseif($work_session->task->status == 'zaakceptowane')
-                                <x-status-green class="text-xs">
-                                    {{ $work_session->task->status }}
-                                </x-status-green>
-                            @elseif($work_session->task->status == 'odrzucone')
-                                <x-status-red class="text-xs">
-                                    {{ $work_session->task->status }}
-                                </x-status-red>
-                            @endif
-                        @endif
-                    </div>
-                </div>
-                <div class="flex flex-col justify-start items-start w-fit gap-2">
-                    <x-status-gray class="text-xs">
-                        🎯 Zadanie
-                    </x-status-gray>
-                    <div
-                        class="text-gray-600 dark:text-gray-300 text-xs tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 gap-2 flex flex-col justify-center items-center text-center">
-                        {!! $work_session->task->note !!}
-                    </div>
-                </div>
-            @endif
-            @if($work_session->notes != null)
-                <div class="flex flex-col justify-start items-start w-fit gap-2">
-                    <x-status-gray class="text-xs">
-                        Notatka
-                    </x-status-gray>
-                    <div
-                        class="text-gray-600 dark:text-gray-300 text-xs tracking-widest hover:text-gray-700 dark:hover:text-gray-300 transition ease-in-out duration-150 gap-2 flex flex-col justify-start items-start text-start">
-                        {!! $work_session->notes !!}
-                    </div>
-                </div>
-            @endif
-            <div
-                class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
-                <x-user-photo :user="$work_session->user" />
-                <x-user-name :user="$work_session->user" />
-            </div>
-            <div class="flex space-x-4">
-                <x-button-link-neutral href="{{route('rcp.work-session.show', $work_session)}}" class="min-h-[38px]">
-                    <i class="fa-solid fa-eye"></i>
-                </x-button-link-neutral>
-                @if($role == 'admin' || $role == 'właściciel')
-                    @if($work_session->status == 'Praca zakończona')
-                        <x-button-link-blue href="{{route('rcp.work-session.edit', $work_session)}}" class="min-h-[38px]">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </x-button-link-blue>
-                    @endif
-                @endif
-            </div>
+@php
+    $user = $work_session->user;
+    $start = $work_session->eventStart ? \Carbon\Carbon::parse($work_session->eventStart->time) : null;
+    $stop = $work_session->eventStop ? \Carbon\Carbon::parse($work_session->eventStop->time) : null;
+    $night = $start && $stop && !$start->isSameDay($stop);
+    $inProgress = $work_session->status === 'W trakcie pracy';
+    $valid = $start && (($inProgress && !$stop) || ($work_session->status === 'Praca zakończona' && $stop && $stop->gte($start)));
+    $details = app(\App\Services\WorkSessionClassification::class)->details($work_session);
+    $category = ['under' => 'Brak normy', 'normal' => 'Norma', 'overtime' => 'Nadgodziny'][$details['category']] ?? null;
+    $tone = match ($details['category']) {
+        'under' => $night ? 'bg-green-400/20 text-green-800 dark:text-green-400' : 'bg-green-300/20 text-green-800 dark:text-green-300',
+        'normal' => $night ? 'bg-green-400 text-green-950' : 'bg-green-300 text-green-900',
+        'overtime' => $night ? 'bg-indigo-400 text-indigo-950' : 'bg-indigo-300 text-indigo-950',
+        default => 'bg-yellow-300 text-gray-900',
+    };
+    $missingTask = $valid && !$inProgress && $user?->overtime_task && !$work_session->task_id && $work_session->getAlertTask();
+    $difference = $details['daySeconds'] - $details['planned'];
+    $url = route('rcp.work-session.show', $work_session);
+@endphp
+<x-RCP.mobile-card :url="$url">
+    <div class="flex w-full items-start justify-between gap-3">
+        <div class="flex min-w-0 flex-1 flex-col items-start gap-2 [&>*]:m-0">
+            <x-RCP.work-session-status :work_session="$work_session" class="text-xs !font-medium" />
+            <x-status-cello class="text-xs !font-medium break-words">{{ $start?->copy()->locale('pl')->translatedFormat('d.m, l') ?? 'Brak START' }}@if($night) – {{ $stop->copy()->locale('pl')->translatedFormat('d.m, l') }}@endif</x-status-cello>
+        </div>
+        <a href="{{ $url }}" aria-label="Przejdź do sesji" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>
+    </div>
+    <div class="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
+        <div class="flex flex-col items-center gap-1">
+            <span aria-label="{{ $night ? 'Zmiana przez północ' : 'Sesja dzienna' }}">{{ $night ? '🌙' : '⏱️' }}</span>
+            <span class="rounded-full px-2 py-0.5 text-xs font-medium {{ $inProgress ? 'bg-yellow-300 text-gray-900' : $tone }}">RCP</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 [&>*]:m-0">
+            <x-paragraf-display class="text-xs leading-5 whitespace-nowrap font-semibold [&>*]:text-xs [&>*]:leading-5"><x-status-dark>{{ $start?->format('H:i') ?? '—' }} - {{ $stop?->format('H:i') ?? '—' }}</x-status-dark></x-paragraf-display>
+            @if($work_session->time_in_work)<x-paragraf-display class="text-xs leading-5 font-medium !text-gray-500 dark:!text-gray-300">{{ $work_session->time_in_work }}</x-paragraf-display>@endif
+        </div>
+        <div class="flex items-center gap-1">
+            @if($work_session->eventStart?->location_id)<x-status-green title="Lokalizacja START"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span class="sr-only">START</span></x-status-green>@endif
+            @if($work_session->eventStop?->location_id)<x-status-red title="Lokalizacja STOP"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span class="sr-only">STOP</span></x-status-red>@endif
         </div>
     </div>
-</li>
+    @if($category)
+        <div class="w-full border-t border-gray-200 pt-3 dark:border-gray-600 [@media(prefers-color-scheme:light)]:border-gray-300">
+            <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {{ $tone }}">{{ $category }}</span>
+            <p class="mt-2 text-xs leading-5 {{ $difference > 0 ? 'text-indigo-700 dark:text-indigo-200' : 'text-green-800 dark:text-green-200' }}" title="Bilans całego dnia pracownika">
+                @if($details['planned'] <= 0) Brak określonej normy
+                @elseif($difference < 0) Brakuje {{ \App\Services\Objects\ObjectWorkReport::duration(-$difference) }}
+                @elseif($difference > 0) +{{ \App\Services\Objects\ObjectWorkReport::duration($difference) }} ponad normę
+                @else Norma zrealizowana
+                @endif
+            </p>
+            @if($details['planned'] > 0)<p class="mt-1 text-[10px] text-gray-500 dark:text-gray-300">Bilans dnia · Norma dnia: {{ \App\Services\Objects\ObjectWorkReport::duration($details['planned']) }}</p>@endif
+        </div>
+    @endif
+    @if(!$valid || $missingTask || $work_session->time_in_work === '24:00:00')
+        <div class="w-full space-y-2 border-t border-gray-200 pt-3 dark:border-gray-600">
+            @if(!$valid)<p class="text-red-700 dark:text-red-300">❌ Nieprawidłowa sesja</p>@endif
+            @if($missingTask)<p class="text-yellow-700 dark:text-yellow-300">⚠️ Brak zadania</p>@endif
+            @if($work_session->time_in_work === '24:00:00')<p class="text-yellow-700 dark:text-yellow-300">⚠️ Automatyczne zakończenie</p>@endif
+        </div>
+    @endif
+    @if($work_session->task)
+        <div class="w-full min-w-0 break-words border-t border-gray-200 pt-3 dark:border-gray-600 [overflow-wrap:anywhere]">
+            <p class="mb-1 font-semibold">🎯 Zadanie @if($work_session->task->status) · {{ $work_session->task->status }} @endif</p>
+            <div class="max-w-full overflow-hidden [&_img]:max-w-full">{!! $work_session->task->note !!}</div>
+        </div>
+    @endif
+    @if($work_session->notes)
+        <div class="w-full min-w-0 break-words border-t border-gray-200 pt-3 dark:border-gray-600 [overflow-wrap:anywhere]">
+            <p class="mb-1 font-semibold">📝 Notatka</p><div class="max-w-full overflow-hidden [&_img]:max-w-full">{!! $work_session->notes !!}</div>
+        </div>
+    @endif
+    <div class="flex min-w-0 items-center gap-3 border-t border-gray-200 pt-3 font-semibold dark:border-gray-600 w-full [@media(prefers-color-scheme:light)]:border-gray-300">
+        @if($user)<x-team-user-identity :user="$user" />@else<span>Usunięty pracownik</span>@endif
+    </div>
+</x-RCP.mobile-card>

@@ -4,6 +4,20 @@
 <script>
     $(document).ready(function() {
         let page = 2;
+        let pagingStopped = Boolean(window.wibestFilterChanged);
+        let pagingRequest;
+        window.addEventListener('wibest-filter-changing', () => {
+            pagingStopped = true;
+            pagingRequest?.abort();
+        });
+        @if(request()->routeIs('rcp.work-session.index'))
+        let sessionRequest;
+        let sessionPagingStopped = @js((bool) session('rcp.filters.active', false)) || Boolean(($('#search').val() || '').trim());
+        window.addEventListener('rcp-session-filter-changing', () => {
+            sessionPagingStopped = true;
+            sessionRequest?.abort();
+        });
+        @endif
         let loading = false;
         const $body = $('#body');
         const $list = $('#list');
@@ -46,11 +60,21 @@
         }
 
         function loadMoreSessions() {
-            if (loading) return;
+            // A restored search is loaded by the filter, not by unfiltered pagination.
+            if (($('#search').val() || '').trim()) return;
+            @if(request()->routeIs('rcp.work-session.index'))
+            if (sessionPagingStopped) return;
+            @endif
+            if (pagingStopped || loading) return;
             loading = true;
             $loader.removeClass('hidden');
             $loaderCard.removeClass('hidden');
-            $.get(`{{ $slot }}?page=${page}${filter_user_id}&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`, function(data) {
+            @if(request()->routeIs('rcp.work-session.index')) sessionRequest = @endif
+            pagingRequest = $.get(`{{ $slot }}?page=${page}${filter_user_id}&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`, function(data) {
+                if (pagingStopped) return;
+                @if(request()->routeIs('rcp.work-session.index'))
+                if (sessionPagingStopped) return;
+                @endif
                 data.table.forEach(function(row) {
                     $loader.before(row);
                 });

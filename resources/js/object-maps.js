@@ -107,7 +107,8 @@ function readingPopup(readings) {
     return container;
 }
 
-function createMap(element, objects) {
+function createMap(element, objects, fitReadings = false) {
+    let visibleReadings = [];
     const maps = window.google.maps;
     const map = new maps.Map(element, {
         center: { lat: 52.0693, lng: 19.4803 }, zoom: 6,
@@ -169,6 +170,7 @@ function createMap(element, objects) {
             this.button = document.createElement('button');
             this.button.type = 'button';
             this.button.setAttribute('aria-label', `${this.readings[0].type}: ${this.readings.length} odczytów`);
+            if (fitReadings) this.button.classList.add('rcp-map-reading-enter');
             Object.assign(this.button.style, {
                 position: 'absolute', width: '18px', height: '18px', borderRadius: '50%',
                 border: '2px solid white', background: start ? '#16a34a' : '#dc2626',
@@ -207,6 +209,14 @@ function createMap(element, objects) {
         }));
     const fit = () => {
         maps.event.trigger(map, 'resize');
+        if (fitReadings) {
+            const bounds = new maps.LatLngBounds();
+            objects.forEach(object => bounds.extend({ lat: Number(object.lat), lng: Number(object.lng) }));
+            visibleReadings.forEach(point => bounds.extend({ lat: Number(point.lat), lng: Number(point.lng) }));
+            circles.forEach(circle => { if (circle.getBounds()) bounds.union(circle.getBounds()); });
+            if (objects.length || visibleReadings.length) map.fitBounds(bounds, { top: 45, left: 45, right: 45, bottom: 150 });
+            return;
+        }
         if (!objects.length) return;
         if (circles.length) {
             const bounds = new maps.LatLngBounds();
@@ -233,10 +243,12 @@ function createMap(element, objects) {
     fit();
     return {
         fit,
-        setReadings(readings) {
+        setReadings(readings, { preserveCamera = false } = {}) {
+            visibleReadings = readings.filter(validPosition);
             info.close();
             readingMarkers.forEach(marker => marker.setMap(null));
             readingMarkers = groupReadings(readings).map(group => new ReadingMarker(group));
+            if (fitReadings && !preserveCamera) fit();
         },
         close: () => info.close(),
         destroy() {
@@ -253,7 +265,7 @@ function createMap(element, objects) {
     };
 }
 
-export function objectMaps({ objects, apiKey, readings = [] }) {
+export function objectMaps({ objects, apiKey, readings = [], fitReadings = false }) {
     // Keep Google Maps instances outside Alpine's reactive proxies.
     const instances = new Map();
     let disposed = false;
@@ -283,13 +295,13 @@ export function objectMaps({ objects, apiKey, readings = [] }) {
                     this.$nextTick(() => this.$refs.openButton?.focus());
                 }
             });
-            if (!validObjects.length) {
+            if (!validObjects.length && !fitReadings) {
                 this.message = emptyMessage;
                 return;
             }
             ready = loadObjectGoogleMaps(apiKey).then(() => {
                 if (disposed || window.__wibestMapsAuthFailed) return;
-                instances.set('card', createMap(this.$refs.cardMap, validObjects));
+                instances.set('card', createMap(this.$refs.cardMap, validObjects, fitReadings));
                 instances.get('card').setReadings(currentReadings);
                 this.message = '';
             }).catch(error => {
@@ -299,10 +311,10 @@ export function objectMaps({ objects, apiKey, readings = [] }) {
                     : 'Nie udało się załadować mapy. Sprawdź połączenie lub konfigurację Google Maps.';
             });
         },
-        updateReadings(readings) {
+        updateReadings(readings, options = {}) {
             currentReadings = readings;
             this.readingsMessage = readings.length ? '' : 'Brak odczytów START/STOP z lokalizacją dla aktywnych filtrów.';
-            instances.forEach(instance => instance.setReadings(currentReadings));
+            instances.forEach(instance => instance.setReadings(currentReadings, options));
         },
         async showFullMap() {
             await ready;
@@ -310,7 +322,7 @@ export function objectMaps({ objects, apiKey, readings = [] }) {
             requestAnimationFrame(() => {
                 if (disposed || !this.fullMapOpen) return;
                 try {
-                    if (!instances.has('full')) instances.set('full', createMap(document.getElementById('objects-full-map'), validObjects));
+                    if (!instances.has('full')) instances.set('full', createMap(document.getElementById('objects-full-map'), validObjects, fitReadings));
                     instances.get('full').setReadings(currentReadings);
                     instances.get('full').fit();
                 } catch {

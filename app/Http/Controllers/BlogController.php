@@ -29,7 +29,7 @@ class BlogController extends Controller
 
         // Walidacja JSON
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($blocks)) {
-            return dd('Błąd w formacie JSON');
+            return back()->withInput()->withErrors(['content' => 'Błąd w formacie JSON.']);
         }
 
         // ===== SLUG =====
@@ -72,7 +72,7 @@ class BlogController extends Controller
 
         // ===== WALIDACJA JSON =====
         if (json_last_error() !== JSON_ERROR_NONE || !is_array($blocks)) {
-            return dd('Błąd w formacie JSON');
+            return back()->withInput()->withErrors(['content' => 'Błąd w formacie JSON.']);
         }
 
         // ===== SLUG =====

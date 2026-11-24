@@ -95,6 +95,131 @@ class ObjectsTest extends TestCase
         return app(\App\Services\Objects\ObjectWorkReport::class)->build(1, \Carbon\Carbon::createFromFormat('!Y-m', $month), $request, $object);
     }
 
+    public function test_rcp_classification_filter_matches_row_labels_and_supports_multiple_choices(): void
+    {
+        // The legacy mobile identity's live status is unrelated to historical classification.
+        \Illuminate\Support\Facades\View::composer('components.user-name', function ($view) {
+            $user = $view->getData()['user'];
+            $view->with('user', (object) ['name' => $user->name, 'role' => $user->role]);
+        });
+        $under = $this->workSession('2026-11-02 08:00:00', '04:00:00');
+        $normal = $this->workSession('2026-11-03 08:00:00', '08:00:00');
+        $extra = $this->workSession('2026-11-04 08:00:00', '10:00:00');
+        $progress = $this->workSession('2026-11-05 08:00:00', '00:00:00', null, ['status' => 'W trakcie pracy', 'event_stop_id' => null]);
+        $classifier = app(\App\Services\WorkSessionClassification::class);
+        foreach ([$under => 'under', $normal => 'normal', $extra => 'overtime', $progress => 'in_progress'] as $id => $category) {
+            $this->assertSame($category, $classifier->details(\App\Models\WorkSession::findOrFail($id))['category']);
+        }
+        $params = ['start_date' => '2026-11-01', 'end_date' => '2026-11-30', 'classification_filter' => 1];
+        $data = $this->getJson(route('api.v1.rcp.work-session.set.date', $params + ['classifications' => ['under', 'overtime']]))->assertOk()->json();
+        $this->assertCount(2, $data['table']);
+        $this->assertStringContainsString('Brak normy', implode('', $data['table']));
+        $this->assertStringContainsString('Nadgodziny', implode('', $data['table']));
+        $this->assertSame(['under', 'overtime'], session('rcp.filters.classifications'));
+        $this->assertTrue(session('rcp.filters.active'));
+        $this->getJson(route('api.v1.rcp.work-session.set.date', $params))->assertOk()->assertJsonPath('table', []);
+        Schema::table('work_sessions', fn (Blueprint $table) => $table->text('notes')->nullable());
+        $task = DB::table('events')->insertGetId(['user_id' => 2, 'company_id' => 1, 'time' => '2026-11-03 16:00:00']);
+        DB::table('work_sessions')->where('id', $normal)->update(['task_id' => $task, 'notes' => 'Test note']);
+        DB::table('work_sessions')->where('id', $under)->update(['notes' => 'Another note']);
+        DB::table('work_sessions')->where('id', $extra)->update(['notes' => '   ']);
+        $base = ['start_date' => '2026-11-01', 'end_date' => '2026-11-30'];
+        foreach ([['has_task' => 1], ['has_note' => 1], ['has_task' => 1, 'has_note' => 1], []] as $filters) {
+            $response = $this->getJson(route('api.v1.rcp.work-session.set.date', $base + $filters))->assertOk()->json();
+            $expected = isset($filters['has_task']) ? 1 : (isset($filters['has_note']) ? 2 : 4);
+            $this->assertCount($expected, $response['table']);
+            $this->assertCount($expected, $response['list']);
+        }
+        $this->getJson(route('api.v1.rcp.work-session.set.date', $base + [
+            'classification_filter' => 1, 'classifications' => ['normal'], 'has_task' => 1, 'has_note' => 1,
+        ]))->assertOk();
+        $this->assertSame(['normal'], session('rcp.filters.classifications'));
+        $this->assertTrue(session('rcp.filters.has_task'));
+        $this->assertTrue(session('rcp.filters.has_note'));
+    }
+
+    public function test_events_paginate_by_three_but_date_filter_returns_all_matches(): void
+    {
+        Schema::table('events', function (Blueprint $table) {
+            $table->string('event_type')->nullable();
+            $table->string('status')->nullable();
+        });
+        for ($day = 2; $day <= 5; $day++) {
+            $this->workSession("2026-11-0{$day} 08:00:00");
+        }
+        DB::table('events')->update(['event_type' => 'start']);
+        $params = ['start_date' => '2026-11-01', 'end_date' => '2026-11-30',
+            'filter_event_types' => 1, 'event_types' => ['start'], 'per_page' => 3];
+        $first = $this->getJson(route('api.v1.rcp.event.get', $params))->assertOk()->json();
+        $this->assertCount(3, $first['table']);
+        $this->assertNotNull($first['next_page_url']);
+        $second = $this->getJson(route('api.v1.rcp.event.get', $params + ['page' => 2]))->assertOk()->json();
+        $this->assertCount(3, $second['table']);
+        $this->assertEmpty(array_intersect(array_column($first['data'], 'id'), array_column($second['data'], 'id')));
+        $filtered = $this->getJson(route('api.v1.rcp.event.set.date', $params))->assertOk()->json();
+        $this->assertCount(8, $filtered['table']);
+        $this->assertCount(8, $filtered['list']);
+    }
+
+    public function test_dashboard_shell_defers_expensive_monthly_report(): void
+    {
+        $report = $this->createMock(\App\Services\Objects\ObjectWorkReport::class);
+        $report->expects($this->never())->method('build');
+        $this->app->instance(\App\Services\Objects\ObjectWorkReport::class, $report);
+        $request = Request::create(route('object.dashboard'));
+        $request->setLaravelSession(session()->driver());
+        $data = app(ObjectController::class)->dashboard($request)->getData();
+        $this->assertTrue($data['deferReport']);
+        $this->assertNull($data['workReport']);
+    }
+
+    public function test_map_search_filters_employees_within_the_shared_month_and_company(): void
+    {
+        $object = $this->workObject();
+        $this->workSession('2026-11-02 08:00:00', '08:00:00', $object->location_id);
+        $params = ['start_date' => '2026-11-01', 'end_date' => '2026-11-30', 'search' => 'Worker'];
+        $this->get(route('rcp.location.index', $params), ['X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()->assertJsonCount(2, 'readings');
+        $params['search'] = 'Other';
+        $this->get(route('rcp.location.index', $params), ['X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()->assertJsonCount(0, 'readings');
+        $params['search'] = '';
+        $this->get(route('rcp.location.index', $params), ['X-Requested-With' => 'XMLHttpRequest'])
+            ->assertOk()->assertJsonCount(2, 'readings');
+    }
+
+    public function test_dashboard_date_ranges_are_corrected_to_a_full_month_and_remembered(): void
+    {
+        $object = $this->workObject();
+        $this->workSession('2026-11-02 08:00:00', '08:00:00', $object->location_id);
+        $this->workSession('2026-12-02 08:00:00', '08:00:00', $object->location_id);
+        foreach ([['2026-11-02', '2026-11-02', '08:00:00'], ['2026-11-01', '2026-12-31', '08:00:00']] as [$start, $end, $total]) {
+            $data = $this->get(route('object.dashboard', ['start_date' => $start, 'end_date' => $end]), ['X-Object-Dashboard' => '1'])->assertOk()->json();
+            $this->assertSame('2026-11-01', $data['startDate']);
+            $this->assertSame('2026-11-30', $data['endDate']);
+            $this->assertStringContainsString($total, $data['cards']);
+            $this->assertSame('2026-11-01', session('start_date'));
+            $this->assertSame('2026-11-30', session('end_date'));
+            $this->assertNotEmpty(session('date_range_info'));
+        }
+        $remembered = app(ObjectController::class)->dashboard(Request::create(route('object.dashboard')))->getData();
+        $this->assertSame('2026-11-01', $remembered['startDate']);
+        $this->assertSame('2026-11-30', $remembered['endDate']);
+        $source = file_get_contents(resource_path('views/admin/object/dashboard.blade.php'));
+        $this->assertStringContainsString('<x-filter-date-user loader="objects">', $source);
+        $this->assertStringNotContainsString('$role', $source);
+        view()->share('errors', new \Illuminate\Support\ViewErrorBag());
+        foreach (['admin', 'właściciel', 'kierownik'] as $role) {
+            auth()->user()->role = $role;
+            $data = app(ObjectController::class)->dashboard(Request::create(route('object.dashboard')))->getData();
+            $template = str_replace(['<x-app-layout class="flex">', '</x-app-layout>'], ['<div>', '</div>'], $source);
+            $html = \Illuminate\Support\Facades\Blade::render($template, $data + ['company' => true, 'role' => $role]);
+            $this->assertStringContainsString('id="selected-dates"', $html);
+            $this->assertStringContainsString('id="sidebar-multi-level-sidebar"', $html);
+        }
+
+    }
+
     public function test_work_attention_missing_outside_and_valid_locations_and_read_has_no_writes(): void
     {
         $object = $this->workObject();
@@ -108,6 +233,21 @@ class ObjectsTest extends TestCase
         $queries = DB::getQueryLog();
         DB::disableQueryLog();
         $this->assertSame(['missing_location' => 1, 'outside_objects' => 1], $report['stats']['reasons']);
+        $this->assertSame(2, $report['stats']['attention']);
+        $this->assertSame(57600, $report['stats']['attention_seconds']);
+        $previewReport = app(\App\Services\Objects\ObjectWorkReport::class)->build(
+            1, \Carbon\Carbon::parse('2026-11-01'), Request::create('/'), $object, true
+        );
+        $this->assertSame(1, $previewReport['stats']['attention']);
+        $this->assertSame(28800, $previewReport['stats']['attention_seconds']);
+        foreach ([[$report, 'dashboard', '16:00:00', '2 sesje'], [$previewReport, 'preview', '08:00:00', '1 sesja']] as [$cardsReport, $mode, $time, $caption]) {
+            $html = view('admin.object.partials.work-cards', [
+                'workReport' => $cardsReport, $mode => true, 'counts' => collect(),
+                'month' => \Carbon\Carbon::parse('2026-11-01'),
+            ])->render();
+            $this->assertStringContainsString($time, $html);
+            $this->assertStringContainsString($caption, $html);
+        }
         $this->assertSame(1, $report['stats']['normal']['count']);
         $this->assertSame(28800, $report['stats']['seconds']);
         $this->assertSame([$valid], collect($this->report($object)['rows']->items())->pluck('id')->all());
@@ -375,22 +515,27 @@ class ObjectsTest extends TestCase
         $object = $this->workObject();
         $this->workSession('2026-11-02 08:00:00', '06:00:00', $object->location_id);
         $this->workSession('2026-10-05 08:00:00', '08:00:00', $object->location_id);
-        $request = Request::create(route('object.show', $object), 'GET', ['month' => '2026-11']);
+        $request = Request::create(route('object.show', $object), 'GET', ['start_date' => '2026-11-01', 'end_date' => '2026-11-30']);
         $data = app(ObjectController::class)->show($object, $request)->getData();
         $this->assertSame('2026-11', $data['month']->format('Y-m'));
         $this->assertSame(1, $data['workReport']['stats']['under']['count']);
         $this->assertSame(1, $data['workReport']['rows']->total());
         $source = str_replace(['<x-app-layout class="flex">', '</x-app-layout>'], ['<div>', '</div>'], file_get_contents(resource_path('views/admin/object/show.blade.php')));
         $html = \Illuminate\Support\Facades\Blade::render($source, $data);
-        foreach (['data-month="2026-11"', '06:00:00', '1 sesja', '02.11.2026', '08:00 - 14:00', 'Norma dnia', 'Brak normy', 'Historia statusów'] as $text) {
+        foreach (['id="current-month-bt"', '06:00:00', '1 sesja', '02.11.2026', '08:00 - 14:00', 'Norma dnia', 'Brak normy', 'Historia statusów'] as $text) {
             $this->assertStringContainsString($text, $html);
         }
         $this->assertStringNotContainsString('05.10.2026 08:00', $html);
         $dashboard = app(ObjectController::class)->dashboard(Request::create(route('object.dashboard'), 'GET', ['month' => '2026-11']))->getData();
-        $this->assertSame($data['workReport']['stats'], $dashboard['workReport']['stats']);
+        $this->assertNull($dashboard['workReport']);
         $source = str_replace(['<x-app-layout class="flex">', '</x-app-layout>'], ['<div>', '</div>'], file_get_contents(resource_path('views/admin/object/dashboard.blade.php')));
         $html = \Illuminate\Support\Facades\Blade::render($source, $dashboard + ['company' => true]);
-        $this->assertStringContainsString('Wszystkie sesje czasu pracy z wybranego miesiąca · 11.2026', $html);
+        $this->assertStringContainsString('aria-label="Ładowanie danych"', $html);
+        $request = Request::create(route('object.dashboard'), 'GET', ['month' => '2026-11']);
+        $request->headers->set('X-Object-Dashboard', '1');
+        $loaded = app(ObjectController::class)->dashboard($request)->getData(true);
+        $this->assertStringContainsString('06:00:00', $loaded['cards']);
+        $this->assertStringContainsString('Wszystkie sesje czasu pracy z wybranego okresu · 01.11.2026 - 30.11.2026', $loaded['work']);
     }
 
     public function test_creation_date_does_not_limit_history_but_real_pause_and_execution_dates_do(): void
@@ -468,7 +613,9 @@ class ObjectsTest extends TestCase
         $this->assertStringContainsString('hidden overflow-x-auto md:block', $html);
         $mobile = view('admin.object.partials.work-mobile', ['workReport' => $report, 'role' => 'admin'])->render();
         $this->assertStringContainsString('border-2 border-gray-200 rounded-lg', $mobile);
-        $this->assertStringContainsString('fa-chevron-right', $mobile);
+        $this->assertStringContainsString('fa-arrow-up-right-from-square', $mobile);
+        $this->assertStringContainsString('Profil pracownika', $html);
+        $this->assertStringContainsString(route('team.user.show', 2), $html);
         $this->assertStringNotContainsString('fa-eye', $mobile);
         $this->assertStringNotContainsString('fa-pen-to-square', $mobile);
         $this->assertStringContainsString(route('rcp.work-session.show', $valid), $mobile);
@@ -635,17 +782,16 @@ class ObjectsTest extends TestCase
         $data = app(ObjectController::class)->dashboard(Request::create(route('object.dashboard'), 'GET', ['month' => '2026-11']))->getData();
         $source = str_replace(['<x-app-layout class="flex">', '</x-app-layout>'], ['<div>', '</div>'], file_get_contents(resource_path('views/admin/object/dashboard.blade.php')));
         $html = \Illuminate\Support\Facades\Blade::render($source, $data + ['company' => true]);
-        $this->assertSame(3, substr_count($html, 'x-show="loading"'));
-        $this->assertSame(3, substr_count($html, 'fa-spinner'));
-        $this->assertSame(2, substr_count($html, '@input="searchChanged($event.target.value)"'));
-        $this->assertSame(2, substr_count($html, 'transition-colors duration-200 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset'));
-        $this->assertStringContainsString('Listopad 2026', $html);
-        $this->assertStringContainsString('month=2026-10', $html);
-        $this->assertStringContainsString('month=2026-12', $html);
-        $this->assertStringContainsString('fa-calendar', $html);
-        $this->assertStringContainsString('aria-label="Poprzedni miesiąc"', $html);
-        $this->assertStringContainsString('aria-label="Następny miesiąc"', $html);
-        $this->assertStringContainsString('rounded-xl border border-gray-200 bg-white', $html);
+        $this->assertTrue($data['deferReport']);
+        $this->assertStringContainsString('aria-label="Ładowanie danych"', $html);
+        $this->assertStringNotContainsString('id="object-list-results"', $html);
+        $request = Request::create(route('object.dashboard'), 'GET', ['month' => '2026-11']);
+        $request->headers->set('X-Object-Dashboard', '1');
+        $loaded = app(ObjectController::class)->dashboard($request)->getData(true);
+        $this->assertSame(2, substr_count($loaded['objects'].$loaded['work'], '@input="searchChanged($event.target.value)"'));
+        $this->assertStringContainsString('01.11.2026 - 30.11.2026', $loaded['work']);
+        $this->assertStringContainsString('sidebar-multi-level-sidebar', $html);
+        $this->assertStringContainsString('object-date-range', $html);
     }
 
     public function test_preview_month_payload_updates_cards_workers_readings_and_table_from_one_report(): void
@@ -722,7 +868,7 @@ class ObjectsTest extends TestCase
         $response = $this->get(route('object.dashboard', $params), ['X-Object-Dashboard' => '1'])
             ->assertOk()->assertHeader('X-Object-Dashboard', '1')->assertJsonPath('month', '2026-11');
         $data = $response->json();
-        $this->assertSame(['month', 'period', 'cards', 'objects', 'work'], array_keys($data));
+        $this->assertSame(['month', 'period', 'startDate', 'endDate', 'cards', 'objects', 'work'], array_keys($data));
         $this->assertStringContainsString('17:00:00', $data['cards']);
         $this->assertStringContainsString('17h', $data['objects']);
         $this->assertStringContainsString('Work site', $data['objects']);
@@ -731,7 +877,7 @@ class ObjectsTest extends TestCase
         $this->assertStringNotContainsString('02.11.2026', $data['work']);
         $this->assertStringContainsString('value="Worker"', $data['work']);
         $this->assertStringContainsString('value="Work site"', $data['objects']);
-        $this->assertStringContainsString('object-period-request', $data['period']);
+        $this->assertSame('01.11.2026 - 30.11.2026', $data['period']);
         $this->assertStringNotContainsString('window.location.assign', $data['period']);
         $this->assertStringNotContainsString('x-ref="cardMap"', implode('', $data));
         $params['month'] = '2026-10';
@@ -1112,8 +1258,28 @@ class ObjectsTest extends TestCase
         $this->assertSame(2, (int) $data['total']);
         $this->assertSame(1, $data['workerCount']);
         $this->assertSame(1, $data['objects']->total());
-        $this->assertCount(1, $data['mapObjects']);
-        $this->assertSame('Paused', $data['mapObjects'][0]['name']);
+        $this->assertCount(2, $data['mapObjects']);
+        $this->assertContains('Paused', $data['mapObjects']->pluck('name')->all());
+    }
+
+    public function test_object_search_memory_is_isolated_from_legacy_employee_search_and_map_keeps_all_objects(): void
+    {
+        $first = $this->workObject(['name' => 'Site A']);
+        $second = $this->workObject(['name' => 'Site B']);
+        session(['objects.filters.1.dashboard' => ['search' => 'anna', 'status' => '']]);
+        $load = function (array $parameters = []) {
+            $request = Request::create(route('object.dashboard'), 'GET', $parameters);
+            $request->setLaravelSession(session()->driver());
+            return app(ObjectController::class)->dashboard($request)->getData();
+        };
+        $initial = $load();
+        $this->assertSame(2, $initial['objects']->total());
+        $this->assertCount(2, $initial['mapObjects']);
+        $this->assertSame(1, $load(['search' => 'Site A'])['objects']->total());
+        $remembered = $load();
+        $this->assertSame([$first->id], $remembered['objects']->pluck('id')->all());
+        $this->assertCount(2, $remembered['mapObjects']);
+        $this->assertSame(2, $load(['search' => ''])['objects']->total());
     }
     public function test_location_change_preserves_original_location_and_empty_selection_is_retained(): void
     {

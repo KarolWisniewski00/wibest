@@ -30,13 +30,14 @@
                             📧 <a href="mailto:biuro@wibest.pl" class="underline text-cello-700 dark:text-cello-300">biuro@wibest.pl</a>
                         </div>
                         <div>
-                            ☎️ <a href="tel:+48451670344" class="underline text-cello-700 dark:text-cello-300">+48 451 670 344</a>
+                            ☎️ <a href="tel:{{ preg_replace('/[^+0-9]/', '', config('support.phones.0')) }}" class="underline text-cello-700 dark:text-cello-300">{{ config('support.phones.0') }}</a>
                         </div>
                         <span class="block text-green-800 dark:text-green-300">Możesz też poczekać – skontaktujemy się z Tobą wkrótce!</span>
                     </div>
                 </div>
                 @endif
             </div>
+            <x-support-contact id="support-contact" class="scroll-mt-24" />
         </div>
     </div>
 </div>

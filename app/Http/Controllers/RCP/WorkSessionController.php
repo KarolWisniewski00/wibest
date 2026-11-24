@@ -14,13 +14,27 @@ use App\Models\WorkSession;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Events\WorkSessionStatusChanged;
 
 class WorkSessionController extends Controller
 {
     // Funkcja do rozpoczęcia pracy
-    public function startWork($user_id, Request $request)
+    public function startWork(Request $request)
     {
+        return DB::transaction(fn () => $this->performStart($request), 3);
+    }
+
+    private function performStart(Request $request)
+    {
+        $validated = $request->validate([
+            'lat' => ['nullable', 'numeric', 'between:-90,90'],
+            'lon' => ['nullable', 'numeric', 'between:-180,180'],
+            'name' => ['nullable', 'string', 'max:120'],
+        ]);
+        $user_id = (int) $request->user()->id;
+        $user = User::query()->lockForUpdate()->findOrFail($user_id);
         $now = Carbon::now();
         Carbon::setLocale('pl');
 
@@ -36,7 +50,7 @@ class WorkSessionController extends Controller
                 'work_session_id' => '',
                 'work_session_status' => '',
                 'work_session_start_time' => '',
-            ], 400);
+            ], 409);
         }
 
         $latestWorkSession = WorkSession::where('user_id', $user_id)
@@ -50,7 +64,7 @@ class WorkSessionController extends Controller
                 'work_session_id' => intval($latestWorkSession->id),
                 'work_session_status' => $latestWorkSession->status,
                 'work_session_start_time' => optional($latestWorkSession->eventStart)->time,
-            ], 400);
+            ], 409);
         }
         if ($request->input('lat') == '' || $request->input('lon') == '') {
         } else {
@@ -92,7 +106,8 @@ class WorkSessionController extends Controller
                         $country = $addressData['country'] ?? null;
                     }
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                Log::warning('Reverse geocoding failed', ['integration' => 'nominatim', 'exception_class' => $e::class, 'request_id' => $request->attributes->get('request_id')]);
             }
             try {
                 if ($name) {
@@ -112,7 +127,8 @@ class WorkSessionController extends Controller
                         'longitude' => $request->input('lon', null),
                     ]);
                 }
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
+                Log::warning('Location persistence failed', ['integration' => 'nominatim', 'exception_class' => $e::class, 'request_id' => $request->attributes->get('request_id')]);
             }
         }
         // Tworzenie eventu startowego
@@ -142,6 +158,7 @@ class WorkSessionController extends Controller
         $seconds_in_work = $status['worked_time_seconds'];
 
         //STAŁY PLANING
+        $seconds_planned = 0;
         if ($user->working_hours_regular == 'stały planing') {
             if ($user->overtime == true) {
                 $seconds_planned = ($user->working_hours_custom * 3600) + ($user->overtime_threshold * 60);
@@ -198,17 +215,33 @@ wibest.pl/login';
     }
 
     // Funkcja do zakończenia pracy
-    public function stopWork($id, Request $request)
+    public function stopWork(Request $request)
     {
+        return DB::transaction(fn () => $this->performStop($request), 3);
+    }
+
+    private function performStop(Request $request)
+    {
+        $request->validate([
+            'lat' => ['nullable', 'numeric', 'between:-90,90'],
+            'lon' => ['nullable', 'numeric', 'between:-180,180'],
+            'name' => ['nullable', 'string', 'max:120'],
+        ]);
         Carbon::setLocale('pl');
-        $workSession = WorkSession::find($id);
+        $workSession = WorkSession::query()
+            ->where('user_id', $request->user()->id)
+            ->where('company_id', $request->user()->company_id)
+            ->where('status', 'W trakcie pracy')
+            ->lockForUpdate()
+            ->first();
         if ($workSession) {
+            $id = $workSession->id;
             $endTime = Carbon::now();
 
             // Pobranie eventu startowego
             $startEvent = Event::find($workSession->event_start_id);
             if (!$startEvent) {
-                return response()->json(['message' => 'Brak rozpoczęcia pracy'], 400);
+                return response()->json(['message' => 'Brak rozpoczęcia pracy'], 409);
             }
 
             // Obliczenie przepracowanego czasu
@@ -259,7 +292,8 @@ wibest.pl/login';
                             $country = $addressData['country'] ?? null;
                         }
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
+                    Log::warning('Reverse geocoding failed', ['integration' => 'nominatim', 'exception_class' => $e::class, 'request_id' => $request->attributes->get('request_id')]);
                 }
                 try {
                     if ($name) {
@@ -279,7 +313,8 @@ wibest.pl/login';
                             'longitude' => $request->input('lon', null),
                         ]);
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
+                    Log::warning('Location persistence failed', ['integration' => 'nominatim', 'exception_class' => $e::class, 'request_id' => $request->attributes->get('request_id')]);
                 }
             }
             // Tworzenie eventu stop
@@ -370,13 +405,14 @@ wibest.pl/login';
         }
 
         return response()->json([
-            'message' => 'Błąd przy kończeniu pracy',
-        ], 200);
+            'message' => 'Brak aktywnej sesji pracy',
+        ], 409);
     }
 
     // Funkcja do pobrania wszystkich sesji pracy użytkownika
-    public function getWorkSession($user_id)
+    public function getWorkSession(Request $request)
     {
+        $user_id = (int) $request->user()->id;
         $latestWorkSession = WorkSession::where('user_id', $user_id)
             ->where('status', 'W trakcie pracy')
             ->with('eventStart')
@@ -397,41 +433,6 @@ wibest.pl/login';
         // Obliczenie przepracowanego czasu
         $endTime = Carbon::now();
         $timeDifference = Carbon::parse($latestWorkSession->eventStart->time)->diffInSeconds($endTime);
-        if ($timeDifference > 86400) { // 86400 seconds = 24 hours
-            $endTime = Carbon::parse($latestWorkSession->eventStart->time)->addHours(24);
-            $timeInWork = '24:00:00';
-            // Tworzenie eventu stop
-            $stopEvent = Event::create([
-                'time' => $endTime,
-                'location' => '',
-                'device' => '',
-                'event_type' => 'stop',
-                'user_id' => $latestWorkSession->user_id,
-                'company_id' => $latestWorkSession->company_id,
-                'created_user_id' => $latestWorkSession->created_user_id,
-            ]);
-
-            // Aktualizacja sesji pracy
-            $latestWorkSession->update([
-                'event_stop_id' => $stopEvent->id,
-                'status' => 'Praca zakończona',
-                'time_in_work' => $timeInWork,
-            ]);
-            // Powiadom wszystkie podłączone urządzenia.
-            $startTime = Carbon::parse($latestWorkSession->eventStart->time);
-            broadcast(new WorkSessionStatusChanged(
-                userId: (int) $latestWorkSession->user_id,
-                workSessionId: (int) $latestWorkSession->id,
-                status: 'Praca zakończona',
-                startTime: $startTime->toIso8601String(),
-                endTime: $endTime->toIso8601String(),
-            ));
-
-            return response()->json([
-                'message' => 'Praca zakończona 24:00:00'
-            ], 200);
-        }
-
         if ($latestWorkSession->event_stop_id == null) {
             return response()->json([
                 'message' => 'W trakcie pracy',

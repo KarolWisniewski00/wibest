@@ -38,7 +38,7 @@
                         <i class="fa-solid fa-inbox mr-2"></i>E-Wnioski
                     </x-nav-link>
                     @if($role == 'admin' || $role == 'właściciel')
-                    <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
+                    <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp') || request()->routeIs('object.*')">
                         <i class="fa-solid fa-clock mr-2"></i>RCP
                     </x-nav-link>
                     <x-nav-link href="{{ route('raport.time-sheet.index') }}"
@@ -46,14 +46,11 @@
                         <i class="fa-solid fa-chart-line mr-2"></i>Raporty
                     </x-nav-link>
                     @else
-                    <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
+                    <x-nav-link href="{{ route('rcp.work-session.index') }}" :active="Str::startsWith(request()->path(), 'dashboard/rcp') || request()->routeIs('object.*')">
                         <i class="fa-solid fa-clock mr-2"></i>Czas pracy
                     </x-nav-link>
                     @endif
                     @if($role == 'admin' || $role == 'właściciel' || $role == 'kierownik')
-                        <x-nav-link href="{{ route('object.dashboard') }}" :active="Str::startsWith(request()->path(), 'dashboard/objects')">
-                            <i class="fa-solid fa-cube mr-2"></i>Obiekty
-                        </x-nav-link>
                         @if($role == 'admin' || $role == 'właściciel')
                         <x-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                             <i class="fa-solid fa-gear"></i>
@@ -253,6 +250,9 @@
 
                         <x-slot name="content">
                             <!-- Account Management -->
+                            <x-dropdown-link href="{{ route('dashboard') }}#support-contact">
+                                <i class="fa-solid fa-headset mr-2" aria-hidden="true"></i>Pomoc WIBEST
+                            </x-dropdown-link>
                             <div class="block px-4 py-2 text-xs text-gray-400">
                                 Zarządaj kontem
                             </div>
@@ -329,7 +329,7 @@
             </x-responsive-nav-link>
             @if($role == 'admin' || $role == 'właściciel')
             <x-responsive-nav-link href="{{ route('rcp.work-session.index') }}"
-                :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
+                :active="Str::startsWith(request()->path(), 'dashboard/rcp') || request()->routeIs('object.*')">
                 <i class="fa-solid fa-clock mr-2"></i>RCP
             </x-responsive-nav-link>
             <x-responsive-nav-link href="{{ route('raport.time-sheet.index') }}"
@@ -338,14 +338,11 @@
             </x-responsive-nav-link>
             @else
             <x-responsive-nav-link href="{{ route('rcp.work-session.index') }}"
-                :active="Str::startsWith(request()->path(), 'dashboard/rcp')">
+                :active="Str::startsWith(request()->path(), 'dashboard/rcp') || request()->routeIs('object.*')">
                 <i class="fa-solid fa-clock mr-2"></i>Czas pracy
             </x-responsive-nav-link>
             @endif
             @if($role == 'admin' || $role == 'właściciel' || $role == 'kierownik')
-                <x-responsive-nav-link href="{{ route('object.dashboard') }}" :active="request()->routeIs('object.*')">
-                    <i class="fa-solid fa-cube mr-2"></i>Obiekty
-                </x-responsive-nav-link>
                 @if($role == 'admin' || $role == 'właściciel')
                 <x-responsive-nav-link href="{{ route('setting') }}" :active="Str::startsWith(request()->path(), 'dashboard/setting')">
                     <i class="fa-solid fa-gear mr-2"></i>Moja firma
@@ -359,6 +356,9 @@
 
             <div class="space-y-1">
                 <!-- Account Management -->
+                <x-responsive-nav-link href="{{ route('dashboard') }}#support-contact" :active="false">
+                    <i class="fa-solid fa-headset mr-2" aria-hidden="true"></i>Pomoc WIBEST
+                </x-responsive-nav-link>
                 <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
                     <i class="fa-solid fa-user-gear mr-2"></i>Ustawienia konta
                 </x-responsive-nav-link>

@@ -41,12 +41,13 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 3);
+        $perPage = min(100, max(1, (int) $request->input('per_page', 25)));
         $userId = Auth::id();
         $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
         $query = User::where('company_id', $companyId)
             ->where('role', '!=', null);
+        $this->filterTeam($query, $request);
         $users = $query->paginate($perPage);
         $invitations = $this->invitationRepository->getByCompanyId($companyId);
         $userCount =  $this->userRepository->countByCompanyId($companyId);
@@ -117,7 +118,12 @@ class UserController extends Controller
             $leave_balance_left =  0;
         }
 
-        return view('admin.team.user', compact('leave_balance', 'leave_balance_left', 'user', 'invitations', 'leaves_used', 'msg', 'msg_sms', 'msg_email'));
+        $employment = null;
+        if (auth()->user()->can('manage-payroll') && (int) $user->company_id === (int) $companyId) {
+            $employment = \App\Models\EmployeeContract::where('company_id', $companyId)->where('user_id', $user->id)
+                ->orderByDesc('effective_from')->orderByDesc('id')->first();
+        }
+        return view('admin.team.user', compact('employment', 'leave_balance', 'leave_balance_left', 'user', 'invitations', 'leaves_used', 'msg', 'msg_sms', 'msg_email'));
     }
     public function restart(User $user)
     {
@@ -135,11 +141,12 @@ class UserController extends Controller
 
     public function get(Request $request)
     {
-        $perPage = $request->input('per_page', 3);
+        $perPage = min(100, max(1, (int) $request->input('per_page', 25)));
         $user = Auth::user();
         $companyId = $this->companyRepository->getCompanyId();
         $query = User::where('company_id', $companyId)
             ->where('role', '!=', null);
+        $this->filterTeam($query, $request);
         $users = $query->paginate($perPage);
 
         $rows_table = [];
@@ -151,42 +158,22 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'data' => $users->items(),
+            'count' => $users->total(),
             'table' => $rows_table,
             'list' => $rows_list,
             'next_page_url' => $users->nextPageUrl(),
         ]);
     }
+    private function filterTeam($query, Request $request): void
+    {
+        $data = $request->validate(['search' => 'nullable|string|max:255', 'role_filter' => 'nullable|array', 'role_filter.*' => 'string']);
+        if (!empty($data['role_filter'])) $query->whereIn('role', $data['role_filter']);
+        if ($search = trim($data['search'] ?? '')) $query->where('name', 'like', '%'.$search.'%');
+    }
+
     public function setRole(Request $request)
     {
-        $request->validate([
-            'role_filter' => 'required|array',
-            'role_filter.*' => 'string',
-        ]);
-
-        $request->session()->put('role_filter', $request->input('role_filter'));
-        $user = Auth::user();
-        $companyId = $this->companyRepository->getCompanyId();
-        $query = User::where('company_id', $companyId)
-            ->where('role', '!=', null);
-        if ($request->filled('role_filter')) {
-            $query->whereIn('role', $request->input('role_filter'));
-        }
-
-        $users = $query->get();
-
-        $rows_table = [];
-        $rows_list = [];
-        foreach ($users as $user) {
-            // użyj partiala/komponentu blade który zwraca <tr>...</tr> lub <li>...</li>
-            array_push($rows_table, View::make('components.row-team', ['user' => $user])->render());
-            array_push($rows_list, View::make('components.card-team', ['user' => $user])->render());
-        }
-
-        return response()->json([
-            'table' => $rows_table,
-            'list' => $rows_list,
-        ]);
+        return $this->get($request);
     }
     public function exportXlsx(Request $request)
     {

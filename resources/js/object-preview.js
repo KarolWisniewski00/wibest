@@ -1,16 +1,34 @@
+import { readFilterUrl, hideFilterUrl } from './filter-url.js';
 export function normalizeEmployeeSearch(value) {
     return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .toLocaleLowerCase('pl').replace(/ł/g, 'l').replace(/\s+/g, ' ').trim();
 }
 
-export function objectPreview({ endpoint, month, objectId, dashboard = false, selectedEmployeeId = null }) {
+export function objectPreview({ endpoint, month, objectId, dashboard = false, selectedEmployeeId = null, deferred = false, startDate = null, endDate = null, initialFilters = {} }) {
     let controller;
     let version = 0;
     let appliedEmployeeId = selectedEmployeeId;
     const marker = dashboard ? 'X-Object-Dashboard' : 'X-Object-Preview';
     const sections = dashboard ? ['period', 'cards', 'objects', 'work'] : ['period', 'cards', 'workers', 'work'];
     return {
-        month, selectedEmployeeId, employeeSearch: '', loading: false, reportLoading: false, error: '', pendingUrl: '', focusEmployeeId: null,
+        month, selectedEmployeeId, employeeSearch: '', loading: deferred, reportLoading: deferred, error: '', pendingUrl: '', focusEmployeeId: null,
+        init() {
+            hideFilterUrl();
+            if (deferred) this.$nextTick(() => {
+                const url = new URL(endpoint, window.location.href);
+                url.searchParams.set('start_date', startDate);
+                url.searchParams.set('end_date', endDate);
+                for (const [key, value] of Object.entries(initialFilters)) url.searchParams.set(key, value ?? '');
+                this.changeMonth(url.href);
+            });
+        },
+        changeRange({ start, end }) {
+            const url = new URL(readFilterUrl());
+            url.searchParams.delete('month');
+            url.searchParams.set('start_date', start);
+            url.searchParams.set('end_date', end);
+            return this.changeMonth(url.href);
+        },
         matchesEmployee(name) {
             return normalizeEmployeeSearch(name).includes(normalizeEmployeeSearch(this.employeeSearch));
         },
@@ -27,7 +45,7 @@ export function objectPreview({ endpoint, month, objectId, dashboard = false, se
             this.focusEmployeeId = clicked ?? this.selectedEmployeeId;
             const selected = clicked === this.selectedEmployeeId ? null : clicked;
             this.selectedEmployeeId = selected;
-            const url = new URL(this.loading ? this.pendingUrl : window.location.href);
+            const url = new URL(this.loading ? this.pendingUrl : readFilterUrl());
             url.searchParams.set('month', this.loading ? new URL(this.pendingUrl).searchParams.get('month') : this.month);
             url.searchParams.delete('employee_id');
             if (selected !== null) url.searchParams.set('employee_id', String(selected));
@@ -82,16 +100,21 @@ export function objectPreview({ endpoint, month, objectId, dashboard = false, se
                 if (!response.ok || response.redirected || response.headers.get(marker) !== '1') throw new Error('response');
                 const data = await response.json();
                 if (current !== version) return;
-                if (data.month !== url.searchParams.get('month') || (!dashboard && (!Array.isArray(data.readings) || (data.selectedEmployeeId ?? null) !== employee))
+                if ((!dashboard && !url.searchParams.has('start_date') && data.month !== url.searchParams.get('month')) || (dashboard && url.searchParams.has('start_date') && (data.startDate !== url.searchParams.get('start_date') || data.endDate !== url.searchParams.get('end_date'))) || (!dashboard && (!Array.isArray(data.readings) || (data.selectedEmployeeId ?? null) !== employee))
                     || sections.some(key => typeof data[key] !== 'string')) throw new Error('payload');
                 // All monthly sections commit together, from one company-scoped report.
                 this.month = data.month;
                 if (!dashboard) appliedEmployeeId = this.selectedEmployeeId = employee;
-                window.history.replaceState(window.history.state, '', url);
-                for (const key of sections) this.$refs[key].innerHTML = data[key];
+                hideFilterUrl(url);
+                for (const key of sections) {
+                    if (this.$refs[key]) this.$refs[key].innerHTML = data[key];
+                }
                 this.$el.querySelectorAll('[data-object-status-history] a, [data-object-status-link]').forEach(link => {
                     const historyUrl = new URL(link.href);
-                    historyUrl.searchParams.set('month', data.month);
+                    if (dashboard) {
+                        historyUrl.searchParams.set('start_date', data.startDate);
+                        historyUrl.searchParams.set('end_date', data.endDate);
+                    } else historyUrl.searchParams.set('month', data.month);
                     if (!dashboard) {
                         historyUrl.searchParams.delete('employee_id');
                         if (employee !== null) historyUrl.searchParams.set('employee_id', String(employee));

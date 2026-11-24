@@ -605,6 +605,9 @@ class RCPController extends Controller
             $query = WorkSession::with('user', 'eventStart', 'eventStop')->where('work_sessions.user_id', Auth::id());
         }
 
+        $query->where('work_sessions.company_id', Auth::user()->company_id);
+        if ($request->filled('filter_user_id')) $query->where('work_sessions.user_id', $request->input('filter_user_id'));
+
         if ($request->filled('start_date') && $request->filled('end_date')) {
             $startDate = $request->input('start_date');
             $endDate = $request->input('end_date');
@@ -630,7 +633,36 @@ class RCPController extends Controller
             $query->where('users.name', 'like', '%' . $request->input('search') . '%');
         }
 
+        $categoryData = $request->validate([
+            'has_task' => ['nullable', 'boolean'],
+            'has_note' => ['nullable', 'boolean'],
+            'classification_filter' => ['nullable', 'boolean'],
+            'classifications' => ['nullable', 'array'],
+            'classifications.*' => [\Illuminate\Validation\Rule::in(['under', 'normal', 'overtime', 'in_progress'])],
+        ]);
+        if ($request->boolean('classification_filter')) {
+            $selected = array_values(array_unique($categoryData['classifications'] ?? []));
+            $request->session()->put('rcp.filters', [
+                'classifications' => $selected,
+                'has_task' => $request->boolean('has_task'),
+                'has_note' => $request->boolean('has_note'),
+                'active' => count($selected) !== 4 || $request->boolean('has_task') || $request->boolean('has_note'),
+            ]);
+        }
+        if ($request->boolean('has_task')) {
+            $query->whereHas('task', fn ($task) => $task->where('company_id', Auth::user()->company_id));
+        }
+        if ($request->boolean('has_note')) {
+            $query->whereNotNull('work_sessions.notes')->whereRaw("TRIM(work_sessions.notes) <> ''");
+        }
         $sessions = $query->get();
+        if ($request->boolean('classification_filter')) {
+            $classifier = app(\App\Services\WorkSessionClassification::class);
+            $selected = $categoryData['classifications'] ?? [];
+            $sessions->loadMissing(['user', 'eventStart', 'eventStop', 'task']);
+            $sessions = $sessions->filter(fn ($session) => in_array($classifier->details($session)['category'], $selected, true));
+        }
+
 
         $rows_table = [];
         $rows_list = [];

@@ -1,6 +1,10 @@
 <x-app-layout class="flex">
     @include('admin.elements.alerts')
-    <x-main-no-filter>
+    <x-sidebar-left>
+        <x-filter-date-user loader="objects">{{ route('object.show', $object) }}</x-filter-date-user>
+        <input type="hidden" id="start_date" value="{{ $startDate }}">
+        <input type="hidden" id="end_date" value="{{ $endDate }}">
+    </x-sidebar-left><x-main>
         <x-object.nav />
         <x-container-content-form>
 
@@ -10,9 +14,9 @@
             </x-button-link-back>
             <!--POWRÓT-->
 
-            <div class="min-w-0 space-y-4" x-data="wibestObjectPreview({ endpoint: {{ \Illuminate\Support\Js::from(route('object.show', $object)) }}, month: {{ \Illuminate\Support\Js::from($month->format('Y-m')) }}, objectId: {{ $object->id }}, selectedEmployeeId: {{ \Illuminate\Support\Js::from($workReport['selected_employee_id']) }} })" @object-period-request.stop="changeMonth($event.detail.url, $event.detail.step)">
-                <div x-ref="period" class="[&>[data-month]]:my-0">@include('admin.object.partials.work-period', ['asyncPeriod' => true])</div>
-                <p x-show="loading" x-cloak role="status" class="mb-3 text-xs text-gray-600 dark:text-gray-300"><i class="fa-solid fa-spinner animate-spin mr-2" aria-hidden="true"></i>Aktualizowanie miesiąca…</p>
+            <div class="min-w-0 space-y-4" x-data="wibestObjectPreview({ endpoint: {{ \Illuminate\Support\Js::from(route('object.show', $object)) }}, month: {{ \Illuminate\Support\Js::from($month->format('Y-m')) }}, objectId: {{ $object->id }}, selectedEmployeeId: {{ \Illuminate\Support\Js::from($workReport['selected_employee_id']) }} })" @object-date-range.window="changeRange($event.detail)">
+                @include('admin.object.partials.date-navigation')
+                
                 <p x-show="error" x-cloak role="alert" class="mb-3 text-sm text-red-700 dark:text-red-300"><span x-text="error"></span><button type="button" @click="changeMonth(pendingUrl)" class="ml-2 underline">Spróbuj ponownie</button></p>
             <div class="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
                 <section class="min-w-0 overflow-hidden rounded-2xl bg-white shadow-sm dark:bg-gray-700 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:ring-1 [@media(prefers-color-scheme:light)]:ring-inset [@media(prefers-color-scheme:light)]:ring-gray-300" aria-labelledby="object-info-title">
@@ -221,5 +225,5 @@
             @include('admin.object.partials.status-history')
             </div>
         </x-container-content-form>
-    </x-main-no-filter>
+    </x-main>
 </x-app-layout>

@@ -1,4 +1,12 @@
 <x-app-layout class="flex">
+    <style>
+        .employee-info-card .employee-card-preview > .grid { border: 0; gap: .5rem; }
+        .employee-info-card .employee-card-preview > .grid > div > span { font-size: 1rem; line-height: 1.5rem; text-transform: none; letter-spacing: normal; font-weight: 500; flex-wrap: wrap; gap: .5rem; }
+        .employee-info-card .employee-card-preview > .grid > p { font-size: .875rem; }
+        .employee-info-card > .grid + .grid { padding-top: .25rem; }
+        .employee-info-card > .grid:last-of-type { border-bottom: 0; padding-bottom: 0; }
+        .dark .employee-info-card > .grid { border-bottom-color: rgb(55 65 81 / .7); }
+    </style>
     @include('admin.elements.alerts')
     @if ($company)
         <!--SIDE BAR-->
@@ -22,279 +30,77 @@
                 </x-button-link-back>
                 <!--POWRÓT-->
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                    <x-container-gray>
-                        <!--Użytkownik-->
-                        <x-text-cell>
-                            <x-text-cell-label>
-                                Użytkownik
-                            </x-text-cell-label>
-                            <x-text-cell-value>
-                                <x-text-cell-span class="gap-2">
-                                    <x-user-photo :user="$user" />
-                                    <x-user-name-xl :user="$user" />
-                                </x-text-cell-span>
-                            </x-text-cell-value>
-                        </x-text-cell>
-                        <!--Użytkownik-->
-
-                        <!--Email-->
-                        <x-text-cell>
-                            <x-text-cell-label>
-                                Email
-                            </x-text-cell-label>
-                            <x-text-cell-value>
-                                <x-text-cell-a href="mailto:{{$user->email}}" style="word-break: break-all;">
-                                    <span class="text-2xl">📧</span>
-                                    {{ $user->email }}
-                                </x-text-cell-a>
-                            </x-text-cell-value>
-                        </x-text-cell>
-                        <!--Email-->
-
-                        <!--Numer telefonu-->
-                        <x-text-cell>
-                            <x-text-cell-label>
-                                Numer telefonu
-                            </x-text-cell-label>
-                            <x-text-cell-value>
-                                <x-text-cell-a href="tel:{{$user->phone}}">
-                                    <span class="text-2xl">📱</span>
-                                    {{ $user->phone }}
-                                </x-text-cell-a>
-                            </x-text-cell-value>
-                        </x-text-cell>
-                        <!--Numer telefonu-->
-
-                        <!--Płeć-->
-                        <x-text-cell>
-                            <x-text-cell-label>
-                                Płeć
-                            </x-text-cell-label>
-                            <x-text-cell-value>
-                                @php
-                                    $genderLabel = match ($user->gender) {
-                                        'male' => '💙 Mężczyzna',
-                                        'female' => '💖 Kobieta',
-                                        default => '⚪ Brak danych',
-                                    };
-                                @endphp
-                                <x-text-cell-span>
-                                    {{ $genderLabel }}
-                                </x-text-cell-span>
-                            </x-text-cell-value>
-                        </x-text-cell>
-                        <!--Płeć-->
-
-
-                        <!--Logowanie przez Google-->
-                        @if($user->oauth_id != null)
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Logowanie przez Google
-                                </x-text-cell-label>
-                                <x-text-cell-value>
-                                    <x-status-green>
-                                        <i class="fa-brands fa-google mr-2"></i> Połączono
-                                    </x-status-green>
-                                </x-text-cell-value>
-                            </x-text-cell>
-                        @endif
-                        <!--Logowanie przez Google-->
-                    </x-container-gray>
-
-                    @if($user->supervisor || $user->position)
-                        @if($user->company)
-                            <x-container-gray>
-                                <!--Bezpośredni przełożony-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Bezpośredni przełożony
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        @if($user->supervisor)
-                                            <x-text-cell-span class="gap-2">
-                                                <x-user-photo :user="$user->supervisor" />
-                                                <x-user-name-xl :user="$user->supervisor" />
-                                            </x-text-cell-span>
-                                        @else
-                                            <x-text-cell-span>
-                                                Brak przełożonego
-                                            </x-text-cell-span>
-                                        @endif
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <!--Bezpośredni przełożony-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Stanowisko
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            <span class="text-2xl">💼</span>
-                                            {{ $user->position ? $user->position : 'Brak stanowiska' }}
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                @if($user->assigned_at)
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Data dołączenia do zespołu
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span class="gap-2 w-full">
-                                                <x-status-cello>
-                                                    📅
-                                                    {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $user->assigned_at)->format('d.m.Y') ?? '' }}
-                                                </x-status-cello>
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                @endif
-                                @if($user->paid_until)
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Opłacone do
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span class="gap-2 w-full">
-                                                <x-status-cello>
-                                                    📅
-                                                    {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $user->paid_until)->format('d.m.Y') ?? '' }}
-                                                </x-status-cello>
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                @endif
-                            </x-container-gray>
-                        @endif
-                    @endif
-
+                @include('admin.team.employee-header')
+                <div class="grid grid-cols-1 gap-6 my-6">
                     @if($user->company)
                         @if($user->working_hours_regular)
-                            <x-container-gray>
-                                @if($user->working_hours_regular == 'stały planing')
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Typ planingu
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span class="gap-2">
-                                                <span>
-                                                    <span class="text-2xl">🏢</span>Stały planing
-                                                </span>
-                                                <x-label-cello>
-                                                    STA
-                                                </x-label-cello>
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                @endif
-                                @if($user->working_hours_regular == 'prosty planing')
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Typ planingu
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span>
-                                                <span class="text-2xl">🧭</span>
-                                                Prosty planing
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                @endif
-                                @if($user->working_hours_regular == 'zmienny planing')
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Typ planingu
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span class="gap-2">
-                                                <span>
-                                                    <span class="text-2xl">🌀</span>Zmienny planing
-                                                </span>
-                                                <x-label-violet>
-                                                    ZMI
-                                                </x-label-violet>
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                @endif
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Liczenie nadgodzin
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            @if($user->overtime == 1)
-                                                <x-success-span>
-                                                    włączone
-                                                </x-success-span>
-                                            @else
-                                                <x-danger-span>
-                                                    wyłączone
-                                                </x-danger-span>
+                            <x-team-info-card>
+                                <div class="flex flex-wrap items-start justify-between gap-5">
+                                    <div class="flex items-start gap-5">
+                                    <div class="hidden sm:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-200 to-violet-100 text-blue-700 text-2xl dark:from-blue-500/20 dark:to-violet-500/10 dark:text-blue-300" aria-hidden="true"><i class="fa-solid fa-calendar-week"></i></div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Ustawienia czasu pracy</p>
+                                        <h2 class="mt-1 text-3xl font-semibold tracking-tight">Typ planingu</h2>
+                                    </div>
+                                    </div>
+                                    @if($user->working_hours_regular === 'stały planing' && ($role === 'admin' || $role === 'właściciel'))
+                                        <x-button-link-blue href="{{ route('team.user.planing', $user) }}" class="ml-auto w-full min-w-0 justify-center !whitespace-normal md:w-auto">
+                                            <i class="fa-solid fa-calendar mr-2" aria-hidden="true"></i>Edytuj planing
+                                        </x-button-link-blue>
+                                    @endif
+                                </div>
+                                <dl class="mt-2 grid gap-5 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                                    <div>
+                                        <dt class="text-gray-500 dark:text-gray-400">📅 Typ</dt>
+                                        <dd class="mt-1 flex flex-wrap items-center gap-2 font-medium">
+                                            {{ ucfirst($user->working_hours_regular) }}
+                                            @if($user->working_hours_regular === 'stały planing')
+                                                <x-label-cello>STA</x-label-cello>
+                                            @elseif($user->working_hours_regular === 'zmienny planing')
+                                                <x-label-violet>ZMI</x-label-violet>
+                                            @elseif($user->working_hours_regular === 'prosty planing')
+                                                <x-label-green>PRO</x-label-green>
                                             @endif
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Próg naliczania
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            <span class="text-2xl">⏳</span>
-                                            powyżej {{ $user->overtime_threshold }} minut
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Wymagaj zadania w nadgodzinach
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            @if($user->overtime_task == 1)
-                                                <x-success-span>
-                                                    włączone
-                                                </x-success-span>
-                                            @else
-                                                <x-danger-span>
-                                                    wyłączone
-                                                </x-danger-span>
-                                            @endif
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Wymagaj zatwierdzenia przez przełożonego
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            @if($user->overtime_accept == 1)
-                                                <x-success-span>
-                                                    włączone
-                                                </x-success-span>
-                                            @else
-                                                <x-danger-span>
-                                                    wyłączone
-                                                </x-danger-span>
-                                            @endif
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
+                                        </dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-gray-500 dark:text-gray-400">⏱️ Liczenie nadgodzin</dt>
+                                        <dd class="mt-1 font-medium {{ $user->overtime ? 'text-green-700 dark:text-green-300' : 'text-red-600 dark:text-red-400' }}">{{ $user->overtime ? 'Włączone' : 'Wyłączone' }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-gray-500 dark:text-gray-400">⏳ Próg naliczania</dt>
+                                        <dd class="mt-1 font-medium">Powyżej {{ $user->overtime_threshold }} minut</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-gray-500 dark:text-gray-400">📝 Zadanie w nadgodzinach</dt>
+                                        <dd class="mt-1 font-medium {{ $user->overtime_task ? 'text-green-700 dark:text-green-300' : 'text-red-600 dark:text-red-400' }}">{{ $user->overtime_task ? 'Wymagane' : 'Niewymagane' }}</dd>
+                                    </div>
+                                    <div>
+                                        <dt class="text-gray-500 dark:text-gray-400">👤 Zatwierdzenie przez przełożonego</dt>
+                                        <dd class="mt-1 font-medium {{ $user->overtime_accept ? 'text-green-700 dark:text-green-300' : 'text-red-600 dark:text-red-400' }}">{{ $user->overtime_accept ? 'Wymagane' : 'Niewymagane' }}</dd>
+                                    </div>
+                                    @if($user->working_hours_regular === 'stały planing' && $user->working_hours_from && $user->working_hours_to && $user->working_hours_start_day && $user->working_hours_stop_day)
+                                    <div><dt class="text-gray-500 dark:text-gray-400">🕒 Godziny pracy</dt><dd class="mt-1 font-medium">Od {{ \Carbon\Carbon::parse($user->working_hours_from)->format('H:i') }} do {{ \Carbon\Carbon::parse($user->working_hours_to)->format('H:i') }}</dd></div>
+                                    <div><dt class="text-gray-500 dark:text-gray-400">📅 Dni tygodnia</dt><dd class="mt-1 font-medium">Od {{ $user->working_hours_start_day }} do {{ $user->working_hours_stop_day }}</dd></div>
+                                    @endif
+                                </dl>
+                                @if($user->working_hours_regular === 'stały planing' && (!$user->working_hours_from || !$user->working_hours_to || !$user->working_hours_start_day || !$user->working_hours_stop_day))
+                                    <div role="status" class="flex w-full items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200">
+                                        <span class="text-2xl" aria-hidden="true">⚠️</span>
+                                        <div><p class="font-semibold">Uzupełnij planing</p><p class="mt-1 text-sm">Ustaw zakres dni i godziny pracy przyciskiem „Edytuj planing”.</p></div>
+                                    </div>
+                                @endif
                                 @if($role == 'admin' || $role == 'właściciel')
-                                    <!-- Konfiguruj planning -->
-                                    <x-button-link-neutral href="{{route('team.user.config_planing', $user)}}" class="text-lg md:mr-2">
-                                        <i class="fa-solid fa-gears mr-2"></i>Konfiguruj
-                                    </x-button-link-neutral>
-                                    <!-- Konfiguruj planning -->
+                                    <details data-animated-config class="mt-1 w-full" @if($errors->any()) open @endif>
+                                        <summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Konfiguruj typ planingu</summary>
+                                        <div class="mt-5">
+                                            @include('admin.team.planning-settings-form')
+                                        </div>
+                                    </details>
                                 @endif
-                            </x-container-gray>
+                            </x-team-info-card>
                         @else
-                            <x-container-gray>
+                            <x-team-info-card>
                                 <x-text-cell>
                                     <x-text-cell-value>
                                         <x-text-cell-span>
@@ -311,330 +117,56 @@
                                         </x-text-cell-span>
                                     </x-text-cell-value>
                                 </x-text-cell>
-                            </x-container-gray>
+                            </x-team-info-card>
                         @endif
                     @endif
 
                     @php
                         $colSpan = '';
                     @endphp
-                    @if($user->company)
-                        @if($user->working_hours_regular == 'stały planing')
-                            @if($user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
-                                @php
-                                    $colSpan = 'md:col-span-2';
-                                @endphp
-                                <x-container-gray>
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Typ planingu
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span class="gap-2">
-                                                <span>
-                                                    <span class="text-2xl">🏢</span>Stały planing
-                                                </span>
-                                                <x-label-cello>
-                                                    STA
-                                                </x-label-cello>
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Godziny pracy
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span>
-                                                <span class="text-2xl">🕒</span>
-                                                Od {{ \Carbon\Carbon::parse($user->working_hours_from)->format('H:i') }} do
-                                                {{ \Carbon\Carbon::parse($user->working_hours_to)->format('H:i') }}
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                    <x-text-cell>
-                                        <x-text-cell-label>
-                                            Dni tygodnia
-                                        </x-text-cell-label>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span>
-                                                <span class="text-2xl">📅</span>
-                                                Od {{ $user->working_hours_start_day }} do {{ $user->working_hours_stop_day }}
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                    @if($role == 'admin' || $role == 'właściciel')
-                                        <!-- Edytuj planning -->
-                                        <x-button-link-blue href="{{route('team.user.planing', $user)}}" class="text-lg md:mr-2">
-                                            <i class="fa-solid fa-calendar mr-2"></i>Edytuj planning
-                                        </x-button-link-blue>
-                                        <!-- Edytuj planning -->
-                                    @endif
-                                </x-container-gray>
-                            @else
-                                @php
-                                    $colSpan = 'md:col-span-2';
-                                @endphp
-                                <x-container-gray>
-                                    <x-text-cell>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span>
-                                                @if($role == 'admin' || $role == 'właściciel')
-                                                    <x-alert-link href="{{ route('team.user.planing', $user->id) }}" class="text-2xl">
-                                                        Edytuj planing
-                                                    </x-alert-link>
-                                                @else
-                                                    <x-alert-link href="" class="text-2xl">
-                                                        Edytuj planing
-                                                    </x-alert-link>
-                                                @endif
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                </x-container-gray>
-                            @endif
-                        @endif
-                    @endif
                     @if($user->supervisor || $user->position)
                         @if($user->company)
-                            <x-container-gray class="{{ $colSpan }}">
-                                <!--Ilość wysłanych wiadomości email-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Ilość wysłanych wiadomości email
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            <span class="text-2xl">📧</span>
-                                            {{ $msg_email->count() }}
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <!--Ilość wysłanych wiadomości email-->
-                                <!--Ilość wysłanych wiadomości SMS-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Ilość wysłanych wiadomości SMS
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            <span class="text-2xl">📱</span>
-                                            {{ $msg_sms->count() }}
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <!--Ilość wysłanych wiadomości SMS-->
-                                <!--Ilość wysłanych wszystkich wiadomości-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Ilość wysłanych wszystkich wiadomości
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            <span class="text-2xl">📩</span>
-                                            {{ $msg->count() }}
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <!--Ilość wysłanych wszystkich wiadomości-->
-                                <!--Powiadomienia SMS-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Powiadomienia SMS
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            @if($user->sms == 1)
-                                                <x-success-span>
-                                                    włączone
-                                                </x-success-span>
-                                            @else
-                                                <x-danger-span>
-                                                    wyłączone
-                                                </x-danger-span>
-                                            @endif
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <!--Powiadomienia SMS-->
-                                <!--Cena za SMS-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Cena za SMS
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            <span class="text-2xl">💲</span>
-                                            {{ number_format($user->company->sms_price ?? 0, 2) }} PLN
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <!--Cena za SMS-->
-                                <!--Suma wysłanych wiadomości SMS-->
-                                <x-text-cell>
-                                    <x-text-cell-label>
-                                        Suma wysłanych wiadomości SMS
-                                    </x-text-cell-label>
-                                    <x-text-cell-value>
-                                        <x-text-cell-span>
-                                            <span class="text-2xl">💵</span>
-                                            {{ number_format($msg->sum('price') ?? 0, 2) }} PLN
-                                        </x-text-cell-span>
-                                    </x-text-cell-value>
-                                </x-text-cell>
-                                <!--Suma wysłanych wiadomości SMS-->
+                            <x-team-info-card class="{{ $colSpan }}">
+                                <div class="flex items-start gap-5">
+                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-2xl dark:bg-gray-700" aria-hidden="true">📱</div>
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Komunikacja z pracownikiem</p>
+                                        <h2 class="mt-1 text-3xl font-semibold tracking-tight">Wiadomości SMS</h2>
+                                    </div>
+                                </div>
+                                <dl class="mt-2 grid gap-5 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                                    <div><dt class="text-gray-500 dark:text-gray-400">📧 Wysłane wiadomości email</dt><dd class="mt-1 font-medium">{{ $msg_email->count() }}</dd></div>
+                                    <div><dt class="text-gray-500 dark:text-gray-400">📱 Wysłane wiadomości SMS</dt><dd class="mt-1 font-medium">{{ $msg_sms->count() }}</dd></div>
+                                    <div><dt class="text-gray-500 dark:text-gray-400">📩 Wszystkie wiadomości</dt><dd class="mt-1 font-medium">{{ $msg->count() }}</dd></div>
+                                    <div><dt class="text-gray-500 dark:text-gray-400">🔔 Powiadomienia SMS</dt><dd class="mt-1 font-medium {{ $user->sms ? 'text-green-700 dark:text-green-300' : 'text-red-600 dark:text-red-400' }}">{{ $user->sms ? 'Włączone' : 'Wyłączone' }}</dd></div>
+                                    <div><dt class="text-gray-500 dark:text-gray-400">💲 Cena za SMS</dt><dd class="mt-1 font-medium">{{ number_format($user->company->sms_price ?? 0, 2) }} PLN</dd></div>
+                                    <div><dt class="text-gray-500 dark:text-gray-400">💵 Suma wysłanych wiadomości SMS</dt><dd class="mt-1 font-medium">{{ number_format($msg->sum('price') ?? 0, 2) }} PLN</dd></div>
+                                </dl>
                                 @if($role == 'admin' || $role == 'właściciel')
-                                    <!-- Konfiguruj SMS -->
-                                    <x-button-link-neutral href="{{route('team.user.config_sms', $user)}}" class="text-lg md:mr-2">
-                                        <i class="fa-solid fa-gears mr-2"></i>Konfiguruj
-                                    </x-button-link-neutral>
-                                    <!-- Konfiguruj SMS -->
+                                    <details data-animated-config class="mt-1">
+                                        <summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Konfiguruj powiadomienia SMS</summary>
+                                        <form method="POST" action="{{ route('team.user.update_sms', $user) }}" class="mt-5 space-y-5">
+                                            @csrf
+                                            @method('PUT')
+                                            <label class="flex items-center gap-3 text-sm">
+                                                <input type="checkbox" role="switch" name="sms" class="sr-only peer" @checked($user->sms)>
+                                                <span aria-hidden="true" class="relative h-6 w-11 shrink-0 rounded-full bg-gray-200 transition-colors dark:bg-gray-700 peer-checked:bg-green-300 dark:peer-checked:bg-green-300 peer-focus-visible:ring-2 peer-focus-visible:ring-green-400 peer-focus-visible:ring-offset-2 dark:peer-focus-visible:ring-offset-gray-800 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:content-[''] peer-checked:after:translate-x-5"></span>
+                                                Wysyłaj powiadomienia SMS przy wnioskach i odczytach pracy
+                                            </label>
+                                            <x-button-green type="submit"><i class="fa-solid fa-floppy-disk mr-2" aria-hidden="true"></i>Zapisz</x-button-green>
+                                        </form>
+                                    </details>
                                 @endif
-                            </x-container-gray>
+                            </x-team-info-card>
                         @endif
                     @endif
                 </div>
+                @include('admin.team.employment')
                 @if($user->supervisor || $user->position)
                     @if($user->company)
-                        <!--PRZYCISKI-->
-                        <div class="flex flex-col md:flex-row justify-end gap-4 mt-4">
-                            @if($role == 'admin' || $role == 'właściciel')
-                                <!-- Reset hasła -->
-                                <x-button-link-orange href="{{route('team.user.restart', $user)}}" class="text-lg">
-                                    <i class="fa-solid fa-paper-plane mr-2"></i>Reset hasła
-                                </x-button-link-orange>
-                                <!-- Reset hasła -->
 
-                                @if($user->company)
-                                    <!-- EDYTUJ -->
-                                    <x-button-link-blue href="{{route('team.user.edit', $user)}}" class="text-lg">
-                                        <i class="fa-solid fa-pen-to-square mr-2"></i>Edytuj
-                                    </x-button-link-blue>
-                                    <!--EDYTUJ-->
-                                @endif
-
-                                <!--USUŃ-->
-                                @if($user->id != $user_id)
-                                    <form action="{{ route('team.user.disconnect', $user) }}" method="POST" class="w-full md:w-fit"
-                                        onsubmit="return confirm('Czy na pewno chcesz usunąć tego użytkownika z firmy?');">
-                                        @csrf
-                                        <x-button-red type="submit" class="text-lg w-full md:w-fit">
-                                            <i class="fa-solid fa-user-minus mr-2"></i>Rozłącz
-                                        </x-button-red>
-                                    </form>
-                                    <!--USUŃ-->
-                                @endif
-                            @endif
-                        </div>
-                        <!--PRZYCISKI-->
                         @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel' || $user->id == auth()->user()->id)
-                            <!--Podsumowanie dnia-->
-                            <div class="flex flex-col w-full md:pt-4">
-                                <x-h1-display class="text-center md:text-start my-4 md:my-0">
-                                    ⏱️ Podsumowanie dnia
-                                </x-h1-display>
-                            </div>
-                            <div class="grid grid-cols-1 gap-4 md:py-4 w-full">
-                                <x-container-gray>
-                                    <x-text-cell>
-                                        <x-text-cell-value>
-                                            <x-text-cell-span class="flex flex-col w-full">
-                                                @php
-                                                    $status = $user->getToday();
-                                                @endphp
-                                                @if($status['status'] == 'warning')
-                                                    <x-alert-span class="!text-center">
-                                                        {{ $status['message'] }}
-                                                    </x-alert-span>
-                                                @elseif($status['status'] == 'success')
-                                                    <x-success-span class="!text-center">
-                                                        {{ $status['message'] }}
-                                                    </x-success-span>
-                                                @else
-                                                    <x-danger-span class="!text-center">
-                                                        {{ $status['message'] }}
-                                                    </x-danger-span>
-                                                @endif
-
-                                                @if($status['timing'])
-                                                    <div class="italic text-xs text-gray-500 dark:text-gray-500 !text-center">
-                                                        {{ $status['timing'] }}
-                                                    </div>
-                                                @endif
-
-                                                @if($status['type'] == 'rcp' && ($status['start'] || $status['stop']))
-                                                    <x-text-cell-span class="gap-2">
-
-                                                        {{-- Ikonka + typ --}}
-                                                        <div class="flex flex-col items-center justify-center h-full w-full">
-                                                            <span class="text-lg md:text-xl">
-                                                                ⏱️
-                                                            </span>
-                                                            <x-label-green class="mt-1">
-                                                                RCP
-                                                            </x-label-green>
-                                                        </div>
-
-                                                        {{-- Dane szczegółowe --}}
-                                                        <div class="flex flex-col items-center justify-center gap-2 my-auto">
-                                                            <x-paragraf-display
-                                                                class="text-2xl whitespace-nowrap font-semibold w-fit text-start relative">
-                                                                <x-status-dark>
-                                                                    @if($status['start'])
-                                                                    {{ \Carbon\Carbon::parse($status['start'])->format('H:i') }} @endif
-                                                                    @if($status['stop']) -
-                                                                    {{ \Carbon\Carbon::parse($status['stop'])->format('H:i') }} @else -
-                                                                    TERAZ @endif
-                                                                </x-status-dark>
-                                                            </x-paragraf-display>
-                                                            @if($status['worked_time'])
-                                                                @if($status['stop'])
-                                                                    <x-paragraf-display
-                                                                        class="text-gray-900 dark:text-gray-50 hover:text-gray-900 hover:dark:text-gray-50 text-2xl whitespace-nowrap font-semibold w-fit text-start relative">
-                                                                        <span>{{ $status['worked_time'] }}</span>
-                                                                    </x-paragraf-display>
-                                                                @endif
-                                                            @endif
-                                                        </div>
-                                                    </x-text-cell-span>
-                                                @endif
-
-                                                @if($status['type'] == 'leave')
-                                                    <div
-                                                        class="flex flex-col md:flex-row items-center justify-center gap-2 py-2 rounded-2xl">
-
-                                                        {{-- Ikonka + typ --}}
-                                                        <div class="flex flex-col items-center justify-center">
-                                                            <span class="text-lg md:text-xl">
-                                                                {{ config('leavetypes.icons.' . $status['timing'], '') }}
-                                                            </span>
-                                                            <x-label-pink class="mt-1">
-                                                                {{ config('leavetypes.shortType.' . $status['timing'], '') }}
-                                                            </x-label-pink>
-                                                        </div>
-
-                                                        {{-- Dane szczegółowe --}}
-                                                        <div
-                                                            class="flex flex-col md:flex-col gap-3 text-sm md:text-base text-gray-800 dark:text-gray-100">
-                                                            <x-paragraf-display class="text-2xl whitespace-nowrap">
-                                                                <x-status-cello>
-                                                                    @if($status['timing'])
-                                                                    {{ \Carbon\Carbon::parse($status['start'])->format('d.m') }} @endif
-                                                                    @if($status['start'] && $status['stop']) - @endif @if($status['stop'])
-                                                                    {{ \Carbon\Carbon::parse($status['stop'])->format('d.m') }} @endif
-                                                                </x-status-cello>
-                                                            </x-paragraf-display>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            </x-text-cell-span>
-                                        </x-text-cell-value>
-                                    </x-text-cell>
-                                </x-container-gray>
-                            </div>
-                            <!--Podsumowanie dnia-->
-
-                            <div class="md:pb-4">
+                            <div class="my-6">
                                 @php
                                     $shortcut = 'UW';
                                     $icon = '🏖️';
@@ -652,13 +184,13 @@
                                 @endphp
 
                                 <section
-                                    class="group relative h-full overflow-hidden rounded-lg bg-gray-100 p-5 shadow-sm transition-all duration-300 ease-out hover:shadow-md dark:bg-gray-700 dark:hover:shadow-black/10 sm:p-6 motion-reduce:transition-none"
+                                    class="group relative h-full overflow-hidden rounded-2xl bg-white p-6 dark:bg-gray-800 sm:p-8"
                                     aria-label="Podsumowanie urlopu wypoczynkowego">
                                     <!-- Nagłówek -->
                                     <div class="flex items-start justify-between gap-4">
-                                        <div class="flex min-w-0 items-center gap-3">
+                                        <div class="flex min-w-0 items-start gap-5">
                                             <div
-                                                class="text-2xl shrink-0 hidden sm:flex w-14 h-14 rounded-2xl items-center justify-center bg-gradient-to-br from-pink-200 to-rose-100 dark:from-pink-500/20 dark:to-rose-500/10 text-pink-300 dark:text-pink-300">
+                                                class="hidden sm:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-200 to-rose-100 text-pink-700 text-2xl dark:from-pink-500/20 dark:to-rose-500/10 dark:text-pink-300" aria-hidden="true">
                                                 {{ $icon }}
                                             </div>
 
@@ -668,9 +200,9 @@
                                                     Twój urlop
                                                 </div>
 
-                                                <h3 class="mt-1 text-base font-semibold text-gray-900 dark:text-white">
+                                                <h2 class="mt-1 text-3xl font-semibold tracking-tight text-white">
                                                     Urlop wypoczynkowy
-                                                </h3>
+                                                </h2>
                                             </div>
                                         </div>
 
@@ -790,6 +322,26 @@
                         @endif
                     @endif
                 @endif
+                @if(($user->supervisor || $user->position) && $user->company)
+                        <!--PRZYCISKI-->
+                        <div class="flex flex-col md:flex-row justify-end gap-4 mt-4">
+                            @if($role == 'admin' || $role == 'właściciel')
+
+                                <!--USUŃ-->
+                                @if($user->id != $user_id)
+                                    <form action="{{ route('team.user.disconnect', $user) }}" method="POST" class="w-full md:w-fit"
+                                        onsubmit="return confirm('Czy na pewno chcesz usunąć tego użytkownika z firmy?');">
+                                        @csrf
+                                        <x-button-red type="submit" class="text-lg w-full md:w-fit">
+                                            <i class="fa-solid fa-user-minus mr-2"></i>Rozłącz
+                                        </x-button-red>
+                                    </form>
+                                    <!--USUŃ-->
+                                @endif
+                            @endif
+                        </div>
+                        <!--PRZYCISKI-->
+                @endif
                 <x-label class="py-2 mt-4">
                     Utworzono {{ $user->created_at }}
                 </x-label>
@@ -805,4 +357,5 @@
     @else
         @include('admin.elements.end_config')
     @endif
+    @include('admin.team.configuration-animation')
 </x-app-layout>

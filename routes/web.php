@@ -69,14 +69,14 @@ Route::post('/kontakt', [ContactController::class, 'send'])
 Route::get('/login/google', [GoogleController::class, 'redirect'])->name('login.google');
 Route::get('/login/google/callback', [GoogleController::class, 'callback']);
 
-Route::prefix('api')->group(function () {
+Route::prefix('api')->middleware(['auth:sanctum', 'throttle:api'])->group(function () {
 
     //API -----------------------------------------------------------------
     Route::prefix('v1')->group(function () {
         Route::prefix('work')->group(function () {
-            Route::get('/start/{user_id}', [RCPWorkSessionController::class, 'startWork'])->name('api.work.start');
-            Route::get('/stop/{id}', [RCPWorkSessionController::class, 'stopWork'])->name('api.work.stop');
-            Route::get('/session/{user_id}', [RCPWorkSessionController::class, 'getWorkSession'])->name('api.work.session');
+            Route::post('/start', [RCPWorkSessionController::class, 'startWork'])->middleware('throttle:work-clock')->name('api.work.start');
+            Route::post('/stop', [RCPWorkSessionController::class, 'stopWork'])->middleware('throttle:work-clock')->name('api.work.stop');
+            Route::get('/session', [RCPWorkSessionController::class, 'getWorkSession'])->middleware('throttle:work-clock-status')->name('api.work.session');
         });
         Route::prefix('invoice')->group(function () {
             Route::get('/{month}/{year}/{type}', [InvoiceController::class, 'value'])->name('api.invoice.value');
@@ -105,7 +105,7 @@ Route::prefix('api')->group(function () {
         Route::prefix('team')->group(function () {
             Route::prefix('user')->group(function () {
                 Route::get('/', [TeamUserController::class, 'get'])->name('api.v1.team.user.get');
-                Route::post('set-role/', [TeamUserController::class, 'setRole'])->name('api.v1.team.user.set.role');
+                Route::post('set-role/', [TeamUserController::class, 'setRole'])->middleware('can:manage-company')->name('api.v1.team.user.set.role');
                 Route::post('/export-xlsx', [TeamUserController::class, 'exportXlsx'])->name('api.v1.team.user.export.xlsx');
             });
         });
@@ -186,6 +186,20 @@ Route::middleware([
     'verified',
 ])->group(function () {
     Route::prefix('dashboard')->group(function () {
+        Route::middleware('can:manage-payroll')->group(function () {
+            Route::get('raport/payroll/{user}/payments/{payment}/payslip', [\App\Http\Controllers\EmploymentNetController::class, 'payslip'])->name('raport.payroll.payslip');
+            Route::post('team/user/{user}/company-payroll-parameters', [\App\Http\Controllers\EmploymentNetController::class, 'companyParameters'])->name('team.user.company-payroll-parameters');
+            Route::get('raport/payroll/{user}/net', [\App\Http\Controllers\EmploymentNetController::class, 'show'])->name('raport.payroll.net');
+            Route::post('raport/payroll/{user}/net/preview', [\App\Http\Controllers\EmploymentNetController::class, 'preview'])->name('raport.payroll.net.preview');
+            Route::post('raport/payroll/{user}/net/approve', [\App\Http\Controllers\EmploymentNetController::class, 'approve'])->name('raport.payroll.net.approve');
+            Route::post('team/user/{user}/tax-settings', [\App\Http\Controllers\EmploymentNetController::class, 'settings'])->name('team.user.tax-settings');
+            Route::post('raport/payroll/{user}/opening', [\App\Http\Controllers\EmploymentNetController::class, 'opening'])->name('raport.payroll.opening');
+            Route::get('raport/payroll', [\App\Http\Controllers\PayrollController::class, 'index'])->name('raport.payroll.index');
+            Route::get('raport/payroll/{user}', [\App\Http\Controllers\PayrollController::class, 'show'])->name('raport.payroll.show');
+            Route::post('raport/payroll/{user}/snapshot', [\App\Http\Controllers\PayrollController::class, 'snapshot'])->name('raport.payroll.snapshot');
+            Route::post('raport/payroll/{user}/cost-inputs', [\App\Http\Controllers\PayrollController::class, 'costInputs'])->name('raport.payroll.cost-inputs');
+            Route::post('team/user/{user}/employment', [\App\Http\Controllers\PayrollController::class, 'storeContract'])->name('team.user.employment.store');
+        });
         Route::post('user-email-availability', \App\Http\Controllers\UserEmailAvailabilityController::class)
             ->middleware('throttle:60,1')->name('users.email-availability');
         //Mierzenie Czasu Pracy -----------------------------------------------------------------
@@ -511,7 +525,8 @@ Route::middleware([
 
 //Przekierowania ustawione dla wystawiania faktur (bo kiedys zmieniałem z fakturowni na rcp) a żeby teraz wystawić fakture trzeba błędy notfound ogarnąć
 //REDIRECTS ---------------------------------------------------------------------------
-Route::get('api-search-gus-old/gus/{nip}', [InvoiceController::class, 'gus'])->name('api.search.gus'); //TSI
+Route::get('api-search-gus-old/gus/{nip}', [InvoiceController::class, 'gus'])
+    ->middleware(['auth:sanctum', 'throttle:10,1'])->name('api.search.gus'); // legacy TSI
 
 //todo
 //poprawić kolorystykę ogólną

@@ -1,0 +1,765 @@
+<?php if (isset($component)) { $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54 = $attributes; } ?>
+<?php $component = App\View\Components\AppLayout::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('app-layout'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(App\View\Components\AppLayout::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'flex']); ?>
+    <?php echo $__env->make('admin.elements.alerts', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($company): ?>
+    <!--MAIN-->
+    <?php if (isset($component)) { $__componentOriginal6d34ed0eb01a1886d57455f1550df787 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal6d34ed0eb01a1886d57455f1550df787 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.main-no-filter','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('main-no-filter'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+        <?php if (isset($component)) { $__componentOriginal49b345aca39c685793a5b0b72a705588 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal49b345aca39c685793a5b0b72a705588 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.setting.nav','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('setting.nav'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal49b345aca39c685793a5b0b72a705588)): ?>
+<?php $attributes = $__attributesOriginal49b345aca39c685793a5b0b72a705588; ?>
+<?php unset($__attributesOriginal49b345aca39c685793a5b0b72a705588); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal49b345aca39c685793a5b0b72a705588)): ?>
+<?php $component = $__componentOriginal49b345aca39c685793a5b0b72a705588; ?>
+<?php unset($__componentOriginal49b345aca39c685793a5b0b72a705588); ?>
+<?php endif; ?>
+        <div x-data="{ open: false }">
+            <div
+                class="flex justify-end md:justify-start px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 rounded-t-lg">
+                <nav class="hidden md:flex gap-x-8 h-full" aria-label="Tabs" role="tablist"
+                    aria-orientation="horizontal">
+                    <?php if (isset($component)) { $__componentOriginalc295f12dca9d42f28a259237a5724830 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc295f12dca9d42f28a259237a5724830 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['class' => 'h-full text-center','href' => ''.e(route('setting.client.show', $client)).'','active' => request()->routeIs('setting.client.show', $client)]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('nav-link'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'h-full text-center','href' => ''.e(route('setting.client.show', $client)).'','active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('setting.client.show', $client))]); ?>
+                        Firma
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc295f12dca9d42f28a259237a5724830)): ?>
+<?php $attributes = $__attributesOriginalc295f12dca9d42f28a259237a5724830; ?>
+<?php unset($__attributesOriginalc295f12dca9d42f28a259237a5724830); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc295f12dca9d42f28a259237a5724830)): ?>
+<?php $component = $__componentOriginalc295f12dca9d42f28a259237a5724830; ?>
+<?php unset($__componentOriginalc295f12dca9d42f28a259237a5724830); ?>
+<?php endif; ?>
+                    <?php if (isset($component)) { $__componentOriginalc295f12dca9d42f28a259237a5724830 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalc295f12dca9d42f28a259237a5724830 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.nav-link','data' => ['class' => 'h-full text-center','href' => ''.e(route('setting.client.sms', $client)).'','active' => request()->routeIs('setting.client.sms', $client)]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('nav-link'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'h-full text-center','href' => ''.e(route('setting.client.sms', $client)).'','active' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(request()->routeIs('setting.client.sms', $client))]); ?>
+                        Moduł SMS
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalc295f12dca9d42f28a259237a5724830)): ?>
+<?php $attributes = $__attributesOriginalc295f12dca9d42f28a259237a5724830; ?>
+<?php unset($__attributesOriginalc295f12dca9d42f28a259237a5724830); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc295f12dca9d42f28a259237a5724830)): ?>
+<?php $component = $__componentOriginalc295f12dca9d42f28a259237a5724830; ?>
+<?php unset($__componentOriginalc295f12dca9d42f28a259237a5724830); ?>
+<?php endif; ?>
+                </nav>
+            </div>
+        </div>
+        <?php if (isset($component)) { $__componentOriginal8179e7dc9acafe002163f8e8838bde91 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal8179e7dc9acafe002163f8e8838bde91 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.setting.header','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('setting.header'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+            <span>📱</span> Moduł SMS
+         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal8179e7dc9acafe002163f8e8838bde91)): ?>
+<?php $attributes = $__attributesOriginal8179e7dc9acafe002163f8e8838bde91; ?>
+<?php unset($__attributesOriginal8179e7dc9acafe002163f8e8838bde91); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal8179e7dc9acafe002163f8e8838bde91)): ?>
+<?php $component = $__componentOriginal8179e7dc9acafe002163f8e8838bde91; ?>
+<?php unset($__componentOriginal8179e7dc9acafe002163f8e8838bde91); ?>
+<?php endif; ?>
+        <!--CONTENT-->
+        <?php if (isset($component)) { $__componentOriginaleb2cf2c6d60985109d6b19ee4f9605bc = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginaleb2cf2c6d60985109d6b19ee4f9605bc = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.container-content-form','data' => ['class' => 'pt-0']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('container-content-form'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'pt-0']); ?>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <?php if (isset($component)) { $__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.container-gray','data' => ['class' => 'md:col-span-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('container-gray'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'md:col-span-2']); ?>
+                    <!--Ilość wysłanych wiadomości SMS-->
+                    <?php if (isset($component)) { $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                        <?php if (isset($component)) { $__componentOriginale45e65b9196dc2b184cf670f0d40f585 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale45e65b9196dc2b184cf670f0d40f585 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-label','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                            Ilość wysłanych wiadomości SMS
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $attributes = $__attributesOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $component = $__componentOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__componentOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginalb358597dd6dc5d75e315d81e5edf4673 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-value','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-value'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                            <?php if (isset($component)) { $__componentOriginal981eab602b8f44b750971a71c99b444e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal981eab602b8f44b750971a71c99b444e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-span','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-span'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                <span class="text-2xl">📱</span>
+                                <?php echo e($msg_sms->count()); ?>
+
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $attributes = $__attributesOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__attributesOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $component = $__componentOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__componentOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $attributes = $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $component = $__componentOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $attributes = $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $component = $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+                    <!--Ilość wysłanych wiadomości SMS-->
+                    <!--Cena za SMS-->
+                    <?php if (isset($component)) { $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                        <?php if (isset($component)) { $__componentOriginale45e65b9196dc2b184cf670f0d40f585 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale45e65b9196dc2b184cf670f0d40f585 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-label','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                            Aktualna cena za SMS
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $attributes = $__attributesOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $component = $__componentOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__componentOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginalb358597dd6dc5d75e315d81e5edf4673 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-value','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-value'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                            <?php if (isset($component)) { $__componentOriginal981eab602b8f44b750971a71c99b444e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal981eab602b8f44b750971a71c99b444e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-span','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-span'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                                <span class="text-2xl">💲</span>
+                                <?php echo e(number_format($company->sms_price ?? 0, 2)); ?> PLN
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $attributes = $__attributesOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__attributesOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $component = $__componentOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__componentOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $attributes = $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $component = $__componentOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $attributes = $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $component = $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+                    <!--Cena za SMS-->
+                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51)): ?>
+<?php $attributes = $__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51; ?>
+<?php unset($__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51)): ?>
+<?php $component = $__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51; ?>
+<?php unset($__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51); ?>
+<?php endif; ?>
+                <h1 class="text-2xl font-medium text-gray-700 dark:text-gray-100 md:col-span-2">
+                    <span>📊</span> Wykres SMS
+                </h1>
+                <div class="flex justify-between items-center md:col-span-2">
+                    <span id="monthLabel" class="text-md md:text-lg font-bold text-gray-900 dark:text-white"><?php echo e($month); ?></span>
+                    <div class="space-x-2 md:space-x-0">
+                        <button id="prevMonth" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" type="button">
+                            <i class="fa-solid fa-chevron-left"></i><span class=" mx-1">pop</span>
+                        </button>
+                        <button id="nextMonth" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300" type="button">
+                            <span class=" mx-1">nas</span><i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <?php if (isset($component)) { $__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.container-gray','data' => ['class' => 'md:col-span-2 !bg-gray-100']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('container-gray'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'md:col-span-2 !bg-gray-100']); ?>
+                    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    <input type="hidden" id="chart-labels" value='<?php echo json_encode($labels, 15, 512) ?>'>
+                    <input type="hidden" id="chart-data" value='<?php echo json_encode($data, 15, 512) ?>'>
+                    <input type="hidden" id="month" value="<?php echo e($month); ?>">
+                    <canvas style="background-color: rgb(243 244 246);" id="myChart" width="400" height="200"></canvas>
+                    <!--Ilość wysłanych wiadomości SMS-->
+                    <?php if (isset($component)) { $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell','data' => ['class' => '!border-gray-100']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => '!border-gray-100']); ?>
+                        <?php if (isset($component)) { $__componentOriginale45e65b9196dc2b184cf670f0d40f585 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale45e65b9196dc2b184cf670f0d40f585 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-label','data' => ['class' => '!text-gray-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => '!text-gray-500']); ?>
+                            Ilość wysłanych wiadomości SMS
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $attributes = $__attributesOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $component = $__componentOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__componentOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginalb358597dd6dc5d75e315d81e5edf4673 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-value','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-value'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                            <?php if (isset($component)) { $__componentOriginal981eab602b8f44b750971a71c99b444e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal981eab602b8f44b750971a71c99b444e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-span','data' => ['class' => '!text-gray-900']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-span'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => '!text-gray-900']); ?>
+                                <span class="text-2xl">📱</span>
+                                <span id="totalSms"><?php echo e($totalSms); ?></span>
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $attributes = $__attributesOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__attributesOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $component = $__componentOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__componentOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $attributes = $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $component = $__componentOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $attributes = $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $component = $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+                    <!--Ilość wysłanych wiadomości SMS-->
+                    <!--Suma wysłanych wiadomości SMS-->
+                    <?php if (isset($component)) { $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell','data' => ['class' => '!border-gray-100']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => '!border-gray-100']); ?>
+                        <?php if (isset($component)) { $__componentOriginale45e65b9196dc2b184cf670f0d40f585 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginale45e65b9196dc2b184cf670f0d40f585 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-label','data' => ['class' => '!text-gray-500']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-label'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => '!text-gray-500']); ?>
+                            Suma wysłanych wiadomości SMS
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $attributes = $__attributesOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__attributesOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginale45e65b9196dc2b184cf670f0d40f585)): ?>
+<?php $component = $__componentOriginale45e65b9196dc2b184cf670f0d40f585; ?>
+<?php unset($__componentOriginale45e65b9196dc2b184cf670f0d40f585); ?>
+<?php endif; ?>
+                        <?php if (isset($component)) { $__componentOriginalb358597dd6dc5d75e315d81e5edf4673 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-value','data' => []] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-value'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+                            <?php if (isset($component)) { $__componentOriginal981eab602b8f44b750971a71c99b444e = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal981eab602b8f44b750971a71c99b444e = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.text-cell-span','data' => ['class' => '!text-gray-900']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('text-cell-span'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => '!text-gray-900']); ?>
+                                <span class="text-2xl">💵</span>
+                                <span id="totalAmount"><?php echo e(number_format($totalAmount ?? 0, 2)); ?> PLN</span>
+                             <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $attributes = $__attributesOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__attributesOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal981eab602b8f44b750971a71c99b444e)): ?>
+<?php $component = $__componentOriginal981eab602b8f44b750971a71c99b444e; ?>
+<?php unset($__componentOriginal981eab602b8f44b750971a71c99b444e); ?>
+<?php endif; ?>
+                         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $attributes = $__attributesOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__attributesOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673)): ?>
+<?php $component = $__componentOriginalb358597dd6dc5d75e315d81e5edf4673; ?>
+<?php unset($__componentOriginalb358597dd6dc5d75e315d81e5edf4673); ?>
+<?php endif; ?>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $attributes = $__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__attributesOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a)): ?>
+<?php $component = $__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a; ?>
+<?php unset($__componentOriginal16ebdf493f2d9bcbc4a1e9656bb76d8a); ?>
+<?php endif; ?>
+                    <!--Suma wysłanych wiadomości SMS-->
+                    <script>
+                    $(document).ready(function () {
+                        const labels = JSON.parse($('#chart-labels').val());
+                        const data = JSON.parse($('#chart-data').val());
+                        const ctx = document.getElementById('myChart').getContext('2d');
+
+                        const myChart = new Chart(ctx, {
+                        type: 'bar', // typ wykresu: bar, line, pie itd.
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                            label: 'Wysłane SMS-y',
+                            data: data,
+                            backgroundColor: 'rgba(134, 239, 172, 1)'
+                            }]
+                        },
+                        options: {
+                            scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                            }
+                        }
+                        });
+
+                        let currentMonth = $('#month').val();
+                        let dateInit = new Date(currentMonth + '-01');
+                        dateInit.setMonth(dateInit.getMonth());
+                        $('#monthLabel').text(formatMonth(dateInit));
+                        
+
+                        $('#prevMonth').on('click', function () {
+                            changeMonth(-1);
+                        });
+
+                        $('#nextMonth').on('click', function () {
+                            changeMonth(1);
+                        });
+
+                        function changeMonth(offset) {
+                            let date = new Date(currentMonth + '-01');
+
+                            date.setMonth(date.getMonth() + offset);
+
+                            let year = date.getFullYear();
+                            let month = String(date.getMonth() + 1).padStart(2, '0');
+
+                            currentMonth = `${year}-${month}`;
+
+                            $('#current-month').val(currentMonth);
+                            $('#monthLabel').text(formatMonth(date));
+
+                            loadChartData(currentMonth);
+                        }
+
+                        function loadChartData(month) {
+                            $.ajax({
+                                url: '<?php echo e(route('api.v1.setting.client.sms.stats', $client)); ?>',
+                                method: 'GET',
+                                data: { month: month },
+                                success: function (response) {
+                                    // 🔥 update wykresu
+                                    console.log(response)
+                                    myChart.data.labels = response.labels;
+                                    myChart.data.datasets[0].data = response.data;
+
+                                    myChart.update();
+                                    // 🔢 liczba SMS
+                                    $('#totalSms').text(response.totalSms);
+
+                                    // 💰 kwota (ładne formatowanie)
+                                    $('#totalAmount').text(
+                                        parseFloat(response.totalAmount).toFixed(2) + ' PLN'
+                                    );
+                                }
+                            });
+                        }
+                        function formatMonth(date) {
+                            return date.toLocaleDateString('pl-PL', {
+                                year: 'numeric',
+                                month: 'long'
+                            });
+                        }
+                    });
+                    </script>
+                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51)): ?>
+<?php $attributes = $__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51; ?>
+<?php unset($__attributesOriginal47bd46e48bdfbb3b3be51d6ffaa2da51); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51)): ?>
+<?php $component = $__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51; ?>
+<?php unset($__componentOriginal47bd46e48bdfbb3b3be51d6ffaa2da51); ?>
+<?php endif; ?>
+                <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel'): ?>
+                <h1 class="text-2xl font-medium text-gray-700 dark:text-gray-100">
+                    <span>📩</span> 10 ostatnich wysłanych wiadomości
+                </h1>
+                <?php else: ?>
+                <h1 class="text-2xl font-medium text-gray-700 dark:text-gray-100">
+                    <span>📩</span> 10 twoich ostatnich wysłanych wiadomości
+                </h1>
+                <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                <?php if (isset($component)) { $__componentOriginalb5d35cb55883e6a5739f51760b541537 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginalb5d35cb55883e6a5739f51760b541537 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.container-scroll','data' => ['class' => 'md:col-span-2']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('container-scroll'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['class' => 'md:col-span-2']); ?>
+                    <!-- MOBILE VIEW -->
+                    <?php if (isset($component)) { $__componentOriginal52edc5f3d6de46edf4e1debed7575931 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal52edc5f3d6de46edf4e1debed7575931 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.list','data' => ['items' => $msg_paginate,'emptyMessage' => 'Brak wiadomości do wyświetlenia.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('list'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['items' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($msg_paginate),'emptyMessage' => 'Brak wiadomości do wyświetlenia.']); ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $msg_paginate; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php if (isset($component)) { $__componentOriginal9d5ba825ce3b801cfdcee6b195dc8c6d = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal9d5ba825ce3b801cfdcee6b195dc8c6d = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.card-msg-setting','data' => ['msg' => $m]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('card-msg-setting'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['msg' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($m)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9d5ba825ce3b801cfdcee6b195dc8c6d)): ?>
+<?php $attributes = $__attributesOriginal9d5ba825ce3b801cfdcee6b195dc8c6d; ?>
+<?php unset($__attributesOriginal9d5ba825ce3b801cfdcee6b195dc8c6d); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9d5ba825ce3b801cfdcee6b195dc8c6d)): ?>
+<?php $component = $__componentOriginal9d5ba825ce3b801cfdcee6b195dc8c6d; ?>
+<?php unset($__componentOriginal9d5ba825ce3b801cfdcee6b195dc8c6d); ?>
+<?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal52edc5f3d6de46edf4e1debed7575931)): ?>
+<?php $attributes = $__attributesOriginal52edc5f3d6de46edf4e1debed7575931; ?>
+<?php unset($__attributesOriginal52edc5f3d6de46edf4e1debed7575931); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal52edc5f3d6de46edf4e1debed7575931)): ?>
+<?php $component = $__componentOriginal52edc5f3d6de46edf4e1debed7575931; ?>
+<?php unset($__componentOriginal52edc5f3d6de46edf4e1debed7575931); ?>
+<?php endif; ?>
+
+                    <!-- PC VIEW -->
+                    <?php if (isset($component)) { $__componentOriginal163c8ba6efb795223894d5ffef5034f5 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal163c8ba6efb795223894d5ffef5034f5 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.table','data' => ['headers' => ['Nazwa', 'Typ', 'Odbiorca', 'Tytuł', 'Treść', 'Status', 'Cena', 'Kiedy wysłano'],'items' => $msg_paginate,'checkBox' => false,'emptyMessage' => 'Brak wiadomości do wyświetlenia.']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('table'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['headers' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(['Nazwa', 'Typ', 'Odbiorca', 'Tytuł', 'Treść', 'Status', 'Cena', 'Kiedy wysłano']),'items' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($msg_paginate),'checkBox' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute(false),'emptyMessage' => 'Brak wiadomości do wyświetlenia.']); ?>
+                        <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = $msg_paginate; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <?php if (isset($component)) { $__componentOriginal95b44f6c57cd9c9a4b97b96a0dcecb20 = $component; } ?>
+<?php if (isset($attributes)) { $__attributesOriginal95b44f6c57cd9c9a4b97b96a0dcecb20 = $attributes; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.row-msg-setting','data' => ['msg' => $m]] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('row-msg-setting'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['msg' => \Illuminate\View\Compilers\BladeCompiler::sanitizeComponentAttribute($m)]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal95b44f6c57cd9c9a4b97b96a0dcecb20)): ?>
+<?php $attributes = $__attributesOriginal95b44f6c57cd9c9a4b97b96a0dcecb20; ?>
+<?php unset($__attributesOriginal95b44f6c57cd9c9a4b97b96a0dcecb20); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal95b44f6c57cd9c9a4b97b96a0dcecb20)): ?>
+<?php $component = $__componentOriginal95b44f6c57cd9c9a4b97b96a0dcecb20; ?>
+<?php unset($__componentOriginal95b44f6c57cd9c9a4b97b96a0dcecb20); ?>
+<?php endif; ?>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+                     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal163c8ba6efb795223894d5ffef5034f5)): ?>
+<?php $attributes = $__attributesOriginal163c8ba6efb795223894d5ffef5034f5; ?>
+<?php unset($__attributesOriginal163c8ba6efb795223894d5ffef5034f5); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal163c8ba6efb795223894d5ffef5034f5)): ?>
+<?php $component = $__componentOriginal163c8ba6efb795223894d5ffef5034f5; ?>
+<?php unset($__componentOriginal163c8ba6efb795223894d5ffef5034f5); ?>
+<?php endif; ?>
+                 <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginalb5d35cb55883e6a5739f51760b541537)): ?>
+<?php $attributes = $__attributesOriginalb5d35cb55883e6a5739f51760b541537; ?>
+<?php unset($__attributesOriginalb5d35cb55883e6a5739f51760b541537); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalb5d35cb55883e6a5739f51760b541537)): ?>
+<?php $component = $__componentOriginalb5d35cb55883e6a5739f51760b541537; ?>
+<?php unset($__componentOriginalb5d35cb55883e6a5739f51760b541537); ?>
+<?php endif; ?>
+            </div>
+
+         <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginaleb2cf2c6d60985109d6b19ee4f9605bc)): ?>
+<?php $attributes = $__attributesOriginaleb2cf2c6d60985109d6b19ee4f9605bc; ?>
+<?php unset($__attributesOriginaleb2cf2c6d60985109d6b19ee4f9605bc); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginaleb2cf2c6d60985109d6b19ee4f9605bc)): ?>
+<?php $component = $__componentOriginaleb2cf2c6d60985109d6b19ee4f9605bc; ?>
+<?php unset($__componentOriginaleb2cf2c6d60985109d6b19ee4f9605bc); ?>
+<?php endif; ?>
+        <!--CONTENT-->
+
+     <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal6d34ed0eb01a1886d57455f1550df787)): ?>
+<?php $attributes = $__attributesOriginal6d34ed0eb01a1886d57455f1550df787; ?>
+<?php unset($__attributesOriginal6d34ed0eb01a1886d57455f1550df787); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal6d34ed0eb01a1886d57455f1550df787)): ?>
+<?php $component = $__componentOriginal6d34ed0eb01a1886d57455f1550df787; ?>
+<?php unset($__componentOriginal6d34ed0eb01a1886d57455f1550df787); ?>
+<?php endif; ?>
+    <!--MAIN-->
+    <?php else: ?>
+    <?php echo $__env->make('admin.elements.end_config', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+    <?php endif; ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+ <?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $attributes = $__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__attributesOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54)): ?>
+<?php $component = $__componentOriginal9ac128a9029c0e4701924bd2d73d7f54; ?>
+<?php unset($__componentOriginal9ac128a9029c0e4701924bd2d73d7f54); ?>
+<?php endif; ?><?php /**PATH C:\xampp\htdocs\wibest\resources\views\admin\client\sms.blade.php ENDPATH**/ ?>

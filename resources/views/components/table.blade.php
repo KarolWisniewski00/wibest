@@ -35,11 +35,6 @@
                         </th>
                     @endif
                 @endforeach
-                @if (request()->is('dashboard/rcp/work-session'))
-                @if($role != 'admin' && $role != 'właściciel')
-                    <td></td>
-                @endif
-                @endif
             </tr>
         </thead>
 

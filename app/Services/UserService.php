@@ -454,8 +454,8 @@ class UserService
                     'niedziela' => 7,
                 ];
 
-                $startWorkDay = $daysMap[$user->working_hours_start_day];
-                $endWorkDay   = $daysMap[$user->working_hours_stop_day];
+                $startWorkDay = $daysMap[$user->working_hours_start_day] ?? null;
+                $endWorkDay   = $daysMap[$user->working_hours_stop_day] ?? null;
 
                 foreach ($leaves as $leave) {
                     $targetStartDate = Carbon::parse($leave->start_date);
@@ -473,7 +473,7 @@ class UserService
                     while ($currentDate->lte($effectiveEndDate)) {
                         $dayOfWeek = $currentDate->dayOfWeekIso; // 1 (pon) – 7 (nd)
 
-                        if ($dayOfWeek >= $startWorkDay && $dayOfWeek <= $endWorkDay) {
+                        if ($startWorkDay !== null && $endWorkDay !== null && $dayOfWeek >= $startWorkDay && $dayOfWeek <= $endWorkDay) {
                             $leaveDays++;
                         }
 
@@ -741,8 +741,8 @@ class UserService
                     'niedziela' => 7,
                 ];
 
-                $startWorkDay = $daysMap[$user->working_hours_start_day];
-                $endWorkDay   = $daysMap[$user->working_hours_stop_day];
+                $startWorkDay = $daysMap[$user->working_hours_start_day] ?? null;
+                $endWorkDay   = $daysMap[$user->working_hours_stop_day] ?? null;
 
                 foreach ($leaves as $leave) {
                     $targetStartDate = Carbon::parse($leave->start_date);
@@ -760,7 +760,7 @@ class UserService
                     while ($currentDate->lte($effectiveEndDate)) {
                         $dayOfWeek = $currentDate->dayOfWeekIso; // 1 (pon) – 7 (nd)
 
-                        if ($dayOfWeek >= $startWorkDay && $dayOfWeek <= $endWorkDay) {
+                        if ($startWorkDay !== null && $endWorkDay !== null && $dayOfWeek >= $startWorkDay && $dayOfWeek <= $endWorkDay) {
                             $leaveDays++;
                         }
 
@@ -912,29 +912,24 @@ class UserService
      * @param Request $request
      * @return \Illuminate\Support\Collection
      */
-    public function getByRoleAddDatesByFilterDate(Request $request): \Illuminate\Support\Collection
+    public function getByRoleAddDatesByFilterDate(Request $request, ?\Illuminate\Support\Collection $users = null): \Illuminate\Support\Collection
     {
         $filterDateService = new FilterDateService();
         $workSessionRepository = new WorkSessionRepository();
         $calendar = new CalendarView();
         $dates = $filterDateService->getRangeDateFilter($request);
-        $users = $this->getByRole($request);
+        $users ??= $this->getByRole($request);
+        $data = ReportCalendarData::load($users, $filterDateService->getStartDateDateFilter($request),
+            $filterDateService->getEndDateDateFilter($request), (int) Auth::user()->company_id);
+        $holidayYears = [];
 
 
         foreach ($users as &$user) {
             $userDates = [];
             $userObjs = [];
             foreach ($dates as $date) {
-                $hasEvent = $workSessionRepository->hasEventForUserOnDate($user->id, $date);
-                $hasStartEvent = $workSessionRepository->hasStartEventForUserOnDate($user->id, $date);
-                $hasStopEvent = $workSessionRepository->hasStopEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->addDay()->format('d.m.y'));
-                $hasStartEvent2 = $workSessionRepository->hasStartEventForUserOnDate($user->id, \Carbon\Carbon::createFromFormat('d.m.y', $date)->subDays(1)->format('d.m.y'));
-                $hasStopEvent2 = $workSessionRepository->hasStopEventForUserOnDate($user->id, $date);
-                $status = $workSessionRepository->hasInProgressEventForUserOnDate($user->id, $date);
-                $leave = $workSessionRepository->hasLeave($user->id, $date);
-                $leaveFirst = $workSessionRepository->getFirstLeave($user->id, $date);
-                $work_obj = $workSessionRepository->getFirstRcp($user->id, $date);
-                $work_obj_last = $workSessionRepository->getLastRcp($user->id, $date);
+                [$hasEvent, $hasStartEvent, $hasStopEvent, $hasStartEvent2, $hasStopEvent2,
+                    $status, $leave, $leaveFirst, $work_obj, $work_obj_last] = $data->day($user->id, $date);
 
                 if ($work_obj) {
                     //brak normy
@@ -998,7 +993,7 @@ class UserService
                 }
                 //if ($user->public_holidays == true) {
                 $carbonDate = Carbon::createFromFormat('d.m.y', $date);
-                $holidays = $calendar->getPublicHolidays($carbonDate->year);
+                $holidays = $holidayYears[$carbonDate->year] ??= $calendar->getPublicHolidays($carbonDate->year);
                 $dateStr = $carbonDate->format('Y-m-d');
 
                 // Sprawdzenie czy to Nowy Rok lub Trzech Króli

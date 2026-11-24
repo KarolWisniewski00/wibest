@@ -24,8 +24,6 @@
                 </x-button-link-back>
                 <!--POWRÓT-->
                 @if($event->event_type == 'start')
-                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
                     <x-container-gray>
                         <!--status-->
                         <x-text-cell>
@@ -56,57 +54,10 @@
                             </x-text-cell-value>
                         </x-text-cell>
                         <!--Czas w pracy-->
-                        @if($event->location)
-                            <!--Lokalizacja-->
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Lokalizacja
-                                </x-text-cell-label>
-                                <div id="map_start"
-                                    style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
-                            </x-text-cell>
-                            <!--Lokalizacja-->
-                            <input type="hidden" id="latitude_start" value="{{$event->location->latitude}}">
-                            <input type="hidden" id="longitude_start" value="{{$event->location->longitude}}">
-                            <script>
-                                $(document).ready(function () {
-                                    // 1. Odczytanie danych z ukrytych inputów
-                                    const latitude = $('#latitude_start').val();
-                                    const longitude = $('#longitude_start').val();
-
-                                    // Konwersja na liczby zmiennoprzecinkowe jest często bezpieczna
-                                    const lat = parseFloat(latitude);
-                                    const lon = parseFloat(longitude);
-
-                                    // Sprawdzenie, czy dane zostały poprawnie odczytane (opcjonalne, ale zalecane)
-                                    if (isNaN(lat) || isNaN(lon)) {
-                                        console.error('Nie udało się odczytać prawidłowych współrzędnych z ukrytych pól.');
-                                        return; // Przerwij działanie, jeśli dane są nieprawidłowe
-                                    }
-
-                                    // 2. Inicjalizacja mapy Leaflet
-                                    const map = L.map('map_start').setView([lat, lon], 13);
-
-                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
-                                    const greenIcon = L.icon({
-                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                                        iconSize: [25, 41],
-                                        iconAnchor: [12, 41],
-                                        popupAnchor: [1, -34],
-                                        shadowSize: [41, 41]
-                                    });
-                                    L.marker([lat, lon], {
-                                        icon: greenIcon
-                                    }).addTo(map);
-                                });
-                            </script>
-                        @endif
+                        @include('admin.events.partials.location')
                     </x-container-gray>
                 @endif
                 @if($event->event_type == 'stop')
-                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
                     <x-container-gray>
                         <!--status-->
                         <x-text-cell>
@@ -137,52 +88,7 @@
                             </x-text-cell-value>
                         </x-text-cell>
                         <!--Czas w pracy-->
-                        @if($event->location)
-                            <!--Lokalizacja-->
-                            <x-text-cell>
-                                <x-text-cell-label>
-                                    Lokalizacja
-                                </x-text-cell-label>
-                                <div id="map_stop"
-                                    style="z-index:1; height: 300px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
-                            </x-text-cell>
-                            <!--Lokalizacja-->
-                            <input type="hidden" id="latitude_stop" value="{{$event->location->latitude}}">
-                            <input type="hidden" id="longitude_stop" value="{{$event->location->longitude}}">
-                            <script>
-                                $(document).ready(function () {
-                                    // 1. Odczytanie danych z ukrytych inputów
-                                    const latitude = $('#latitude_stop').val();
-                                    const longitude = $('#longitude_stop').val();
-
-                                    // Konwersja na liczby zmiennoprzecinkowe jest często bezpieczna
-                                    const lat = parseFloat(latitude);
-                                    const lon = parseFloat(longitude);
-
-                                    // Sprawdzenie, czy dane zostały poprawnie odczytane (opcjonalne, ale zalecane)
-                                    if (isNaN(lat) || isNaN(lon)) {
-                                        console.error('Nie udało się odczytać prawidłowych współrzędnych z ukrytych pól.');
-                                        return; // Przerwij działanie, jeśli dane są nieprawidłowe
-                                    }
-
-                                    // 2. Inicjalizacja mapy Leaflet
-                                    const map = L.map('map_stop').setView([lat, lon], 13);
-
-                                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
-                                    const redIcon = L.icon({
-                                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                                        iconSize: [25, 41],
-                                        iconAnchor: [12, 41],
-                                        popupAnchor: [1, -34],
-                                        shadowSize: [41, 41]
-                                    });
-                                    L.marker([lat, lon], {
-                                        icon: redIcon
-                                    }).addTo(map);
-                                });
-                            </script>
-                        @endif
+                        @include('admin.events.partials.location')
                     </x-container-gray>
                 @endif
                 @if($event->event_type == 'task')
@@ -271,7 +177,7 @@
                     {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $event->created_at)->format('d.m.Y H:i:s') ?? '' }}
                 </x-label>
                 <x-label class="py-2">
-                    Utoworzono przez {{ $event->created_user->name }}
+                    Utworzono przez {{ $event->created_user?->name ?? 'System lub usunięty użytkownik' }}
                 </x-label>
                 <x-label class="py-2">
                     Ostatnia aktualizacja
@@ -292,8 +198,18 @@
                                     <div class="flex items-center gap-2">
                                         <div
                                             class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-1 font-semibold uppercase tracking-widest">
-                                            <x-user-photo :user="$log->causer" />
-                                            <x-user-name :user="$log->causer" />
+                                            @if($log->causer)
+                                                <x-user-photo :user="$log->causer" />
+                                                <x-user-name :user="$log->causer" />
+                                            @else
+                                                <img src="https://ui-avatars.com/api/?name=S&amp;color=7F9CF5&amp;background=EBF4FF" alt="System" class="flex-shrink-0 w-10 h-10 rounded-full">
+                                                <div class="flex flex-wrap items-center gap-2 text-start text-xs">
+                                                    <span class="inline-flex items-center text-gray-900 dark:text-gray-50 font-semibold uppercase tracking-widest transition ease-in-out duration-150">System</span>
+                                                    <div class="flex items-center gap-2 text-start">
+                                                        <x-label-violet>Brak Roli</x-label-violet>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
 
                                         <p class="text-sm text-gray-600 dark:text-gray-400">

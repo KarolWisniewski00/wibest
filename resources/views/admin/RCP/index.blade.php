@@ -4,50 +4,31 @@
         <!--SIDE BAR-->
         <x-sidebar-left>
             @if(isset($filter_user_id) && $filter_user_id)
-                <div class="relative">
-                    <div class="p-2 pt-0 text-sm rounded-lg">
-                        <div class="flex flex-col gap-4">
-                            <span class="text-gray-900 dark:text-white">👤 Dla zespołu</span>
-                            <label
-                                class="h-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
-
-                                <div class="flex items-center gap-2">
-                                    <x-user-photo :user="App\Models\User::where('id', $filter_user_id)->first()" />
-                                    <x-user-name :user="App\Models\User::where('id', $filter_user_id)->first()"
-                                        class="flex-wrap" />
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    @if($startDate != '' || $endDate != '')
-                        <div class="p-2 pt-0 text-sm rounded-lg flex flex-col gap-4 flex-wrap">
-                            <span class="text-gray-900 dark:text-white">📅 Zakres</span>
-                            <x-status-cello>
-                                @if($startDate != '')
-                                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y') ?? ''}}
-                                @endif
-                                <span class="px-2">-</span>
-                                @if($endDate != '')
-                                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y') ?? ''}}
-                                @endif
-                            </x-status-cello>
-                        </div>
-                    @endif
-                </div>
-            @else
-                @if($role == 'admin' || $role == 'właściciel')
-                    <x-search-filter />
-                    <x-filter-date loader="work-session">
-                        {{ route('api.v1.rcp.work-session.set.date') }}
-                    </x-filter-date>
-                @else
-                    <x-filter-date-user loader="work-session">
-                        {{ route('api.v1.rcp.work-session.set.date') }}
-                    </x-filter-date-user>
-                @endif
+                <li class="p-2">
+                    <p class="mb-3 text-sm text-gray-900 dark:text-white">Dla pracownika</p>
+                    <x-team-user-identity :user="App\Models\User::findOrFail($filter_user_id)" />
+                </li>
+            @elseif($role === 'admin' || $role === 'właściciel')
+                <x-search-filter />
             @endif
+            <x-filter-date-user loader="work-session">
+                {{ route('api.v1.rcp.work-session.set.date') }}
+            </x-filter-date-user>
+            @include('admin.rcp.partials.classification-filter')
+            <li class="space-y-2 p-2" data-rcp-filter-loading aria-busy="true">
+                @foreach(['has_task' => '🎯 Zadanie', 'has_note' => '📝 Notatka'] as $name => $label)
+                    <div data-rcp-filter-skeleton class="h-12 w-full rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse motion-reduce:animate-none" role="status" aria-label="Ładowanie filtra {{ $label }}"></div>
+                    <label data-rcp-filter-content style="display: none;" class="flex cursor-pointer items-center justify-between gap-3 rounded-lg bg-gray-100 px-3 py-3 text-sm font-medium text-gray-900 dark:bg-gray-700 dark:text-white">
+                        <span>{{ $label }}</span>
+                        <span class="relative inline-flex shrink-0">
+                            <input id="rcp-{{ $name }}" name="{{ $name }}" type="checkbox" role="switch" @checked(session('rcp.filters.'.$name, false)) disabled data-rcp-filter-input class="peer sr-only">
+                            <span aria-hidden="true" class="h-6 w-11 rounded-full bg-gray-300 transition-colors duration-200 after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:duration-200 after:content-[''] peer-checked:bg-green-400 peer-checked:after:translate-x-5 peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-green-500 dark:bg-gray-500 dark:peer-checked:bg-green-400 motion-reduce:transition-none motion-reduce:after:transition-none"></span>
+                        </span>
+                    </label>
+                @endforeach
+            </li>
+            <x-sidebar-filter-ready />
+            <input type="hidden" id="rcp-filter-user" value="{{ $filter_user_id ?? '' }}">
             <input type="hidden" id="start_date" value="{{ $startDate }}">
             <input type="hidden" id="end_date" value="{{ $endDate }}">
         </x-sidebar-left>
@@ -60,11 +41,7 @@
                 <x-RCP.header>
                     <span>⏱️</span> RCP
                 </x-RCP.header>
-                <x-status-cello id="show-filter"
-                    class="mb-4 mx-4 md:m-4">
-                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} -
-                    {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
-                </x-status-cello>
+
             @else
                 <x-RCP.header>
                     <span>⏱️</span> Podsumowanie czasu pracy
@@ -268,6 +245,7 @@ Cały rok
                 @endif
             @endif
             @if($showTable)
+                @include('admin.object.partials.date-navigation', ['month' => \Carbon\Carbon::parse($startDate), 'dateNavigationMargin' => 'my-4'])
                 <!--CONTENT-->
                 <x-container-content>
                     <!--MOBILE VIEW-->
@@ -280,13 +258,15 @@ Cały rok
                     <!--MOBILE VIEW-->
 
                     <!--PC VIEW-->
-                    <x-table :headers="['Nazwa', 'Status', 'Lokalizacja', 'Ikona', 'Czas Pracy', 'Kiedy', 'Podgląd']"
+                    <div class="rcp-sessions-table">
+                    <x-table :headers="['Pracownik', 'Status', 'Lokalizacja', 'Typ', 'Godziny / czas', 'Data', 'Klasyfikacja / notatka / uwagi', '']"
                         :items="$work_sessions" emptyMessage="Brak użytkowników do wyświetlenia.">
                         @foreach($work_sessions as $work_session)
                             <x-row-work-session :work_session="$work_session" />
                         @endforeach
                         <x-loader-work-session id="loader" />
                     </x-table>
+                    </div>
                     <!--PC VIEW-->
                     @if(isset($filter_user_id) && $filter_user_id)
                         <x-loader-script filter_user_id="{{ $filter_user_id }}">

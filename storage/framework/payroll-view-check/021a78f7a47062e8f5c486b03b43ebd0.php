@@ -1,0 +1,1 @@
+<div id="loader" class="text-center py-4 hidden text-gray-700 dark:text-gray-50">Ładowanie...</div><?php /**PATH C:\xampp\htdocs\wibest\resources\views\components\loader.blade.php ENDPATH**/ ?>

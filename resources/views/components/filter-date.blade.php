@@ -91,7 +91,7 @@
             let currentDate = new Date();
             let rangeStart = null;
             let rangeEnd = null;
-            let searchQuery = '';
+            let searchQuery = ($('#search').val() || '').trim();
             const $body = $('#body');
             const $list = $('#list');
             const $search = $('#search');
@@ -539,6 +539,7 @@
                 const today = new Date();
                 setRange(today, today);
             }
+            if (searchQuery) loadSessions();
         });
     </script>
 </li>

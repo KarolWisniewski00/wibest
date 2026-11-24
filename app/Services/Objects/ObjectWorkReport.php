@@ -42,7 +42,7 @@ class ObjectWorkReport
         return $default->startOfMonth();
     }
 
-    public function build(int $companyId, Carbon $month, Request $request, ?WorkObject $object = null, bool $includeAttention = false): array
+    public function build(int $companyId, Carbon $month, Request $request, ?WorkObject $object = null, bool $includeAttention = false, ?Carbon $rangeEnd = null): array
     {
         abort_if($object && (int) $object->company_id !== $companyId, 404);
         $selectedEmployeeId = null;
@@ -59,11 +59,11 @@ class ObjectWorkReport
         $workerSeconds = [];
         $readings = [];
         $stats = ['under' => ['count' => 0, 'seconds' => 0], 'normal' => ['count' => 0, 'seconds' => 0],
-            'overtime' => ['count' => 0, 'seconds' => 0], 'attention' => 0, 'seconds' => 0, 'reasons' => []];
+            'overtime' => ['count' => 0, 'seconds' => 0], 'attention' => 0, 'attention_seconds' => 0, 'seconds' => 0, 'reasons' => []];
         $page = max(1, (int) $request->input('work_page', 1));
         $rows = [];
         $total = 0;
-        $query = $this->sessions->month($companyId, $month);
+        $query = $this->sessions->month($companyId, $month, $rangeEnd);
         if ($object) {
             // Current formal assignments gate every preview section, including AJAX and map readings.
             // Use the relation as an SQL subquery so a detached or foreign-company worker cannot leak in.
@@ -91,12 +91,12 @@ class ObjectWorkReport
                 ->whereHas('objects', fn ($q) => $q->where('objects.company_id', $companyId))
                 ->select('users.id')->reorder()->toBase());
         }
-        $query->chunkById(250, function ($batch) use ($companyId, $month, $object, $selectedEmployeeId, $includeAttention, $page, $filter, $search, &$objectSeconds, &$workerSeconds, &$readings, &$rows, &$total, &$stats) {
+        $query->chunkById(250, function ($batch) use ($companyId, $month, $rangeEnd, $object, $selectedEmployeeId, $includeAttention, $page, $filter, $search, &$objectSeconds, &$workerSeconds, &$readings, &$rows, &$total, &$stats) {
             $ids = $batch->pluck('user_id')->unique()->all();
             $users = User::where('company_id', $companyId)->whereIn('id', $ids)->get()->keyBy('id');
-            $totals = $this->sessions->dailyTotals($companyId, $ids, $month);
+            $totals = $this->sessions->dailyTotals($companyId, $ids, $month, $rangeEnd);
             $blocks = WorkBlock::where('company_id', $companyId)->whereIn('user_id', $ids)
-                ->where('starts_at', '>=', $month)->where('starts_at', '<', $month->copy()->addMonth())
+                ->where('starts_at', '>=', $month)->where('starts_at', '<', ($rangeEnd ? $rangeEnd->copy()->addDay()->startOfDay() : $month->copy()->addMonth()))
                 ->orderBy('id')->get()->groupBy(fn ($block) => $block->user_id.'|'.$block->starts_at->toDateString());
             $objects = $this->candidates($companyId, $batch, $ids, $month);
             foreach ($batch as $session) {
@@ -157,6 +157,7 @@ class ObjectWorkReport
                     }
                 } elseif ($contributesToObject) {
                     $stats['attention']++;
+                    $stats['attention_seconds'] += $session->seconds;
                     $reason = $session->reason->value;
                     $stats['reasons'][$reason] = ($stats['reasons'][$reason] ?? 0) + 1;
                 }
@@ -165,9 +166,8 @@ class ObjectWorkReport
                 if ($matchesSearch && ($filter === 'all' || ($filter === 'attention' ? $session->reason !== null : $session->category === $filter))) {
                     if ($total >= ($page - 1) * 25 && $total < $page * 25) {
                         $user = $users->get($session->user_id);
-                        // Plain presentation data: x-user-name must not call User::getToday() per row.
-                        $session->user = (object) ['name' => $session->employee, 'role' => $user?->role,
-                            'profile_photo_url' => $user?->profile_photo_url];
+                        // Reuse the batch-loaded employee; the identity component performs no status queries.
+                        $session->user = $user;
                         $session->missing_task = (bool) ($user?->overtime_task && !$session->task_id && $session->day_extra > 0);
                         $rows[] = $session;
                     }

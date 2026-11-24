@@ -1,6 +1,7 @@
 @props([
 'headers' => [],
 'items' => collect(),
+'loading' => false,
 'emptyMessage' => 'Brak danych do wyświetlenia.',
 'checkBox' => true,
 ])
@@ -74,7 +75,9 @@
         </thead>
 
         <tbody id="body">
-            @if ($items->isEmpty())
+            @if ($loading)
+            {{ $slot }}
+            @elseif ($items->isEmpty())
             <tr class="bg-white dark:bg-gray-800">
                 <td colspan="999" class="px-2 py-2">
                     <x-empty-place />

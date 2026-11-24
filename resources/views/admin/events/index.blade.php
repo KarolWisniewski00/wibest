@@ -4,9 +4,37 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <x-search-filter />
-        <x-filter-date loader="event">
+        <x-filter-date-user loader="event">
             {{ route('api.v1.rcp.event.set.date') }}
-        </x-filter-date>
+        </x-filter-date-user>
+        <li data-rcp-filter-loading aria-busy="true">
+            <div data-rcp-filter-skeleton class="p-2 space-y-2" role="status" aria-label="Ładowanie filtra typu zdarzenia">
+                <div class="h-6 w-32 mb-4 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse motion-reduce:animate-none"></div>
+                @foreach(range(1, 3) as $placeholder)
+                    <div class="h-11 w-full rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse motion-reduce:animate-none"></div>
+                @endforeach
+            </div>
+            <fieldset data-rcp-filter-content style="display: none;" class="space-y-2 p-2">
+                <legend class="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200">Typ zdarzenia</legend>
+                @php
+                    $selectedTypes = session('events.types', session('events.type') ? [session('events.type')] : ['start', 'stop', 'task']);
+                    $eventOptions = [
+                        ['start', '🟢 START', 'peer-checked:bg-green-300 peer-checked:text-green-950 dark:peer-checked:bg-green-300 dark:peer-checked:text-green-950'],
+                        ['stop', '🔴 STOP', 'peer-checked:bg-red-300 peer-checked:text-red-950 dark:peer-checked:bg-red-300 dark:peer-checked:text-red-950'],
+                        ['task', '🎯 Zadanie', 'peer-checked:bg-white peer-checked:text-gray-900 peer-checked:shadow-sm dark:peer-checked:bg-white dark:peer-checked:text-gray-900'],
+                    ];
+                @endphp
+                @foreach($eventOptions as [$value, $label, $tone])
+                    <label class="group block cursor-pointer">
+                        <input type="checkbox" name="event_types[]" value="{{ $value }}" @checked(in_array($value, $selectedTypes)) disabled data-rcp-filter-input class="peer sr-only">
+                        <span class="flex items-center justify-center rounded-full bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-600 transition duration-200 group-hover:brightness-95 peer-checked:shadow-sm peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-green-500 dark:bg-gray-700 dark:text-gray-300 dark:group-hover:brightness-110 {{ $tone }}">
+                            {{ $label }}
+                        </span>
+                    </label>
+                @endforeach
+            </fieldset>
+        </li>
+        <x-sidebar-filter-ready />
         <input type="hidden" id="start_date" value="{{ $startDate }}">
         <input type="hidden" id="end_date" value="{{ $endDate }}">
     </x-sidebar-left>
@@ -18,9 +46,7 @@
         <x-RCP.header>
             <span>⏱️</span> Zdarzenia
         </x-RCP.header>
-        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
-            {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
-        </x-status-cello>
+        @include('admin.object.partials.date-navigation', ['month' => \Carbon\Carbon::parse($startDate), 'dateNavigationMargin' => 'my-4'])
         @php
         $showTable = true;
         @endphp
@@ -111,8 +137,9 @@
             <!--MOBILE VIEW-->
 
             <!--PC VIEW-->
+            <div class="rcp-events-table">
             <x-table
-                :headers="['Nazwa', 'Status', 'Zdarzenie', 'Lokalizacja', 'Kiedy', 'Podgląd']"
+                :headers="['Pracownik', 'Status', 'Zdarzenie', 'Lokalizacja', 'Kiedy', '']"
                 :items="$events"
                 emptyMessage="Brak użytkowników do wyświetlenia.">
                 @foreach($events as $event)
@@ -120,10 +147,10 @@
                 @endforeach
                 <x-loader-event id="loader" />
             </x-table>
+            </div>
             <!--PC VIEW-->
-            <x-loader-script>
-                {{ route('api.v1.rcp.event.get') }}
-            </x-loader-script>
+
+            <div id="event-scroll-sentinel" class="h-1" aria-hidden="true"></div>
         </x-container-content>
         @endif
         <!--CONTENT-->

@@ -24,7 +24,7 @@
                         @click="if (!$event.target.closest('a, button, input, select, textarea, label, [role=button]')) window.location.assign(url)"
                         @keydown.enter.self.prevent="window.location.assign(url)"
                         class="group snap-center cursor-pointer border-b border-gray-200 bg-white text-center transition-colors duration-200 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:border-gray-300">
-                        <td class="px-5 py-4"><div class="flex items-center justify-start gap-2 font-semibold text-gray-700 dark:text-gray-100"><x-user-photo :user="$row->user" /><a href="{{ $url }}" class="rounded text-left text-sm [&>div]:text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500"><x-user-name :user="$row->user" /></a></div></td>
+                        <td class="px-5 py-4"><x-team-user-identity :user="$row->user" /></td>
                         <td class="px-5 py-4"><x-RCP.work-session-status :work_session="$row" class="text-xs !font-medium" /></td>
                         <td class="px-5 py-4"><div class="flex justify-center gap-1">
                             @if($row->start_lat !== null && $row->start_lng !== null)<x-status-green title="Lokalizacja START"><i class="fa-solid fa-location-dot mx-1" aria-hidden="true"></i><span class="sr-only">START</span></x-status-green>@endif
@@ -65,9 +65,9 @@
                             @endif
                         </div></td>
                             <td class="w-1 px-5 py-4 align-middle">
-                                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600">
-                                    <i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i>
-                                </div>
+                                <a href="{{ route('rcp.work-session.show', $row->id) }}" aria-label="Przejd? do sesji" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600">
+                                    <i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i>
+                                </a>
                             </td>
                     </tr>
                 @empty

@@ -8,19 +8,13 @@
         </x-flex-center>
     </td>
 
-    <td class="px-2 py-2 sticky md:left-8 md:z-20 bg-white dark:bg-gray-800 min-w-[200px]">
-        <div
-            class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
-            <x-user-photo :user="$user" />
-            <x-user-name :user="$user" />
-        </div>
+    <td class="px-2 py-2 sticky md:left-8 md:z-20 bg-white dark:bg-gray-800 min-w-[280px]">
+        <x-team-user-identity :user="$user" />
     </td>
     @if($user->working_hours_regular == 'stały planing')
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
                     @if($user->time_in_work_hms_planned != '')
-                        {{$user->time_in_work_hms_planned}}
+                        <x-report-time :value="$user->time_in_work_hms_planned" />
                     @else
                         @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
                             <x-alert-link href="{{ route('team.user.config_planing', $user->id) }}">
@@ -32,53 +26,21 @@
                             </x-alert-link>
                         @endif
                     @endif
-                </span>
-            </x-paragraf-display>
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_total != '00h 00min 00s')
-                        {{$user->time_in_work_hms_total}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_total" tone="neutral" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms != '00h 00min 00s')
-                        {{$user->time_in_work_hms}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms" tone="work" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_extra != '00h 00min 00s')
-                        {{$user->time_in_work_hms_extra}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_extra" tone="extra" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_under != '00h 00min 00s')
-                        {{$user->time_in_work_hms_under}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_under" tone="under" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_leave != '00h')
-                        {{$user->time_in_work_hms_leave}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_leave" tone="leave" />
         </td>
         @if($user->leave_times_by_type)
             @php
@@ -90,11 +52,7 @@
                         ->firstWhere('type', $type);
                 @endphp
                 <td class="px-3 py-2 font-semibold text-lg text-gray-700 dark:text-gray-50  min-w-[200px]">
-                    <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                        <span class="text-gray-400">
-                            {{ $leaveType['hms'] ?? '' }}
-                        </span>
-                    </x-paragraf-display>
+                    <x-report-time :value="$leaveType['hms'] ?? null" tone="leave" />
                 </td>
             @endforeach
         @endif
@@ -102,11 +60,7 @@
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
             @if($user->time_in_work_hms_planned != '')
                 @if($user->time_in_work_hms_planned != '00h 00min 00s')
-                    <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                        <span class="text-gray-400">
-                            {{$user->time_in_work_hms_planned}}
-                        </span>
-                    </x-paragraf-display>
+                    <x-report-time :value="$user->time_in_work_hms_planned" />
                 @else
                     <x-alert-link href="{{ route('calendar.work-schedule.index') }}" class="text-sm">
                         Zaplanuj godziny pracy
@@ -125,49 +79,19 @@
             @endif
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_total != '00h 00min 00s')
-                        {{$user->time_in_work_hms_total}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_total" tone="neutral" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms != '00h 00min 00s')
-                        {{$user->time_in_work_hms}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms" tone="work" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_extra != '00h 00min 00s')
-                        {{$user->time_in_work_hms_extra}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_extra" tone="extra" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_under != '00h 00min 00s')
-                        {{$user->time_in_work_hms_under}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_under" tone="under" />
         </td>
         <td class="px-3 py-2 font-semibold text-lg  text-gray-700 dark:text-gray-50 min-w-[200px]">
-            <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                <span class="text-gray-400">
-                    @if($user->time_in_work_hms_leave != '00h')
-                        {{$user->time_in_work_hms_leave}}
-                    @endif
-                </span>
-            </x-paragraf-display>
+            <x-report-time :value="$user->time_in_work_hms_leave" tone="leave" />
         </td>
         @if($user->leave_times_by_type)
             @php
@@ -179,11 +103,7 @@
                         ->firstWhere('type', $type);
                 @endphp
                 <td class="px-3 py-2 font-semibold text-lg text-gray-700 dark:text-gray-50  min-w-[200px]">
-                    <x-paragraf-display class="font-semibold w-fit text-start text-sm py-2">
-                        <span class="text-gray-400">
-                            {{ $leaveType['hms'] ?? '' }}
-                        </span>
-                    </x-paragraf-display>
+                    <x-report-time :value="$leaveType['hms'] ?? null" tone="leave" />
                 </td>
             @endforeach
         @endif

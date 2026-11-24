@@ -1,11 +1,7 @@
-<!--NAV-->
-<div class="px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-    <nav class="flex gap-x-8 h-full" aria-label="Tabs" role="tablist" aria-orientation="horizontal">
-        <x-nav-link class="h-full text-center"
-            href="{{ route('object.dashboard') }}"
-            :active="Str::startsWith(request()->path(), 'dashboard/objects')">
-            Dashboard
-        </x-nav-link>
-    </nav>
-</div>
-<!--NAV-->
+@php
+    $countEvents = app(\App\Repositories\EventRepository::class)->getEventsTasksForCurrentUserCount(
+        session('start_date', now()->startOfMonth()->toDateString()),
+        session('end_date', now()->endOfMonth()->toDateString())
+    );
+@endphp
+<x-RCP.nav :countEvents="$countEvents" />

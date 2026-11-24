@@ -143,11 +143,32 @@
                         </div>
                     @endif
                 </div>
+                @if(in_array($loader, ['work-session', 'event', 'calendar', 'calendar-smart', 'attendance']))
+                    <button type="button" id="btn-custom-range" aria-controls="custom-date-range" aria-expanded="false"
+                        class="w-full px-2 py-2 rounded-lg bg-gray-100 hover:bg-green-300 dark:bg-gray-700 dark:hover:bg-green-300 text-gray-900 dark:text-white col-span-2 dark:hover:text-gray-900 tracking-widest">
+                        Zakres dat
+                    </button>
+                    <div id="custom-date-range" class="hidden mt-3">
+                        <div class="grid grid-cols-7 text-center text-gray-500 dark:text-gray-500 mb-2">
+                            <div>Pon</div>
+                            <div>Wt</div>
+                            <div>Śr</div>
+                            <div>Czw</div>
+                            <div>Pt</div>
+                            <div>Sob</div>
+                            <div>Ndz</div>
+                        </div>
+                        <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center"></div>
+                    </div>
+                @endif
             </div>
         </div>
     @endif
     <script>
         $(document).ready(function () {
+            @if(session('date_range_info'))
+                toastr.info(@js(session('date_range_info')), '', { positionClass: 'toast-top-center', timeOut: 5000, closeButton: true, progressBar: true });
+            @endif
             const monthNames = [
                 "Styczeń", "Luty", "Marzec", "Kwiecień", "Maj", "Czerwiec",
                 "Lipiec", "Sierpień", "Wrzesień", "Październik", "Listopad", "Grudzień"
@@ -210,14 +231,20 @@
             let currentDate = new Date();
             let wasYear = null;
             let allYear = null;
+            let filterRequest;
+            let filterRevision = 0;
+            let summaryRequest;
+            let summaryRevision = 0;
             let rangeStart = null;
             let rangeEnd = null;
-            let searchQuery = '';
+            let searchQuery = ($('#search').val() || '').trim();
             const $body = $('#body');
             const $list = $('#list');
             const $search = $('#search');
 
             function loadAttendanceSummary(start, end) {
+                const revision = ++summaryRevision;
+                summaryRequest?.abort();
                 const $wrapper = $('#attendance-summary-wrapper');
 
                 if (!$wrapper.length) {
@@ -232,12 +259,13 @@
 
                 const url = `${$wrapper.data('url')}?page=&start_date=${formatDate(start)}&end_date=${formatDate(end)}`;
                 console.log('Wysyłanie żądania AJAX do:', url);
-                $.ajax({
+                summaryRequest = $.ajax({
                     url: url,
                     type: 'GET',
                     dataType: 'json',
 
                     success: function (response) {
+                        if (revision !== summaryRevision) return;
                         console.log('Odpowiedź z serwera:', response);
                         if (!response.success || !response.data) {
                             $skeleton.hide();
@@ -346,7 +374,8 @@
                         $content.show();
                     },
 
-                    error: function (xhr) {
+                    error: function (xhr, status) {
+                        if (status === 'abort' || revision !== summaryRevision) return;
                         console.error(
                             'Błąd pobierania podsumowania czasu pracy:',
                             xhr.status,
@@ -450,7 +479,7 @@
                 }
 
                 updateHiddenInput();
-                loadAttendanceSummary(rangeStart, rangeEnd);
+                loadAttendanceSummary(rangeStart, rangeEnd || rangeStart);
             }
 
             function formatDate(date) {
@@ -476,6 +505,13 @@
             }
 
             function updateShowFilter() {
+                @if(in_array($loader, ['objects', 'event', 'work-session', 'payroll', 'calendar', 'calendar-smart', 'attendance']))
+                if (rangeStart) {
+                    $('#current-month-bt').text(`${monthNames[rangeStart.getMonth()]} ${rangeStart.getFullYear()}`);
+                    $('#show-filter').text(`${formatDateDMY(rangeStart)} - ${formatDateDMY(rangeEnd || rangeStart)}`);
+                }
+                return;
+                @endif
                 if (allYear) {
                     $('#show-filter').html(`${formatDateDMY(rangeStart)} - ${formatDateDMY(rangeEnd)}`);
                     $('#current-month-bt').html(
@@ -500,13 +536,183 @@
                 }
             }
 
+            @if($loader == 'payroll')
+            window.history.replaceState(window.history.state, '', window.location.pathname + window.location.hash);
+            let payrollRequest;
+            let payrollRevision = 0;
+            function refreshPayroll(page = 1) {
+                const revision = ++payrollRevision;
+                payrollRequest?.abort();
+                const $results = $('#payroll-results');
+                $results.attr('aria-busy', 'true').html('<div class="grid gap-4 xl:grid-cols-2"><div class="h-64 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"></div><div class="h-64 rounded-2xl bg-gray-200 dark:bg-gray-700 animate-pulse"></div></div>');
+                updateShowFilter();
+                const data = { start_date: formatDate(rangeStart), end_date: formatDate(rangeEnd || rangeStart), search: $('#search').val() || '', page };
+                payrollRequest = $.ajax({
+                    url: @js(trim((string) $slot)), data,
+                    headers: { 'X-Payroll-Results': '1' },
+                    success(html) {
+                        if (revision !== payrollRevision) return;
+                        $results.html(html);
+                        window.history.replaceState(window.history.state, '', window.location.pathname + window.location.hash);
+                    },
+                    error(xhr, status) { if (status !== 'abort' && revision === payrollRevision) $results.html('<p role="alert" class="p-4 text-red-700 dark:text-red-300">Nie udało się pobrać raportu. Zmień filtr, aby spróbować ponownie.</p>'); },
+                    complete() { if (revision === payrollRevision) $results.attr('aria-busy', 'false'); }
+                });
+            }
+            $(document).on('click.payroll', '#payroll-results nav a', function (event) {
+                if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
+                event.preventDefault();
+                refreshPayroll(Number(new URL(this.href).searchParams.get('page')) || 1);
+            });
+            @endif
+            @if($loader == 'work-session')
+            let workSessionRequest;
+            let workSessionRevision = 0;
+            function refreshWorkSessions() {
+                const revision = ++workSessionRevision;
+                workSessionRequest?.abort();
+                window.dispatchEvent(new Event('rcp-session-filter-changing'));
+                const $body = $('#body'), $list = $('#list');
+                const rowSkeleton = @js(view('components.loader-work-session', ['attributes' => new \Illuminate\View\ComponentAttributeBag()])->render());
+                const cardSkeleton = @js(view('components.loader-work-session-card', ['attributes' => new \Illuminate\View\ComponentAttributeBag()])->render());
+                $body.html(rowSkeleton.repeat(3));
+                $list.html(cardSkeleton.repeat(3));
+                updateShowFilter();
+                workSessionRequest = $.ajax({
+                    url: @js(trim((string) $slot)),
+                    data: { start_date: formatDate(rangeStart), end_date: formatDate(rangeEnd || rangeStart),
+                        filter_user_id: $('#rcp-filter-user').val() || '', search: $('#search').val() || '',
+                        has_task: $('#rcp-has_task').is(':checked') ? 1 : 0, has_note: $('#rcp-has_note').is(':checked') ? 1 : 0,
+                        classification_filter: 1, classifications: $('input[name="rcp_classifications[]"]:checked').map(function () { return this.value; }).get() },
+                    success(data) {
+                        if (revision !== workSessionRevision) return;
+                        $body.html(data.table.join(''));
+                        $list.html(data.list.join(''));
+                        if (!data.table.length) $body.html('<tr><td colspan="9" class="p-6 text-center text-gray-500 dark:text-gray-300">Brak wyników</td></tr>');
+                        if (!data.list.length) $list.html('<li class="p-6 text-center text-gray-500 dark:text-gray-300">Brak wyników</li>');
+                    },
+                    error(xhr, status) { if (status !== 'abort' && revision === workSessionRevision) { $body.html('<tr><td colspan="9" class="p-6 text-center">Nie udało się pobrać danych</td></tr>'); $list.empty(); } }
+                });
+            }
+            $('input[name="rcp_classifications[]"]').on('change', refreshWorkSessions);
+            $('#rcp-has_task, #rcp-has_note').on('change', refreshWorkSessions);
+            @endif
+            @if($loader == 'event')
+            let eventRequest;
+            let eventNextPage = null;
+            let eventPageLoading = false;
+            let eventGeneration = 0;
+            const eventRowSkeleton = @js(view('components.loader-event', ['attributes' => new \Illuminate\View\ComponentAttributeBag()])->render());
+            const eventCardSkeleton = @js(view('components.loader-event-card', ['attributes' => new \Illuminate\View\ComponentAttributeBag()])->render());
+            function eventFilterData() {
+                return { per_page: 3, start_date: formatDate(rangeStart), end_date: formatDate(rangeEnd || rangeStart), filter_event_types: 1, event_types: $('input[name="event_types[]"]:checked').map(function () { return this.value; }).get(), search: $('#search').val() };
+            }
+            function loadMoreEvents() {
+                const sentinel = document.getElementById('event-scroll-sentinel');
+                if (!eventNextPage || eventPageLoading || !sentinel || sentinel.getBoundingClientRect().top > window.innerHeight + 150) return;
+                const generation = eventGeneration;
+                eventPageLoading = true;
+                $('#body').append($(eventRowSkeleton).addClass('event-page-loader'));
+                $('#list').append($(eventCardSkeleton).addClass('event-page-loader'));
+                eventRequest = $.ajax({
+                    url: eventNextPage,
+                    data: eventFilterData(),
+                    success(data) {
+                        if (generation !== eventGeneration) return;
+                        $('.event-page-loader').remove();
+                        $('#body').append(data.table.join(''));
+                        $('#list').append(data.list.join(''));
+                        eventNextPage = data.next_page_url;
+                    },
+                    error(xhr, status) {
+                        if (generation === eventGeneration && status !== 'abort') $('.event-page-loader').remove();
+                    },
+                    complete(xhr, status) {
+                        if (generation !== eventGeneration) return;
+                        eventPageLoading = false;
+                        if (status === 'success') requestAnimationFrame(loadMoreEvents);
+                    }
+                });
+            }
+            const eventSentinel = document.getElementById('event-scroll-sentinel');
+            if (eventSentinel) {
+                const observer = new IntersectionObserver(entries => {
+                    if (entries.some(entry => entry.isIntersecting)) loadMoreEvents();
+                }, { rootMargin: '150px' });
+                observer.observe(eventSentinel);
+            }
+            $(window).on('scroll.eventsPagination resize.eventsPagination', loadMoreEvents);
+            function refreshEvents(initial = false) {
+                const firstPage = initial === true;
+                const generation = ++eventGeneration;
+                eventNextPage = null;
+                eventRequest?.abort();
+                eventPageLoading = true;
+                const $body = $('#body'), $list = $('#list');
+                $body.html(eventRowSkeleton.repeat(3));
+                $list.html(eventCardSkeleton.repeat(3));
+                updateShowFilter();
+                eventRequest = $.ajax({
+                    url: firstPage ? @js(route('api.v1.rcp.event.get')) : @js(trim((string) $slot)),
+                    data: eventFilterData(),
+                    success(data) {
+                        if (generation !== eventGeneration) return;
+                        eventNextPage = firstPage ? data.next_page_url : null;
+                        $body.html(data.table.join(''));
+                        $list.html(data.list.join(''));
+                        if (!data.table.length) $body.html('<tr><td colspan="7" class="p-6 text-center text-gray-500 dark:text-gray-300">Brak zdarzeń</td></tr>');
+                        if (!data.list.length) $list.html('<li class="p-6 text-center text-gray-500 dark:text-gray-300">Brak zdarzeń</li>');
+                    },
+                    error(xhr, status) { if (status !== 'abort' && generation === eventGeneration) { $body.html('<tr><td colspan="7" class="p-6 text-center">Nie udało się pobrać zdarzeń</td></tr>'); $list.empty(); } },
+                    complete(xhr, status) {
+                        if (generation !== eventGeneration) return;
+                        eventPageLoading = false;
+                        if (firstPage && status === 'success') requestAnimationFrame(loadMoreEvents);
+                    }
+                });
+            }
+            $('input[name="event_types[]"]').on('change', refreshEvents);
+            @endif
             function ajaxFilter() {
+                window.wibestFilterChanged = true;
+                window.dispatchEvent(new Event('wibest-filter-changing'));
+                const revision = ++filterRevision;
+                filterRequest?.abort();
+                @if($loader == 'payroll')
+                refreshPayroll();
+                return;
+                @endif
+                @if($loader == 'work-session')
+                refreshWorkSessions();
+                return;
+                @endif
+                @if($loader == 'event')
+                refreshEvents();
+                return;
+                @endif
+
+                @if($loader == 'objects')
+                updateShowFilter();
+                window.dispatchEvent(new CustomEvent('object-date-range', { detail: {
+                    start: formatDate(rangeStart), end: formatDate(rangeEnd || rangeStart), search: $('#search').val() || ''
+                }}));
+                return;
+                @endif
+
 
                 const $body = $('#body');
                 const $head = $('#head');
-                $.ajax({
-                    url: `{{ $slot }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}`,
+                filterRequest = $.ajax({
+                    url: `{{ $slot }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd || rangeStart)}`,
+                    data: { search: $('#search').val() || '',
+                        @if(in_array($loader, ['calendar', 'calendar-smart']))
+                        classification_filter: 1, classifications: $('input[name="rcp_classifications[]"]:checked').map(function () { return this.value; }).get(),
+                        @endif
+                    },
                     method: 'get',
+                    @if($loader == 'work-session')
+                    data: { filter_user_id: $('#rcp-filter-user').val() || '', search: $('#search').val() || '' },
+                    @endif
                     // Wywołuje się ZANIM AJAX wyśle zapytanie
                     beforeSend: function () {
                         $body.empty(); // czyści stare dane
@@ -539,7 +745,7 @@
                         // =========================
 
                         const start = new Date(rangeStart);
-                        const end = new Date(rangeEnd);
+                        const end = new Date(rangeEnd || rangeStart);
 
                         let currentDate = new Date(start);
 
@@ -693,6 +899,7 @@
                         };
                     },
                     success: function (data) {
+                        if (revision !== filterRevision) return;
                         $.each(data.table, function (date, html) {
 
                             const cell = $(`[data-date="${date}"]`);
@@ -708,7 +915,7 @@
 
                         $('.date-column').remove();
                         const start = new Date(rangeStart);
-                        const end = new Date(rangeEnd);
+                        const end = new Date(rangeEnd || rangeStart);
                         const dates = [];
 
                         for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
@@ -787,7 +994,7 @@
                             $list.append(row);
                         });
 
-                        if (!added) {
+                        if (!added && !data.next_page_url) {
                             $body.append(`<tr class="bg-white dark:bg-gray-800">
                                     <td colspan="999" class="px-2 py-2">
                                         <x-empty-place />
@@ -797,8 +1004,15 @@
                         }
 
                         $(window).off('scroll');
+                        @if(in_array($loader, ['calendar', 'calendar-smart']))
+                        window.dispatchEvent(new CustomEvent('wibest-report-loaded', { detail: { next: data.next_page_url, empty: !added } }));
+                        @endif
                     },
-                    error: function (xhr) {
+                    error: function (xhr, status) {
+                        if (status === 'abort' || revision !== filterRevision) return;
+                        @if(in_array($loader, ['calendar', 'calendar-smart']))
+                        window.dispatchEvent(new Event('wibest-report-error'));
+                        @endif
                         console.error('Błąd:', xhr.responseText);
                     }
                 });
@@ -817,7 +1031,13 @@
                     start.getFullYear() === end.getFullYear();
                 wasYear = currentDate.getFullYear();
                 renderCalendar(currentDate);
+                updateShowFilter();
             }
+
+            @if(in_array($loader, ['calendar', 'calendar-smart']))
+            $('input[name="rcp_classifications[]"]').on('change', ajaxFilter);
+            window.addEventListener('wibest-report-retry', ajaxFilter);
+            @endif
 
             // Nawigacja strzałkami
             $('#prev-month').on('click', function () {
@@ -861,6 +1081,17 @@
 
                 $(window).off('scroll');
             });
+            $('#btn-custom-range').on('click', function () {
+                const expanded = $(this).attr('aria-expanded') !== 'true';
+                $(this).attr('aria-expanded', String(expanded));
+                $('#custom-date-range').toggleClass('hidden', !expanded);
+                if (!expanded) {
+                    setRange(new Date(currentDate.getFullYear(), currentDate.getMonth(), 1),
+                        new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0));
+                    ajaxFilter();
+                }
+            });
+
             // Kliknięcie dnia
             $('#calendar-days').on('click', '.day-btn', function () {
                 const [year, month, day] = $(this).data('date').split('-').map(Number);
@@ -878,7 +1109,10 @@
                     }
                 }
 
+                allYear = false;
+                wasYear = year;
                 renderCalendar(currentDate);
+                updateShowFilter();
                 ajaxFilter();
                 $(window).off('scroll');
             });
@@ -888,79 +1122,7 @@
             }
 
             function loadSessions() {
-                $.ajax({
-                    url: `{{ $slot }}?page=&start_date=${formatDate(rangeStart)}&end_date=${formatDate(rangeEnd)}&search=${encodeURIComponent(searchQuery)}`,
-                    method: 'get',
-                    // Wywołuje się ZANIM AJAX wyśle zapytanie
-                    beforeSend: function () {
-                        $body.empty(); // czyści stare dane
-                        $list.empty();
-                        for (let i = 0; i < 3; i++) {
-                            $body.append(`
-                                @if($loader == 'calendar')
-                                    <x-loader-calendar />
-                                @elseif($loader == 'leave')
-                                    <x-loader-leave />
-                                @elseif($loader == 'pending')
-                                    <x-loader-leave-pending />
-                                @elseif($loader == 'work-session')
-                                    <x-loader-work-session />
-                                @elseif($loader == 'event')
-                                    <x-loader-event />
-                                @elseif($loader == 'attendance')
-                                    <x-loader-attendance />
-                                @elseif($loader == 'planing')
-                                    <x-loader-planing />
-                                @elseif($loader == 'calendar-smart')
-                                    <x-loader-calendar-smart />
-                                @elseif($loader == 'planing-smart')
-                                    <x-loader-planing-smart />
-                                @elseif($loader == 'leave-balance')
-                                    <x-loader-leave-balance />
-                                @endif
-                                `);
-                            $list.append(`
-                                @if($loader == 'leave')
-                                    <x-loader-leave-card />
-                                @elseif($loader == 'pending')
-                                    <x-loader-leave-pending-card />
-                                @elseif($loader == 'work-session')
-                                    <x-loader-work-session-card />
-                                @elseif($loader == 'event')
-                                    <x-loader-event-card />
-                                @endif
-                                `);
-                        };
-                    },
-                    success: function (data) {
-                        $body.empty();
-                        $list.empty();
-                        console.log(data);
-                        let added = false;
-
-                        data.table.forEach(function (row) {
-                            $body.append(row);
-                            added = true;
-                        });
-                        data.list.forEach(function (row) {
-                            $list.append(row);
-                        });
-
-                        if (!added) {
-                            $body.append(`<tr class="bg-white dark:bg-gray-800">
-                                    <td colspan="999" class="px-2 py-2">
-                                        <x-empty-place />
-                                    </td>
-                                </tr>`);
-                            $list.append(`<x-empty-place />`);
-                        }
-
-                        $(window).off('scroll');
-                    },
-                    error: function (xhr) {
-                        console.error('Błąd:', xhr.responseText);
-                    }
-                });
+                ajaxFilter();
             }
             $('#next-month-bt').on('click', function () {
                 currentDate = new Date(
@@ -1158,12 +1320,31 @@
                 end.setHours(23, 59, 59, 999); //zmiana czasu letni/zimowy
 
                 setRange(start, end);
+                const fullMonth = start.getDate() === 1 && start.getFullYear() === end.getFullYear()
+                    && start.getMonth() === end.getMonth()
+                    && end.getDate() === new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+                $('#btn-custom-range').attr('aria-expanded', String(!fullMonth));
+                $('#custom-date-range').toggleClass('hidden', fullMonth);
             } else {
                 // fallback na dzisiaj, jeśli inputy puste
                 const today = new Date();
-                setRange(today, today);
+                setRange(new Date(today.getFullYear(), today.getMonth(), 1), new Date(today.getFullYear(), today.getMonth() + 1, 0));
             }
 
+            @if($loader == 'event')
+            refreshEvents(true);
+            @endif
+            @if($loader == 'work-session' && session('rcp.filters.active', false))
+            refreshWorkSessions();
+            @elseif($loader == 'work-session')
+            if (searchQuery) refreshWorkSessions();
+            @elseif($loader == 'payroll')
+            if (searchQuery) refreshPayroll();
+            @elseif(in_array($loader, ['calendar', 'calendar-smart']) && request()->routeIs('raport.time-sheet.index', 'raport.time-smart.index'))
+            requestAnimationFrame(() => ajaxFilter());
+            @elseif($loader != 'event' && $loader != 'objects')
+            if (searchQuery) loadSessions();
+            @endif
         });
     </script>
 </li>

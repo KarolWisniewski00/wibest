@@ -13,14 +13,14 @@
             };
         @endphp
         <li>
-        <a href="{{ route('rcp.work-session.show', $row->id) }}" class="group cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition-colors duration-200 h-full block w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:border-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">
+        <div x-data="{ url: {{ \Illuminate\Support\Js::from(route('rcp.work-session.show', $row->id)) }} }" tabindex="0" @click="if (!$event.target.closest('a, button, input, select, textarea')) window.location.assign(url)" @keydown.enter.self.prevent="window.location.assign(url)" class="group cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 transition-colors duration-200 h-full block w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg hover:text-gray-600 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 [@media(prefers-color-scheme:light)]:bg-gray-100 [@media(prefers-color-scheme:light)]:border-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">
         <div class="flex min-w-0 w-full flex-col items-start gap-3 text-xs leading-relaxed">
             <div class="flex w-full items-start justify-between gap-3">
                 <div class="flex min-w-0 flex-1 flex-col items-start gap-2 [&>*]:m-0">
                 <x-RCP.work-session-status :work_session="$row" class="text-xs !font-medium" />
                 <x-status-cello class="text-xs !font-medium break-words">{{ $start?->copy()->locale('pl')->translatedFormat('d.m, l') ?? 'Brak START' }}@if($night) – {{ $stop->copy()->locale('pl')->translatedFormat('d.m, l') }}@endif</x-status-cello>
                 </div>
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i></div>
+            <a href="{{ route('rcp.work-session.show', $row->id) }}" aria-label="Przejd? do sesji" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>
             </div>
             <div class="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
                 <div class="flex flex-col items-center gap-1">
@@ -54,14 +54,10 @@
                 </p>
             @endif
             <div class="flex min-w-0 items-center gap-3 border-t border-gray-200 pt-3 font-semibold dark:border-gray-600 w-full [@media(prefers-color-scheme:light)]:border-gray-300">
-                <x-user-photo :user="$row->user" />
-                <div class="min-w-0 text-xs [overflow-wrap:anywhere]">
-                    <p class="break-words text-xs leading-5 dark:text-gray-50">{{ $row->user->name }}</p>
-                    <x-user-role :user="$row->user" />
-                </div>
+                <x-team-user-identity :user="$row->user" />
             </div>
         </div>
-        </a>
+        </div>
         </li>
     @empty
         <li class="p-4 text-center text-xs text-gray-500 dark:text-gray-300 [@media(prefers-color-scheme:light)]:text-gray-600">Brak sesji dla wybranego miesiąca i kategorii.</li>

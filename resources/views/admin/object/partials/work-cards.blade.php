@@ -1,16 +1,23 @@
 @php
-    $stats = $workReport['stats'];
+    $stats = $workReport['stats'] ?? [
+        'seconds' => 0, 'attention_seconds' => 0, 'attention' => 0,
+        'under' => ['count' => 0, 'seconds' => 0],
+        'normal' => ['count' => 0, 'seconds' => 0],
+        'overtime' => ['count' => 0, 'seconds' => 0],
+    ];
     $cards = [];
+    $sessionCount = $stats['under']['count'] + $stats['normal']['count'] + $stats['overtime']['count'];
+    $sessionWord = $sessionCount === 1 ? 'sesja' : (in_array($sessionCount % 10, [2, 3, 4]) && !in_array($sessionCount % 100, [12, 13, 14]) ? 'sesje' : 'sesji');
+    $attentionCount = $stats['attention'];
+    $attentionWord = $attentionCount === 1 ? 'sesja' : (in_array($attentionCount % 10, [2, 3, 4]) && !in_array($attentionCount % 100, [12, 13, 14]) ? 'sesje' : 'sesji');
     if ($dashboard ?? false) {
         $cards[] = ['Aktywne obiekty', $counts->get('active', 0), 'Stan bieżący', 'fa-cube'];
-        $cards[] = ['Czas spędzony na obiektach', \App\Services\Objects\ObjectWorkReport::duration($stats['seconds']), 'Zakwalifikowane sesje · ' . $month->format('m.Y'), 'fa-clock'];
-        $cards[] = ['Wymaga uwagi', $stats['attention'], 'Sesje bez jednoznacznego przypisania · ' . $month->format('m.Y'), 'fa-triangle-exclamation'];
+        $cards[] = ['Czas spędzony na obiektach', \App\Services\Objects\ObjectWorkReport::duration($stats['seconds']), $sessionCount . ' ' . $sessionWord, 'fa-clock'];
+        $cards[] = ['Wymaga uwagi', \App\Services\Objects\ObjectWorkReport::duration($stats['attention_seconds']), $attentionCount . ' ' . $attentionWord, 'fa-triangle-exclamation'];
     }
     if ($preview ?? false) {
-        $sessionCount = $stats['under']['count'] + $stats['normal']['count'] + $stats['overtime']['count'];
-        $sessionWord = $sessionCount === 1 ? 'sesja' : (in_array($sessionCount % 10, [2, 3, 4]) && !in_array($sessionCount % 100, [12, 13, 14]) ? 'sesje' : 'sesji');
         $cards[] = ['Czas na obiekcie', \App\Services\Objects\ObjectWorkReport::duration($stats['seconds']), $sessionCount . ' ' . $sessionWord, 'fa-clock'];
-        $cards[] = ['Wymaga uwagi', $stats['attention'], 'Sesje bez jednoznacznego przypisania · ' . $month->format('m.Y'), 'fa-triangle-exclamation'];
+        $cards[] = ['Wymaga uwagi', \App\Services\Objects\ObjectWorkReport::duration($stats['attention_seconds']), $attentionCount . ' ' . $attentionWord, 'fa-triangle-exclamation'];
     }
     foreach (['under' => 'Brak normy', 'normal' => 'Norma', 'overtime' => 'Nadgodziny'] as $key => $label) {
         $count = $stats[$key]['count'];
@@ -54,24 +61,21 @@
                     <p
                         class="text-sm text-gray-600 dark:text-gray-300 [@media(prefers-color-scheme:light)]:font-semibold [@media(prefers-color-scheme:light)]:text-gray-700">
                         {{ $label }}</p>
-                    @if($label === 'Aktywne obiekty')
-                        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ $value }}</p>
-                        <p class="mt-4 text-xs text-gray-600 dark:text-gray-300">{{ $caption }}</p>
-                    @else
-                        <p class="relative mt-2 text-3xl font-bold text-gray-900 dark:text-white"><span
+                        <p class="relative mt-2 min-w-[4ch] text-3xl font-bold text-gray-900 dark:text-white"><span
+                                @if($deferReport ?? false) style="visibility: hidden;" @endif
                                 :class="reportLoading ? 'invisible' : ''">{{ $value }}</span><span x-show="reportLoading"
                                 x-cloak aria-hidden="true"
                                 class="absolute inset-x-0 top-1/2 h-3 -translate-y-1/2 animate-pulse rounded bg-gray-200 motion-reduce:animate-none dark:bg-gray-600"></span>
                         </p>
-                        <p class="relative mt-4 text-xs text-gray-600 dark:text-gray-300"><span
+                        <p class="relative mt-4 min-w-[8ch] text-xs text-gray-600 dark:text-gray-300"><span
+                                @if($deferReport ?? false) style="visibility: hidden;" @endif
                                 :class="reportLoading ? 'invisible' : ''">{{ $caption }}</span><span x-show="reportLoading"
                                 x-cloak aria-hidden="true"
                                 class="absolute inset-x-0 top-1/2 h-3 -translate-y-1/2 animate-pulse rounded bg-gray-200 motion-reduce:animate-none dark:bg-gray-600"></span>
                         </p>
-                    @endif
                 </div>
             </div>
         </div>
     @endforeach
 </div>
-<span x-show="reportLoading" x-cloak class="sr-only" role="status">?adowanie statystyk?</span>
+<span x-show="reportLoading" x-cloak class="sr-only" role="status">Ładowanie statystyk…</span>

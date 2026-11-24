@@ -8,12 +8,8 @@
         </x-flex-center>
     </td>
 
-    <td class="px-1 py-1 sticky md:left-8 md:z-20 bg-white dark:bg-gray-800">
-        <div
-            class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-1 font-semibold uppercase tracking-widest">
-            <x-user-photo :user="$user" />
-            <x-user-name :user="$user" />
-        </div>
+    <td class="px-1 py-1 sticky md:left-8 md:z-20 bg-white dark:bg-gray-800 min-w-[280px] px-4 py-4">
+        <x-team-user-identity :user="$user" :compact="true" />
     </td>
     @php
         $dates = $user->dates ?? [];

@@ -1601,9 +1601,8 @@
                                                     data-id="{{ $user->id }}">
                                             </div>
                                             <div
-                                                class="min-w-0 px-3 py-3 text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
-                                                <x-user-photo :user="$user" />
-                                                <x-user-name :user="$user" />
+                                                class="min-w-0 px-3 py-3 text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2">
+                                                <x-team-user-identity :user="$user" />
                                             </div>
                                         </div>
                                     @empty

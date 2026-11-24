@@ -154,16 +154,16 @@ class DashboardController extends Controller
 
             // Zamiana na liczby
             $dayNum   = $daysMap[$dayPolish];
-            $startNum = $daysMap[$startDay];
-            $stopNum  = $daysMap[$stopDay];
+            $startNum = $daysMap[$startDay] ?? null;
+            $stopNum  = $daysMap[$stopDay] ?? null;
 
             // Sprawdzenie, czy dzień jest w przedziale
             $inRange = false;
 
-            if ($startNum <= $stopNum) {
+            if ($startNum !== null && $stopNum !== null && $startNum <= $stopNum) {
                 // np. poniedziałek - piątek
                 $inRange = ($dayNum >= $startNum && $dayNum <= $stopNum);
-            } else {
+            } elseif ($startNum !== null && $stopNum !== null) {
                 // np. piątek - wtorek (cykliczne)
                 $inRange = ($dayNum >= $startNum || $dayNum <= $stopNum);
             }

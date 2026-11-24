@@ -944,9 +944,9 @@
                         aria-label="Podsumowanie urlopu wypoczynkowego">
                         <!-- Nagłówek -->
                         <div class="flex items-start justify-between gap-4">
-                            <div class="flex min-w-0 items-center gap-3">
+                            <div class="flex min-w-0 items-start gap-5">
                                 <div
-                                    class="text-2xl shrink-0 hidden sm:flex w-14 h-14 rounded-2xl items-center justify-center bg-gradient-to-br from-pink-200 to-rose-100 dark:from-pink-500/20 dark:to-rose-500/10 text-pink-300 dark:text-pink-300">
+                                    class="hidden sm:flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-200 to-rose-100 text-pink-700 text-2xl dark:from-pink-500/20 dark:to-rose-500/10 dark:text-pink-300" aria-hidden="true">
                                     {{ $icon }}
                                 </div>
 
@@ -956,9 +956,9 @@
                                         Twój urlop
                                     </div>
 
-                                    <h3 class="mt-1 text-base font-semibold text-gray-900 dark:text-white">
+                                    <h2 class="mt-1 text-3xl font-semibold tracking-tight text-white">
                                         Urlop wypoczynkowy
-                                    </h3>
+                                    </h2>
                                 </div>
                             </div>
 
@@ -1076,6 +1076,7 @@
                     </section>
                 </div>
             </div>
+            <x-support-contact id="support-contact" :dashboard="true" class="m-4 scroll-mt-24" />
         </x-main-no-filter>
     @else
         @include('admin.elements.end_config')

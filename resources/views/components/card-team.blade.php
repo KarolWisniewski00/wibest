@@ -1,11 +1,13 @@
 @props(['user'])
 <li class="snap-center">
-    <div class="h-full inline-flex items-center justify-between w-full p-4
-                text-gray-500 bg-white border-2 border-gray-200 rounded-lg
+    <div data-team-record class="group relative cursor-pointer active:bg-gray-100 dark:active:bg-gray-700 focus-within:ring-2 focus-within:ring-green-300 h-full inline-flex items-center justify-between w-full p-4
+                text-gray-500 bg-white border border-gray-200 rounded-2xl
                 hover:text-gray-600 hover:bg-gray-50
                 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700">
-        <div class="flex flex-col w-full gap-4">
+        <div class="flex flex-col min-w-0 w-full gap-5">
+            <div class="absolute top-4 right-4"><div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></div></div>
 
+            <x-team-user-identity :user="$user" />
             @if($user->working_hours_custom != null && $user->working_hours_from != null && $user->working_hours_to != null && $user->working_hours_start_day != null && $user->working_hours_stop_day != null)
             @if($role == 'admin' || $role == 'menedżer' || $role == 'właściciel')
             @php
@@ -110,16 +112,10 @@
             @endif
             @endif
 
-            <div class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
-                <x-user-photo :user="$user" />
-                <x-user-name :user="$user" />
-            </div>
 
-            <div class="flex space-x-3">
-                <x-button-link-neutral href="{{route('team.user.show', $user)}}" class="min-h-[38px]">
-                    <i class="fa-solid fa-eye"></i>
-                </x-button-link-neutral>
-            </div>
+
+
+            <x-team-user-details :user="$user" />
         </div>
     </div>
 </li>

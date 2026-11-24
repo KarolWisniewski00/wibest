@@ -40,15 +40,39 @@ class TimeSheetController extends Controller
      * @param Request $request
      * @return \Illuminate\View\View
      */
+    private function reportUsers(Request $request, bool $paginate = false)
+    {
+        $filter = app(\App\Services\ReportClassificationFilter::class);
+        $selected = $filter->selected($request);
+        $candidates = $this->userService->getByRole($request);
+        $page = max(1, (int) $request->input('page', 1));
+        if (!$paginate) return $filter->apply($this->userService->getByRoleAddDatesByFilterDate($request, $candidates), $selected);
+        $request->validate(['cursor' => ['nullable', 'integer', 'min:0']]);
+        $cursor = (int) $request->input('cursor', ($page - 1) * 3);
+        $users = collect();
+        // Fill the visible batch after classification without calculating the
+        // calendars of every employee or skipping unmatched candidates.
+        while ($users->count() < 3 && $cursor < $candidates->count()) {
+            $batch = $candidates->slice($cursor, 3 - $users->count())->values();
+            $cursor += $batch->count();
+            $users = $users->concat($filter->apply($this->userService->getByRoleAddDatesByFilterDate($request, $batch), $selected));
+        }
+
+        $result = new \Illuminate\Pagination\Paginator($users->values(), 3, $page,
+            ['path' => $request->url(), 'query' => array_replace($request->query(), ['cursor' => $cursor])]);
+        return $result->hasMorePagesWhen($cursor < $candidates->count());
+    }
+
     public function index(Request $request): \Illuminate\View\View
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
         $dates = $this->filterDateService->getRangeDateFilter($request, 'd.m.y');
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
-        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
+        $users = collect();
+        $deferReport = true;
 
-        return view('admin.raport.index', compact('dates', 'startDate', 'endDate', 'users'));
+        return view('admin.raport.index', compact('dates', 'startDate', 'endDate', 'users', 'deferReport'));
     }
     public function smart(Request $request): \Illuminate\View\View
     {
@@ -56,9 +80,10 @@ class TimeSheetController extends Controller
         $dates = $this->filterDateService->getRangeDateFilter($request, 'd.m.y');
         $startDate = $this->filterDateService->getStartDateDateFilter($request);
         $endDate = $this->filterDateService->getEndDateDateFilter($request);
-        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
+        $users = collect();
+        $deferReport = true;
 
-        return view('admin.raport.smart', compact('dates', 'startDate', 'endDate', 'users'));
+        return view('admin.raport.smart', compact('dates', 'startDate', 'endDate', 'users', 'deferReport'));
     }
     /**
      * Zwraca użytkowników dla paginated infinite scroll.
@@ -69,7 +94,7 @@ class TimeSheetController extends Controller
     public function get(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
-        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
+        $users = $this->reportUsers($request, true);
         $rows_table = [];
         $rows_list = [];
         foreach ($users as $user) {
@@ -87,7 +112,7 @@ class TimeSheetController extends Controller
     public function getSmart(Request $request): \Illuminate\Http\JsonResponse
     {
         $this->filterDateService->initFilterDateIfNotExist($request);
-        $users = $this->userService->paginatedByRoleAddDatesByFilterDate($request);
+        $users = $this->reportUsers($request, true);
         $rows_table = [];
         $rows_list = [];
         foreach ($users as $user) {
@@ -111,7 +136,7 @@ class TimeSheetController extends Controller
     public function setDate(DateRequest $request): \Illuminate\Http\JsonResponse
     {
         $this->filterDateService->initFilterDate($request);
-        $users = $this->userService->getByRoleAddDatesByFilterDate($request);
+        $users = $this->reportUsers($request, true);
         $rows_table = [];
         $rows_list = [];
         foreach ($users as $user) {
@@ -122,12 +147,13 @@ class TimeSheetController extends Controller
         return response()->json([
             'table' => $rows_table,
             'list' => $rows_list,
+            'next_page_url' => $users->nextPageUrl(),
         ]);
     }
     public function setDateSmart(DateRequest $request): \Illuminate\Http\JsonResponse
     {
         $this->filterDateService->initFilterDate($request);
-        $users = $this->userService->getByRoleAddDatesByFilterDate($request);
+        $users = $this->reportUsers($request, true);
         $rows_table = [];
         $rows_list = [];
         foreach ($users as $user) {
@@ -138,6 +164,7 @@ class TimeSheetController extends Controller
         return response()->json([
             'table' => $rows_table,
             'list' => $rows_list,
+            'next_page_url' => $users->nextPageUrl(),
         ]);
     }
     /**

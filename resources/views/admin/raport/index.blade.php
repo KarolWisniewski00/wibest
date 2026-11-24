@@ -4,9 +4,11 @@
     <!--SIDE BAR-->
     <x-sidebar-left>
         <x-search-filter />
-        <x-filter-date>
+        <x-filter-date-user>
             {{ route('api.v1.raport.time-sheet.set.date') }}
-        </x-filter-date>
+        </x-filter-date-user>
+        @include('admin.rcp.partials.classification-filter')
+        <x-sidebar-filter-ready />
         <input type="hidden" id="start_date" value="{{ $startDate }}">
         <input type="hidden" id="end_date" value="{{ $endDate }}">
     </x-sidebar-left>
@@ -18,20 +20,20 @@
             <span>🙋🏻‍♂️</span> Lista obecności
         </x-raport.header>
         <!--HEADER-->
-        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
-            {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
-        </x-status-cello>
+        <x-raport.date-navigation :start-date="$startDate" />
 
         <x-container-content-calendar class="rounded-lg">
             <!--PC VIEW-->
             <x-table-calendar
                 :headers="array_merge(['Nazwa'], $dates)"
-                :items="$users"
+                :items="$users" :loading="$deferReport ?? false"
                 emptyMessage="Brak użytkowników do wyświetlenia.">
                 @foreach($users as $user)
                 <x-row-raport :user="$user" />
                 @endforeach
-                <x-loader-calendar id="loader" />
+                @for($row = 0; $row < 3; $row++)
+                    <x-loader-calendar />
+                @endfor
             </x-table-calendar>
             <!--PC VIEW-->
             @php
@@ -40,9 +42,7 @@
             <x-download-pdf-check :file="$file">
                 {{ route('api.v1.raport.time-sheet.export.xlsx') }}
             </x-download-pdf-check>
-            <x-loader-script-calendar>
-                {{ route('api.v1.raport.time-sheet.get') }}
-            </x-loader-script-calendar>
+            <x-report-pages />
         </x-container-content-calendar>
     </x-main>
     @else

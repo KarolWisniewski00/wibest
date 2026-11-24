@@ -1,9 +1,11 @@
-@props(['kind' => 'list', 'pending' => 'reportLoading'])
+@props(['kind' => 'list', 'pending' => 'reportLoading', 'preview' => false])
 <div x-show="{{ $pending }}" x-cloak role="status" aria-live="polite"
     @class(['absolute inset-x-0 bottom-0 z-10 overflow-hidden bg-white dark:bg-gray-700', 'top-0 md:top-[49px]' => $kind === 'table', 'top-0' => $kind !== 'table'])>
     <span class="sr-only">Ładowanie danych…</span>
     <div class="h-full animate-pulse motion-reduce:animate-none" aria-hidden="true">
-        @if($kind === 'map')
+        @if($kind === 'cards')
+            <x-object.card-skeleton :preview="$preview" />
+        @elseif($kind === 'map')
             <div class="relative h-full bg-gray-100 dark:bg-gray-700">
                 <div class="absolute inset-x-0 top-1/3 h-8 -rotate-12 bg-gray-200 dark:bg-gray-600"></div>
                 <div class="absolute inset-y-0 left-1/3 w-6 rotate-12 bg-gray-200 dark:bg-gray-600"></div>

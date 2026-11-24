@@ -7,7 +7,7 @@ function setup(dashboard = false) {
     const requests = [], events = [];
     globalThis.window = {
         location: { href: 'http://localhost/objects/show/4?month=2026-11&work_page=3&work_category=normal' },
-        history: { state: {}, replaceState(state, title, url) { window.location.href = String(url); } },
+        history: { state: {}, replaceState(state, title, url) { this.state = state; window.location.href = String(url); } },
         dispatchEvent(event) { events.push({ name: event.type, detail: event.detail }); return true; },
     };
     globalThis.fetch = (url, options) => new Promise(resolve => requests.push({ url, options, resolve }));
@@ -24,6 +24,23 @@ function respond(request, month, dashboard = false) {
     for (const key of (dashboard ? ['period', 'cards', 'objects', 'work'] : ['period', 'cards', 'workers', 'work'])) payload[key] = `${key}:${month}${selectedEmployeeId ? ':' + selectedEmployeeId : ''}`;
     request.resolve({ ok: true, redirected: false, headers: new Headers({ [dashboard ? 'X-Object-Dashboard' : 'X-Object-Preview']: '1' }), json: async () => payload });
 }
+
+test('deferred dashboard starts with its server filters instead of an old employee search in history', async () => {
+    const { requests } = setup(true);
+    window.location.href = 'http://localhost/objects/dashboard';
+    window.history.state = { wibestFilterUrl: 'http://localhost/objects/dashboard?search=anna' };
+    const instance = objectPreview({ endpoint: window.location.href, dashboard: true, deferred: true,
+        month: '2026-11', startDate: '2026-11-01', endDate: '2026-11-30', initialFilters: { search: '', status: '' } });
+    instance.$refs = {};
+    instance.$dispatch = () => {};
+    instance.$nextTick = callback => callback();
+    instance.init();
+    assert.equal(requests.length, 1);
+    assert.equal(requests[0].url.searchParams.get('search'), '');
+    assert.equal(requests[0].url.searchParams.get('start_date'), '2026-11-01');
+    requests[0].resolve({ ok: false });
+    await new Promise(resolve => setTimeout(resolve, 0));
+});
 
 test('quick month changes commit all sections once and ignore the older response', async () => {
     const { instance, requests, events, historyLink } = setup();
@@ -43,7 +60,7 @@ test('quick month changes commit all sections once and ignore the older response
     assert.equal(instance.month, '2027-01');
     assert.equal(instance.loading, false);
     assert.equal(instance.reportLoading, false);
-    assert.equal(new URL(window.location.href).searchParams.get('month'), '2027-01');
+    assert.equal(new URL(window.history.state.wibestFilterUrl).searchParams.get('month'), '2027-01');
     assert.equal(new URL(historyLink.href).searchParams.get('month'), '2027-01');
     const updates = events.filter(event => event.name === 'wibest:object-readings');
     assert.equal(updates.length, 1);
@@ -260,7 +277,7 @@ test('dashboard month change captures pending searches, resets both pages and co
     for (const key of ['period', 'cards', 'objects', 'work']) assert.equal(instance.$refs[key].innerHTML, `${key}:2027-01`);
     assert.equal(instance.month, '2027-01');
     assert.equal(events.some(event => event.name === 'wibest:object-readings'), false);
-    assert.equal(new URL(window.location.href).searchParams.get('work_search'), 'Kowalski');
+    assert.equal(new URL(window.history.state.wibestFilterUrl).searchParams.get('work_search'), 'Kowalski');
     const failed = instance.changeMonth('http://localhost/objects/dashboard?month=2027-02');
     requests[2].resolve({ ok: false });
     await failed;

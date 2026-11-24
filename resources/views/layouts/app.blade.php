@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="search-memory-scope" content="{{ auth()->id() }}:{{ auth()->user()?->company_id }}">
 
     <!--ICON-->
     <link rel="icon" href="{{ asset('wibest_icon_transparent_bg.png') }}" type="image/png">
@@ -55,9 +56,9 @@
             {{ $slot }}
         </main>
     </div>
-    <input type="hidden" id="work_start" value="{{ route('api.work.start', '') }}">
-    <input type="hidden" id="work_stop" value="{{ route('api.work.stop', '') }}">
-    <input type="hidden" id="work_sessions" value="{{ route('api.work.session', ['', '']) }}">
+    <input type="hidden" id="work_start" value="{{ route('api.work.start') }}">
+    <input type="hidden" id="work_stop" value="{{ route('api.work.stop') }}">
+    <input type="hidden" id="work_sessions" value="{{ route('api.work.session') }}">
     <input type="hidden" id="user_id" value="{{ $user_id }}">
     <input type="hidden" id="company_id" value="{{ $company_id }}">
     <input type="hidden" id="work_sessions_logged_user" value="{{ $work_sessions_logged_user }}">
@@ -226,7 +227,7 @@
                     $('#loaderPlaningWrapper').addClass('hidden');
                     const self = this;
                     $.ajax({
-                        url: self.workSessions + '/' + self.userId,
+                        url: self.workSessions,
                         type: 'GET',
                         dataType: 'json',
                         success: function (response) {
@@ -308,10 +309,10 @@
                     const self = this;
                     const lat = $('#lat').val();
                     const lon = $('#lon').val();
-                    console.log(lat, lon)
                     $.ajax({
-                        url: self.workStart + '/' + self.userId,
-                        type: 'GET',
+                        url: self.workStart,
+                        type: 'POST',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         data: {
                             name: 'Widget',
                             lat: lat,
@@ -385,8 +386,9 @@
                     const lat = $('#lat').val();
                     const lon = $('#lon').val();
                     $.ajax({
-                        url: self.workStop + '/' + self.session_id,
-                        type: 'GET',
+                        url: self.workStop,
+                        type: 'POST',
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         data: {
                             name: 'Widget',
                             lat: lat,

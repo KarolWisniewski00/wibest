@@ -73,10 +73,22 @@ class EventController extends Controller
     {
         $perPage = $request->input('per_page', 3);
 
+        $typeData = $request->validate([
+            'event_type' => ['nullable', \Illuminate\Validation\Rule::in(['start', 'stop', 'task'])],
+            'event_types' => ['nullable', 'array'],
+            'event_types.*' => [\Illuminate\Validation\Rule::in(['start', 'stop', 'task'])],
+            'filter_event_types' => ['nullable', 'boolean'],
+        ]);
+        $eventTypes = $request->boolean('filter_event_types') || array_key_exists('event_types', $typeData)
+            ? ($typeData['event_types'] ?? [])
+            : (!empty($typeData['event_type']) ? [$typeData['event_type']] : ['start', 'stop', 'task']);
         $query = Event::with('user')
             ->select('events.*')
             ->join('users', 'events.user_id', '=', 'users.id')
             ->orderBy('events.time', 'desc');
+
+        $query->where('events.company_id', Auth::user()->company_id);
+        $query->whereIn('events.event_type', $eventTypes);
 
         // Filtrowanie po roli
         if (
@@ -134,10 +146,23 @@ class EventController extends Controller
         $request->session()->put('start_date', $request->input('start_date'));
         $request->session()->put('end_date', $request->input('end_date'));
 
+        $typeData = $request->validate([
+            'event_type' => ['nullable', \Illuminate\Validation\Rule::in(['start', 'stop', 'task'])],
+            'event_types' => ['nullable', 'array'],
+            'event_types.*' => [\Illuminate\Validation\Rule::in(['start', 'stop', 'task'])],
+            'filter_event_types' => ['nullable', 'boolean'],
+        ]);
+        $eventTypes = $request->boolean('filter_event_types') || array_key_exists('event_types', $typeData)
+            ? ($typeData['event_types'] ?? [])
+            : (!empty($typeData['event_type']) ? [$typeData['event_type']] : ['start', 'stop', 'task']);
+        session(['events.types' => $eventTypes]);
         $query = Event::with('user')
             ->select('events.*')
             ->join('users', 'events.user_id', '=', 'users.id')
             ->orderBy('events.time', 'desc');
+
+        $query->where('events.company_id', Auth::user()->company_id);
+        $query->whereIn('events.event_type', $eventTypes);
 
         // Filtrowanie po dacie
         if ($request->filled('start_date')) {

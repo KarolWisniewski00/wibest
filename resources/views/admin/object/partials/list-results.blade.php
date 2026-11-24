@@ -33,7 +33,7 @@
                 <div class="flex shrink-0 items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300 md:hidden lg:flex" aria-label="Przypisani pracownicy: {{ $object->users_count }}"><i class="fa-solid fa-users" aria-hidden="true"></i>{{ $object->users_count }}</div>
             @endif
             <div class="shrink-0 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300" aria-label="Czas pracy na obiekcie w wybranym miesiącu"><i class="fa-solid fa-clock" aria-hidden="true"></i>{{ intdiv($workReport['object_seconds'][$object->id] ?? 0, 3600) }}h</div>
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i></div>
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></div>
         </a>
     @empty
         <x-empty-place/>

@@ -24,7 +24,7 @@
         <x-nav-link class="h-full text-center"
             href="{{ route('rcp.location.index') }}"
             :active="Str::startsWith(request()->path(), 'dashboard/rcp/location')">
-            Lokalizacje
+            Mapa
         </x-nav-link>
         @else
         @if(request()->routeIs('rcp.work-session.calendar.user'))
@@ -44,6 +44,13 @@
             href="{{ route('rcp.work-session.calendar.user') }}"
             :active="Str::startsWith(request()->path(), 'dashboard/rcp/work-session/calendar')">
             Kalendarz
+        </x-nav-link>
+        @endif
+        @if($role == 'admin' || $role == 'właściciel' || $role == 'kierownik')
+        <x-nav-link class="h-full text-center"
+            href="{{ route('object.dashboard') }}"
+            :active="request()->routeIs('object.*')">
+            Obiekty
         </x-nav-link>
         @endif
     </nav>

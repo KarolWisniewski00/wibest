@@ -8,6 +8,21 @@ use Illuminate\Http\Request;
 
 class FilterDateService
 {
+    /** Normalize month-only views to the month containing the range start. */
+    public function fullMonth(Request $request, string $start, string $end): array
+    {
+        $month = \Carbon\Carbon::parse($start)->startOfMonth();
+        $dates = [$month->toDateString(), $month->copy()->endOfMonth()->toDateString()];
+        $session = $request->hasSession() ? $request->session() : session();
+        if ($dates !== [$start, $end]) {
+            $session->flash('date_range_info', 'Skorygowano zakres dat na pełny miesiąc: '.$month->format('m.Y').'.');
+        }
+        $session->put(['start_date' => $dates[0], 'end_date' => $dates[1]]);
+        $request->merge(['start_date' => $dates[0], 'end_date' => $dates[1]]);
+
+        return $dates;
+    }
+
     /**
      * Ustawia zmienna sesyjną filtra daty start_date i end_date.
      *

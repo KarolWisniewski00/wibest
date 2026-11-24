@@ -1,16 +1,13 @@
 @props(['event'])
-<tr class="snap-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
-    <td class="px-3 py-2">
+<tr x-data="{ url: {{ \Illuminate\Support\Js::from(route('rcp.event.show', $event)) }} }" tabindex="0" @click="if (!$event.target.closest('a, button, input, select, textarea, label')) window.location.assign(url)" @keydown.enter.self.prevent="window.location.assign(url)" class="group cursor-pointer snap-center bg-white dark:bg-gray-800 text-center hover:bg-gray-100 dark:hover:bg-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300">
+    <td class="px-3 py-2 align-middle">
         <x-flex-center>
             <input type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" data-id="{{ $event->id }}">
         </x-flex-center>
     </td>
 
     <td class="px-2 py-2">
-        <div class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
-            <x-user-photo :user="$event->user" />
-            <x-user-name :user="$event->user" />
-        </div>
+        <x-team-user-identity :user="$event->user" />
     </td>
     <td class="px-3 py-2 text-sm min-w-32">
         @if($event->status == 'oczekujące')
@@ -82,5 +79,5 @@
             </x-paragraf-display>
         </div>
     </td>
-    <x-show-cell href="{{ route('rcp.event.show', $event) }}" />
+    <td class="px-3 py-2"><div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-700 text-gray-200"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></div></td>
 </tr>

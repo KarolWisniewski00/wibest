@@ -29,17 +29,11 @@
                         @if($object->users->isNotEmpty())
                             <div id="object-assigned-workers" data-object-user-list class="max-h-[330px] divide-y divide-gray-200 overflow-y-auto pr-1 dark:divide-gray-600">
                                 @foreach($object->users as $user)
-                                    <div role="button" tabindex="0" data-employee-id="{{ $user->id }}" data-employee-name="{{ $user->name }}" x-show="matchesEmployee({{ \Illuminate\Support\Js::from($user->name) }})" @click="selectEmployee({{ $user->id }})" @keydown.enter.prevent="selectEmployee({{ $user->id }})" @keydown.space.prevent="selectEmployee({{ $user->id }})"
+                                    <div role="button" tabindex="0" data-employee-id="{{ $user->id }}" data-employee-name="{{ $user->name }}" x-show="matchesEmployee({{ \Illuminate\Support\Js::from($user->name) }})" @click="if (!$event.target.closest('a, button, input')) selectEmployee({{ $user->id }})" @keydown.enter.self.prevent="selectEmployee({{ $user->id }})" @keydown.space.self.prevent="selectEmployee({{ $user->id }})"
                                         :aria-pressed="selectedEmployeeId === {{ $user->id }} ? 'true' : 'false'" aria-controls="work-list-results"
                                         :class="selectedEmployeeId === {{ $user->id }} ? 'rounded-xl bg-green-300/20 hover:bg-green-300/30 ring-1 ring-inset ring-green-300' : 'rounded-none bg-transparent hover:rounded-xl hover:bg-gray-50 dark:hover:bg-gray-600'"
-                                        class="flex cursor-pointer items-center gap-2 px-3 py-3 font-semibold uppercase tracking-widest text-gray-600 transition-all duration-200 focus-visible:rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 dark:text-gray-300">
-                                        <div class="flex shrink-0 items-center [&>*]:m-0">
-                                            <x-user-photo :user="$user" />
-                                        </div>
-                                        <div class="flex min-w-0 flex-1 flex-wrap items-center gap-2 text-start text-xs leading-tight [&>*]:m-0">
-                                            <x-status-gray class="min-w-0 break-words [overflow-wrap:anywhere]">{{ $user->name }}</x-status-gray>
-                                            <x-user-role :user="$user" />
-                                        </div>
+                                        class="flex cursor-pointer items-center gap-2 px-3 py-3 text-gray-600 transition-all duration-200 focus-visible:rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-300 dark:text-gray-300">
+                                        <div class="min-w-0 flex-1"><x-team-user-identity :user="$user" /></div>
                                         <div class="shrink-0 flex items-center gap-2 text-sm font-semibold text-gray-600 dark:text-gray-300" aria-label="Czas pracy na obiekcie w wybranym miesiącu"><i class="fa-solid fa-clock" aria-hidden="true"></i>{{ intdiv($workReport['worker_seconds'][$user->id] ?? 0, 3600) }}h</div>
                                     </div>
                                 @endforeach

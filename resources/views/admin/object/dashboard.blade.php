@@ -1,7 +1,12 @@
 <x-app-layout class="flex">
     @include('admin.elements.alerts')
     @if ($company)
-        <x-main-no-filter>
+        <x-sidebar-left>
+            <x-filter-date-user loader="objects">{{ route('object.dashboard') }}</x-filter-date-user>
+            <input type="hidden" id="start_date" value="{{ $startDate }}">
+            <input type="hidden" id="end_date" value="{{ $endDate }}">
+        </x-sidebar-left>
+        <x-main>
             <x-object.nav />
             <x-container-content style="box-shadow: 0 0 #0000;">
                 <div class="my-4 flex flex-wrap items-center justify-between gap-4">
@@ -17,9 +22,9 @@
                     <x-button-link-green href="{{ route('object.create') }}"><i class="fa-solid fa-plus mr-2"></i>Dodaj obiekt</x-button-link-green>
                 </div>
 
-                <div x-data="wibestObjectPreview({ endpoint: {{ \Illuminate\Support\Js::from(route('object.dashboard')) }}, month: {{ \Illuminate\Support\Js::from($month->format('Y-m')) }}, dashboard: true })" @object-period-request.stop="changeMonth($event.detail.url, $event.detail.step)">
-                    <div x-ref="period">@include('admin.object.partials.work-period', ['asyncPeriod' => true])</div>
-                    <p x-show="loading" x-cloak role="status" class="mb-3 text-xs text-gray-600 dark:text-gray-300"><i class="fa-solid fa-spinner animate-spin mr-2" aria-hidden="true"></i>Aktualizowanie miesiąca…</p>
+                <div x-data="wibestObjectPreview({ endpoint: {{ \Illuminate\Support\Js::from(route('object.dashboard')) }}, month: {{ \Illuminate\Support\Js::from($month->format('Y-m')) }}, dashboard: true, deferred: {{ \Illuminate\Support\Js::from($deferReport ?? false) }}, startDate: @js($startDate), endDate: @js($endDate), initialFilters: @js(request()->only(['search', 'status', 'work_search', 'work_category'])) })" @object-date-range.window="changeRange($event.detail)">
+                    @include('admin.object.partials.date-navigation')
+                    
                     <p x-show="error" x-cloak role="alert" class="mb-3 text-sm text-red-700 dark:text-red-300"><span x-text="error"></span><button type="button" @click="changeMonth(pendingUrl)" class="ml-2 underline">Spróbuj ponownie</button></p>
                     <div x-ref="cards">@include('admin.object.partials.work-cards', ['dashboard' => true])</div>
                 <div class="mb-4 grid grid-cols-1 gap-4 xl:grid-cols-3">
@@ -60,7 +65,7 @@
                             </div>
                             <div class="space-y-2">
                                 @foreach($colors as $status => $color)
-                                    <a data-object-status-link href="{{ route('object.dashboard', ['status' => $status, 'month' => $month->format('Y-m')]) }}" class="flex items-center justify-between gap-3 rounded-md text-sm text-gray-700 transition hover:text-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 dark:text-gray-300 dark:hover:text-green-200 dark:focus-visible:ring-green-300">
+                                    <a data-object-status-link href="{{ route('object.dashboard', ['start_date' => $startDate, 'end_date' => $endDate, 'status' => $status, 'month' => $month->format('Y-m')]) }}" class="flex items-center justify-between gap-3 rounded-md text-sm text-gray-700 transition hover:text-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 dark:text-gray-300 dark:hover:text-green-200 dark:focus-visible:ring-green-300">
                                         <span class="flex items-center gap-3"><span class="h-2.5 w-2.5 shrink-0 rounded-full ring-1 ring-black/10" style="background: {{ $color }}" aria-hidden="true"></span>{{ \App\Models\WorkObject::STATUSES[$status] }}</span><strong class="font-semibold tabular-nums text-gray-900 dark:text-white">{{ $counts->get($status, 0) }}</strong>
                                     </a>
                                 @endforeach
@@ -69,11 +74,11 @@
                     </div>
                 </div>
 
-                <div x-ref="objects">@include('admin.object.partials.list')</div>
-                <div x-ref="work">@include('admin.object.partials.work-table', ['dashboard' => true])</div>
+                <div x-ref="objects">@if($deferReport ?? false)<x-object.table-skeleton label="Lista obiektów" />@else @include('admin.object.partials.list') @endif</div>
+                <div x-ref="work">@if($deferReport ?? false)<x-object.table-skeleton />@else @include('admin.object.partials.work-table', ['dashboard' => true]) @endif</div>
                 </div>
             </x-container-content>
-        </x-main-no-filter>
+        </x-main>
     @else
         @include('admin.elements.end_config')
     @endif

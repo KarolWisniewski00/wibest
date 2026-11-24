@@ -1,12 +1,8 @@
 @props(['user'])
-<tr class="snap-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 text-center">
+<tr data-team-record class="group cursor-pointer snap-center text-center rounded-xl">
 
-    <td class="px-2 py-2">
-        <div class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
-            <x-user-photo :user="$user" />
-            <x-user-name :user="$user" />
-        </div>
-    </td>
+    <td class="p-5 align-top"><x-team-user-identity :user="$user" /></td>
+    <td class="p-5 align-top"><x-team-user-details :user="$user" /></td>
 
     <td class="px-2 py-2">
         @if($user->working_hours_regular != null)
@@ -107,5 +103,5 @@
         @endif
     </td>
 
-    <x-show-cell href="{{route('team.user.show', $user)}}" />
+    <td class="p-2"><div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-chevron-right text-xs" aria-hidden="true"></i></div></td>
 </tr>

@@ -1,0 +1,6 @@
+<dl class="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+    <?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if BLOCK]><![endif]--><?php endif; ?><?php $__currentLoopData = ['nominal' => '📅 Nominalny czas pracy', 'planned' => '🗓️ Zaplanowano w grafiku', 'worked' => '⏱️ Zarejestrowano w RCP', 'extra' => '➕ Czas ponad grafik', 'night' => '🌙 Praca w nocy', 'absence' => '🏖️ Nieobecności wg grafiku']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $label): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+    <div><dt class="text-gray-500 dark:text-gray-400"><?php echo e($label); ?></dt><dd class="mt-1 font-medium"><?php echo e($row[$key] === null ? 'Nie dotyczy' : \App\Services\Objects\ObjectWorkReport::duration($row[$key])); ?></dd></div>
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?><?php if(\Livewire\Mechanisms\ExtendBlade\ExtendBlade::isRenderingLivewireComponent()): ?><!--[if ENDBLOCK]><![endif]--><?php endif; ?>
+</dl>
+<?php /**PATH C:\xampp\htdocs\wibest\resources\views\admin\payroll\time-summary.blade.php ENDPATH**/ ?>

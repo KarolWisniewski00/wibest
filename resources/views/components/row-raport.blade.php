@@ -8,12 +8,8 @@
         </x-flex-center>
     </td>
 
-    <td class="px-2 py-2 sticky md:left-8 md:z-20 bg-white dark:bg-gray-800">
-        <div
-            class="text-gray-600 dark:text-gray-300 flex justify-start items-center gap-2 font-semibold uppercase tracking-widest">
-            <x-user-photo :user="$user" />
-            <x-user-name :user="$user" />
-        </div>
+    <td class="px-2 py-2 sticky md:left-8 md:z-20 bg-white dark:bg-gray-800 min-w-[280px] px-4 py-4">
+        <x-team-user-identity :user="$user" />
     </td>
     @php
         $dates = $user->dates ?? [];
@@ -41,6 +37,9 @@
 
                 // 🔸 Łącz tylko jeśli status i godziny są identyczne
                 for ($j = $i + 1; $j < $count; $j++) {
+                    if ($currentStatus === 'holiday') {
+                        break;
+                    }
                     $nextStatus = $entries[$j];
                     $nextObj = $user->objs[$keys[$j]] ?? null;
                     try {
@@ -416,7 +415,7 @@
                     </a>
                 </td>
             @elseif ($currentStatus === 'holiday')
-                <td colspan="{{ $span }}" title="{{ $startDate }} - {{ $endDate }}"
+                <td colspan="{{ $span }}" title="{{ \App\Services\PolishHoliday::name(\Carbon\Carbon::createFromFormat('!d.m.y', $startDate)) }} ({{ $startDate }})"
                     class="px-2 py-2 font-semibold text-lg text-gray-900 dark:text-gray-900 border-x border-gray-200 dark:border-gray-700">
 
                     <div class="h-[180px] flex flex-col items-center justify-center text-center 
@@ -438,7 +437,7 @@
                             <div
                                 class="flex flex-col items-center text-[0.65rem] md:text-sm text-gray-800 dark:text-gray-100 leading-tight">
                                 <div class="font-semibold tracking-widest uppercase">
-                                    Święto
+                                    {{ \App\Services\PolishHoliday::name(\Carbon\Carbon::createFromFormat('!d.m.y', $startDate)) }}
                                 </div>
 
                                 <div class="text-[0.6rem] mt-1 font-medium tracking-widest text-gray-700 dark:text-gray-200">

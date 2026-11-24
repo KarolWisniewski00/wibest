@@ -221,6 +221,8 @@ class WorkSession extends Model
 
         // 🚨 Uruchamia logikę ZARAZ PO POBRANIU modelu z bazy
         static::retrieved(function ($workSession) {
+            // Reads must never mutate attendance data. Conflict repair belongs to an explicit command.
+            return;
             if (!$workSession->user_id) {
                 return;
             }

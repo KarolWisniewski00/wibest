@@ -3,11 +3,21 @@ import assert from 'node:assert/strict';
 import { objectList } from '../resources/js/object-list.js';
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+test('object names do not inherit a remembered employee search', () => {
+    const { instance, requests } = setup('objects');
+    globalThis.document = { querySelector: () => ({ content: '1:2' }) };
+    globalThis.localStorage = { getItem: () => 'anna' };
+    instance.init();
+    assert.equal(instance.search, 'old');
+    assert.equal(requests.length, 0);
+    delete globalThis.document;
+    delete globalThis.localStorage;
+});
 function setup(kind = 'work') {
     const requests = [];
     globalThis.window = {
         location: { href: 'http://localhost/dashboard/objects/dashboard?month=2026-09&status=active&work_category=overtime&work_search=old&work_page=4' },
-        history: { state: {}, replaceState(state, title, url) { window.location.href = String(url); } },
+        history: { state: {}, replaceState(state, title, url) { this.state = state; window.location.href = String(url); } },
     };
     globalThis.fetch = (url, options) => new Promise(resolve => requests.push({ url, options, resolve }));
     const instance = objectList({ endpoint: 'http://localhost/dashboard/objects/dashboard?month=2026-09', kind, status: kind === 'work' ? 'overtime' : 'active', search: 'old' });
@@ -45,7 +55,7 @@ test('work search debounces, resets page, preserves filters and ignores stale re
     assert.equal(instance.$refs.results.innerHTML, 'newest');
     instance.searchChanged('');
     await sleep(330);
-    assert.equal(requests[3].url.searchParams.has('work_search'), false);
+    assert.equal(requests[3].url.searchParams.get('work_search'), '');
     respond(requests[3], 'cleared');
     await sleep(0);
     assert.equal(instance.$refs.results.innerHTML, 'cleared');
@@ -121,7 +131,8 @@ test('object debounce and concurrent section responses preserve independent resu
     assert.equal(work.$refs.results.innerHTML, '');
     respond(requests[0], 'work results');
     await pendingWork;
-    const url = new URL(window.location.href);
+    const url = new URL(window.history.state.wibestFilterUrl);
+    assert.equal(new URL(window.location.href).search, '');
     assert.equal(url.searchParams.get('search'), 'Biuro');
     assert.equal(url.searchParams.get('status'), 'active');
     assert.equal(url.searchParams.get('work_page'), '2');

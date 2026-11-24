@@ -1,201 +1,40 @@
 <x-app-layout class="flex">
-    @include('admin.elements.alerts')
-    @if ($company)
-    <!--SIDE BAR-->
-    <x-sidebar-left>
-        <li>
-            <div class="p-2 text-sm text-blue-300 rounded-lg dark:text-blue-300">
-                W tej zakładce filtry są niedostępne bezpośrednio w mapie, jeśli chcesz zmienić zakres dat zrób to w innej zakładce
-            </div>
-        </li>
-        <input type="hidden" id="start_date" value="{{ $startDate }}">
-        <input type="hidden" id="end_date" value="{{ $endDate }}">
-    </x-sidebar-left>
-    <!--SIDE BAR-->
-
-    <!--MAIN-->
-    <x-main>
-        <x-RCP.nav :countEvents="$countEvents" />
-        <x-RCP.header>
-            <span>📍</span> Lokalizacje
-        </x-RCP.header>
-        <x-status-cello id="show-filter" class="mb-4 mx-4 md:m-4">
-            {{\Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->format('d.m.Y')}} - {{\Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->format('d.m.Y')}}
-        </x-status-cello>
-        @php
-        $showTable = true;
-        @endphp
-        @if(session('report_key_rcp'))
-        @php
-        $reportKey = session('report_key_rcp');
-        $report = Cache::get($reportKey);
-        @endphp
-
-        @if($report)
-        @php
-        $showTable = false;
-        @endphp
-        <div id="operation-summary-modal" class="mb-4 mx-4">
-            <div class="relative gap-4 h-full flex flex-col items-start justify-center w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
-                <x-h1-display class="w-full">
-                    <span>🎯</span> Podsumowanie operacji
-                </x-h1-display>
-                <x-info-span class="-my-2">
-                    Łączna liczba prób {{ $report['total_attempts'] }}
-                </x-info-span>
-                <x-success-span class="-my-2">
-                    Pomyślnie dodano {{ $report['successful'] }}
-                </x-success-span>
-                @if($report['failed_count'] > 0)
-                <x-danger-span class="-my-2">
-                    Nieudane próby {{ $report['failed_count'] }}
-                </x-danger-span>
-                <div class="flex flex-col gap-4 w-full ">
-                    @foreach($report['failed_details'] as $detail)
-                    <label class="gap-4 h-full w-full inline-flex items-center justify-between w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
-                        <div class="flex items-center gap-2">
-                            @php
-                            $user = \App\Models\User::where('id', $detail['user_id'])->first();
-                            @endphp
-                            <x-user-photo :user="$user" />
-                            <x-user-name :user="$user" class="flex-wrap" />
-                        </div>
-                        <div class="flex flex-row gap-4 items-center justify-between">
-                            <x-status-cello>
-                                {{ $detail['date'] }}
-                            </x-status-cello>
-                            <x-danger-span class="-my-2">
-                                {{ $detail['reason'] }}
-                            </x-danger-span>
-                        </div>
-                    </label>
-                    @endforeach
-                </div>
-                @endif
-            </div>
+<x-sidebar-left>
+<x-search-filter placeholder="Wyszukaj pracownika" />
+<x-filter-date-user loader="objects">{{ route('rcp.location.index') }}</x-filter-date-user>
+<input type="hidden" id="start_date" value="{{ $startDate }}">
+<input type="hidden" id="end_date" value="{{ $endDate }}">
+</x-sidebar-left>
+<x-main><x-RCP.nav :countEvents="$countEvents" />
+<div class="mx-4 my-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+        <div class="flex h-11 sm:h-14 w-11 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl bg-green-300/10 text-green-300 [@media(prefers-color-scheme:light)]:text-green-700 [@media(prefers-color-scheme:light)]:bg-green-100">
+            <i class="fa-solid fa-map-location-dot text-2xl" aria-hidden="true"></i>
         </div>
-        @php
-        $reportKey = session('report_key_rcp');
-
-        if ($reportKey) {
-        // 2. Usuwamy powiązany wpis z pamięci podręcznej (Cache)
-        Cache::forget($reportKey);
-
-        // 3. Usuwamy klucz sesji, aby nie odwoływać się do nieistniejącego cache
-        session()->forget('report_key_rcp');
-
-        // Opcjonalnie: Dodaj komunikat flash do wyświetlenia użytkownikowi
-        // session()->flash('success', 'Dane raportu zostały pomyślnie usunięte z pamięci podręcznej.');
-        }
-        @endphp
-        @else
-        {{-- To się pokaże, jeśli Job jeszcze nie skończył, lub jeśli upłynął czas na Cache --}}
-        <div class="mb-4 mx-4">
-            <div class="gap-4 h-full flex flex-col items-start justify-center w-full p-4 text-gray-500 bg-white border-2 border-gray-200 rounded-lg dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800">
-                <x-info-span class="-my-2">
-                    Trwa przetwarzanie danych w tle. Odśwież za chwilę, aby zobaczyć raport.
-                </x-info-span>
-            </div>
+        <div class="text-start">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Mapa</h1>
+            <p class="text-sm text-gray-400 [@media(prefers-color-scheme:light)]:text-gray-600">Lokalizacje pracowników i zasięgi obiektów</p>
         </div>
-        @endif
-        @endif
-        @if($showTable)
-        <!--CONTENT-->
-        <x-container-content>
-            @if($events->isNotEmpty())
-            <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin="" />
-            <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.css" />
-            <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.3.0/dist/MarkerCluster.Default.css" />
-
-            <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
-            <script src="https://unpkg.com/leaflet.markercluster@1.3.0/dist/leaflet.markercluster.js"></script>
-
-            <!--Lokalizacja-->
-            <x-text-cell>
-                <div id="map_stop" style="z-index:1; height: 600px; width: 100%; border-radius: 0.5rem; margin-top: 1rem;"></div>
-            </x-text-cell>
-            <!--Lokalizacja-->
-            <input type="hidden" id="events_data" value='@json($mapEvents)'>
-            <script>
-                $(document).ready(function() {
-                    let events = [];
-
-                    try {
-                        const eventsRaw = $('#events_data').val();
-                        events = JSON.parse(eventsRaw);
-                    } catch (e) {
-                        console.error('Błąd parsowania JSON:', e);
-                    }
-
-                    if (!events || events.length === 0) {
-                        console.warn('Brak danych do wyświetlenia na mapie');
-                        return;
-                    }
-
-                    // Start mapy - pierwszy punkt jako center
-                    const first = events[0];
-                    const map = L.map('map_stop').setView([first.lat, first.lng], 6);
-
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(map);
-
-                    const redIcon = L.icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41]
-                    });
-                    const greenIcon = L.icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41]
-                    });
-                    var markers = new L.MarkerClusterGroup();
-                    const bounds = [];
-
-                    events.forEach(event => {
-                        if (!event.lat || !event.lng) return;
-                        console.log(event.type);
-                        var icon = greenIcon;
-                        if (event.type === 'start') {
-                            var icon = greenIcon;
-                        } else {
-                            var icon = redIcon;
-                        }
-
-                        const marker = L.marker([event.lat, event.lng], {
-                                icon: icon
-                            })
-                            .bindPopup(`
-                            <div style="min-width:150px">
-                                <b>${event.user}</b><br>
-                                <small>${event.date}</small>
-                            </div>
-                            `);
-
-                        markers.addLayer(marker); // 👈 zamiast addTo(map)
-                        bounds.push([event.lat, event.lng]);
-                    });
-
-                    map.addLayer(markers); // 👈 dodajemy grupę do mapy
-
-                    // Dopasowanie widoku do wszystkich punktów
-                    if (bounds.length > 0) {
-                        map.fitBounds(bounds);
-                    }
-
-                });
-            </script>
-            @else
-            <x-empty-place />
-            @endif
-
-        </x-container-content>
-        @endif
-        <!--CONTENT-->
-    </x-main>
-    <!--MAIN-->
-    @else
-    @include('admin.elements.end_config')
-    @endif
-</x-app-layout>
+    </div>
+</div>
+@include('admin.object.partials.date-navigation', ['month' => \Carbon\Carbon::parse($startDate)])
+<div class="m-4 text-gray-900 dark:text-white" x-data="{ loading: false, error: '', controller: null, async refresh(detail) {
+this.controller?.abort(); const requestController = new AbortController(); this.controller = requestController; this.loading = true; this.error = '';
+window.dispatchEvent(new CustomEvent('map-readings-clear'));
+try { const url = new URL(window.location.href); url.searchParams.set('start_date', detail.start); url.searchParams.set('end_date', detail.end); url.searchParams.set('search', detail.search || '');
+const response = await fetch(url, { signal: requestController.signal, headers: {'X-Requested-With': 'XMLHttpRequest'} }); if (!response.ok) throw Error();
+const data = await response.json(); if (this.controller !== requestController) return; window.dispatchEvent(new CustomEvent('map-readings', {detail: data.readings}));
+} catch(e) { if(e.name !== 'AbortError' && this.controller === requestController) this.error = 'Nie udało się odświeżyć mapy'; } finally { if (this.controller === requestController) this.loading = false; }
+} }" x-init="if (document.getElementById('search')?.value.trim()) refresh({ start: document.getElementById('start_date').value, end: document.getElementById('end_date').value, search: document.getElementById('search').value })" @object-date-range.window="refresh($event.detail)">
+<p x-text="error" role="alert"></p>
+<div class="relative overflow-hidden rounded-2xl" x-data="wibestObjectMaps({ fitReadings: true, objects: {{ \Illuminate\Support\Js::from($mapObjects) }}, readings: {{ \Illuminate\Support\Js::from($mapEvents) }}, apiKey: {{ \Illuminate\Support\Js::from(config('services.google.maps_key')) }} })" @map-readings.window="updateReadings($event.detail)" @map-readings-clear.window="updateReadings([], { preserveCamera: true })">
+<div x-ref="cardMap" class="h-[70vh] w-full"></div>
+<div x-show="loading" x-cloak x-transition.opacity.duration.200ms class="rcp-map-scan pointer-events-none absolute inset-0 z-20" role="status" aria-label="Odświeżanie punktów mapy">
+    <div class="rcp-map-scan-beam" aria-hidden="true"></div>
+</div>
+<div class="absolute bottom-8 right-3 left-3 z-10 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl bg-white/95 px-4 py-3 text-xs text-gray-700 shadow-lg backdrop-blur dark:bg-gray-700 dark:text-gray-200 sm:right-auto sm:max-w-lg" aria-label="Legenda statusów obiektów">
+    @foreach(['bg-blue-300' => 'Planowany', 'bg-green-300' => 'Aktywny', 'bg-yellow-400' => 'Wstrzymany', 'bg-red-300' => 'Odwołany', 'bg-gray-500' => 'Zakończony'] as $color => $label)
+        <span class="flex items-center gap-2 whitespace-nowrap"><span class="h-2.5 w-2.5 rounded-full {{ $color }} ring-1 ring-black/10" aria-hidden="true"></span>{{ $label }}</span>
+    @endforeach
+</div><p x-show="message" x-text="message"></p>
+</div></div></x-main></x-app-layout>

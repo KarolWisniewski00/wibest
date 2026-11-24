@@ -50,7 +50,8 @@ class GoogleController extends Controller
                 return redirect()->route('dashboard');
             }
         } catch (Exception $e) {
-            dd($e);
+            report($e);
+            return redirect()->route('login')->with('fail', 'Logowanie przez Google nie powiodło się. Spróbuj ponownie.');
         }
         // Tutaj możesz obsłużyć użytkownika zalogowanego przez Google, np. zaktualizować rekord w bazie danych lub utworzyć nowego użytkownika.
 

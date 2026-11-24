@@ -1,8 +1,28 @@
 <x-app-layout class="flex">
+    <style>
+        [data-team-record] { position: relative; isolation: isolate; }
+        #table { border-collapse: separate; border-spacing: 0 12px; }
+        #table thead th:first-child { border-radius: .75rem 0 0 .75rem; }
+        #table thead th:last-child { border-radius: 0 .75rem .75rem 0; }
+        #table thead th { padding-top: 1rem; padding-bottom: 1rem; }
+        #table tr[data-team-record] > td { background-color: #fff; transition: background-color 150ms ease; }
+        #table tr[data-team-record]:hover > td { background-color: #f3f4f6; }
+        #table tr[data-team-record] > td:first-child { border-radius: .75rem 0 0 .75rem; }
+        #table tr[data-team-record] > td:last-child { border-radius: 0 .75rem .75rem 0; }
+        @media (prefers-color-scheme: dark) {
+            #table tr[data-team-record] > td { background-color: #1f2937; }
+            #table tr[data-team-record]:hover > td { background-color: #374151; }
+        }
+        [data-team-link]::after { content: ''; position: absolute; inset: 0; z-index: 1; border-radius: inherit; }
+        [data-team-link]:focus-visible::after { outline: 2px solid #9ca3af; outline-offset: -2px; }
+        [data-team-record] a:not([data-team-link]), [data-team-record] button,
+        [data-team-record] input, [data-team-record] select { position: relative; z-index: 2; }
+    </style>
     @include('admin.elements.alerts')
     @if ($company)
     <!--SIDE BAR-->
     <x-sidebar-left>
+        <x-search-filter aria-label="Szukaj użytkownika po nazwie" />
         <x-search-team />
         <x-filter-team-script>
             {{ route('api.v1.team.user.set.role') }}
@@ -31,7 +51,7 @@
 
             <!--PC VIEW-->
             <x-table
-                :headers="['Nazwa', 'Informacje', 'Podgląd']"
+                :headers="['Pracownik', 'Dane kontaktowe', 'Obecność', '']"
                 :items="$users"
                 :checkBox="false"
                 emptyMessage="Brak użytkowników do wyświetlenia.">
@@ -40,13 +60,11 @@
                 @endforeach
                 <x-loader-team id="loader" />
             </x-table>
-            <x-loader />
             <!--PC VIEW-->
-            <x-loader-script>
-                {{ route('api.v1.team.user.get') }}
-            </x-loader-script>
+
         </x-container-content>
         <!--CONTENT-->
+        <p id="team-feedback" role="status" aria-live="polite" class="px-4 mb-8 pb-4 text-sm text-gray-600 dark:text-gray-300"></p>
         <x-download-only-counting />
     </x-main>
     <!--MAIN-->
