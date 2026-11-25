@@ -469,8 +469,16 @@ class PayrollTest extends TestCase
             'duration'=>'04:32:02','status'=>'Praca zakończona','start_location'=>true,'stop_location'=>false];
         $html = view('admin.payroll.rcp-sessions',['user'=>$worker,'row'=>['sessions'=>[$session]]])->render();
         $this->assertStringContainsString(route('rcp.work-session.show',5948),$html);
-        foreach (['dark:hover:bg-gray-600','04:32:02','02.10.2026','Lokalizacja START','fa-chevron-right','@keydown.enter.self.prevent'] as $text) $this->assertStringContainsString($text,$html);
+        foreach (['dark:hover:bg-gray-600','04:32:02','02.10.2026','Lokalizacja START','fa-arrow-up-right-from-square','@keydown.enter.self.prevent'] as $text) $this->assertStringContainsString($text,$html);
         $this->assertStringNotContainsString('Lokalizacja STOP',$html);
+        foreach (['under' => ['Brak normy', 'bg-green-300/20'], 'normal' => ['Norma', 'bg-green-300'], 'overtime' => ['Nadgodziny', 'bg-indigo-300']] as $category => [$label, $color]) {
+            $session['classification'] = $category;
+            $html = view('admin.payroll.rcp-sessions', ['user' => $worker, 'row' => ['sessions' => [$session]]])->render();
+            $this->assertStringContainsString('>RCP</span>', $html);
+            $this->assertStringContainsString('>'.$label.'</span>', $html);
+            $this->assertStringContainsString($color, $html);
+        }
+
     }
 
     public function test_simple_contract_saves_history_and_tax_settings_atomically_and_checks_dates(): void

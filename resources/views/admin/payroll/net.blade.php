@@ -1,9 +1,9 @@
 <x-app-layout class="flex">
     <x-sidebar-left>
         <li>
-                <div class="payroll-month flex w-full items-center gap-4 rounded-2xl bg-gray-700 p-5 text-white dark:bg-gray-700">
-                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-2xl dark:bg-gray-600" aria-hidden="true">📅</span>
-                    <div><p class="text-sm text-gray-300">Miesiąc rozliczenia</p><p class="mt-1 text-xl font-semibold tracking-tight">{{ \Carbon\Carbon::createFromFormat('!Y-m', $period)->locale('pl')->translatedFormat('F Y') }}</p><p class="mt-1 text-sm text-gray-300">Okres wynagrodzenia</p></div>
+                <div class="payroll-month flex w-full items-center gap-4 rounded-2xl bg-gray-100 p-5 text-gray-900 dark:bg-gray-700 dark:text-white">
+                    <span class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gray-200 text-2xl dark:bg-gray-600" aria-hidden="true">📅</span>
+                    <div><p class="text-sm text-gray-600 dark:text-gray-300">Miesiąc rozliczenia</p><p class="mt-1 text-xl font-semibold tracking-tight">{{ \Carbon\Carbon::createFromFormat('!Y-m', $period)->locale('pl')->translatedFormat('F Y') }}</p><p class="mt-1 text-sm text-gray-600 dark:text-gray-300">Okres wynagrodzenia</p></div>
                 </div>
         </li>
     </x-sidebar-left>
@@ -15,7 +15,7 @@
         <div class="payroll-workspace">
             <header class="flex flex-wrap items-start justify-between gap-6">
                 <div class="flex min-w-0 items-start gap-5">
-                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-2xl dark:bg-gray-700" aria-hidden="true">💼</div>
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl dark:bg-gray-700" aria-hidden="true">💼</div>
                     <div class="min-w-0"><p class="text-sm text-gray-500 dark:text-gray-400">Wynagrodzenia · {{ $user->name }}</p>
                     <h1 class="mt-1">Rozliczenie miesiąca</h1>
                     <p class="mt-3">Umowa o pracę · {{ \Carbon\Carbon::createFromFormat('!Y-m', $period)->format('m.Y') }}</p>
@@ -91,24 +91,24 @@
             </section>
             <section class="payroll-card">
                 <x-payroll.section-heading icon="fa-file-signature" icon-background="bg-gradient-to-br from-pink-200 to-rose-100 text-pink-700 dark:from-pink-500/20 dark:to-rose-500/10 dark:text-pink-300" icon-class="hidden sm:flex h-16 w-16 rounded-2xl text-2xl" title="E-wnioski" :employee="$user->name" :period="$period" description="Zaakceptowane i zrealizowane wnioski przyjęte do rozliczenia wynagrodzenia." />
-                <details class="mt-4"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Wnioski przyjęte do rozliczenia ({{ count($row['leaves']) }})</summary><ul class="mt-3 space-y-2 text-sm">@forelse($row['leaves'] as $leave)<li>#{{ $leave['id'] }} · {{ $leave['type'] }} · {{ $leave['start'] }} – {{ $leave['end'] }} · {{ $leave['status'] }}</li>@empty<li>Brak zaakceptowanych / zrealizowanych wniosków.</li>@endforelse</ul></details>
+                <details data-animated-config class="mt-4"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Wnioski przyjęte do rozliczenia ({{ count($row['leaves']) }})</summary><ul class="mt-3 space-y-2 text-sm">@forelse($row['leaves'] as $leave)<li>#{{ $leave['id'] }} · {{ $leave['type'] }} · {{ $leave['start'] }} – {{ $leave['end'] }} · {{ $leave['status'] }}</li>@empty<li>Brak zaakceptowanych / zrealizowanych wniosków.</li>@endforelse</ul></details>
             </section>
             <x-team-info-card class="payroll-card" id="payment-history">
                 <div class="flex items-start gap-5">
-                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-2xl dark:bg-gray-700" aria-hidden="true">💸</div>
+                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl dark:bg-gray-700" aria-hidden="true">💸</div>
                     <div>
                         <p class="text-sm text-gray-500 dark:text-gray-400">Wynagrodzenia · {{ $user->name }}</p>
                         <h2 class="mt-1 !text-3xl font-semibold">Zatwierdzone wypłaty · {{ $year }}</h2>
                     </div>
                 </div>
-                <details id="approved-payments">
+                <details data-animated-config id="approved-payments">
                     <summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Lista zatwierdzonych wypłat w {{ $year }} roku ({{ $payments->total() }})</summary>
                 <div class="mt-4 space-y-5">
                 @forelse($payments as $payment)
                     <article class="payroll-payment rounded-xl bg-gray-50 p-4 sm:p-5 dark:bg-gray-900">
                         <div class="flex flex-wrap items-start justify-between gap-4">
                             <div class="flex min-w-0 items-start gap-4">
-                                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-2xl dark:bg-gray-800" aria-hidden="true">📄</span>
+                                <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-transparent text-2xl dark:bg-gray-800" aria-hidden="true">📄</span>
                                 <div class="min-w-0">
                                     <p class="font-semibold">Zatwierdzona wypłata #{{ $payment->id }}</p>
                                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Data wypłaty: {{ \Carbon\Carbon::parse($payment->paid_on)->format('d.m.Y') }} · Okres: {{ \Carbon\Carbon::parse($payment->period)->format('m.Y') }}</p>
@@ -118,7 +118,7 @@
                             </div>
                             <x-button-link-neutral class="payroll-action ml-auto" href="{{ route('raport.payroll.payslip',['user'=>$user,'payment'=>$payment]) }}"><i class="fas fa-file-pdf mr-2" aria-hidden="true"></i> Pobierz pasek wypłaty (PDF)</x-button-link-neutral>
                         </div>
-                        <details id="payment-details-{{ $payment->id }}" class="mt-4">
+                        <details data-animated-config id="payment-details-{{ $payment->id }}" class="mt-4">
                         <summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Szczegóły wypłaty</summary>
                         @include('admin.payroll.net-result', ['calculation' => $payment->payload, 'savedPayment' => $payment])
                         </details>
@@ -133,4 +133,5 @@
             @endif
         </div>
     </x-main>
+    @include('admin.team.configuration-animation')
 </x-app-layout>

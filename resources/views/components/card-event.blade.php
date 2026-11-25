@@ -11,7 +11,7 @@
             @elseif($event->status === 'odrzucone')<x-status-red class="text-xs !font-medium">{{ $event->status }}</x-status-red>@endif
             <x-status-cello class="text-xs !font-medium break-words">{{ $time?->translatedFormat('d.m, l') ?? 'Brak daty' }}</x-status-cello>
         </div>
-        <a href="{{ $url }}" aria-label="Przejdź do zdarzenia" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>
+        <a href="{{ $url }}" aria-label="Przejdź do zdarzenia" class="record-open-icon"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>
     </div>
     <div class="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
         @if($event->event_type === 'start')<x-status-green class="text-xs !font-medium">🟢 Start</x-status-green>

@@ -79,5 +79,5 @@
             </x-paragraf-display>
         </div>
     </td>
-    <td class="px-3 py-2"><div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gray-700 text-gray-200"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></div></td>
+    <td class="px-3 py-2"><div class="record-open-icon"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></div></td>
 </tr>

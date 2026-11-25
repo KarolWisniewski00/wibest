@@ -1,6 +1,6 @@
 @props(['kind' => 'list', 'pending' => 'reportLoading', 'preview' => false])
 <div x-show="{{ $pending }}" x-cloak role="status" aria-live="polite"
-    @class(['absolute inset-x-0 bottom-0 z-10 overflow-hidden bg-white dark:bg-gray-700', 'top-0 md:top-[49px]' => $kind === 'table', 'top-0' => $kind !== 'table'])>
+    @class(['absolute inset-x-0 bottom-0 z-10 overflow-hidden bg-gray-100 dark:bg-gray-700', 'top-0 md:top-[49px]' => $kind === 'table', 'top-0' => $kind !== 'table'])>
     <span class="sr-only">Ładowanie danych…</span>
     <div class="h-full animate-pulse motion-reduce:animate-none" aria-hidden="true">
         @if($kind === 'cards')
@@ -15,7 +15,7 @@
             @if(in_array($kind, ['table', 'list']))
                 <div class="space-y-3 p-3 md:hidden">
                     @for($i = 0; $i < 6; $i++)
-                        <div @class(['space-y-4 border-gray-200 p-4 dark:border-gray-700', 'rounded-lg border-2 bg-white dark:bg-gray-700' => $kind === 'table', 'rounded-xl border' => $kind === 'list'])>
+                        <div @class(['space-y-4 border-gray-200 p-4 dark:border-gray-700', 'rounded-xl border bg-gray-100 dark:bg-gray-700' => $kind === 'table', 'rounded-xl border' => $kind === 'list'])>
                             @if($kind === 'table')
                                 <div class="flex justify-between gap-4"><div class="h-4 w-28 rounded-full bg-gray-200 dark:bg-gray-600"></div><div class="h-3 w-20 rounded bg-gray-200 dark:bg-gray-600"></div></div>
                                 <div class="flex items-center gap-3"><div class="h-10 w-10 rounded bg-gray-200 dark:bg-gray-600"></div><div class="flex-1 space-y-3"><div class="h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-600"></div><div class="h-3 w-1/3 rounded bg-gray-200 dark:bg-gray-600"></div></div></div>

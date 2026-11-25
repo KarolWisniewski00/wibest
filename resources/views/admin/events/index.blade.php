@@ -14,14 +14,18 @@
                     <div class="h-11 w-full rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse motion-reduce:animate-none"></div>
                 @endforeach
             </div>
-            <fieldset data-rcp-filter-content style="display: none;" class="space-y-2 p-2">
-                <legend class="mb-2 text-sm font-semibold text-gray-900 dark:text-gray-200">Typ zdarzenia</legend>
+            <div data-rcp-filter-content style="display: none;">
+                <button type="button" class="flex w-full items-center rounded-lg p-2 text-base text-gray-900 dark:text-white" aria-controls="event-type-dropdown" aria-expanded="true" data-collapse-toggle="event-type-dropdown">
+                    <span class="flex-1 text-left">Typ zdarzenia</span><i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
+                </button>
+                <fieldset id="event-type-dropdown" class="space-y-2 p-2">
+                <legend class="sr-only">Typ zdarzenia</legend>
                 @php
                     $selectedTypes = session('events.types', session('events.type') ? [session('events.type')] : ['start', 'stop', 'task']);
                     $eventOptions = [
                         ['start', '🟢 START', 'peer-checked:bg-green-300 peer-checked:text-green-950 dark:peer-checked:bg-green-300 dark:peer-checked:text-green-950'],
                         ['stop', '🔴 STOP', 'peer-checked:bg-red-300 peer-checked:text-red-950 dark:peer-checked:bg-red-300 dark:peer-checked:text-red-950'],
-                        ['task', '🎯 Zadanie', 'peer-checked:bg-white peer-checked:text-gray-900 peer-checked:shadow-sm dark:peer-checked:bg-white dark:peer-checked:text-gray-900'],
+                        ['task', '🎯 Zadanie', 'peer-checked:bg-gray-300 peer-checked:text-gray-900 peer-checked:shadow-sm dark:peer-checked:bg-gray-300 dark:peer-checked:text-gray-900'],
                     ];
                 @endphp
                 @foreach($eventOptions as [$value, $label, $tone])
@@ -32,7 +36,8 @@
                         </span>
                     </label>
                 @endforeach
-            </fieldset>
+                </fieldset>
+            </div>
         </li>
         <x-sidebar-filter-ready />
         <input type="hidden" id="start_date" value="{{ $startDate }}">
@@ -126,7 +131,7 @@
         @endif
         @if($showTable)
         <!--CONTENT-->
-        <x-container-content>
+        <x-container-content class="[@media(prefers-color-scheme:light)]:!shadow-none">
             <!--MOBILE VIEW-->
             <x-list :items="$events" emptyMessage="Brak użytkowników do wyświetlenia.">
                 @foreach ($events as $event)

@@ -1,5 +1,5 @@
 @if(($row['contract']['type'] ?? '') === 'employment' && !$row['saved_at'])
-<details class="mt-6"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">🏢 Dane do szacowanego kosztu pracodawcy</summary>
+<details data-animated-config class="mt-6"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">🏢 Dane do szacowanego kosztu pracodawcy</summary>
     <p class="mt-3 text-sm text-gray-500 dark:text-gray-400">Dla standardowego zatrudnienia w Polsce, bez FEP, szczególnych podstaw i wyłączeń składkowych. Podaj podstawę emerytalno-rentową od początku roku ze wszystkich tytułów, przed tym miesiącem. Ustal obowiązek FP/FS i FGŚP z uwzględnieniem wieku, zwolnień i innych tytułów.</p>
     @if($errors->any())<ul class="my-3 text-red-600">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>@endif
     <form method="POST" action="{{ route('raport.payroll.cost-inputs', $user) }}" class="mt-4 grid gap-4 sm:grid-cols-2">

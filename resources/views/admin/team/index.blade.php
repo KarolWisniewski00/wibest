@@ -1,7 +1,7 @@
 <x-app-layout class="flex">
     <style>
         [data-team-record] { position: relative; isolation: isolate; }
-        #table { border-collapse: separate; border-spacing: 0 12px; }
+        #table { border-collapse: separate; border-spacing: 0 12px; margin-top: -12px; margin-bottom: -12px; }
         #table thead th:first-child { border-radius: .75rem 0 0 .75rem; }
         #table thead th:last-child { border-radius: 0 .75rem .75rem 0; }
         #table thead th { padding-top: 1rem; padding-bottom: 1rem; }
@@ -39,7 +39,7 @@
             WSZYSTKO
         </x-status-cello>
         <!--CONTENT-->
-        <x-container-content>
+        <x-container-content class="[@media(prefers-color-scheme:light)]:!shadow-none">
             <!--MOBILE VIEW-->
             <x-list :items="$users" emptyMessage="Brak użytkowników do wyświetlenia.">
                 @foreach ($users as $user)

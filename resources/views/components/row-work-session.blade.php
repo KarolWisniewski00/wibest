@@ -57,5 +57,5 @@
         @if($missingTask)<span class="text-xs text-yellow-700 dark:text-yellow-300">⚠️ Brak zadania</span>@endif
         @if($work_session->time_in_work === '24:00:00')<span class="text-xs text-yellow-700 dark:text-yellow-300">⚠️ Automatyczne zakończenie</span>@endif
     </div></td>
-    <td class="w-1 px-5 py-4 align-middle"><a href="{{ route('rcp.work-session.show', $work_session) }}" aria-label="Przejdź do sesji" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a></td>
+    <td class="w-1 px-5 py-4 align-middle"><a href="{{ route('rcp.work-session.show', $work_session) }}" aria-label="Przejdź do sesji" class="record-open-icon"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a></td>
 </tr>

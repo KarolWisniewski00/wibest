@@ -245,9 +245,11 @@ Cały rok
                 @endif
             @endif
             @if($showTable)
+                @if($role === 'admin' || $role === 'właściciel')
                 @include('admin.object.partials.date-navigation', ['month' => \Carbon\Carbon::parse($startDate), 'dateNavigationMargin' => 'my-4'])
+                @endif
                 <!--CONTENT-->
-                <x-container-content>
+                <x-container-content class="[@media(prefers-color-scheme:light)]:!shadow-none">
                     <!--MOBILE VIEW-->
                     <x-list :items="$work_sessions" emptyMessage="Brak użytkowników do wyświetlenia.">
                         @foreach ($work_sessions as $work_session)

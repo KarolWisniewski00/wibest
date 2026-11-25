@@ -7,7 +7,7 @@
     .payroll-workspace .payroll-card { @apply rounded-none border-0 bg-transparent p-0 shadow-none dark:bg-transparent; }
     .payroll-workspace h1 { @apply text-3xl font-semibold tracking-tight; }
     .payroll-workspace h2 { @apply text-xl font-semibold tracking-tight; }
-    .payroll-workspace .payroll-input { @apply mt-2 block min-h-[48px] w-full rounded-xl border-0 bg-gray-700 text-base text-white shadow-none placeholder:text-gray-300 focus:ring-2 focus:ring-green-300 dark:bg-gray-700 dark:text-white; color-scheme: dark; }
+    .payroll-workspace .payroll-input { @apply mt-2 block min-h-[48px] w-full rounded-xl border-0 bg-gray-100 text-base text-gray-900 shadow-none placeholder:text-gray-500 dark:placeholder:text-gray-300 focus:ring-2 focus:ring-green-300 dark:bg-gray-700 dark:text-white; color-scheme: light; }
     @media (prefers-color-scheme: dark) { .payroll-workspace .payroll-input { color-scheme: dark; } }
     .payroll-workspace summary { @apply min-h-[44px] cursor-pointer py-3 text-base font-semibold text-green-700 dark:text-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-green-600; }
     .payroll-workspace input[type="checkbox"] { @apply relative mt-0.5 h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full border-0 bg-gray-300 shadow-inner focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 dark:bg-gray-600 dark:focus-visible:ring-offset-gray-800; background-image: none; transition: background-color 180ms ease; }
@@ -124,7 +124,7 @@ html[data-search-pending] #list > :not(.animate-pulse) { display: none; }
 
 
 
-.rcp-events-table table { border-collapse: separate; border-spacing: 0 8px; }
+.rcp-events-table table { border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; margin-bottom: -8px; }
 .rcp-events-table thead { background: transparent; }
 .rcp-events-table thead th { background: #f9fafb; }
 @media (prefers-color-scheme: dark) {
@@ -134,7 +134,7 @@ html[data-search-pending] #list > :not(.animate-pulse) { display: none; }
 .rcp-events-table tr > :last-child { border-radius: 0 12px 12px 0; }
 .rcp-events-table tbody tr > td { background: inherit; }
 
-.rcp-sessions-table table { border-collapse: separate; border-spacing: 0 8px; }
+.rcp-sessions-table table { border-collapse: separate; border-spacing: 0 8px; margin-top: -8px; margin-bottom: -8px; }
 .rcp-sessions-table thead { background: transparent; }
 .rcp-sessions-table thead th { background: #f9fafb; }
 .rcp-sessions-table thead th:first-child { border-radius: 12px 0 0 12px; }
@@ -203,4 +203,86 @@ html[data-search-pending] #list > :not(.animate-pulse) { display: none; }
 .object-results-pending tbody,
 .object-results-pending [data-work-pagination] {
     visibility: hidden;
+}
+
+@media (prefers-color-scheme: light) {
+    .object-edit-form input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not(#user-search),
+    .object-edit-form select,
+    .object-edit-form textarea,
+    .object-edit-form .ts-control,
+    body .object-edit-form #object_type + .ts-wrapper .ts-control,
+    body .object-edit-form #object-location-search gmp-place-autocomplete {
+        background-color: #f3f4f6 !important;
+        border: 1px solid #d1d5db !important;
+        color: #111827 !important;
+        color-scheme: light;
+        box-shadow: none !important;
+    }
+    .object-edit-form .ts-control input { background-color: transparent !important; }
+    body .object-edit-form #object-location-search gmp-place-autocomplete { --gmpx-color-surface: #f3f4f6; }
+}
+
+@layer components {
+    .record-open-icon {
+        @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-transparent text-gray-600 transition-colors dark:text-gray-400;
+    }
+}
+.group:hover .record-open-icon,
+.group:focus-within .record-open-icon,
+.record-open-icon:hover,
+.record-open-icon:focus-visible {
+    background-color: #e5e7eb;
+    color: #111827;
+}
+@media (prefers-color-scheme: dark) {
+    .group:hover .record-open-icon,
+    .group:focus-within .record-open-icon,
+    .record-open-icon:hover,
+    .record-open-icon:focus-visible {
+        background-color: #6b7280;
+        color: #f3f4f6;
+    }
+}
+
+/* Tom Select renders a search input inside its already bordered control. */
+body .object-edit-form #object_type + .ts-wrapper .ts-control input {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+@media (prefers-color-scheme: light) {
+    .object-edit-form #editor,
+    .object-edit-form .ql-toolbar {
+        background-color: #f3f4f6;
+        border: 1px solid #d1d5db !important;
+        color: #111827;
+    }
+    .object-edit-form #editor { overflow: hidden auto; }
+    .object-edit-form #editor .ql-editor {
+        background-color: transparent;
+        color: #111827;
+    }
+    .object-edit-form #editor .ql-editor.ql-blank::before { color: #6b7280; }
+}
+
+/* Only the outer Tom Select wrapper owns the object type field border. */
+body .object-edit-form #object_type + .ts-wrapper {
+    border: 1px solid #d1d5db !important;
+    border-radius: 0.5rem;
+}
+body .object-edit-form #object_type + .ts-wrapper > .ts-control {
+    border: 0 !important;
+    border-radius: inherit !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+body .object-edit-form #object_type + .ts-wrapper:focus-within {
+    border-color: #22c55e !important;
+    outline: 2px solid #86efac;
+    outline-offset: 2px;
+}
+@media (prefers-color-scheme: dark) {
+    body .object-edit-form #object_type + .ts-wrapper { border-color: #4b5563 !important; }
 }

@@ -23,8 +23,14 @@
     $(document).ready(function () {
         $('[data-collapse-toggle]').on('click', function () {
             var target = $(this).attr('aria-controls');
-            $('#' + target).toggleClass('hidden');
-            $(this).find('i').toggleClass('fa-chevron-up fa-chevron-down');
+            var panel = $('#' + target);
+            var expanded = $(this).attr('aria-expanded') !== 'false';
+            var duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280;
+            panel.stop(true, false);
+            if (panel.hasClass('hidden')) panel.removeClass('hidden').hide();
+            $(this).attr('aria-expanded', String(!expanded));
+            panel[expanded ? 'slideUp' : 'slideDown'](duration);
+            $(this).find('i').toggleClass('fa-chevron-up', !expanded).toggleClass('fa-chevron-down', expanded);
         });
         var $sidebar = $('#sidebar-multi-level-sidebar');
         var $contentContainer = $('#content-container');

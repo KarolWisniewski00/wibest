@@ -10,7 +10,7 @@
     <x-main>
         <x-object.nav />
         <x-container-content-no-shadow>
-            <form id="myForm" method="POST" action="{{ route('object.store') }}" class="space-y-4">
+            <form id="myForm" method="POST" action="{{ route('object.store') }}" class="object-edit-form space-y-4">
                 @csrf
                 @include('admin.object.partials.form-fields')
             </form>

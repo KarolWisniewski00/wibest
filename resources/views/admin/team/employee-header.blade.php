@@ -1,6 +1,6 @@
 <header class="my-6 rounded-2xl bg-white p-6 sm:p-8 dark:bg-gray-800 text-gray-900 dark:text-gray-100">
     <div class="flex flex-wrap items-start gap-5">
-        <div class="shrink-0 rounded-2xl bg-green-100 p-3 dark:bg-gray-700"><x-user-photo :user="$user" /></div>
+        <div class="shrink-0 rounded-2xl bg-transparent p-3"><x-user-photo :user="$user" /></div>
         <div class="min-w-0 flex-1"><p class="text-sm text-gray-500 dark:text-gray-400">Profil pracownika</p><h1 class="mt-1 break-words text-3xl font-semibold tracking-tight">{{ $user->name }}</h1>
             <div class="mt-3 flex flex-wrap items-center gap-3"><x-user-role :user="$user" /><span class="text-sm text-gray-500 dark:text-gray-400">{{ $user->position ?: 'Stanowisko nieuzupełnione' }}</span></div>
         </div>

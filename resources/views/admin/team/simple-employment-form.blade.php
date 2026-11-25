@@ -33,5 +33,5 @@
         <label x-show="ppk &amp;&amp; ppkRate === '0.5'" class="sm:col-span-2 flex items-start gap-3 text-sm"><input name="ppk_reduced_confirmed" value="1" type="checkbox" :disabled="!ppk || ppkRate !== '0.5'" :required="ppk &amp;&amp; ppkRate === '0.5'" class="mt-1 rounded">Potwierdzam deklarację obniżenia wpłaty. Miesięczne przychody ze wszystkich źródeł muszą mieścić się w limicie 120% płacy minimalnej.</label>
     </div></div>
     <label class="flex items-start gap-3 text-sm"><input type="checkbox" name="confirmed" value="1" required class="mt-1 rounded">Potwierdzam zgodność danych z umową i oświadczeniami pracownika, w tym warunki wybranej ulgi PIT-0, PIT-2, KUP i PPK. Zapis w WIBEST nie zastępuje podpisania dokumentów.</label>
-    <div class="flex justify-end"><x-button-green type="submit" class="w-full min-w-0 justify-center !whitespace-normal md:w-auto">Zapisz</x-button-green></div>
+    <div class="flex justify-end"><x-button-green type="submit" class="w-full min-w-0 justify-center !whitespace-normal md:w-auto"><i class="fa-solid fa-floppy-disk mr-2" aria-hidden="true"></i>Zapisz</x-button-green></div>
 </form>

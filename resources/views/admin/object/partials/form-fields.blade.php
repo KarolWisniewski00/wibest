@@ -329,16 +329,6 @@
                                         }
                                     }
                                 </style>
-                                <style>
-                                    #object_type + .ts-wrapper .ts-control {
-                                        border: 0 !important;
-                                        box-shadow: none !important;
-                                    }
-                                    #object_type + .ts-wrapper.focus .ts-control {
-                                        outline: 2px solid rgb(134 239 172);
-                                        outline-offset: 2px;
-                                    }
-                                </style>
                                 <div class="mb-4 text-start">
                                     <label for="object_type"
                                         class="block text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">

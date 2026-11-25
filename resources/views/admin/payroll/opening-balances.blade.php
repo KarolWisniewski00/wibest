@@ -8,7 +8,7 @@
         </div>
     </aside>
 @else
-<details class="payroll-card"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">📅 Dane początkowe roku — uzupełnij przed pierwszym rozliczeniem</summary>
+<details data-animated-config class="payroll-card"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">📅 Dane początkowe roku — uzupełnij przed pierwszym rozliczeniem</summary>
     <aside role="note" aria-labelledby="opening-year-info" class="relative mt-4 overflow-hidden rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700 dark:border-blue-800/40 dark:bg-blue-900/20 dark:text-blue-200">
         <div class="pointer-events-none absolute -bottom-7 -right-5 text-8xl opacity-10" aria-hidden="true"><i class="fa-solid fa-circle-info"></i></div>
         <div class="relative flex items-start gap-3">

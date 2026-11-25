@@ -24,7 +24,7 @@
             <x-RCP.work-session-status :work_session="$work_session" class="text-xs !font-medium" />
             <x-status-cello class="text-xs !font-medium break-words">{{ $start?->copy()->locale('pl')->translatedFormat('d.m, l') ?? 'Brak START' }}@if($night) – {{ $stop->copy()->locale('pl')->translatedFormat('d.m, l') }}@endif</x-status-cello>
         </div>
-        <a href="{{ $url }}" aria-label="Przejdź do sesji" class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>
+        <a href="{{ $url }}" aria-label="Przejdź do sesji" class="record-open-icon"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></a>
     </div>
     <div class="flex w-full flex-wrap items-center gap-x-4 gap-y-2">
         <div class="flex flex-col items-center gap-1">
@@ -33,7 +33,7 @@
         </div>
         <div class="flex flex-col items-center gap-1 [&>*]:m-0">
             <x-paragraf-display class="text-xs leading-5 whitespace-nowrap font-semibold [&>*]:text-xs [&>*]:leading-5"><x-status-dark>{{ $start?->format('H:i') ?? '—' }} - {{ $stop?->format('H:i') ?? '—' }}</x-status-dark></x-paragraf-display>
-            @if($work_session->time_in_work)<x-paragraf-display class="text-xs leading-5 font-medium !text-gray-500 dark:!text-gray-300">{{ $work_session->time_in_work }}</x-paragraf-display>@endif
+            @if($work_session->time_in_work)<x-paragraf-display class="text-xs leading-5 font-semibold !text-gray-900 dark:!text-gray-300">{{ $work_session->time_in_work }}</x-paragraf-display>@endif
         </div>
         <div class="flex items-center gap-1">
             @if($work_session->eventStart?->location_id)<x-status-green title="Lokalizacja START"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span class="sr-only">START</span></x-status-green>@endif

@@ -1,4 +1,4 @@
-@props(['emoji' => null, 'icon' => null, 'title', 'employee', 'period', 'description', 'iconClass' => 'flex h-16 w-16 rounded-2xl text-2xl', 'iconBackground' => 'bg-green-100 dark:bg-gray-700'])
+@props(['emoji' => null, 'icon' => null, 'title', 'employee', 'period', 'description', 'iconClass' => 'flex h-16 w-16 rounded-2xl text-2xl', 'iconBackground' => 'bg-gray-100 dark:bg-gray-700'])
 <div class="flex items-start gap-5">
     <div class="{{ $iconClass }} shrink-0 items-center justify-center {{ $iconBackground }}" aria-hidden="true">@if($icon)<i class="fa-solid {{ $icon }}"></i>@else{{ $emoji }}@endif</div>
     <div>

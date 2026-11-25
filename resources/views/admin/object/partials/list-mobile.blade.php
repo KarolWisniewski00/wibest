@@ -20,7 +20,7 @@
                     <h3 class="break-words text-sm font-semibold text-gray-900 dark:text-white [overflow-wrap:anywhere]">{{ $object->name }}</h3>
                     <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {{ $statusStyles[$object->status] ?? $statusStyles['completed'] }}">{{ \App\Models\WorkObject::STATUSES[$object->status] ?? $object->status }}</span>
                 </div>
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-500 transition group-hover:bg-gray-100 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:bg-gray-700 dark:group-hover:text-gray-200 [@media(prefers-color-scheme:light)]:text-gray-600"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></div>
+                <div class="record-open-icon"><i class="fa-solid fa-arrow-up-right-from-square text-xs" aria-hidden="true"></i></div>
             </div>
             <div class="flex items-start gap-2 text-xs text-gray-600 dark:text-gray-300"><i class="fa-solid fa-location-dot mt-0.5 shrink-0" aria-hidden="true"></i><span class="min-w-0 break-words [overflow-wrap:anywhere]">{{ $fullAddress ?: ($object->location?->name ?: 'Brak lokalizacji') }}</span></div>
             @if($object->starts_at || $object->ends_at)

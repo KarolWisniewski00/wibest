@@ -29,7 +29,7 @@
     @isset($calculation['target_net'])<p class="mt-4 text-sm">Netto z umowy: {{ \App\Services\Payroll\Money::display($calculation['target_net']) }}. Brutto ustalono dla tej daty wypłaty i wykorzystanych limitów. Ewentualna różnica groszowa wynika z zaokrągleń.</p>@endisset
     @include('admin.payroll.calculation-tables')
     <p class="mt-5 text-sm text-gray-500 dark:text-gray-400">Przy kilku wypłatach w miesiącu obliczenia uwzględniają już pobrane składki i PIT. KUP i pomniejszenie PIT nie są stosowane ponownie w pełnej kwocie. Składki pracownika są zawarte w brutto i nie zwiększają ponownie kosztu firmy.</p>
-    <details class="mt-6"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Limity narastająco i parametry</summary>
+    <details data-animated-config class="mt-6"><summary class="cursor-pointer font-semibold text-green-700 dark:text-green-300">Limity narastająco i parametry</summary>
         <p class="mt-3 text-sm">Dochód PIT u tego płatnika przed miesiącem: {{ \App\Services\Payroll\Money::display($calculation['year_before_month']['payer_income_cents']) }}. Podstawa składek emerytalno-rentowych: {{ \App\Services\Payroll\Money::display($calculation['year_before_month']['pension_base_cents']) }}.</p>
         <p class="mt-3 text-sm">{{ $calculation['parameters']['version'] }} · ustawienia #{{ $calculation['settings']['id'] ?? '—' }}</p>
     </details>

@@ -128,7 +128,7 @@
                         @if($user->company)
                             <x-team-info-card class="{{ $colSpan }}">
                                 <div class="flex items-start gap-5">
-                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-100 text-2xl dark:bg-gray-700" aria-hidden="true">📱</div>
+                                    <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gray-100 text-2xl dark:bg-gray-700" aria-hidden="true">📱</div>
                                     <div class="min-w-0">
                                         <p class="text-sm text-gray-500 dark:text-gray-400">Komunikacja z pracownikiem</p>
                                         <h2 class="mt-1 text-3xl font-semibold tracking-tight">Wiadomości SMS</h2>
@@ -200,7 +200,7 @@
                                                     Twój urlop
                                                 </div>
 
-                                                <h2 class="mt-1 text-3xl font-semibold tracking-tight text-white">
+                                                <h2 class="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
                                                     Urlop wypoczynkowy
                                                 </h2>
                                             </div>

@@ -1,4 +1,4 @@
-<li x-data="{ classificationOpen: true }" data-rcp-filter-loading aria-busy="true">
+<li data-rcp-filter-loading aria-busy="true">
     <div data-rcp-filter-skeleton class="p-2 space-y-2" role="status" aria-label="Ładowanie filtra klasyfikacji">
         <div class="h-6 w-32 mb-4 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse motion-reduce:animate-none"></div>
         @foreach(range(1, 4) as $placeholder)
@@ -8,12 +8,11 @@
     <div data-rcp-filter-content style="display: none;">
     <button type="button"
         class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group-hover:bg-gray-100 dark:text-white dark:group-hover:bg-gray-700"
-        aria-controls="rcp-classification-dropdown" :aria-expanded="classificationOpen"
-        @click="classificationOpen = !classificationOpen">
+        aria-controls="rcp-classification-dropdown" aria-expanded="true" data-collapse-toggle="rcp-classification-dropdown">
         <span class="flex-1 text-left rtl:text-right whitespace-nowrap text-md">Klasyfikacja</span>
-        <i class="fa-solid" :class="classificationOpen ? 'fa-chevron-up' : 'fa-chevron-down'" aria-hidden="true"></i>
+        <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
     </button>
-    <div id="rcp-classification-dropdown" x-show="classificationOpen">
+    <div id="rcp-classification-dropdown">
     <fieldset class="space-y-2 p-2">
         <legend class="sr-only">Klasyfikacja</legend>
         <div class="space-y-2">

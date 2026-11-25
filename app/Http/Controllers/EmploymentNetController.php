@@ -26,6 +26,18 @@ class EmploymentNetController extends Controller
     private function page(User $user, string $period, ?array $result = null, array $input = [])
     {
         $row = app(\App\Services\Payroll\PayrollReport::class)->build($user->company_id,collect([$user]),Carbon::createFromFormat('!Y-m',$period))->first();
+        $sessionModels = \App\Models\WorkSession::where('company_id', $user->company_id)
+            ->where('user_id', $user->id)->whereIn('id', array_column($row['sessions'], 'id'))
+            ->with(['user', 'eventStart', 'eventStop'])->get()->keyBy('id');
+        $classification = app(\App\Services\WorkSessionClassification::class);
+        foreach ($row['sessions'] as &$session) {
+            $model = $sessionModels->get($session['id']);
+            $details = $model ? $classification->details($model) : ['category' => null, 'planned' => 0, 'daySeconds' => 0];
+            $session['classification'] = $details['category'];
+            $session['planned'] = $details['planned'];
+            $session['day_seconds'] = $details['daySeconds'];
+        }
+        unset($session);
         $remainingGross = $row['gross'] === null ? 0 : max(0, Money::cents((string) $row['gross']) - $row['paid_gross_cents']);
         $input += ['gross'=>Money::decimal($remainingGross), 'benefit'=>'0', 'ppk_transferred'=>'0'];
         $settings = EmployeeTaxSetting::where('company_id', $user->company_id)->where('user_id', $user->id)->orderByDesc('effective_from')->orderByDesc('id')->limit(12)->get();

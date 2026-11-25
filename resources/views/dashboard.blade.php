@@ -940,7 +940,7 @@
                     @endphp
 
                     <section
-                        class="group relative h-full overflow-hidden rounded-lg bg-gray-100 p-5 shadow-sm transition-all duration-300 ease-out hover:shadow-md dark:bg-gray-700 dark:hover:shadow-black/10 sm:p-6 motion-reduce:transition-none"
+                        class="group relative h-full overflow-hidden rounded-lg bg-gray-100 p-5 shadow-none transition-colors duration-300 ease-out dark:bg-gray-700 sm:p-6 motion-reduce:transition-none"
                         aria-label="Podsumowanie urlopu wypoczynkowego">
                         <!-- Nagłówek -->
                         <div class="flex items-start justify-between gap-4">
@@ -956,7 +956,7 @@
                                         Twój urlop
                                     </div>
 
-                                    <h2 class="mt-1 text-3xl font-semibold tracking-tight text-white">
+                                    <h2 class="mt-1 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
                                         Urlop wypoczynkowy
                                     </h2>
                                 </div>
